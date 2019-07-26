@@ -1,0 +1,922 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.naqelexpress.naqelpointer">
+
+
+    <permission-group
+        android:name="android.permission-group.PHONE"
+        android:description="@string/permgrouprequest_calllog"
+        android:icon="@drawable/camera"
+        android:label="@string/permgroupdesc_calllog"
+        android:permissionGroupFlags="personalInfo"
+        android:priority="450" />
+
+    <permission
+        android:name="android.permission.READ_CALL_LOG"
+        android:description="@string/permgrouprequest_calllog"
+        android:label="@string/permgroupdesc_calllog"
+        android:permissionGroup="android.permission-group.PHONE"
+        android:protectionLevel="dangerous" />
+
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
+    <permission android:name="android.permission.INTERNET" />
+
+    <uses-feature android:name="android.hardware.location.gps" />
+
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
+    <uses-permission
+        android:name="android.permission.READ_LOGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
+
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+
+    <!-- <uses-feature android:name="android.hardware.camera" /> -->
+    <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.flash" />
+
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- <permission-group android:name="android.permission-group.CALL_LOG" /> -->
+
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission
+        android:name="android.permission.INSTALL_PACKAGES"
+        tools:ignore="ProtectedPermissions" />
+
+    <application
+        android:name=".ApplicationController"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:logo="@mipmap/ic_launcher"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.vision.DEPENDENCIES"
+            android:value="barcode" />
+
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.naqelexpress.naqelpointer.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
+
+        <!-- [START firebase_iid_service] -->
+        <service android:name=".DB.FirebaseIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".DB.MyFirebaseMessagingService"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="com.naqelexpress.naqelpointer" />
+            </intent-filter>
+        </receiver>
+
+
+        <service android:name=".Activity.GoogleMap.GeofenceTransitionService" />
+
+        <activity
+            android:name=".Activity.Login.LoginActivity"
+            android:label="@string/LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Booking.BookingPlanActivity"
+            android:label="Booking Details"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.MainPage.MainPageActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Waybill.WaybillPlanActivity"
+            android:label="Waybill Details"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Notification.NotificationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Breaks.BreaksActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.MyRoute.MyRouteActivity"
+            android:label="My Route"
+            android:screenOrientation="portrait"
+            android:theme="@style/myroute.NoActionBar">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+
+
+        <!--
+        <activity
+            android:name=".Activity.Login.SplashScreenActivity"
+
+            android:screenOrientation="portrait" /> -->
+
+        <activity
+            android:name=".Activity.Login.SplashScreenActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.DIAL" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tel" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".Activity.Login.ForgotPasswordActivity"
+            android:label="@string/ForgotPasswordActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.MapList.GoogleMapsActivity"
+            android:label="@string/title_activity_google_maps"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
+
+        <activity
+            android:name=".Activity.Delivery.DeliveryActivity"
+            android:label="@string/DeliveryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.Waybill.ConsigneeAddressTranslationActivity"
+            android:label="@string/ConsigneeAddressTranslationActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.CheckPointNew.CheckPointsActivity"
+            android:label="@string/CheckPointsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.CheckPointbyPieceLevel.CheckPointsActivity"
+            android:label="@string/CheckPointsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.MultiDelivery.MultiDeliveryActivity"
+            android:label="@string/MultiDeliveryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.AtOrigin.AtOrigin"
+            android:label="@string/AtOrigin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.NotDelivered.NotDeliveredActivity"
+            android:label="@string/NotDelivered"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.NotDeliveredCBU.NotDeliveredActivity"
+            android:label="@string/NotDelivered"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.NotDeliveredSinglePiece.NotDeliveredActivity"
+            android:label="@string/NotDelivered"
+            android:theme="@style/myDialog" />
+
+
+        <activity
+            android:name=".Activity.PickUp.PickUpActivity"
+            android:label="@string/title_activity_pick_up"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.GoogleMap.ShipmentsMapActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.ShipmentPicking.ShipmentPickingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.ShipmentPicking.ShipmentPickingSelectingDialog"
+            android:label="@string/SelectingShipments"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Settings.SettingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.DeliverySheet.DeliverySheetActivity"
+            android:label="Delivery Sheet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.DeliverysheetEBU.DeliverySheetActivity"
+            android:label="Delivery Sheet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.OFDPieceLevel.DeliverySheetActivity"
+            android:label="Delivery Sheet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.MyAccount.MyAccountActivity"
+            android:label="My Account"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.CheckCOD.CODCheckingActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".Activity.DataActivity.ShowDataActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.PendingMoney.PendingMoneyActivity"
+            android:label="Pending COD"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Classes.NewBarCodeScanner"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Classes.NewBarCodeScannerForVS"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Classes.BarcodeScan"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.CheckPoint.CheckPointActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.WaybillMeasurments.WaybillMeasurementActivity"
+            android:label="@string/WaybillMeasurementActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.Booking.BookingList"
+            android:label="@string/title_activity_booking_list" />
+        <activity android:name=".Activity.Booking.BookingDetailActivity" />
+        <activity android:name=".Activity.History.History" />
+
+        <activity
+            android:name=".Activity.LoadtoDestLocalDB.LoadtoDestination"
+            android:label="LoadtoDest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.LoadtoDestLocalDB.Summery"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.LoadtoDestLocalDB.TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.LoadtoDestLocalDB.SyncTripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.LoadtoDest.LoadtoDestination"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.LoadtoDest.Summery"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.LoadtoDest.TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.LoadtoDest.SyncTripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <!-- comment by ismail and added <activity android:name=".MainActivity"></activity> -->
+
+        <activity android:name=".Activity.routeMap.RouteMap"></activity>
+        <activity android:name=".Activity.routeMap.TagsDemoActivity"></activity>
+        <activity android:name=".Activity.routeMap.MapsActivity"></activity>
+        <activity android:name=".Activity.routeMap.MapMovingOnCurLatLng"></activity>
+        <activity
+            android:name=".Activity.DigitalSign.Signature"
+            android:screenOrientation="landscape"
+            android:theme="@style/trans" />
+
+        <activity
+            android:name=".Activity.AtOriginNew.AtOrigin"
+            android:label="@string/AtOrigin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.AtOriginusingLocalDB.AtOrigin"
+            android:label="@string/AtOrigin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.AtOriginDelete.AtOriginDelete"
+            android:label="@string/AtOrigin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.Login.UpdatePassword"
+            android:label="Update Password"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.Login.UpdatePasswordModule"
+            android:label="Update Password"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".ContactNo.Contact"
+            android:label="Contact Details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.ArrivedDest.ArrivedatDestination"
+            android:label="Arrived at Destination"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.ArrivedatDestNew.ArrivedatDestination"
+            android:label="Arrived at Destination"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.ArrivedatDestNoValidation.ArrivedatDestination"
+            android:label="ArrivedatDest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.ValidationDS.ValidationDS"
+            android:label="Arrived at Destination"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.Login.EmployeeInformation"
+            android:label="Employee Information"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.routeMap.RouteMap_Distance"
+            android:theme="@style/trans" />
+
+        <activity
+            android:name=".Activity.EBURoute.DeliverySheet"
+            android:label="DeliverySheet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.SuggestDeliverysheet.MyRouteActivity"
+            android:label="Suggest Deliverysheet"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.Incident.Incident"
+            android:screenOrientation="portrait" />
+
+
+        <activity
+            android:name=".Activity.NightStock.NSScanShipmentActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.Login.FacilityLogin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.PickupPieceLevel.PickUpActivity"
+            android:label="@string/title_activity_pick_up"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.DeliveryOFD.DeliveryActivity"
+            android:label="@string/DeliveryActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.TerminalHandling.TerminalHandling"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.TerminalHandlingGroup"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.NCL.NclShipmentActivity"
+            android:label="Consolidation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.NCLAutoSave.NclShipmentActivity"
+            android:label="Consolidation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.BringTripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.TerminalHandling.TripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.InventoryHeldIn"
+            android:label="Inventory Held - IN"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.InventoryHeldOut"
+            android:label="Inventory Held OUT"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.InventoryGroup"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.SPGroup"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandling.TripArrviedatDest"
+            android:label="Arrived Dest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.TerminalHandling"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.TerminalHandlingGroup"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.BringTripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.TripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldIn"
+            android:label="Inventory Held - IN"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldOut"
+            android:label="Inventory Held OUT"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.InventoryGroup"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.SPGroup"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.TripArrviedatDest"
+            android:label="Arrived Dest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.InventoryControlOnetab"
+            android:label="Inventory Control"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.InventoryControlOnetab"
+            android:label="Inventory Control"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.InventoryHeldIn"
+            android:label="Inventory Held - IN"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.InventoryHeldOut"
+            android:label="Inventory Held - IN"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+
+        <activity android:name=".MainActivity" />
+        <activity android:name=".RoomsListActivity" />
+        <activity
+            android:name=".ChatRoomActivity"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ChatRoomActivitynew"
+            android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".Activity.CustomerRating.CustomerRatings"
+            android:label="Ratings"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.CourierKPIEBU.CourierKpi"
+            android:label="KPI"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Activity.DeliverySheetPartial.DeliverySheet"
+            android:label="KPI"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.CloseTruck"
+            android:label="Close Truck"
+            android:screenOrientation="portrait"
+            android:theme="@style/myDialog" />
+
+        <activity
+            android:name=".Activity.TerminalHandlingAutoSave.UndoNcl"
+            android:label="Undo Ncl"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".Activity.IncabCheckList.IncCabChecklist"
+            android:label="InCabChecklist"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.signature"
+            android:process=":naqelsignature" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.LocationService"
+            android:process=":location"></service>
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.AtOrigin"
+            android:process=":naqelAtOrigin" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.CheckPoint"
+            android:process=":naqelCheckPoint" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.MultiDelivery"
+            android:process=":naqelMultiDelivery" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.WayBillMeasurement"
+            android:process=":naqelMultiDeliveryMeasurement" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.NotDelivery"
+            android:process=":naqelNotDelivery" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.OnDelivery"
+            android:process=":naqelOnDelivery" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.PartialDelivery"
+            android:process=":naqelPartialDelivery" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.OnLoading"
+            android:process=":naqelOnLoading" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.Deliverysheet"
+            android:process=":naqelDeliverysheet" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.DeliverysheetbyPiece"
+            android:process=":naqelDeliverysheetbyPiece" />
+
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.PickUp"
+            android:process=":naqelPickup" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.CallRecord"
+            android:process=":naqelCallRecord" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.Palletize"
+            android:process=":naqelPalletize" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.TripPlanDetails"
+            android:process=":naqelTripPlanDetails" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.TripPlanDDetails"
+            android:process=":naqelTripPlanDDetails" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.ArrivedatDest"
+            android:process=":naqelArrivedatDest" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.Discrepancy"
+            android:process=":naqelDiscrepancy" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.DeviceToken"
+            android:process=":naqelDeviceToken" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.Radios200Service"
+            android:process=":naqelRadios200" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.Radios200InsertService"
+            android:process=":naqelRadios200InsertService" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.NightStock"
+            android:process=":naqelNightStock" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.VehicleManifest"
+            android:process=":naqelVehicleManifest" />
+
+        <service
+            android:name=".Activity.History.CallRecord"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:process=":naqelCallRecordTrigger" />
+
+        <service
+            android:name=".Activity.History.CallRecordTrigger"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".service.CallRecordAbove26"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".Activity.History.LocationTrigger"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".Activity.History.LocationTriggerNew"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.UpdateLocation"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.LocationupdateResetAlarm"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".service.ActualLocation"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+        <service
+            android:name=".service.Radius200"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService"
+            android:enabled="true"></service>
+
+        <service
+            android:name=".service.SendNotificationtoConsignee"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.CallService"
+            android:permission="android.permission.BIND_INCALL_SERVICE">
+            <meta-data
+                android:name="android.telecom.IN_CALL_SERVICE_UI"
+                android:value="true" />
+
+            <intent-filter>
+                <action android:name="android.telecom.InCallService" />
+            </intent-filter>
+        </service>
+
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.PhoneState"
+            android:process=":naqelDeviceToken" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.CustomerRating"
+            android:process=":naqelCustomerRating" />
+
+        <receiver
+            android:name="com.naqelexpress.naqelpointer.Receiver.MyReceiver"
+            android:directBootAware="true"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":remote">
+            <intent-filter>
+                <!--<action android:name="com.naqelexpress.naqelpointer.BroadcastReceiver" /> -->
+
+                <!-- for Pre N Deive -->
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <!-- above N -->
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="ACTION_PHONE_STATE_CHANGED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+
+
+        </receiver>
+
+        <receiver android:name=".Receiver.LocationupdateInterval">
+            <intent-filter>
+                <action android:name="com.naqelexpress.naqelpointer.LocationAlaram" />
+
+            </intent-filter>
+        </receiver>
+
+
+        <service
+            android:name=".Watsapp.WhatsappAccessibilityService"
+            android:label="Accessibility Service"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/whatsapp_service" />
+
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".Activity.PhoneState.ServiceReceiver"
+            android:permission="android.permission.READ_PHONE_STATE">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.CallStateReceiver"
+            android:enabled="true"
+            android:exported="true" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.TerminalHandling"
+            android:process=":naqelTerminalHandling" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.TerminalHandlingBulk"
+            android:process=":naqelTerminalHandlingBulk" />
+        <service
+            android:name=".service.NclService"
+            android:process=":naqelNclService" />
+
+    </application>
+
+
+</manifest>

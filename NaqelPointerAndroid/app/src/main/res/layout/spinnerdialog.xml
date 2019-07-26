@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    android:orientation="vertical">
+
+    <!--<LinearLayout-->
+    <!--android:layout_width="4dp"-->
+    <!--android:layout_height="6dp"-->
+    <!--android:layout_margin="15dp"-->
+    <!--android:orientation="vertical"-->
+    <!--tools:ignore="UselessParent"-->
+    <!--tools:layout_editor_absoluteY="15dp"-->
+    <!--tools:layout_editor_absoluteX="16dp">-->
+
+    <TextView
+        android:id="@+id/spinerTitle"
+        android:layout_width="0dp"
+        android:layout_height="33dp"
+        android:background="@drawable/bluebuttonnoround"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:text="select_or_search_items"
+        android:textAlignment="center"
+        android:textColor="@color/White"
+        android:textSize="17sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,MissingConstraints" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center|left"
+        android:orientation="horizontal"
+        tools:ignore="MissingConstraints,RtlHardcoded"
+        android:id="@+id/linearLayout"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/spinerTitle"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_search_black_36dp"
+            tools:ignore="ContentDescription"
+            android:id="@+id/imageView4"
+            android:layout_marginLeft="8dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/searchBox"
+            android:layout_marginTop="8dp"
+            app:layout_constraintBottom_toBottomOf="@+id/searchBox"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp" />
+
+        <EditText
+            android:id="@+id/searchBox"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:background="#ffffff"
+            android:hint="Search"
+            android:inputType="text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toRightOf="@+id/imageView4"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,LabelFor,RtlHardcoded"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+    </android.support.constraint.ConstraintLayout>
+
+    <ListView
+        android:id="@+id/list"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:divider="#d1d1d1"
+        android:dividerHeight="0.1dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:ignore="MissingConstraints"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"></ListView>
+
+    <TextView
+        android:id="@+id/close"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/closetrip"
+        android:clickable="true"
+        android:padding="5dp"
+        android:textSize="18sp"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/list"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="8dp" />
+
+    <!--</LinearLayout>-->
+
+</android.support.constraint.ConstraintLayout>

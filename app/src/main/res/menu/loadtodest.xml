@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.Activity.DeliverySheet.DeliverySheetActivity">
+
+    <item
+        android:id="@+id/summery"
+        android:icon="@drawable/summery"
+        android:title="Summery"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/tripdetails"
+        android:title="Trip Details"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/save"
+        android:title="Save"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/clear"
+        android:title="Clear All"
+        app:showAsAction="always" />
+
+</menu>

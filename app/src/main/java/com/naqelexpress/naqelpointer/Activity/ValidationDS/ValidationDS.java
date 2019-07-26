@@ -1,0 +1,642 @@
+package com.naqelexpress.naqelpointer.Activity.ValidationDS;
+
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
+import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.service.Discrepancy;
+
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+/**
+ * Created by Hasna on 11/11/18.
+ */
+
+public class ValidationDS extends AppCompatActivity {
+
+    ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
+    public static ArrayList<String> scannedBarCode = new ArrayList<>();
+    ArrayList<HashMap<String, String>> waybilldetails = new ArrayList<>();
+    ArrayList<HashMap<String, String>> ScannedBarCode = new ArrayList<>();
+    public static ArrayList<String> ScanbyDevice = new ArrayList<>();
+    public static ArrayList<String> ConflictBarcode = new ArrayList<>();
+
+    private GridView waybilgrid;
+    BarCode adapter;
+    EditText txtBarcode;
+    TextView count;
+
+    EditText employid;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.validationds);
+
+
+        conflict.clear();
+        scannedBarCode.clear();
+        waybilldetails.clear();
+        ScannedBarCode.clear();
+        ScanbyDevice.clear();
+        ConflictBarcode.clear();
+
+        waybilgrid = (GridView) findViewById(R.id.barcode);
+//        adapter = new BarCode(ScannedBarCode, getApplicationContext());
+        adapter = new BarCode(conflict, getApplicationContext());
+        waybilgrid.setAdapter(adapter);
+
+        txtBarcode = (EditText) findViewById(R.id.txtBarcode);
+        employid = (EditText) findViewById(R.id.employ);
+        count = (TextView) findViewById(R.id.count);
+
+        Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        Button validate = (Button) findViewById(R.id.validate);
+        validate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                GetDeliverysheet();
+            }
+        });
+        btnOpenCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!GlobalVar.GV().checkPermission(ValidationDS.this, GlobalVar.PermissionType.Camera)) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                    GlobalVar.GV().askPermission(ValidationDS.this, GlobalVar.PermissionType.Camera);
+                } else {
+                    if (waybilldetails.size() > 0) {
+                        NewBarCodeScannerForVS.scannedBarCode.clear();
+                        NewBarCodeScannerForVS.ScanbyDevice.clear();
+                        NewBarCodeScannerForVS.ConflictBarcode.clear();
+                        Bundle bundle = new Bundle();
+                        Intent intent = new Intent(ValidationDS.this.getApplicationContext(), NewBarCodeScannerForVS.class);
+                        bundle.putSerializable("scannedBarCode", scannedBarCode);
+                        bundle.putSerializable("ScanbyDevice", ScanbyDevice);
+                        bundle.putSerializable("ConflictBarcode", ConflictBarcode);
+                        intent.putExtras(bundle);
+                        startActivityForResult(intent, 2);
+                    } else {
+                        NoData();
+                    }
+                }
+            }
+        });
+
+        txtBarcode.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (txtBarcode != null && txtBarcode.getText().length() == 13) {
+                    String result = txtBarcode.getText().toString();
+                    if (scannedBarCode.contains(result)) {
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                        if (!ScanbyDevice.contains(result))
+                            ScanbyDevice.add(result);
+
+                    } else {
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                        if (!ConflictBarcode.contains(result))
+                            ConflictBarcode.add(result);
+                        conflict(result);
+                    }
+                    txtBarcode.setText("");
+                    doaction();
+                }
+            }
+        });
+
+    }
+
+    public void conflict(String Barcode) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ValidationDS.this);
+        builder.setTitle("Warning " + Barcode)
+                .setMessage("This Piece is not belongs to this Employee")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        dialogInterface.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    private void GetDeliverysheet() {
+        GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+
+        if (employid.getText().toString().length() > 4) {
+
+            insertDiscrepancy();
+
+            count.setText("Count - 0");
+            conflict.clear();
+            scannedBarCode.clear();
+            waybilldetails.clear();
+            ScannedBarCode.clear();
+            ScanbyDevice.clear();
+            ConflictBarcode.clear();
+            adapter.notifyDataSetChanged();
+
+//            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+            BringMyRouteShipmentsRequest bringMyRouteShipmentsRequest = new BringMyRouteShipmentsRequest();
+            bringMyRouteShipmentsRequest.EmployID = Integer.parseInt(employid.getText().toString());
+
+            new BringMyRouteShipmentsList().execute(JsonSerializerDeserializer.serialize(bringMyRouteShipmentsRequest, true));
+
+        } else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter valid employ ID", GlobalVar.AlertType.Error);
+    }
+
+    public void NoData() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ValidationDS.this);
+        builder.setTitle("Warning ")
+                .setMessage("Kindly please Load the Deliverysheet")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        GetDeliverysheet();
+                        dialogInterface.dismiss();
+                    }
+                });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
+    private void insertDiscrepancy() {
+        if (ConflictBarcode.size() > 0) {
+            try {
+                JSONObject header = new JSONObject();
+                JSONArray jsonArray = new JSONArray();
+
+                for (int i = 0; i < ConflictBarcode.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put("BarCode", ConflictBarcode.get(i));
+                    jsonObject.put("OperationEmp", GlobalVar.GV().EmployID);
+                    jsonObject.put("EmployID", employid.getText().toString());
+                    jsonObject.put("ScanDate", DateTime.now().toString());
+                    jsonArray.put(jsonObject);
+
+                }
+
+                header.put("Discrepancy", jsonArray);
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                dbConnections.InsertDiscrepancy(header.toString(), getApplicationContext());
+                dbConnections.close();
+
+                stopService(new Intent(ValidationDS.this, Discrepancy.class));
+                startService(new Intent(ValidationDS.this, Discrepancy.class));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+        int buttonclick;
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog = ProgressDialog.show(ValidationDS.this, "Please wait.", "Downloading Shipments Details.", true);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "ValidationDS");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+
+            if (finalJson != null) {
+
+                try {
+                    waybilldetails.clear();
+                    scannedBarCode.clear();
+
+                    ArrayList<HashMap<String, String>> ds = new ArrayList<>();
+                    JSONObject jsonObjectHeader = new JSONObject(finalJson);
+                    JSONArray jsonObjectDeliverySheet = jsonObjectHeader.getJSONArray("DeliverySheet");
+                    for (int i = 0; i < jsonObjectDeliverySheet.length(); i++) {
+                        JSONObject jsonObject = jsonObjectDeliverySheet.getJSONObject(i);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", jsonObject.getString("WayBillNo"));
+                        temp.put("BarCode", jsonObject.getString("BarCode"));
+                        temp.put("bgcolor", "2");
+                        scannedBarCode.add(jsonObject.getString("BarCode"));
+                        waybilldetails.add(temp);
+                        conflict.add(temp);
+                        count.setText("Piece Count - " + String.valueOf(waybilldetails.size()));
+                    }
+
+                    adapter.notifyDataSetChanged();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            } else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+            if (progressDialog != null)
+                progressDialog.dismiss();
+        }
+    }
+
+//    private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
+//        private ProgressDialog progressDialog;
+//        String result = "";
+//        StringBuffer buffer;
+//        int buttonclick;
+//
+//        @Override
+//        protected void onPreExecute() {
+//
+//            progressDialog = ProgressDialog.show(ValidationDS.this, "Please wait.", "Downloading Shipments Details.", true);
+//        }
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//            String jsonData = params[0];
+//
+//            HttpURLConnection httpURLConnection = null;
+//            OutputStream dos = null;
+//            InputStream ist = null;
+//
+//            try {
+//                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "ValidationDS");
+//                httpURLConnection = (HttpURLConnection) url.openConnection();
+//
+//                httpURLConnection.setRequestMethod("POST");
+//                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+//                httpURLConnection.setDoInput(true);
+//                httpURLConnection.setDoOutput(true);
+//                httpURLConnection.connect();
+//
+//                dos = httpURLConnection.getOutputStream();
+//                httpURLConnection.getOutputStream();
+//                dos.write(jsonData.getBytes());
+//
+//                ist = httpURLConnection.getInputStream();
+//                String line;
+//                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+//                buffer = new StringBuffer();
+//
+//                while ((line = reader.readLine()) != null) {
+//                    buffer.append(line);
+//                }
+//                return String.valueOf(buffer);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//                try {
+//                    if (ist != null)
+//                        ist.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                try {
+//                    if (dos != null)
+//                        dos.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                if (httpURLConnection != null)
+//                    httpURLConnection.disconnect();
+//                result = String.valueOf(buffer);
+//            }
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String finalJson) {
+//
+//            if (finalJson != null) {
+//
+//                try {
+//                    waybilldetails.clear();
+//                    ScannedBarCode.clear();
+//                    ScannedBarCode.addAll(conflict);
+//                    ArrayList<HashMap<String, String>> ds = new ArrayList<>();
+//                    JSONObject jsonObjectHeader = new JSONObject(finalJson);
+//                    JSONArray jsonObjectDeliverySheet = jsonObjectHeader.getJSONArray("DeliverySheet");
+//                    for (int i = 0; i < jsonObjectDeliverySheet.length(); i++) {
+//                        JSONObject jsonObject = jsonObjectDeliverySheet.getJSONObject(i);
+//                        HashMap<String, String> temp = new HashMap<>();
+//                        temp.put("WayBillNo", jsonObject.getString("WayBillNo"));
+//                        temp.put("BarCode", jsonObject.getString("BarCode"));
+//                        temp.put("bgcolor", "0");
+//
+//                        waybilldetails.add(temp);
+//                    }
+//
+//                    for (int j = 0; j < ScannedBarCode.size(); j++) {
+//                        boolean add = false;
+//                        for (int i = 0; i < waybilldetails.size(); i++) {
+//
+//                            if (ScannedBarCode.get(j).get("BarCode").equals(waybilldetails.get(i).get("BarCode"))) {
+//                                add = true;
+//                                waybilldetails.get(i).put("bgcolor", "1");
+//                                ScannedBarCode.get(j).put("bgcolor", "1");
+//                                break;
+//                            }
+//                        }
+//                        if (!add) {
+//                            ScannedBarCode.get(j).put("bgcolor", "2");
+//                        }
+//                    }
+//
+//                    for (int k = 0; k < waybilldetails.size(); k++) {
+//                        for (int i = 0; i < ScannedBarCode.size(); i++) {
+//                            if (!waybilldetails.get(k).get("BarCode").equals(ScannedBarCode.get(i).get("BarCode"))) {
+//                                waybilldetails.get(k).put("bgcolor", "3");
+//                                ScannedBarCode.add(waybilldetails.get(k));
+//                                break;
+//                            }
+//
+//                        }
+//                    }
+//                    adapter.notifyDataSetChanged();
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//            } else
+//                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+//            if (progressDialog != null)
+//                progressDialog.dismiss();
+//        }
+//    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            if (requestCode == 2 && resultCode == RESULT_OK) {
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        if (extras.containsKey("scannedBarCode")) {
+                            scannedBarCode.clear();
+                            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+
+                        }
+                        if (extras.containsKey("ScanbyDevice")) {
+                            ScanbyDevice.clear();
+                            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+
+                        }
+                        if (extras.containsKey("ConflictBarcode")) {
+                            ConflictBarcode.clear();
+                            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception ex) {
+            Toast.makeText(ValidationDS.this, ex.toString(),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == 2 && resultCode == RESULT_OK) {
+//            if (data != null) {
+//                Bundle extras = data.getExtras();
+//                if (extras != null) {
+//                    if (extras.containsKey("scannedBarCode")) {
+//                        scannedBarCode.clear();
+//                        scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+//
+//                    }
+//                    if (extras.containsKey("ScanbyDevice")) {
+//                        ScanbyDevice.clear();
+//                        ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+//
+//                    }
+//                    if (extras.containsKey("ConflictBarcode")) {
+//                        ConflictBarcode.clear();
+//                        ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+//
+//                    }
+//                }
+//
+//            }
+//        }
+//    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        doaction();
+
+    }
+
+    private void doaction()
+
+    {
+        conflict.clear();
+        for (int i = 0; i < ConflictBarcode.size(); i++) {
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", "");
+            temp.put("BarCode", ConflictBarcode.get(i));
+            temp.put("bgcolor", "3");
+            conflict.add(temp);
+        }
+
+        for (int i = 0; i < waybilldetails.size(); i++) {
+            String barcode = waybilldetails.get(i).get("BarCode");
+            boolean added = false;
+            for (int j = 0; j < ScanbyDevice.size(); j++) {
+                if (barcode.equals(ScanbyDevice.get(j))) {
+                    added = true;
+                    waybilldetails.get(i).put("bgcolor", "1");
+                    conflict.add(waybilldetails.get(i));
+                    break;
+                }
+            }
+            if (!added) {
+                waybilldetails.get(i).put("bgcolor", "2");
+                conflict.add(waybilldetails.get(i));
+            }
+
+        }
+
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (employid.getText().toString().trim().replace(" ", "").length() > 0)
+            outState.putString("CourierID", employid.getText().toString());
+        else
+            outState.putString("CourierID", "");
+        outState.putString("Count", count.getText().toString());
+        outState.putInt("EmployID", GlobalVar.GV().EmployID);
+        outState.putInt("UserID", GlobalVar.GV().UserID);
+        outState.putInt("StationID", GlobalVar.GV().StationID);
+        outState.putString("EmployMobileNo", GlobalVar.GV().EmployMobileNo);
+        outState.putString("EmployName", GlobalVar.GV().EmployName);
+        outState.putString("EmployStation", GlobalVar.GV().EmployStation);
+        outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
+        outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
+        outState.putStringArrayList("scannedBarCode", scannedBarCode);
+        outState.putStringArrayList("ScanbyDevice", ScanbyDevice);
+        outState.putStringArrayList("ConflictBarcode", ConflictBarcode);
+        outState.putSerializable("conflict", conflict);
+        outState.putSerializable("waybilldetails", waybilldetails);
+        outState.putSerializable("ScannedBarCode", ScannedBarCode);
+        //Parcelable state = waybilgrid.onSaveInstanceState();
+        //outState.putParcelable("state", state);
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            employid.setText(savedInstanceState.getString("CourierID"));
+            count.setText(savedInstanceState.getString("Count"));
+            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
+            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
+            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
+            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
+            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
+            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
+            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
+            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+            scannedBarCode = savedInstanceState.getStringArrayList("scannedBarCode");
+            ScanbyDevice = savedInstanceState.getStringArrayList("ScanbyDevice");
+            ConflictBarcode = savedInstanceState.getStringArrayList("ConflictBarcode");
+            conflict = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("conflict");
+            waybilldetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("waybilldetails");
+            ScannedBarCode = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("ScannedBarCode");
+//            waybilgrid.setAdapter(adapter);
+//            waybilgrid.onRestoreInstanceState(savedInstanceState.getParcelable("state"));
+
+            adapter = new BarCode(conflict, getApplicationContext());
+            waybilgrid.setAdapter(adapter);
+
+            doaction();
+
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Exit ValidationDS")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        insertDiscrepancy();
+                        ValidationDS.super.onBackPressed();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+}

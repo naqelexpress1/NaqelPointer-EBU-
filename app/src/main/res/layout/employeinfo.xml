@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/NaqelBlue">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight=".3"
+                android:ems="10"
+                android:hint="Name"
+                android:inputType="textEmailAddress|number|numberSigned"
+                android:text=""
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/btnScan"
+                app:layout_constraintTop_toBottomOf="@+id/imgNaqelLogo"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/empname"
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_weight=".7"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight=".3"
+                android:ems="10"
+                android:hint="Iqama No"
+                android:inputType="textEmailAddress|number|numberSigned"
+                android:text=""
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/btnScan"
+                app:layout_constraintTop_toBottomOf="@+id/imgNaqelLogo"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/iqamano"
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_weight=".7"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+            <TextView
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight=".3"
+                android:ems="10"
+                android:hint="Mobile No"
+                android:inputType="textEmailAddress|number|numberSigned"
+                android:text=""
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/btnScan"
+                app:layout_constraintTop_toBottomOf="@+id/imgNaqelLogo"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/countrycode"
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_weight=".25"
+                android:ems="10"
+                android:hint="+966"
+                android:inputType="number|numberSigned"
+                android:textColorHint="@color/NaqelGray" />
+
+            <EditText
+                android:id="@+id/mno"
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_weight=".45"
+                android:ems="10"
+                android:hint="593793637"
+                android:inputType="number"
+                android:textColorHint="@color/NaqelGray" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/forvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="1">
+
+            <TextView
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight=".3"
+                android:ems="10"
+                android:hint="OTP No"
+                android:inputType="textEmailAddress|number|numberSigned"
+                android:text=""
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@+id/btnScan"
+                app:layout_constraintTop_toBottomOf="@+id/imgNaqelLogo"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <EditText
+                android:id="@+id/otp"
+                style="@style/NaqelPointer.EditText"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="2dp"
+                android:layout_weight=".7"
+                android:ems="10"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:orientation="horizontal"
+            android:weightSum="1">
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginTop="2dip"
+            android:background="#FFFFFF"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+
+                android:contentDescription="@null"
+                android:gravity="center"
+                android:text="Profile Photo" />
+
+            <ImageView
+                android:id="@+id/profilephoto"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:background="@drawable/test"
+                android:contentDescription="@null"
+                android:src="@drawable/capture" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="wrap_content"
+            android:layout_height="45dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/test"
+            android:contentDescription="@null"
+            android:text="Send" />
+    </TableLayout>
+
+
+</ScrollView>

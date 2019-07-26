@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.NotDelivered">
+
+
+    <item
+        android:id="@+id/completed"
+        android:title="Completed"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/mnuSave"
+        android:title="Save"
+        app:showAsAction="always" />
+</menu>

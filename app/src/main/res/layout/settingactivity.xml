@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity">
+
+    <CheckBox
+        android:id="@+id/chShowScaningCamera"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Show Barcode Scaning Camera"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="HardcodedText"
+        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginTop="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/txtIPAddress" />
+
+    <!--<android.support.constraint.ConstraintLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|end"-->
+        <!--android:orientation="horizontal"-->
+        <!--tools:ignore="RtlHardcoded"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--android:layout_marginBottom="8dp">-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/txtShowShipments"-->
+            <!--android:textColor="@color/NaqelBlue"-->
+            <!--style="@style/TextAppearance.AppCompat.Title"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Close"-->
+            <!--app:layout_constraintRight_toLeftOf="@+id/btnClose"-->
+
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone"-->
+
+            <!--tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded"-->
+            <!--app:layout_constraintTop_toTopOf="parent"-->
+            <!--android:layout_marginTop="16dp"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--app:layout_constraintHorizontal_bias="0.0" />-->
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/btnClose"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/signout"-->
+            <!--app:backgroundTint="@color/White"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:pressedTranslationZ="0dp"-->
+
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:layout_marginRight="8dp"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone"-->
+
+            <!--tools:ignore="RtlHardcoded"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/btnShowSelectedShipments" />-->
+
+        <!--<TextView-->
+            <!--android:id="@+id/txtSave"-->
+            <!--android:textColor="@color/NaqelBlue"-->
+            <!--style="@style/TextAppearance.AppCompat.Title"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:text="Save"-->
+
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone"-->
+
+            <!--tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded"-->
+            <!--android:layout_marginLeft="8dp"-->
+            <!--app:layout_constraintLeft_toLeftOf="parent"-->
+            <!--android:layout_marginTop="32dp"-->
+            <!--app:layout_constraintTop_toBottomOf="@+id/txtShowShipments" />-->
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/btnShowSelectedShipments"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:src="@drawable/save"-->
+            <!--app:backgroundTint="@color/White"-->
+            <!--app:layout_constraintRight_toRightOf="parent"-->
+            <!--app:pressedTranslationZ="0dp"-->
+
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:layout_marginRight="8dp"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone"-->
+
+            <!--tools:ignore="RtlHardcoded"-->
+            <!--app:layout_constraintBottom_toTopOf="@+id/btnOptions" />-->
+
+        <!--<android.support.design.widget.FloatingActionButton-->
+            <!--android:id="@+id/btnOptions"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="bottom|end"-->
+            <!--android:layout_marginBottom="8dp"-->
+            <!--android:elevation="6dp"-->
+            <!--app:pressedTranslationZ="20dp"-->
+            <!--android:src="@drawable/optionsicon"-->
+            <!--app:backgroundTint="@color/White"-->
+            <!--tools:ignore="RtlHardcoded"-->
+            <!--app:layout_constraintBottom_toBottomOf="parent"-->
+            <!--android:layout_marginRight="8dp"-->
+            <!--app:layout_constraintRight_toRightOf="parent" />-->
+
+    <!--</android.support.constraint.ConstraintLayout>-->
+
+    <TextView
+        android:id="@+id/lbIPAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="32dp"
+        android:text="@string/lbIPAddress"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <EditText
+        android:id="@+id/txtIPAddress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="0dp"
+        android:ems="10"
+        android:hint="@string/IPAddress"
+        android:inputType="textPersonName"
+        app:layout_constraintHorizontal_bias="0.503"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbIPAddress"
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:id="@+id/lbLastMasterUpdate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="1-1-2017"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chShowScaningCamera"
+        tools:ignore="HardcodedText" />
+
+    <CheckBox
+        android:id="@+id/chAutomaticSync"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Automatic Sync"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbLastMasterUpdate"
+        tools:ignore="HardcodedText" />
+
+    <CheckBox
+        android:id="@+id/multiplemarker"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Multiple Marker"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chAutomaticSync"
+        tools:ignore="HardcodedText,OnClick"
+        android:onClick="multipleColors"/>
+</android.support.constraint.ConstraintLayout>

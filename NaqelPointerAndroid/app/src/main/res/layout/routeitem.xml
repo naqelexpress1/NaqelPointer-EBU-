@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/White">
+
+    <TextView
+        android:id="@+id/changesheader"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textColor="@color/NaqelRed"
+        android:textSize="12sp" />
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/White"
+        app:layout_constraintTop_toBottomOf="@id/changesheader">
+
+        <ImageView
+            android:id="@+id/imgHasRequest"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/redstar"
+            android:visibility="visible"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,RtlHardcoded" />
+
+        <ImageView
+            android:id="@+id/imgHasLocation"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="44dp"
+            android:background="@drawable/marker"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,RtlHardcoded" />
+
+        <ImageView
+            android:id="@+id/imgHasComplaint"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/greenstar"
+            android:visibility="visible"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription,MissingConstraints,RtlHardcoded" />
+
+
+        <TextView
+
+            android:id="@+id/txtWaybilll"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="Waybill No"
+            app:layout_constraintLeft_toRightOf="@+id/lbSerial"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/txtAmount"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="16dp"
+            android:text="Type Waybill or Booking"
+            app:layout_constraintRight_toLeftOf="@+id/imgHasLocation"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/lbDeliveryDate"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Expected Time"
+            app:layout_constraintLeft_toRightOf="@+id/lbSerial"
+            app:layout_constraintTop_toBottomOf="@+id/txtWaybilll"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <TextView
+            android:id="@+id/txtExpectedTime"
+            style="@style/NaqelPointer.TextView.Red"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Expected Time"
+            app:layout_constraintRight_toLeftOf="@+id/imgHasLocation"
+            app:layout_constraintTop_toBottomOf="@+id/txtAmount"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <Space
+            android:id="@+id/space2"
+            android:layout_width="344dp"
+            android:layout_height="5dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/lbDeliveryDate"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteX="8dp" />
+
+        <TextView
+            android:id="@+id/lbSerial"
+            style="@style/NaqelPointer.TextView.Red"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:text="123"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>

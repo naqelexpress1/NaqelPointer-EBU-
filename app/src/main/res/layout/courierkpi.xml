@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/White"
+    android:padding="5dp">
+
+
+    <TextView
+        android:id="@+id/empname"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mohamed Ismail : 19127"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/White"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.1"
+            android:weightSum="1">
+
+            <TextView
+                android:id="@+id/lbSerial"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="1"
+                android:textColor="@color/NaqelRed"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9"
+            android:background="@color/White"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/cardview_shadow_start_color"
+                android:weightSum="1">
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.3"
+                    android:gravity="center"
+                    android:text="Deliver "
+                    android:textColor="@color/common_google_signin_btn_text_light_pressed"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.05"
+                    android:gravity="center"
+                    android:text=" : "
+                    android:textColor="@color/NaqelRed"
+                    android:textSize="13sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/delivercount"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.65"
+                    android:gravity="start|center_vertical"
+                    android:text=" 31 / 35"
+                    android:textColor="#02ab16"
+                    android:textSize="13sp"
+                    android:textStyle="normal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/common_google_signin_btn_text_light_disabled"
+                android:weightSum="1">
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.3"
+                    android:gravity="center"
+                    android:text="Pickup "
+                    android:textColor="@color/common_google_signin_btn_text_light_pressed"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.05"
+                    android:gravity="center"
+                    android:text=" : "
+                    android:textColor="@color/NaqelRed"
+                    android:textSize="13sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/pickupcount"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="0.65"
+                    android:gravity="start|center_vertical"
+                    android:text=" 31 / 35"
+                    android:textColor="#02ab16"
+                    android:textSize="13sp"
+                    android:textStyle="normal" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</TableLayout>

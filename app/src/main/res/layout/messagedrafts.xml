@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="5dp"
+    android:id="@+id/popup"
+    android:orientation="vertical"
+    android:background="@color/NaqelBlue">
+
+
+    <TextView
+        android:id="@+id/customerlocation"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:padding="1dp"
+        android:text="Customer Location"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/frontofthedoor"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:padding="1dp"
+        android:text="Front of Door"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+
+    <TextView
+        android:id="@+id/cssupport"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:padding="1dp"
+        android:text="CS Support"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
+</LinearLayout>

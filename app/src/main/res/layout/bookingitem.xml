@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White">
+
+    <TextView
+
+        android:id="@+id/txtPieces2"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="70dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="status"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtReferenceNo7"
+        app:layout_constraintTop_toBottomOf="@+id/txtPiecesCount"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtReferenceNo7"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="65dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:text="Status:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lbSerial"
+        app:layout_constraintTop_toBottomOf="@+id/txtReferenceNo6"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtWeight"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="100dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="close"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtReferenceNo9"
+        app:layout_constraintTop_toBottomOf="@+id/txtCloseTime"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        />
+
+    <TextView
+        android:id="@+id/txtReferenceNo9"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="75dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="Weight:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtPiecesCount"
+        app:layout_constraintTop_toBottomOf="@+id/txtReferenceNo5"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtPiecesCount"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="70dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="Pick"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtReferenceNo6"
+        app:layout_constraintTop_toBottomOf="@+id/txtClient"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtReferenceNo6"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="65dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:text="Pieces:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lbSerial"
+        app:layout_constraintTop_toBottomOf="@+id/lblSpecialInstruction"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtReferenceNo5"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="75dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:fontFamily="sans-serif"
+        android:text="Close Time:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtClient"
+        app:layout_constraintTop_toBottomOf="@+id/lblClientId"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/lblSpecialInstruction"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="65dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="4dp"
+        android:text="Req Time:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lbSerial"
+        app:layout_constraintTop_toBottomOf="@+id/lblReferenceNo"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/lblClientId"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="75dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="5dp"
+        android:text="Req Date:"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtReferenceNo"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        />
+
+    <TextView
+        android:id="@+id/lblReferenceNo"
+        style="@style/NaqelPointer.Lable"
+        android:layout_width="50dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="2dp"
+        android:text="Ref No :"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lbSerial"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        />
+
+    <TextView
+        android:id="@+id/txtCloseTime"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="100dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:text="Close Time"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/txtReferenceNo5"
+        app:layout_constraintTop_toBottomOf="@+id/txtClientId"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        android:visibility="invisible"/>
+
+    <TextView
+        android:id="@+id/txtClientId"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="100dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:text="Required Date"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lblClientId"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        />
+
+
+    <TextView
+        android:id="@+id/txtReferenceNo"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="90dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="5dp"
+        android:text=" No"
+        android:textSize="10sp"
+        app:layout_constraintStart_toEndOf="@+id/lblReferenceNo"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtClient"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="70dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="4dp"
+        android:text="Required Time"
+        android:textSize="12sp"
+        app:layout_constraintStart_toEndOf="@+id/lblSpecialInstruction"
+        app:layout_constraintTop_toBottomOf="@+id/txtReferenceNo"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+
+    <Space
+        android:id="@+id/space2"
+        android:layout_width="375dp"
+        android:layout_height="0dp"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="5dp"
+        tools:layout_editor_absoluteY="82dp" />
+
+    <TextView
+        android:id="@+id/lbSerial"
+        style="@style/NaqelPointer.TextView.Red"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="123"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,RtlHardcoded"
+        android:visibility="gone"/>
+
+
+</android.support.constraint.ConstraintLayout>
+

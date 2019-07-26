@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@color/White">
+
+    <TextView
+        android:id="@+id/lbSerial"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:text="123"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/txtWaybilll"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/lbSerial"
+        android:gravity="center"
+        android:text="Waybill No" />
+
+    <View
+        android:id="@+id/line1"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_toRightOf="@id/txtWaybilll"
+        android:background="@color/NaqelRed"
+        android:gravity="center" />
+
+
+    <TextView
+        android:id="@+id/txtAmount"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/line1"
+        android:gravity="center"
+        android:text="COD "
+        tools:ignore="HardcodedText,RtlHardcoded" />
+
+    <TableLayout
+        android:id="@+id/tl"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_toRightOf="@id/txtAmount"
+        android:layout_toLeftOf="@id/line3"
+        android:background="@color/White"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/posAmount"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:text="POS 120 " />
+
+        <View
+
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_margin="10dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginEnd="15dp"
+            android:background="@color/NaqelRed"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/cashmount"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:text="Cash 120 "
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+
+    </TableLayout>
+
+
+
+    <TableLayout
+        android:layout_alignParentRight="true"
+        android:id="@+id/tl1"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:background="@color/White"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/differ"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Differ." />
+
+
+        <TextView
+            android:id="@+id/differamt"
+            style="@style/NaqelPointer.TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="120 "
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+
+    </TableLayout>
+
+    <View
+        android:id="@+id/line3"
+        style="@style/NaqelPointer.TextView"
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_toLeftOf="@id/tl1"
+        android:background="@color/NaqelRed"
+        android:gravity="center" />
+
+
+</RelativeLayout>

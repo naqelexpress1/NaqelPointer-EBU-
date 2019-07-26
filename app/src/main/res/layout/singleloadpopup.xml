@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/White"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/waybillonly"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Waybill Only"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/shipmentonly"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Shipment Only"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/balanceshipment"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Balance Shipment"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/connectonnext"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Connect on Next Trailer"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/pcenotrecev"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Pcs Not Received"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+    <TextView
+        android:id="@+id/pcshold"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="start|center_vertical"
+        android:text="Pcs Hold - Future Connect"
+        android:textColor="#000000"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="sans" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/NaqelBlue" />
+
+
+</LinearLayout>

@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.Activity.PickUp.PickUpActivity">
+
+    <item
+        android:id="@+id/mnuBringData"
+        android:orderInCategory="100"
+        android:title="Bring Data"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mnuSave"
+        android:orderInCategory="100"
+        android:title="Save"
+        app:showAsAction="never" />
+</menu>

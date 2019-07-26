@@ -1,0 +1,128 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/NaqelBlue</item>
+        <item name="colorPrimaryDark">@color/NaqelBlue</item>
+        <item name="colorAccent">@color/NaqelBlue</item>
+        <item name="cardViewStyle">@style/CardView</item>
+
+    </style>
+
+    <style name="NoActivityTitle">
+        <item name="windowActionBar">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <!--/////////////////////////// Text View //////////////////////////-->
+    <style name="NaqelPointer.TextView" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textSize">15dp</item>
+        <item name="android:textColor">@color/NaqelBlue</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+    </style>
+
+    <style name="NaqelPointer.Lable" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textSize">12dp</item>
+        <!--<item name="android:textColor">@color/NaqelBlue</item>-->
+        <!--<item name="android:textStyle">bold</item>-->
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+    </style>
+
+    <style name="NaqelPointer.TextView.Red" parent="NaqelPointer.TextView">
+        <item name="android:textColor">@color/NaqelRed</item>
+    </style>
+
+    <style name="NaqelPointer.TextView.Welcome">
+        <item name="android:textSize">25dp</item>
+        <item name="android:textColor">@color/White</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="NaqelPointer.TextView.BigLabel" parent="NaqelPointer.TextView">
+        <!--<item name="android:paddingLeft">10dp</item>-->
+        <!--<item name="android:paddingRight">10dp</item>-->
+        <item name="android:textSize">20dp</item>
+    </style>
+
+    <style name="NaqelPointer.TextView.Medium" parent="NaqelPointer.TextView">
+        <!--<item name="android:paddingLeft">10dp</item>-->
+        <!--<item name="android:paddingRight">10dp</item>-->
+        <item name="android:textSize">17dp</item>
+    </style>
+
+    <!--/////////////////////////// Edit Text //////////////////////////-->
+    <style name="NaqelPointer.EditText" parent="TextAppearance.AppCompat">
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:textColorHint">@color/NaqelBlue</item>
+        <item name="android:textColor">@color/NaqelBlue</item>
+        <item name="android:gravity">center</item>
+        <item name="android:colorActivatedHighlight">@color/White</item>
+        <item name="android:textCursorDrawable">@color/White</item>
+        <item name="android:background">@color/White</item>
+    </style>
+
+    <!--/////////////////////////// Button //////////////////////////-->
+    <style name="NaqelPointer.BlueButton" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/White</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/NaqelBlue</item>
+    </style>
+
+    <style name="NaqelPointer.MainPageLabel" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@color/NaqelBlue</item>
+        <item name="android:textSize">17dp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="DialogAnimations" />
+
+    <style name="DialogAnimations.SmileWindow">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_top</item>
+    </style>
+
+    <style name="trans" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
+
+    <style name="myroute" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/NaqelBlue</item>
+        <item name="colorPrimaryDark">@color/NaqelBlue</item>
+        <item name="colorAccent">@color/NaqelBlue</item>
+    </style>
+
+    <style name="myroute.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="myroute.AppBarOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="myroute.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="myDialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="colorPrimary">@color/NaqelBlue</item>
+        <item name="colorPrimaryDark">@color/NaqelBlue</item>
+        <item name="colorAccent">@color/NaqelBlue</item>
+        <item name="android:windowNoTitle">true</item>
+
+    </style>
+
+</resources>

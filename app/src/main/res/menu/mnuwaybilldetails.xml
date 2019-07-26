@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.Activity.DeliverySheet.DeliverySheetActivity">
+
+    <item
+        android:id="@+id/ConsigneeAddrss"
+        android:title="@string/consigneeaddress"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/CallConsignee"
+        android:title="@string/CallConsignee"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/Delivered"
+        android:title="@string/delivered"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/NotDelivered"
+        android:title="@string/not_delivered"
+        app:showAsAction="never" />
+
+</menu>

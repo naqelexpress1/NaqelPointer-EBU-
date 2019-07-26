@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Naqel Pointer</string>
+    <string name="lbWelcome">Welcome to Naqel Pointer</string>
+    <string name="txtEmployIDHint">Employ ID</string>
+    <string name="txtPasswordHint">Password</string>
+    <string name="txtScanTruckHint">Scan / Type Truck ID</string>
+    <string name="btnLogin">Login</string>
+    <string name="btnForgotPassword">Forgot Password</string>
+    <string name="LoginActivity">Login</string>
+    <string name="ForgotPasswordActivity">Forgot Password</string>
+    <string name="lbConsigneeName">Consignee Name</string>
+    <string name="title_activity_google_maps">Google Map</string>
+    <string name="NeedLocationPermision">Need permission to get the location.</string>
+    <string name="NeedStoragePermision">Need permission to write to storage.</string>
+    <string name="lbEmployID">Employ ID</string>
+    <string name="GetPassword">Get Password</string>
+    <string name="DeliverySheetActivity">Delivery Sheet</string>
+    <string name="MyRouteActivity">My Route</string>
+    <string name="BreaksActivity">Breaks</string>
+    <string name="DeliveryActivity">Delivery</string>
+    <string name="ConsigneeAddressTranslationActivity">Consignee Address Translation</string>
+    <string name="MultiDeliveryActivity">Multi Delivery</string>
+    <string name="CheckPointsActivity">Customs Clearance</string>
+    <string name="NotDeliveredActivity">Not Delivered</string>
+    <string name="SettingsActivity">Settings</string>
+    <string name="DataSync">Data Sync</string>
+    <string name="CODChecking">Check COD</string>
+    <string name="PendingCOD">Pending COD</string>
+    <string name="CustomsClearance">Customs Clearance</string>
+    <string name="BookingList">Booking List</string>
+    <string name="AtOrigin">At Origin</string>
+    <string name="PickUpActivity">PickUp</string>
+    <string name="WaybillMeasurementActivity">Measurement</string>
+    <string name="DeliveryFirstFragment">Waybill Details</string>
+    <string name="DeliverySecondFragment">Delivery Details</string>
+    <string name="DeliveryThirdFragment">Pieces Scan</string>
+    <string name="ld">Load to Dest</string>
+
+
+    <string name="MultiDeliveryFirstFragment">Delivery Details</string>
+    <string name="MultiDeliverySecondFragment">Waybill List</string>
+    <string name="MultiDeliveryThirdFragment">Pieces List</string>
+
+    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_tap">TapActivity</string>
+    <string name="SaveDelivery">Save</string>
+    <string name="SaveSuccessfully">Save Successfully</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="title_activity_taping">TapingActivity</string>
+    <string name="title_activity_main_tap">MainTapActivity</string>
+    <string name="txtBarCode">BarCode Scaning</string>
+    <string name="txtWaybillNo">Waybill Scaning</string>
+    <string name="txtWeight">Weight : </string>
+    <string name="txtBillingType">Billing Type : </string>
+    <string name="txtCODAmount">COD Amount : </string>
+    <string name="txtPiecesCount">Pieces Count : </string>
+    <string name="WaybillNo">Waybill No</string>
+    <string name="txtConsigneeName">Consignee Name : </string>
+    <string name="txtAddress">Address : </string>
+    <string name="txtSecondAddress">Second Address Line</string>
+    <string name="txtNear">Near : </string>
+    <string name="txtMobileNo">Mobile No : </string>
+    <string name="txtPhoneNo">Phone No : </string>
+    <string name="txtCashAmount">Cash Amount</string>
+    <string name="txtPOSAmount">POS Amount</string>
+    <string name="txtReceiverName">Receiver Name</string>
+    <string name="TotalCollectedAmount">Total Collected Amount : </string>
+    <string name="checkbox">CheckBox</string>
+    <string name="button">Button</string>
+    <string name="action_settings">Settings</string>
+    <string name="mnuClose">Close</string>
+    <string name="PickUpFirstFragment">PickUp</string>
+    <string name="PiecesFragment">Pieces</string>
+    <string name="DeliverySheetFirstFragement">Delivery Sheet</string>
+    <string name="DeliverySheetSecondFragment">Waybill</string>
+    <string name="DeliverySheetThirdFragment">Pieces</string>
+
+    <string name="CheckPointFirstFragement">Check Points</string>
+    <string name="Waybill">Waybill</string>
+    <string name="Pieces">Pieces</string>
+
+
+    <string name="ok">OK</string>
+    <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+    <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+    <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
+    <string name="title_activity_main">Barcode Reader Sample</string>
+    <string name="barcode_header">Click &quot;Read Barcode&quot; to read a barcode</string>
+    <string name="read_barcode">Read Barcode</string>
+    <string name="auto_focus">Auto Focus</string>
+    <string name="use_flash">Use Flash</string>
+    <string name="barcode_success">Barcode read successfully</string>
+    <string name="barcode_failure">No barcode captured</string>
+    <string name="barcode_error">"Error reading barcode: %1$s"</string>
+    <string name="CallConsignee">Call Consignee</string>
+    <string name="NeedCameraPermission">You should make a permission for Camera in the Sittings.</string>
+    <string name="AlreadyExists">Already Exists</string>
+    <string name="EnterEmployID">You have to enter the Employ ID</string>
+    <string name="SyncSuccessfully">Data Sync Successfully</string>
+    <string name="PickUpSyncSuccessfully">Data Sync Successfully</string>
+    <string name="SendingPickUpData">Sending PickUp Data</string>
+    <string name="SendingDeliveryData">Sending Delivery Data</string>
+    <string name="SendingCheckPointData">Sending Check Point Data</string>
+    <string name="SendingNotDeliveredData">Sending Not Delivered Data</string>
+    <string name="SendingOnCloadingForDData">Sending OnCloadingForD Data</string>
+    <string name="SendingMultiDeliveryData">Sending Multi Delivery Data</string>
+    <string name="SendingWaybillMeasurmentData">Sending Waybill Measurement Data</string>
+    <string name="SendingUserLoginData">Sending User Login Data</string>
+    <string name="lbVersion">Version :</string>
+    <string name="NotDelivered">Not Delivered</string>
+    <string name="ClientID">Client ID</string>
+    <string name="title_activity_pick_up">PickUp</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="SelectOrgStation">Select Destination Station</string>
+    <string name="EditBarCode">Edit BarCode</string>
+    <string name="NoInternetConnection">No Internet Connection</string>
+    <string name="NoPendingCOD">No Pending COD</string>
+    <string name="SyncingFinishSuccessully">Syncing Finish Successfully</string>
+    <string name="SyncingStarted">Syncing Started</string>
+    <string name="notes">Notes</string>
+    <string name="origin">Origin</string>
+    <string name="title_activity_shipments_picking">Shipments Picking</string>
+    <string name="ConsigneeName">Consignee Name :</string>
+    <string name="SelectingShipments">Selecting Shipments</string>
+    <string name="lbIPAddress">IP Address :</string>
+    <string name="IPAddress">IP Address</string>
+    <string name="PiecesCount">Pieces Count :</string>
+    <string name="NeedPhonePermission">Need Phone Permission</string>
+    <string name="ErrorWhileSaving">An error happened while saving the data</string>
+    <string name="NotSaved">An Error happen durring saving, Data not saved.</string>
+    <string name="lbCount">Count : </string>
+    <string name="MyLocation">My Location</string>
+    <string name="lbPhoneNo">Phone No :</string>
+    <string name="lbCashAmount">Cash Amount</string>
+    <string name="lbDataType">Data Type</string>
+    <string name="check">Check</string>
+    <string name="consigneeaddress">Consignee Address</string>
+    <string name="not_delivered">Not Delivered</string>
+    <string name="delivered">Delivered</string>
+    <string name="title_activity_booking_approval">BookingApproval</string>
+    <string name="title_activity_booking_list">BookingList</string>
+    <string name="pieces">Pieces</string>
+    <string name="title_activity_booking_details">BookingDetails</string>
+    <!-- Added by ismail-->
+    <string name="sign">Signature</string>
+    <string name="sign_title">SIGN HERE</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
+    <string name="save">Save</string>
+    <string name="validwaybill">Please enter the waybill correclty.</string>
+    <string name="wentwrong">Something went wrong,kindly check your internet connection</string>
+    <string name="watsappPredefinedMsg">Dear Customer,\nTo serve you better and deliver your shipment</string>
+    <string name="watsappPredefinedMsg1">Please share your location by whatsapp. https://infotrack.naqelexpress.com/GPS/3.0/MainPage.aspx?WaybillNo=</string>
+    <string name="history">History</string>
+
+    <string name="waybilldetails">WayBill Details</string>
+    <string name="barcodedetails">Barcode Details</string>
+
+    <string name="prompt">Choose a Report</string>
+    <string-array name="report">
+        <item>Pickup</item>
+        <item>OnDelivery</item>
+        <item>Not Delivery</item>
+        <item>Delivery Sheet</item>
+        <item>Waybill Measurement</item>
+
+    </string-array>
+
+</resources>

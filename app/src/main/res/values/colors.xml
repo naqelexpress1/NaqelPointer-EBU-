@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="NaqelBlue">#003E7E</color>
+    <color name="NaqelRed">#E31837</color>
+    <color name="NaqelYello">#ffd600</color>
+    <color name="NaqelGray">#EFEFF4</color>
+    <color name="White">#FFFFFF</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+</resources>

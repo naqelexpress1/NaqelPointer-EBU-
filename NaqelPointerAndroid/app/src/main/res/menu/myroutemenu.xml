@@ -1,0 +1,57 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity">
+
+    <item
+        android:id="@+id/deleteall"
+        android:icon="@drawable/ic_delete_white"
+        android:title="My Account"
+        app:showAsAction="always"
+        tools:ignore="HardcodedText" />
+
+
+    <item
+        android:id="@+id/OptimizeShipments"
+        android:orderInCategory="100"
+        android:title="Optimize my Shipments"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mnuShowDeliverySheetOrder"
+        android:orderInCategory="100"
+        android:title="Delivery Sheet Order"
+        app:showAsAction="never" />
+
+    <!--<item-->
+    <!--android:id="@+id/DeleteAll"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:title="Delete All Data"-->
+    <!--app:showAsAction="never" />-->
+
+    <!--<item-->
+    <!--android:id="@+id/CheckNewBooking"-->
+    <!--android:orderInCategory="100"-->
+    <!--android:title="Check New Booking"-->
+    <!--app:showAsAction="never" />-->
+
+    <item
+        android:id="@+id/mnuSyncData"
+        android:orderInCategory="100"
+        android:title="Sync Data"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/groupmap"
+        android:orderInCategory="100"
+        android:title="Route Map"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/movingmap"
+        android:orderInCategory="100"
+        android:title="Map View"
+        android:visible="false"
+        app:showAsAction="never" />
+
+</menu>

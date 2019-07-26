@@ -79,7 +79,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Testing App ";
+    public String AppVersion = "1.5.1.0";
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;

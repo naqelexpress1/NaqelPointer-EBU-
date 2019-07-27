@@ -93,7 +93,7 @@ public class AtOriginDelete
             for (int i = 0; i < AtOriginDeleteFirstFrgament.Selectedwaybilldetails.size(); i++) {
                 WaybillNo = AtOriginDeleteFirstFrgament.Selectedwaybilldetails.get(i).get("WaybillNo");
                 for (int j = 0; j < AtOriginDeleteSecondFrgament.Selectedbarcodedetails.size(); j++) {
-                    String SecWaybillNo = AtOriginDeleteSecondFrgament.Selectedbarcodedetails.get(i).get("WaybillNo");
+                    String SecWaybillNo = AtOriginDeleteSecondFrgament.Selectedbarcodedetails.get(j).get("WaybillNo");
                     if (WaybillNo.equals(SecWaybillNo)) {
                         break;
                     }

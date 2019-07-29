@@ -689,6 +689,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name=".Activity.Login.FindVehicle"
+            android:label="Choose Truck"
+            android:screenOrientation="portrait"
+            android:theme="@style/myroute.NoActionBar" />
+
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
             android:process=":naqelsignature" />

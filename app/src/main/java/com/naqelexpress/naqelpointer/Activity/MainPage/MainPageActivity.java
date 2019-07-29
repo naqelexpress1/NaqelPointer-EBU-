@@ -414,7 +414,7 @@ public class MainPageActivity
         // updateApp();
 
     }
-    
+
     HashMap<Integer, Integer> itemposition = new HashMap<>();
 
     private void LoadMenu() {
@@ -1859,7 +1859,7 @@ public class MainPageActivity
 //                            jsonObject.getString("Division").equals("Express") ||
 //                            jsonObject.getString("Division").equals("IRS")) && GlobalVar.GV().EmployID != 19127
 //                            && GlobalVar.GV().EmployID != 15365) {
-                    if (GlobalVar.GV().EmployID == 19127 && GlobalVar.GV().EmployID == 17099)
+                    if (GlobalVar.GV().EmployID == 19127)
                         versioncode = jo.getInt("VersionCode");
 
 

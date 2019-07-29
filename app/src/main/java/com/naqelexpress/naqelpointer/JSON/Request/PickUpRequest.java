@@ -25,6 +25,7 @@ public class PickUpRequest
     public String Longitude;
     public int LoadTypeID;
     public int al;
+    public int TruckID = 0;
     public String DeviceToken = "";
     //    public double ReceivedAmount;
     public String CurrentVersion = GlobalVar.GV().AppVersion;

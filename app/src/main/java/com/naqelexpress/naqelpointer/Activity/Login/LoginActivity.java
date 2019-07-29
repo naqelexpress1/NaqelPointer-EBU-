@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.Login;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,8 +24,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +46,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointTypeDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Contacts;
 import com.naqelexpress.naqelpointer.DB.DBObjects.DeliveryStatus;
 import com.naqelexpress.naqelpointer.DB.DBObjects.FacilityStatus;
+import com.naqelexpress.naqelpointer.DB.DBObjects.FindVehilceObject;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NoNeedVolumeReason;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
@@ -68,6 +75,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class LoginActivity
         extends AppCompatActivity {
@@ -77,16 +86,23 @@ public class LoginActivity
     Button btnLogin, btnForgotPassword, btnScan;
     EditText txtEmployID, txtPassword;
 
+    EditText truck;
+    ArrayList<FindVehilceObject> vehicles;
+    int truckID = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.login);
+        if (GlobalVar.GV().LoginVariation)
+            setContentView(R.layout.loginebu);
+        else
+            setContentView(R.layout.login);
+
 
         //GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
 
 //        int empid = GlobalVar.getlastlogin(getApplicationContext());
         btnLogin = (Button) findViewById(R.id.btnLogin);
@@ -209,6 +225,71 @@ public class LoginActivity
 //                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
 //                1
 //        );
+
+        if (GlobalVar.GV().LoginVariation) {
+            vehicles = new ArrayList<FindVehilceObject>();
+
+
+            truck = (EditText) findViewById(R.id.truckid);
+            truck.setKeyListener(null);
+            truck.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (vehicles.size() > 0)
+                        RedirectVechicleClass();
+                    else
+                        ShowAlertMessage("No Truck Data , Kindly contact concern person", 1);
+
+                }
+            });
+
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            Cursor result = dbConnections.Fill("select * from Truck", getApplicationContext());
+            if (result.getCount() == 0) {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    //jsonObject.put("StationID", GlobalVar.GV().StationID);
+                    //jsonObject.put("Function", function);
+                    new BringTruckData().execute(jsonObject.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } else
+                ReadFromLocal(result, dbConnections);
+
+            dbConnections.close();
+            result.close();
+        }
+
+    }
+
+    private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
+
+        result.moveToFirst();
+        vehicles.clear();
+
+        try {
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                do {
+                    FindVehilceObject fvo = new FindVehilceObject();
+                    fvo.ID = result.getInt(result.getColumnIndex("TruckID"));
+                    fvo.Name = result.getString(result.getColumnIndex("Name"));
+                    vehicles.add(fvo);
+                } while (result.moveToNext());
+            }
+
+            result.close();
+            dbConnections.close();
+            RedirectVechicleClass();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     public void HideKeyBoard(View view) {
@@ -238,6 +319,10 @@ public class LoginActivity
         if (txtPassword.getText().toString().equals("")) {
 
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter your password", GlobalVar.AlertType.Warning);
+            return;
+        }
+        if (GlobalVar.GV().LoginVariation && truck.getText().toString().equals("")) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select Fleet Number", GlobalVar.AlertType.Warning);
             return;
         }
 //        if (txtPassword.getText().toString().equals("123456")) {
@@ -278,6 +363,7 @@ public class LoginActivity
 
 //            DBConnections dbConnections = new DBConnections(context, null);
             dbConnections.UpdateLastLogin(GlobalVar.GV().EmployID, getApplicationContext(), uid);
+            dbConnections.UpdateTruckID(GlobalVar.GV().EmployID, getApplicationContext(), truckID);
 
 //            try
 //            {
@@ -374,6 +460,7 @@ public class LoginActivity
         }
     }
 
+
     class Optimization {
         public String EmployID;
         public String DeviceId;
@@ -394,6 +481,7 @@ public class LoginActivity
 
 
     }
+
 
 //    @Override
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -971,6 +1059,8 @@ public class LoginActivity
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("txtEmployID", txtEmployID.getText().toString());
         outState.putString("txtPassword", txtPassword.getText().toString());
+        outState.putString("truck", truck.getText().toString());
+        outState.putInt("truckID", truckID);
 
         super.onSaveInstanceState(outState);
     }
@@ -980,6 +1070,8 @@ public class LoginActivity
         if (savedInstanceState != null) {
             txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
             txtPassword.setText(savedInstanceState.getString("txtPassword"));
+            truck.setText(savedInstanceState.getString("truck"));
+            truckID = savedInstanceState.getInt("truckID");
         }
     }
 
@@ -1099,6 +1191,7 @@ public class LoginActivity
                     instance.UsertypeID = getUserMEDataResult.UsertypeId;
                     instance.Menu = getUserMEDataResult.Menu;
                     usertype = getUserMEDataResult.UsertypeId;
+                    instance.TruckID = truckID;
 
                     dbConnections.UpdateLastLogin(instance.EmployID, getApplicationContext(), instance.UsertypeID);
 //                    dbConnections.close();
@@ -1225,7 +1318,7 @@ public class LoginActivity
                     dbConnections.InsertAppVersion(jo.getInt("VersionCode"), context);
                     int versioncode = GlobalVar.VersionCode(context);
 
-                    if (GlobalVar.GV().EmployID == 19127 ) //&& GlobalVar.GV().EmployID == 17099
+                    if (GlobalVar.GV().EmployID == 19127) //&& GlobalVar.GV().EmployID == 17099
                         versioncode = jo.getInt("VersionCode");
 
                     if (jo.getInt("VersionCode") == versioncode) {
@@ -1377,7 +1470,198 @@ public class LoginActivity
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    ProgressDialog progressDialog;
+
+    private class BringTruckData extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+
+        @Override
+        protected void onPreExecute() {
+
+            if (progressDialog == null)
+                progressDialog = ProgressDialog.show(LoginActivity.this,
+                        "Please wait.", "Bringing Truck Details...", true);
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... params) {
+
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringTruck");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(60000);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+//
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.getBoolean("HasError")) {
+
+                        fetchData(jsonObject);
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(result);
+            } else {
+
+                ShowAlertMessage("No Internet connection / Something went wrong ", 0);
+            }
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+        }
+    }
+
+    private void setDefault() {
+        FindVehilceObject fvo = new FindVehilceObject();
+        fvo.ID = 0;
+        fvo.Name = "At Yard";
+
+        vehicles.add(fvo);
+    }
+
+    private void fetchData(JSONObject jsonObject) {
+        vehicles.clear();
+        setDefault();
+
+
+        try {
+
+            JSONArray status = jsonObject.getJSONArray("Truck");
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+            if (status.length() > 0) {
+                for (int i = 0; i < status.length(); i++) {
+                    JSONObject jsonObject1 = status.getJSONObject(i);
+
+                    FindVehilceObject fvo = new FindVehilceObject();
+                    fvo.Name = jsonObject1.getString("Name");
+                    fvo.ID = jsonObject1.getInt("ID");
+                    vehicles.add(fvo);
+
+                    dbConnections.InsertTruck(jsonObject1.getString("Name"), jsonObject1.getInt("ID"), getApplicationContext());
+
+                }
+
+                RedirectVechicleClass();
+            } else
+                ShowAlertMessage("No Vehicle Data, Kindly contact Admin", 1);
+
+            dbConnections.close();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
 
     }
+
+    private void RedirectVechicleClass() {
+        Intent intent = new Intent(this, FindVehicle.class);
+        intent.putExtra("Vehicles", vehicles);
+        startActivityForResult(intent, 99);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 99: {
+                if (resultCode == Activity.RESULT_OK) {
+
+                    truck.setText(data.getStringExtra("name"));
+                    truckID = data.getIntExtra("truckid", 0);
+                }
+                break;
+            }
+        }
+    }
+
+    private void ShowAlertMessage(String message, final int fun) {
+        AlertDialog alertDialog = new AlertDialog.Builder(LoginActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Info.");
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (fun == 0) {
+                            JSONObject jsonObject = new JSONObject();
+                            //jsonObject.put("StationID", GlobalVar.GV().StationID);
+                            //jsonObject.put("Function", function);
+                            new BringTruckData().execute(jsonObject.toString());
+                        }
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Close",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
+
 }

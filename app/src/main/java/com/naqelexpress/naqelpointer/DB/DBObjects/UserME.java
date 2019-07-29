@@ -18,6 +18,7 @@ public class UserME {
     public String Division;
     public int UsertypeID;
     public int Menu = 0;
+    public int TruckID = 0;
     public UserME() {
         StatusID = 1;
     }

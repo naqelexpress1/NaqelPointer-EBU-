@@ -161,6 +161,7 @@ public class PickUp extends Service {
                     pickUpRequest.CurrentVersion = result.getString(result.getColumnIndex("CurrentVersion"));
                     pickUpRequest.LoadTypeID = result.getInt(result.getColumnIndex("LoadTypeID"));
                     pickUpRequest.al = result.getInt(result.getColumnIndex("AL"));
+                    pickUpRequest.TruckID = result.getInt(result.getColumnIndex("TruckID"));
                     try {
                         FirebaseApp.initializeApp(this);
                         String token = FirebaseInstanceId.getInstance().getToken();

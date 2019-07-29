@@ -79,7 +79,8 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "At Origin Delete";
+    public String AppVersion = "Test - LFN";
+    public boolean LoginVariation = true; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;

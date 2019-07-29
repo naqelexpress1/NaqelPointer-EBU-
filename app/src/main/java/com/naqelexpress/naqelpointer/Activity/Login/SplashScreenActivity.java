@@ -53,6 +53,8 @@ public class SplashScreenActivity
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
         dbConnections.DeleteExsistingLogin(getApplicationContext());
+        dbConnections.DeleteTrucks(getApplicationContext());
+
         dbConnections.close();
 
 

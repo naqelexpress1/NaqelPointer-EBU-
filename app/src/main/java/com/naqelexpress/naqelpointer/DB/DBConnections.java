@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 67;
+    private static final int Version = 71; // Truck Info for EBU
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -89,7 +89,7 @@ public class DBConnections
                 " , \"Password\" TEXT NOT NULL, \"StationID\" INTEGER NOT NULL , \"RoleMEID\" INTEGER, \"StatusID\" INTEGER NOT NULL," +
                 " \"MachineID\" TEXT,  \"EmployName\" TEXT, \"EmployFName\" TEXT, \"MobileNo\" TEXT, \"StationCode\" TEXT, " +
                 "\"StationName\" TEXT, \"StationFName\" TEXT,\"Division\" TEXT DEFAULT 0 ," +
-                "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0)");
+                "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0 ,  \"TruckID\" INTEGER DEFAULT 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserLogs\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , \"UserID\" INTEGER NOT NULL , \"SuperVisorID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL , \"LogTypeID\" INTEGER NOT NULL , \"CTime\" DATETIME NOT NULL , \"MachineID\" TEXT , \"Remarks\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserMeLogin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE ," +
@@ -117,11 +117,13 @@ public class DBConnections
                 " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
-                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
+                " \"TruckID\" Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserSettings\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE  , \"EmployID\" INTEGER NOT NULL , \"ShowScaningCamera\" BOOL NOT NULL , \"IPAddress\" TEXT NOT NULL , \"LastBringMasterData\" DATETIME)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierDailyRoute\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"EmployID\" INTEGER NOT NULL , \"StartingTime\" DATETIME NOT NULL , \"StartLatitude\" TEXT, \"StartLongitude\" TEXT, \"EndTime\" DATETIME NULL , \"EndLatitude\" TEXT, \"EndLongitude\" TEXT, \"DeliverySheetID\" INTEGER)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierDailyRoute\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"EmployID\" INTEGER NOT NULL , \"StartingTime\" DATETIME NOT NULL , \"StartLatitude\" TEXT, \"StartLongitude\" TEXT, " +
+                "\"EndTime\" DATETIME  , \"EndLatitude\" TEXT, \"EndLongitude\" TEXT, \"DeliverySheetID\" INTEGER)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCloadingForD\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"CourierID\" INTEGER NOT NULL , \"UserID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL , \"CTime\" DATETIME NOT NULL , \"PieceCount\" INTEGER NOT NULL , \"TruckID\" TEXT, \"WaybillCount\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCLoadingForDDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
@@ -129,6 +131,7 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCLoadingForDWaybill\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL ," +
                 "\"WaybillNo\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"OnCLoadingID\" INTEGER NOT NULL )");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteShipments\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
                 "\"OrderNo\" INTEGER NOT NULL , \"ItemNo\" TEXT NOT NULL , \"TypeID\" INTEGER NOT NULL , \"BillingType\" TEXT, " +
                 "\"CODAmount\" DOUBLE NOT NULL , \"DeliverySheetID\" INTEGER, \"Date\" DATETIME NOT NULL , \"ExpectedTime\" DATETIME," +
@@ -149,7 +152,7 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
-                "\"CheckPointTypeDetailID\" INTEGER NULL , \"CheckPointTypeDDetailID\" INTEGER NULL , \"Latitude\" TEXT, " +
+                "\"CheckPointTypeDetailID\" INTEGER  , \"CheckPointTypeDDetailID\" INTEGER  , \"Latitude\" TEXT, " +
                 "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
@@ -313,7 +316,8 @@ public class DBConnections
                 " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
-                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
+                " \"TruckID\" Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
@@ -321,9 +325,13 @@ public class DBConnections
                 " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
-                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0 ," +
+                " \"TruckID\" Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailTemp\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"Truck\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT," +
+                " \"TruckID\" Interger Not Null,\"IsDate\"  TEXT NOT NULL  )");
 
     }
 
@@ -496,7 +504,8 @@ public class DBConnections
                     " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                     "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                     "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
-                    " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                    " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
+                    " \"TruckID\" Integer Default 0)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
@@ -505,9 +514,13 @@ public class DBConnections
                     " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                     "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                     "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
-                    " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                    " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
+                    "\"TruckID\" Integer Default 0)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailTemp\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"Truck\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT, " +
+                    " \"TruckID\" Interger Not Null , \"IsDate\"  TEXT NOT NULL)");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -586,6 +599,18 @@ public class DBConnections
 
             if (!isColumnExist("TerminalHandling", "Count"))
                 db.execSQL("ALTER TABLE TerminalHandling ADD COLUMN Count Integer DEFAULT 0  ");
+
+            if (!isColumnExist("PickUp", "TruckID"))
+                db.execSQL("ALTER TABLE PickUp ADD COLUMN TruckID INTEGER DEFAULT 0");
+
+            if (!isColumnExist("PickUpAuto", "TruckID"))
+                db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN TruckID INTEGER DEFAULT 0");
+
+            if (!isColumnExist("PickUpTemp", "TruckID"))
+                db.execSQL("ALTER TABLE PickUpTemp ADD COLUMN TruckID INTEGER DEFAULT 0");
+
+            if (!isColumnExist("UserME", "TruckID"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN TruckID INTEGER DEFAULT 0");
 
         }
 
@@ -778,6 +803,7 @@ public class DBConnections
             contentValues.put("UserTypeID", instance.UsertypeID);
             contentValues.put("Menu", instance.Menu);
             contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("TruckID", instance.TruckID);
 
             result = db.insert("UserME", null, contentValues);
             db.close();
@@ -1084,6 +1110,7 @@ public class DBConnections
             contentValues.put("CurrentVersion", instance.CurrentVersion);
             contentValues.put("LoadTypeID", lid);
             contentValues.put("AL", al);
+            contentValues.put("TruckID", GetTruck(context));
 //            result = db.insert("PickUp", null, contentValues);
             result = db.insert("PickUpAuto", null, contentValues);
             db.insert("PickUpTemp", null, contentValues);
@@ -3925,6 +3952,32 @@ public class DBConnections
         return result != -1;
     }
 
+    public boolean UpdateTruckID(int EmpID, Context context, int TruckID) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);//SELECT *  FROM  Productivity WHERE ID = (SELECT MAX(ID)  FROM Productivity)
+            final String query = "SELECT *  FROM  UserME Where EmployID = " + EmpID + " Order by ID Desc Limit 1";
+            Cursor cur = db.rawQuery(query, null);
+
+            if (cur != null && cur.getCount() > 0) {
+                cur.moveToFirst();
+                int ID = cur.getInt(cur.getColumnIndex("ID"));
+
+                ContentValues cv = new ContentValues();
+                cv.put("TruckID", TruckID);
+
+                result = db.update("UserME", cv, "ID =" + ID, null);
+                db.close();
+            }
+
+            cur.close();
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
 
     public String GetLastDeliveredWaybill(Context context) {
         String Waybillno = "0";
@@ -4773,6 +4826,66 @@ public class DBConnections
         } catch (SQLiteException e) {
 
         }
+    }
+
+    public boolean InsertTruck(String TruckName, int truckid, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            final String maxid = "SELECT *  FROM  Truck where TruckID = " + truckid;
+            Cursor cur = db.rawQuery(maxid, null);
+
+            if (cur.getCount() == 0) {
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", TruckName);
+                contentValues.put("TruckID", truckid);
+                contentValues.put("IsDate", GlobalVar.getDate());
+
+                result = db.insert("Truck", null, contentValues);
+            }
+            db.close();
+        } catch (SQLiteException e) {
+            System.out.println(e);
+        }
+        return result != -1;
+    }
+
+    public int GetTruck(Context context) {
+
+        int truckID = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            final String maxid = "SELECT *  FROM  UserME where EmployID = " + GlobalVar.GV().EmployID + "  Order by ID Desc Limit 1";
+            Cursor cur = db.rawQuery(maxid, null);
+
+            if (cur.getCount() > 0) {
+
+                cur.moveToFirst();
+                truckID = cur.getInt(cur.getColumnIndex("TruckID"));
+            }
+            cur.close();
+            db.close();
+        } catch (SQLiteException e) {
+            System.out.println(e);
+        }
+        return truckID;
+    }
+
+    public boolean DeleteTrucks(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.delete("Truck", "IsDate!=?", args);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
     }
 
 }

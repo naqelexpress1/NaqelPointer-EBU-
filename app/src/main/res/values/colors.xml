@@ -2,6 +2,7 @@
 <resources>
     <color name="NaqelBlue">#003E7E</color>
     <color name="NaqelRed">#E31837</color>
+    <color name="Green">#08e308</color>
     <color name="NaqelYello">#ffd600</color>
     <color name="NaqelGray">#EFEFF4</color>
     <color name="White">#FFFFFF</color>

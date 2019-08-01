@@ -92,8 +92,10 @@ public class SingleLoad extends Fragment {
             ValidateBarCodeList.add(barcode);
             lbTotal.setText(String.valueOf(ValidateBarCodeList.size()));
 
-        } else
+        } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+        }
 
     }
 
@@ -153,7 +155,7 @@ public class SingleLoad extends Fragment {
 
             }
             while (result.moveToNext());
-            lbTotal.setText( String.valueOf(ValidateBarCodeList.size()));
+            lbTotal.setText(String.valueOf(ValidateBarCodeList.size()));
             adapter.notifyDataSetChanged();
         }
 

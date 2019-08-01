@@ -51,9 +51,9 @@ public class ScanNclWaybillFragment extends Fragment {
     View rootView;
     public EditText txtBarcode;
     TextView lbTotal, lbNclNo;
-    public ArrayList<String> WaybillList = new ArrayList<>();
+    public static ArrayList<String> WaybillList = new ArrayList<>();
     //public ArrayList<Double> WaybillWeight = new ArrayList<>();
-    public ArrayList<PieceDetail> PieceCodeList = new ArrayList<PieceDetail>();
+    public static ArrayList<PieceDetail> PieceCodeList = new ArrayList<PieceDetail>();
     private RecyclerView recyclerView;
     public NclAdapter adapter;
     public static double waybillweight = 0.0;
@@ -73,6 +73,8 @@ public class ScanNclWaybillFragment extends Fragment {
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             lbNclNo = (TextView) rootView.findViewById(R.id.lbNclNo);
+            WaybillCount = 0;
+            PiecesCount = 0;
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
@@ -147,26 +149,28 @@ public class ScanNclWaybillFragment extends Fragment {
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
         if (!IsDuplicate(PieceCode)) {
             if (PieceCode.length() == 13) {
-
                 //SaveData(WaybillNo, PieceCode);
                 PiecesCount = PiecesCount + 1;
                 PieceCodeList.add(0, new PieceDetail(PieceCode, WaybillNo, Weight));
                 waybillweight = waybillweight + Weight;
-                lbTotal.setText(getString(R.string.lbCount) + PieceCodeList.size());
+                lbTotal.setText(getString(R.string.lbCount) + PiecesCount);
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                 txtBarcode.setText("");
-
+                txtBarcode.requestFocus();
                 //if (PieceCodeList.size() > 5)
                 //     PieceCodeList.remove(5);
                 initViews();
             }
-            if (PieceCodeList.size() == 30) {
-                SaveData();
-            }
+
+
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarcode.setText("");
+        }
+
+        if (PieceCodeList.size() == 20) {
+            SaveData();
         }
     }
 
@@ -318,12 +322,14 @@ public class ScanNclWaybillFragment extends Fragment {
                     GlobalVar.GV().ShowSnackbar(rootView, "No data with these Barcode", GlobalVar.AlertType.Error);
                     GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
                     txtBarcode.setText("");
+                    txtBarcode.requestFocus();
                 }
 
             } else {
                 GlobalVar.GV().ShowSnackbar(rootView, "No data with these Barcode", GlobalVar.AlertType.Error);
                 GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
                 txtBarcode.setText("");
+                txtBarcode.requestFocus();
             }
         }
     }
@@ -387,13 +393,16 @@ public class ScanNclWaybillFragment extends Fragment {
 
             DateTime TimeIn = DateTime.now();
             Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
-
+            ArrayList<String> waybill = new ArrayList<String>();
             if (dbConnections.InsertNcl(ncl, getContext())) {
                 int nclId = dbConnections.getMaxID("Ncl", getContext());
                 for (int i = 0; i < PieceCodeList.size(); i++) {
-                    NclWaybillDetail nclWaybillDetail =
-                            new NclWaybillDetail(PieceCodeList.get(i).Waybill, nclId);
-                    dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getContext());
+                    if (waybill.contains(PieceCodeList.get(i).Waybill)) {
+                        waybill.add(PieceCodeList.get(i).Waybill);
+//                        NclWaybillDetail nclWaybillDetail =
+//                                new NclWaybillDetail(PieceCodeList.get(i).Waybill, nclId);
+//                        dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getContext());
+                    }
 
                     NclDetail nclDetail = new NclDetail(PieceCodeList.get(i).Barcode,
                             nclId);

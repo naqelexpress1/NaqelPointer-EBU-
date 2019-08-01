@@ -268,7 +268,7 @@ public class LoginActivity
 
         result.moveToFirst();
         vehicles.clear();
-
+        setDefault();
         try {
             if (result.getCount() > 0) {
                 result.moveToFirst();

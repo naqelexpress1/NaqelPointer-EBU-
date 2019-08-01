@@ -87,8 +87,10 @@ public class WayBillDetails extends Fragment // implements ResultInterface
             validatewaybilldetails.add(waybillno);
             waybillcount.setText(getString(R.string.lbCount) + validatewaybilldetails.size());
 
-        } else
+        } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+        }
     }
 
     @Override

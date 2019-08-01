@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 71; // Truck Info for EBU
+    private static final int Version = 72; // Truck Info for EBU
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;

@@ -2,13 +2,17 @@ package com.naqelexpress.naqelpointer.NCL;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,22 +51,30 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.naqelexpress.naqelpointer.Activity.Print.PdfDocumentAdapter;
 import com.naqelexpress.naqelpointer.BuildConfig;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControlOnetab;
+import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
 
 import org.joda.time.DateTime;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -96,15 +108,14 @@ public class NclShipmentActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        NclNo = "0";
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 switch (tab.getPosition()) {
                     case 1: {
                         secondFragment.lbNclNo.setText("NCL NO : " + NclNo);
                     }
-
                 }
             }
 
@@ -115,7 +126,6 @@ public class NclShipmentActivity extends AppCompatActivity {
 
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
-
             }
         });
     }
@@ -130,9 +140,21 @@ public class NclShipmentActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.mnuSave:
-                SaveData();
+            case R.id.finish:
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    ErrorAlert("Info", "Are yo sure want to Finish the Job?", 0);
+                } else
+                    GlobalVar.RedirectSettings(NclShipmentActivity.this);
                 return true;
+            case R.id.manual:
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    UploadManul("Info", "Are yo sure want to upload Manual?");
+                } else
+                    GlobalVar.RedirectSettings(NclShipmentActivity.this);
+                return true;
+//            case R.id.mnuSave:
+//                SaveData();
+//                return true;
             case R.id.print:
                 if (IsValid())
                     askPermission();
@@ -159,7 +181,7 @@ public class NclShipmentActivity extends AppCompatActivity {
                         Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                         startActivity(intent);
                     } catch (Exception e) {
-                        ErrorAlert("Contact System Admin For Storage Permission");
+                        ErrorAlert("Info", "Contact System Admin For Storage Permission");
                     }
                 } else {
                     ActivityCompat.requestPermissions(NclShipmentActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -300,7 +322,7 @@ public class NclShipmentActivity extends AppCompatActivity {
             // load image
             try {
                 // get input stream
-                InputStream ims = getAssets().open("naqellogo.jpeg") ;
+                InputStream ims = getAssets().open("naqellogo.jpeg");
                 Bitmap bmp = BitmapFactory.decodeStream(ims);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -587,10 +609,10 @@ public class NclShipmentActivity extends AppCompatActivity {
         document.addCreator(String.valueOf(GlobalVar.GV().EmployID));
     }
 
-    private void ErrorAlert(String message) {
+    private void ErrorAlert(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
         alertDialog.setCancelable(false);
-        alertDialog.setTitle("Error");
+        alertDialog.setTitle(title);
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
@@ -602,6 +624,119 @@ public class NclShipmentActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+
+    private void ErrorAlert(final String title, String message, int dummy) {
+        AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+//        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Continue",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        SaveDataCompleteJob(0);
+//                    }
+//                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit without Save",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        finish();
+
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Exit with Save",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        SaveDataCompleteJob(1);
+                        dialog.dismiss();
+
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void UploadManul(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save & Upload",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        SaveDataCompleteJob(2);
+                        dialog.dismiss();
+
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Without Save & Upload",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        NCLbyManual();
+                        dialog.dismiss();
+
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void SaveDataCompleteJob(int close) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        if (IsValid()) {
+
+            DateTime TimeIn = DateTime.now();
+            Ncl ncl = new Ncl(ScanNclWaybillFragment.WaybillList.size(), ScanNclWaybillFragment.PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
+            ArrayList<String> waybill = new ArrayList<String>();
+            if (dbConnections.InsertNcl(ncl, getApplicationContext())) {
+                int nclId = dbConnections.getMaxID("Ncl", getApplicationContext());
+                for (int i = 0; i < ScanNclWaybillFragment.PieceCodeList.size(); i++) {
+                    if (waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
+                        waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
+//                        NclWaybillDetail nclWaybillDetail =
+//                                new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, nclId);
+//                        dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getApplicationContext());
+                    }
+
+                    NclDetail nclDetail = new NclDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Barcode,
+                            nclId);
+                    dbConnections.InsertNclDetail(nclDetail, getApplicationContext());
+                }
+            }
+
+            if (!isMyServiceRunning(NclService.class)) {
+                startService(
+                        new Intent(this, NclService.class));
+
+            }
+            if (close == 1)
+                finish();
+            else if (close == 2)
+                NCLbyManual();
+
+            ScanNclWaybillFragment.PieceCodeList.clear();
+            ScanNclWaybillFragment.WaybillList.clear();
+
+        }
+        dbConnections.close();
+
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplication()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -720,5 +855,225 @@ public class NclShipmentActivity extends AppCompatActivity {
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    ProgressDialog progressDialog;
+
+    private class NCLbyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(NclShipmentActivity.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+            Cursor result = db.Fill("select * from Ncl order by ID", getApplicationContext());
+            result.moveToFirst();
+            do {
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+                Ncl ncl = new Ncl();
+                ncl.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                ncl.NclNo = result.getString(result.getColumnIndex("NclNo"));
+                ncl.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+                ncl.UserID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
+                ncl.PieceCount = Integer.parseInt(result.getString(result.getColumnIndex("PieceCount")));
+                ncl.WaybillCount = Integer.parseInt(result.getString(result.getColumnIndex("WaybillCount")));
+                ncl.IsSync = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsSync")));
+
+                Cursor resultDetail = db.Fill("select * from NclDetail where NclID = " + ncl.ID, getApplicationContext());
+
+                if (resultDetail.getCount() > 0) {
+                    resultDetail.moveToFirst();
+                    int index = 0;
+                    resultDetail.moveToFirst();
+                    do {
+                        ncl.ncldetails.add(index,
+                                new NclDetail(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), ncl.ID));
+                        index++;
+                    }
+                    while (resultDetail.moveToNext());
+                }
+
+                String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmit"); //LoadtoDestination
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+
+                if (returnresult.contains("Created")) {
+                    moveddata = moveddata + ncl.PieceCount;
+                    db.deleteNcl(ncl.ID, getApplicationContext());
+                    //db.deleteNclWayBill(ncl.ID, getApplicationContext());
+                    db.deleteNclBarcode(ncl.ID, getApplicationContext());
+                }
+                try {
+                    uploaddatacount = uploaddatacount + ncl.PieceCount;
+                } catch (Exception e) {
+
+                }
+                publishProgress((int) ((uploaddatacount * 100) / totalsize));
+
+            } while (result.moveToNext());
+
+            result.close();
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl", getApplicationContext());
+                ts.moveToFirst();
+                //int totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
+                    );
+                    startService(
+                            new Intent(NclShipmentActivity.this,
+                                    com.naqelexpress.naqelpointer.service.NclService.class));
+                } else {
+                    ErrorAlert("No Data",
+                            "All Data Synchronized Successfully");
+                }
+                ts.close();
+                db.close();
+
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
+        }
+    }
+
+    int totalsize = 0, uploaddatacount = 0;
+
+    private void NCLbyManual() {
+
+        totalsize = 0;
+        stopService(
+                new Intent(NclShipmentActivity.this,
+                        com.naqelexpress.naqelpointer.service.NclService.class));
+
+        try {
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+
+            Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl", getApplicationContext());
+            ts.moveToFirst();
+            try {
+                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+            } catch (Exception e) {
+                totalsize = 0;
+            }
+            ts.close();
+
+            if (totalsize > 0) {
+                new NCLbyManual().execute(String.valueOf(totalsize));
+            } else {
+                ErrorAlert("No Data",
+                        "All Data Synchronized Successfully"
+                );
+            }
+            db.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
     }
 }

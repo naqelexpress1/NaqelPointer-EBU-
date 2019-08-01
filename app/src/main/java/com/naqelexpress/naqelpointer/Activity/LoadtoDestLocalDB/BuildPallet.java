@@ -231,8 +231,10 @@ public class BuildPallet extends Fragment implements IOnFocusListenable {
             validateBarcodeetails.add(barcode);
             lbTotal.setText(String.valueOf(buildpalletary.size()));
 
-        } else
+        } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+        }
     }
 
     Point p;

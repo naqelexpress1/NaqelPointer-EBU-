@@ -79,8 +79,8 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Test - LFN";
-    public boolean LoginVariation = true; //For EBU only
+    public String AppVersion = "Test - Terminal Handling";
+    public boolean LoginVariation = false; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -1401,7 +1401,7 @@ public class GlobalVar {
         ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> pickupFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from PickUp where IsSync = 0 ", context);
+        Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 ", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
@@ -2351,6 +2351,17 @@ public class GlobalVar {
             }
         });
         builder.create().show();
+    }
+
+    public boolean GetDivision(Context context) {
+        if (GlobalVar.GV().EmployID == 19127)
+            return false;
+        String division = GlobalVar.GV().getDivisionID(context, GlobalVar.GV().EmployID);
+        if (division.equals("Express"))
+            return false;
+        else
+            return true;
+
     }
 
 //    public static String getDivision(Context context) {

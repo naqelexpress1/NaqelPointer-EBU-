@@ -17,9 +17,9 @@ android {
         applicationId "com.naqelexpress.naqelpointer"
         minSdkVersion 21
         targetSdkVersion 28
-        versionName '1.5.1.0'
+        versionName '2.5.1.4'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 51
+        versionCode 253
     }
     buildTypes {
 

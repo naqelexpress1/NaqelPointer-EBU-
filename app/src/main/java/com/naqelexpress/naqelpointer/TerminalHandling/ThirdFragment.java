@@ -344,6 +344,7 @@ public class ThirdFragment
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
+        txtBarCode.requestFocus();
     }
 
     private void ErrorAlert(final String title, String message, final int clear, final String piececode) {

@@ -104,20 +104,20 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
         Intent intent = getIntent();
         trips = (HashMap<String, String>) intent.getSerializableExtra("tripdata");
-        if (trips.get("AdHoc").equals("0")) {
+        //if (trips.get("AdHoc").equals("0")) {
 
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("OriginID", trips.get("OriginID"));
-                if (trips.get("DestinationsID").equals("0"))
-                    jsonObject.put("DestinationsID", trips.get("DestinationID"));
-                else
-                    jsonObject.put("DestinationsID", trips.get("DestinationsID"));
-                new BringNCLData().execute(jsonObject.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("OriginID", trips.get("OriginID"));
+            if (trips.get("DestinationsID").equals("0"))
+                jsonObject.put("DestinationsID", trips.get("DestinationID"));
+            else
+                jsonObject.put("DestinationsID", trips.get("DestinationsID"));
+            new BringNCLData().execute(jsonObject.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        // }
 
         initViews();
 
@@ -165,11 +165,12 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void AddNewPiece() {
-        if (trips.get("AdHoc").equals("0"))
-            if (!isncl.contains(txtBarCode.getText().toString())) {
-                ErrorAlert("This Ncl(" + txtBarCode.getText().toString() + ") not in this Trip(" + trips.get("TripCode") + ")");
-                return;
-            }
+        // if (trips.get("AdHoc").equals("0"))
+        if (!isncl.contains(txtBarCode.getText().toString())) {
+            ErrorAlert("This Ncl(" + txtBarCode.getText().toString() + ") not in this Trip(" + trips.get("TripCode") + ")");
+            return;
+        }
+
         if (!ncl.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 10) {
                 ncl.add(0, txtBarCode.getText().toString());
@@ -182,6 +183,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
+        txtBarCode.requestFocus();
     }
 
     private void initSwipe() {

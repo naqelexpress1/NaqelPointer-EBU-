@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -27,6 +28,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -160,7 +162,7 @@ public class MainPageActivity
     TextView ofd, attempted, delivered, exceptions, productivity, complaint, compDelvrd, ComRemain;
 
     TableLayout tl, tl1;
-    TextView user, version;
+    TextView user, version, devicestatus;
 
     //TextView out
     @Override
@@ -176,7 +178,7 @@ public class MainPageActivity
 
             user = (TextView) findViewById(R.id.user);
             version = (TextView) findViewById(R.id.version);
-
+            devicestatus = (TextView) findViewById(R.id.devicestatus);
 
             tl = (TableLayout) findViewById(R.id.tl);
             tl1 = (TableLayout) findViewById(R.id.tl1);
@@ -202,6 +204,8 @@ public class MainPageActivity
 
             mActionBar.setCustomView(mCustomView);
             mActionBar.setDisplayShowCustomEnabled(true);
+
+            // isDeviceonline();
 
         } catch (Exception e) {
             System.out.println(e);
@@ -763,13 +767,6 @@ public class MainPageActivity
         complaint.setText("Req and Complaints : " + String.valueOf(comp) + " / " + excep1);
         ComRemain.setText(String.valueOf(remain));
         compDelvrd.setText(String.valueOf(delivrd1));
-    }
-
-
-    @Override
-    protected void onResume() {
-        setProductivitytext();
-        super.onResume();
     }
 
 
@@ -2326,4 +2323,88 @@ public class MainPageActivity
         return valid;
     }
 
+    Handler isdeviceonlinehandler;
+
+    private void isDeviceonline() {
+        try {
+            isdeviceonlinehandler = new Handler();
+            isdeviceonlinehandler.postDelayed(new Runnable() {
+                public void run() {
+                    try {
+                        new InternetAvailability().execute();
+                        isdeviceonlinehandler.postDelayed(this, 10000);
+                    } catch (Exception e) {
+
+                        isdeviceonlinehandler.postDelayed(this, 10000);
+                        Log.e("Dashboard thread", e.toString());
+                    }
+
+                }
+            }, 10000);
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    private class InternetAvailability extends AsyncTask<String, Integer, String> {
+
+        @Override
+        protected String doInBackground(String... sUrl) {
+            String ds = "";
+            try {
+                HttpURLConnection urlc = (HttpURLConnection)
+                        (new URL("http://clients3.google.com/generate_204")
+                                .openConnection());
+                urlc.setRequestProperty("User-Agent", "Android");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1500);
+                urlc.connect();
+
+                if (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0)
+                    ds = "Device is Online!";
+                else
+                    ds = "No Internet!";
+
+            } catch (IOException e) {
+                ds = "No Internet!";
+                Log.e("", "Error checking internet connection", e);
+            }
+
+            return ds;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+            super.onProgressUpdate(progress);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            devicestatus.setText(result);
+            if (result.contains("No Internet"))
+                devicestatus.setTextColor(getResources().getColor(R.color.NaqelRed));
+            else
+                devicestatus.setTextColor(getResources().getColor(R.color.Green));
+
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isdeviceonlinehandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    protected void onResume() {
+        setProductivitytext();
+        isDeviceonline();
+        super.onResume();
+    }
 }

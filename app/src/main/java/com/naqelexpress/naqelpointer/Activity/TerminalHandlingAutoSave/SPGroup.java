@@ -16,7 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Activity.NCLAutoSave.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;

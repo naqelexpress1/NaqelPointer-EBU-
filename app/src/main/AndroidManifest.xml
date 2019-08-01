@@ -643,6 +643,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 
+        <activity
+            android:name=".NCL.NclShipmentActivity"
+            android:label="Consolidation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TerminalHandling.TerminalHandling"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
 
         <activity android:name=".MainActivity" />
         <activity android:name=".RoomsListActivity" />

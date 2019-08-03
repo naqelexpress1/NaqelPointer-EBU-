@@ -722,7 +722,7 @@ public class TerminalHandling extends AppCompatActivity {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
 
-            Cursor ts = db.Fill("select SUM(Count) As totalRecord  from CheckPointBarCodeDetails", getApplicationContext());
+            Cursor ts = db.Fill("select SUM(Count) As totalRecord  from CheckPoint", getApplicationContext());
             ts.moveToFirst();
             try {
                 totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));

@@ -416,7 +416,7 @@ public class ThirdFragment
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
                         FirstFragment.txtCheckPointTypeDDetail.getText().toString()
-                        , "");
+                        , "" , 0);
 
         int ID = 0;
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
@@ -444,7 +444,7 @@ public class ThirdFragment
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "");
+                        , "" , 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

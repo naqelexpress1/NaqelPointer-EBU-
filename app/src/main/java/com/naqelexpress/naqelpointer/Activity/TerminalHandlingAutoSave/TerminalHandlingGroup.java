@@ -232,7 +232,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             intent.putExtras(bundle);
             startActivity(intent);
         } else if (group.equals("3")) {
-            Intent intent = new Intent(this, SPGroup.class);
+            Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.SPGroup.class);
             intent.putExtras(bundle);
             startActivity(intent);
         } else {

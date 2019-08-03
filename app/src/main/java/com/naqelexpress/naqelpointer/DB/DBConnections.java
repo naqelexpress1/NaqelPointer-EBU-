@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 73; // Added for Terminal Handling Count Column
+    private static final int Version = 74; // Added for Terminal Handling Count Column
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -611,7 +611,7 @@ public class DBConnections
 
             if (!isColumnExist("UserME", "TruckID"))
                 db.execSQL("ALTER TABLE UserME ADD COLUMN TruckID INTEGER DEFAULT 0");
-            if (!isColumnExist("CheckPoint", "Comments"))
+            if (!isColumnExist("CheckPoint", "Count"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Count INTEGER Default 0");
 
         }

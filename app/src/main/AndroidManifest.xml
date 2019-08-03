@@ -705,6 +705,13 @@
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar" />
 
+        <activity
+            android:name=".TerminalHandling.SPGroup"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
             android:process=":naqelsignature" />

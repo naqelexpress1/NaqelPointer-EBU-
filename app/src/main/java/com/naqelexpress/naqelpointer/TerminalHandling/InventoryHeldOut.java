@@ -301,7 +301,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 44, ""
-                            , "");
+                            , "" , 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -463,7 +463,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        countDownTimer.cancel();
+                       // countDownTimer.cancel();
                         InventoryHeldOut.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -510,33 +510,33 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         return false;
     }
 
-    private long startTime = 1000; // 15 MINS IDLE TIME
-    private final long interval = 1 * 1000;
-    MyCountDownTimer countDownTimer;
-
-    public class MyCountDownTimer extends CountDownTimer {
-        public MyCountDownTimer(long startTime, long interval) {
-            super(startTime, interval);
-        }
-
-        @Override
-        public void onFinish() {
-            //DO WHATEVER YOU WANT HERE
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-            UserMeLogin userMeLogin = new UserMeLogin(id);
-            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
-
-            ActivityCompat.finishAffinity(InventoryHeldOut.this);
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-    }
+//    private long startTime = 1000; // 15 MINS IDLE TIME
+//    private final long interval = 1 * 1000;
+//    MyCountDownTimer countDownTimer;
+//
+//    public class MyCountDownTimer extends CountDownTimer {
+//        public MyCountDownTimer(long startTime, long interval) {
+//            super(startTime, interval);
+//        }
+//
+//        @Override
+//        public void onFinish() {
+//            //DO WHATEVER YOU WANT HERE
+//            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+//            UserMeLogin userMeLogin = new UserMeLogin(id);
+//            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+//            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+//
+//            ActivityCompat.finishAffinity(InventoryHeldOut.this);
+//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//            startActivity(intent);
+//        }
+//
+//        @Override
+//        public void onTick(long millisUntilFinished) {
+//        }
+//    }
 
     @Override
     public void onUserInteraction() {
@@ -544,7 +544,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         super.onUserInteraction();
 
         //Reset the timer on user interaction...
-        countDownTimer.cancel();
-        countDownTimer.start();
+        //countDownTimer.cancel();
+        //countDownTimer.start();
     }
 }

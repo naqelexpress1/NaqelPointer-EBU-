@@ -24,6 +24,7 @@ public class TerminalHandling {
     public String AppVersion = GlobalVar.GV().AppVersion;
     public String Reference = "";
     public String Comments = "";
+    public int Count = 0;
 
     public List<CheckPointWaybillDetails> TerminalHandlingWaybillDetails;
     public List<CheckPointBarCodeDetails> TerminalHandlingBarCodeDetails;
@@ -34,12 +35,13 @@ public class TerminalHandling {
     }
 
     public TerminalHandling(int checkPointTypeID, String latitude, String longitude, int checkPointTypeDetailID, String reference,
-                            String Comments) {
+                            String Comments, int Count) {
         CheckPointTypeID = checkPointTypeID;
         CheckPointTypeDetailID = checkPointTypeDetailID;
         Reference = reference;
         Latitude = latitude;
         Longitude = longitude;
         this.Comments = Comments;
+        this.Count = Count;
     }
 }

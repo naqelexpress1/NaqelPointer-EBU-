@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 72; // Truck Info for EBU
+    private static final int Version = 73; // Added for Terminal Handling Count Column
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -153,7 +153,7 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
                 "\"CheckPointTypeDetailID\" INTEGER  , \"CheckPointTypeDDetailID\" INTEGER  , \"Latitude\" TEXT, " +
-                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT )");
+                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointBarCodeDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
@@ -611,6 +611,8 @@ public class DBConnections
 
             if (!isColumnExist("UserME", "TruckID"))
                 db.execSQL("ALTER TABLE UserME ADD COLUMN TruckID INTEGER DEFAULT 0");
+            if (!isColumnExist("CheckPoint", "Comments"))
+                db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Count INTEGER Default 0");
 
         }
 
@@ -4258,7 +4260,7 @@ public class DBConnections
             result = db.insertOrThrow("CheckPoint", null, contentValues);
             db.close();
         } catch (SQLiteException e) {
-
+            System.out.println(e);
         }
         return result != -1;
     }

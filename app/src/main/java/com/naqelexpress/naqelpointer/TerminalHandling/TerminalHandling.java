@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,13 +23,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointWaybillDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -147,8 +151,8 @@ public class TerminalHandling extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        //MenuInflater inflater = getMenuInflater();
-        //inflater.inflate(R.menu.checkpointmenu, menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.terminalmanu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -157,14 +161,42 @@ public class TerminalHandling extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
-                    SaveData();
-                else
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2);
+                } else
                     GlobalVar.RedirectSettings(TerminalHandling.this);
                 return true;
+            case R.id.manual:
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    ErrorAlert("Info", "Are yo sure want to upload Manual?", 3);
+                } else
+                    GlobalVar.RedirectSettings(TerminalHandling.this);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void ErrorAlert(final String title, String message, final int clear) {
+        AlertDialog alertDialog = new AlertDialog.Builder(TerminalHandling.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                        if (clear == 2)
+                            SaveData();
+                        else if (clear == 3)
+                            insertManual1();
+
+                    }
+                });
+
+        alertDialog.show();
     }
 
     private void SaveData() {
@@ -183,31 +215,17 @@ public class TerminalHandling extends AppCompatActivity {
             }
 
 
-//            if (firstFragment.CheckPointTypeID == 20) {
-//                Comments = firstFragment.txtCheckPointTypeDDetail.getText().toString();
-//                firstFragment.txtCheckPointTypeDDetail.setText(Comments);
-//            }
-
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                             String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "");
+                            , "", thirdFragment.Barcodes.size());
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
 
-//                for (int i = 0; i < secondFragment.WaybillList.size(); i++) {
-//                    CheckPointWaybillDetails waybills = new CheckPointWaybillDetails(secondFragment.WaybillList.get(i), ID);
-//                    if (!dbConnections.InsertCheckPointWaybillDetails(waybills, getApplicationContext())) {
-//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving),
-//                                GlobalVar.AlertType.Error);
-//                        IsSaved = false;
-//                        break;
-//                    }
-//                }
 
-                for (int i = 0; i < thirdFragment.BarCodeList.size(); i++) {
-                    CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(thirdFragment.BarCodeList.get(i), ID);
+                for (int i = 0; i < thirdFragment.Barcodes.size(); i++) {
+                    CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(thirdFragment.Barcodes.get(i), ID);
                     if (!dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext())) {
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving),
                                 GlobalVar.AlertType.Error);
@@ -218,15 +236,14 @@ public class TerminalHandling extends AppCompatActivity {
 
 
                 if (IsSaved) {
-//                    stopService(
-//                            new Intent(TerminalHandling.this,
-//                                    com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+//
                     if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                         startService(
                                 new Intent(TerminalHandling.this,
                                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));
                     }
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+
                     finish();
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
@@ -693,5 +710,244 @@ public class TerminalHandling extends AppCompatActivity {
         //Reset the timer on user interaction...
         // countDownTimer.cancel();
         //countDownTimer.start();
+    }
+
+    private void insertManual1() {
+
+        stopService(
+                new Intent(TerminalHandling.this,
+                        com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+
+        try {
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+
+            Cursor ts = db.Fill("select SUM(Count) As totalRecord  from CheckPointBarCodeDetails", getApplicationContext());
+            ts.moveToFirst();
+            try {
+                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+            } catch (Exception e) {
+                totalsize = 0;
+            }
+            ts.close();
+
+            if (totalsize > 0) {
+                new SaveAtTerminalHandlingbyManual().execute(String.valueOf(totalsize));
+            } else {
+                ErrorAlert("No Data",
+                        "All Data Synchronized Successfully"
+                );
+            }
+            db.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+    int uploaddatacount = 0, totalsize = 0;
+
+    private class SaveAtTerminalHandlingbyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(TerminalHandling.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+            Cursor result = db.Fill("select * from CheckPoint order by ID", getApplicationContext());
+            result.moveToFirst();
+            do {
+                int jsonlegth = result.getInt(result.getColumnIndex("Count"));
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+
+                final com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling();
+                checkPoint.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                checkPoint.TerminalHandlingScanStatusID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeID")));
+                checkPoint.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+                checkPoint.EmployID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
+                checkPoint.IsSync = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsSync")));
+                checkPoint.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                checkPoint.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
+                checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
+
+
+                Cursor resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
+                if (resultDetail.getCount() > 0) {
+                    resultDetail.moveToFirst();
+                    int index = 0;
+                    resultDetail.moveToFirst();
+                    do {
+                        checkPoint.TerminalHandlingBarCodeDetails.add(index, new CheckPointBarCodeDetails(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), checkPoint.ID));
+                        index++;
+                    }
+                    while (resultDetail.moveToNext());
+                }
+
+
+                String jsonData = JsonSerializerDeserializer.serialize(checkPoint, true);
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+
+                if (returnresult.contains("Created")) {
+                    moveddata = moveddata + jsonlegth;
+                    db.deleteCheckPointID(checkPoint.ID, getApplicationContext());
+                    db.deleteCheckPointWayBill(checkPoint.ID, getApplicationContext());
+                    db.deleteCheckPointBarcode(checkPoint.ID, getApplicationContext());
+                }
+                try {
+                    uploaddatacount = uploaddatacount + jsonlegth;
+                } catch (Exception e) {
+
+                }
+                publishProgress((int) ((uploaddatacount * 100) / totalsize));
+
+            } while (result.moveToNext());
+
+            result.close();
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select SUM(Count) As totalRecord  from CheckPoint", getApplicationContext());
+                ts.moveToFirst();
+                //int totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
+                    );
+                    startService(
+                            new Intent(TerminalHandling.this,
+                                    com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+                } else {
+                    ErrorAlert("No Data",
+                            "All Data Synchronized Successfully");
+                }
+                ts.close();
+                db.close();
+
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
+        }
+    }
+
+    private void ErrorAlert(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(TerminalHandling.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+        alertDialog.show();
     }
 }

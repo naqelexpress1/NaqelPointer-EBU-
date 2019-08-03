@@ -45,6 +45,7 @@ public class ThirdFragment
     TextView lbTotal;
     public static EditText txtBarCode;
     public ArrayList<String> BarCodeList = new ArrayList<>();
+    public ArrayList<String> Barcodes = new ArrayList<>();
     private DataAdapter adapter;
     private RecyclerView recyclerView;
     private Paint p = new Paint();
@@ -55,6 +56,7 @@ public class ThirdFragment
 //    private View view;
 //    private boolean add = false;
     private Intent intent;
+    ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
 
     @Override
@@ -86,7 +88,7 @@ public class ThirdFragment
                             if (IsValid()) {
                                 AddNewPiece();
                             } else {
-                                txtBarCode.setText("");
+                                requestfocus();
                             }
                         }
                     } else {
@@ -94,7 +96,7 @@ public class ThirdFragment
                             if (IsValid()) {
                                 AddNewPiece();
                             } else {
-                                txtBarCode.setText("");
+                                requestfocus();
                             }
                         }
                     }
@@ -121,6 +123,11 @@ public class ThirdFragment
 
 
         return rootView;
+    }
+
+    private void requestfocus() {
+        txtBarCode.setText("");
+        txtBarCode.requestFocus();
     }
 
     private void initViews() {
@@ -250,6 +257,13 @@ public class ThirdFragment
 
     private void AddNewPiece() {
 
+        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+            txtBarCode.requestFocus();
+            txtBarCode.setText("");
+            initViews();
+            return;
+        }
+
         try {
             double convert = Double.parseDouble(txtBarCode.getText().toString());
         } catch (Exception e) {
@@ -257,7 +271,7 @@ public class ThirdFragment
             ErrorAlert("Error",
                     "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
             );
-            txtBarCode.setText("");
+            requestfocus();
             return;
         }
 
@@ -272,7 +286,6 @@ public class ThirdFragment
             if (TerminalHandling.isdeliveryReq.contains(txtBarCode.getText().toString())) {
                 if (TerminalHandling.isrtoReq.contains(txtBarCode.getText().toString())) {
                     rtoreq = true;
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0, txtBarCode.getText().toString());
                     if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
                         TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
                         HashMap<String, String> temp = new HashMap<>();
@@ -282,9 +295,8 @@ public class ThirdFragment
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
                     }
-
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0);
                 } else {
-                    ErrorAlert("Request For Delivery", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
                     if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
                         TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
                         HashMap<String, String> temp = new HashMap<>();
@@ -294,14 +306,13 @@ public class ThirdFragment
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
                     }
+                    ErrorAlert("Request For Delivery", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0);
                 }
-
                 return;
             }
 
             if (!rtoreq) {
                 if (TerminalHandling.isrtoReq.contains(txtBarCode.getText().toString())) {
-                    ErrorAlert("Request For RTO", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0, txtBarCode.getText().toString());
                     if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
                         TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
                         HashMap<String, String> temp = new HashMap<>();
@@ -311,14 +322,30 @@ public class ThirdFragment
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
                     }
+                    ErrorAlert("Request For RTO", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0);
                     return;
                 }
             }
         }
 
-        if (!BarCodeList.contains(txtBarCode.getText().toString())) {
+        int picecodeLength = 0;
+        if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
+                FirstFragment.CheckPointTypeID == 2) {
+            picecodeLength = 10;
+        } else
+            picecodeLength = 13;
 
-            if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
+        if (!BarCodeList.contains(txtBarCode.getText().toString())) {
+            if (txtBarCode.getText().toString().length() == picecodeLength) {
+                Barcodes.add(txtBarCode.getText().toString());
+                BarCodeList.add(0, txtBarCode.getText().toString());
+                lbTotal.setText(getString(R.string.lbCount) + BarCodeList.size());
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                requestfocus();
+                initViews();
+            }
+
+            /*if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
                     FirstFragment.CheckPointTypeID == 2) {
                 if (txtBarCode.getText().toString().length() == 10) {
                     SaveData(txtBarCode.getText().toString());
@@ -338,69 +365,88 @@ public class ThirdFragment
                     txtBarCode.setText("");
                     initViews();
                 }
-            }
+            }*/
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
-        txtBarCode.requestFocus();
-    }
 
-    private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setCancelable(false);
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        if (clear == 0)
-                            txtBarCode.setText("");
-                        if (piececode.length() > 0)
-                            SaveData(piececode, title);
-                    }
-                });
-
-        alertDialog.show();
-    }
-
-    private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setCancelable(false);
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-        alertDialog.show();
-    }
-
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("lbTotal", lbTotal.getText().toString());
-        outState.putString("txtBarCode", txtBarCode.getText().toString());
-        outState.putStringArrayList("BarCodeList", BarCodeList);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
-            lbTotal.setText(savedInstanceState.getString("lbTotal"));
-            txtBarCode.setText(savedInstanceState.getString("txtBarCode"));
-            BarCodeList = savedInstanceState.getStringArrayList("BarCodeList");
+        if (Barcodes.size() == 20) {
+            SaveData();
         }
+        requestfocus();
     }
 
-    private void SaveData(String piece) {
+    private void SaveData() {
+
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        String Comments = "";
+        if (FirstFragment.CheckPointTypeID == 18) {
+            Comments = "Weight " + FirstFragment.txtweight.getText().toString() + " KG " + "  W * L * H" +
+                    FirstFragment.txtwidth.getText().toString() + " * " +
+                    FirstFragment.txtlength.getText().toString() + " * " +
+                    FirstFragment.txtheight.getText().toString();
+            FirstFragment.txtCheckPointTypeDDetail.setText(Comments);
+
+        }
+
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
+                        String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
+                        FirstFragment.txtCheckPointTypeDDetail.getText().toString()
+                        , "", Barcodes.size());
+
+        int ID = 0;
+        if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
+            ID = dbConnections.getMaxID("CheckPoint", getContext());
+
+            if (ID > 0) {
+                for (String PieceCode : Barcodes) {
+                    CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(PieceCode, ID);
+                    dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getContext());
+                }
+
+            }
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+                getActivity().startService(
+                        new Intent(getActivity(),
+                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+            }
+            Barcodes.clear();
+        }
+        dbConnections.close();
+
+
+    }
+
+    private void ErrorAlert(final String title, String message, final int clear) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (clear == 0) {
+                            txtBarCode.setText("");
+                            txtBarCode.requestFocus();
+                        }
+
+//                        if (piececode.length() > 0)
+//                            SaveData(piececode, title);
+
+                        if (Barcodes.size() == 20) {
+                            SaveData();
+                        }
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    /*private void SaveData(String piece) {
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
         String Comments = "";
@@ -436,7 +482,80 @@ public class ThirdFragment
         dbConnections.close();
 
 
+    }*/
+
+
+    private void ErrorAlert(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
     }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("lbTotal", lbTotal.getText().toString());
+        outState.putString("txtBarCode", txtBarCode.getText().toString());
+        outState.putStringArrayList("BarCodeList", BarCodeList);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            lbTotal.setText(savedInstanceState.getString("lbTotal"));
+            txtBarCode.setText(savedInstanceState.getString("txtBarCode"));
+            BarCodeList = savedInstanceState.getStringArrayList("BarCodeList");
+        }
+    }
+
+   /* private void SaveData(String piece) {
+
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        String Comments = "";
+        if (FirstFragment.CheckPointTypeID == 18) {
+            Comments = "Weight " + FirstFragment.txtweight.getText().toString() + " KG " + "  W * L * H" +
+                    FirstFragment.txtwidth.getText().toString() + " * " +
+                    FirstFragment.txtlength.getText().toString() + " * " +
+                    FirstFragment.txtheight.getText().toString();
+            FirstFragment.txtCheckPointTypeDDetail.setText(Comments);
+
+        }
+
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
+                        String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
+                        FirstFragment.txtCheckPointTypeDDetail.getText().toString()
+                        , "");
+
+        int ID = 0;
+        if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
+            ID = dbConnections.getMaxID("CheckPoint", getContext());
+
+            if (ID > 0) {
+                CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(piece, ID);
+                dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getContext());
+            }
+            if (!isMyServiceRunning(TerminalHandling.class)) {
+                getActivity().startService(
+                        new Intent(getActivity(),
+                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+            }
+        }
+        dbConnections.close();
+
+
+    }*/
 
     private void SaveData(String PieceCode, String req) {
 
@@ -445,7 +564,7 @@ public class ThirdFragment
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "");
+                        , "" , 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

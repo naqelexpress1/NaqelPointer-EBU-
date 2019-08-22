@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
@@ -32,6 +33,9 @@ public class LocationService extends Service {
     @Override
     public void onStart(Intent intent, int startId) {
 
+        if (Build.MANUFACTURER.equals("unknown")) {
+            return;
+        }
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         listener = new MyLocationListener();
         int ACCESS_COARSE_LOCATION = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -44,6 +48,7 @@ public class LocationService extends Service {
         }
 
     }
+
 
     @Override
     public IBinder onBind(Intent intent) {

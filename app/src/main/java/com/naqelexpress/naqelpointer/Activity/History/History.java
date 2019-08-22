@@ -18,10 +18,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.gson.JsonObject;
-import com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB.AtOrigin;
 import com.naqelexpress.naqelpointer.Activity.Booking.Booking;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingListAdapter;
 import com.naqelexpress.naqelpointer.Activity.MyRoute.RouteListAdapter;
@@ -34,7 +30,6 @@ import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.PickUpDetailRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.PickUpRequest;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControlOnetab;
 
 import org.joda.time.DateTime;
 
@@ -421,19 +416,19 @@ public class History extends Activity {
                             com.naqelexpress.naqelpointer.service.NotDelivery.class));
         }
 
-//        if (!GetDivision()) {
-//            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnDelivery.class)) {
+        if (!GetDivision()) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnDelivery.class)) {
 //                startService(
 //                        new Intent(History.this,
 //                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
-//            }
-//        } else {
-//            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PartialDelivery.class)) {
-//                startService(
-//                        new Intent(History.this,
-//                                com.naqelexpress.naqelpointer.service.PartialDelivery.class));
-//            }
-//        }
+            }
+        } else {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PartialDelivery.class)) {
+                startService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.PartialDelivery.class));
+            }
+        }
         if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnLoading.class)) {
             startService(
                     new Intent(History.this,
@@ -448,10 +443,10 @@ public class History extends Activity {
 //            }
 
         if (GetDivision()) {
-            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
                 startService(
                         new Intent(History.this,
-                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+                                com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
             }
         }
         if (GetDivision()) {

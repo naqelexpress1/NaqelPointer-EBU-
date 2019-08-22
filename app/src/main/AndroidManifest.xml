@@ -653,6 +653,16 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".TerminalHandling.BringTripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TerminalHandling.TripDetails"
+            android:label="TripDetails"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
 
         <activity android:name=".MainActivity" />
         <activity android:name=".RoomsListActivity" />
@@ -711,6 +721,35 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
+        <activity
+            android:name=".TerminalHandling.TripArrviedatDest"
+            android:label="Arrived Dest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.CloseTruck"
+            android:label="Close Truck"
+            android:screenOrientation="portrait"
+            android:theme="@style/myDialog" />
+
+        <activity
+            android:name=".TerminalHandling.UndoNcl"
+            android:label="Undo Ncl"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.TripArrviedatDestbyNCL"
+            android:label="Arrived Dest"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".NCLBulk.NclShipmentActivity"
+            android:label="Consolidation"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
@@ -938,6 +977,9 @@
         <service
             android:name=".service.NclService"
             android:process=":naqelNclService" />
+        <service
+            android:name=".service.NclServiceBulk"
+            android:process=":naqelNclServiceBulk" />
 
     </application>
 

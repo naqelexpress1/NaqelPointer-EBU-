@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.NCL;
+package com.naqelexpress.naqelpointer.NCLBulk;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -58,8 +58,8 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControlOnetab;
 import com.naqelexpress.naqelpointer.service.NclService;
+import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
 
 import org.joda.time.DateTime;
@@ -721,27 +721,38 @@ public class NclShipmentActivity extends AppCompatActivity {
         if (IsValid()) {
 
             DateTime TimeIn = DateTime.now();
-            Ncl ncl = new Ncl(ScanNclWaybillFragment.WaybillList.size(), ScanNclWaybillFragment.PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
+            // Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
             ArrayList<String> waybill = new ArrayList<String>();
-            if (dbConnections.InsertNcl(ncl, getApplicationContext())) {
-                int nclId = dbConnections.getMaxID("Ncl", getApplicationContext());
-                for (int i = 0; i < ScanNclWaybillFragment.PieceCodeList.size(); i++) {
-                    if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
-                        waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
-                        NclWaybillDetail nclWaybillDetail =
-                                new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, nclId);
-                        dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getApplicationContext());
-                    }
 
-                    NclDetail nclDetail = new NclDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Barcode,
-                            nclId);
-                    dbConnections.InsertNclDetail(nclDetail, getApplicationContext());
+            Ncl ncl = new Ncl();
+            ncl.NclNo = NclShipmentActivity.NclNo;
+            ncl.Date = TimeIn;
+            ncl.UserID = GlobalVar.GV().UserID;
+            ncl.PieceCount = ScanNclWaybillFragment.PieceCodeList.size();
+
+            ncl.IsSync = false;
+
+            for (int i = 0; i < ScanNclWaybillFragment.PieceCodeList.size(); i++) {
+                if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
+
+                    waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
+                    ncl.nclwaybilldetails.add(i,
+                            new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, 0));
+
                 }
+                ncl.ncldetails.add(i,
+                        new NclDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Barcode, 0));
             }
+            ncl.WaybillCount = waybill.size();
+            
+            String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
+            jsonData = jsonData.replace("Date(-", "Date(");
 
-            if (!isMyServiceRunning(NclService.class)) {
+            dbConnections.InsertNclBulk(jsonData, getApplicationContext());
+
+            if (!isMyServiceRunning(NclServiceBulk.class)) {
                 startService(
-                        new Intent(this, NclService.class));
+                        new Intent(this, NclServiceBulk.class));
 
             }
             if (close == 1)
@@ -805,7 +816,7 @@ public class NclShipmentActivity extends AppCompatActivity {
                 if (IsSaved) {
                     startService(
                             new Intent(NclShipmentActivity.this,
-                                    com.naqelexpress.naqelpointer.service.NclService.class));
+                                    NclService.class));
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
                     finish();
                 } else
@@ -1070,7 +1081,7 @@ public class NclShipmentActivity extends AppCompatActivity {
                     );
                     startService(
                             new Intent(NclShipmentActivity.this,
-                                    com.naqelexpress.naqelpointer.service.NclService.class));
+                                    NclService.class));
                 } else {
 
                     SavedSucessfully("No Data",
@@ -1096,7 +1107,7 @@ public class NclShipmentActivity extends AppCompatActivity {
         totalsize = 0;
         stopService(
                 new Intent(NclShipmentActivity.this,
-                        com.naqelexpress.naqelpointer.service.NclService.class));
+                        NclService.class));
 
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);

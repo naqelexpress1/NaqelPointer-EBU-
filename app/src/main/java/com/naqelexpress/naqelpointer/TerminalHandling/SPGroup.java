@@ -16,10 +16,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Activity.NCLAutoSave.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class SPGroup extends AppCompatActivity implements View.OnClickListener {
 
         setContentView(R.layout.spgroup);
 
-        countDownTimer = new MyCountDownTimer(startTime, interval);
+        //countDownTimer = new MyCountDownTimer(startTime, interval);
 
         ImageView group3 = (ImageView) findViewById(R.id.group3);
         group3.setOnClickListener(this);
@@ -145,7 +145,7 @@ public class SPGroup extends AppCompatActivity implements View.OnClickListener {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        countDownTimer.cancel();
+                        //countDownTimer.cancel();
                         SPGroup.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -227,41 +227,41 @@ public class SPGroup extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
-    private final long interval = 1 * 1000;
-    MyCountDownTimer countDownTimer;
-
-    public class MyCountDownTimer extends CountDownTimer {
-        public MyCountDownTimer(long startTime, long interval) {
-            super(startTime, interval);
-        }
-
-        @Override
-        public void onFinish() {
-            //DO WHATEVER YOU WANT HERE
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-            UserMeLogin userMeLogin = new UserMeLogin(id);
-            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
-
-            ActivityCompat.finishAffinity(SPGroup.this);
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-    }
-
-    @Override
-    public void onUserInteraction() {
-
-        super.onUserInteraction();
-
-        //Reset the timer on user interaction...
-        countDownTimer.cancel();
-        countDownTimer.start();
-    }
+//    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
+//    private final long interval = 1 * 1000;
+//    MyCountDownTimer countDownTimer;
+//
+//    public class MyCountDownTimer extends CountDownTimer {
+//        public MyCountDownTimer(long startTime, long interval) {
+//            super(startTime, interval);
+//        }
+//
+//        @Override
+//        public void onFinish() {
+//            //DO WHATEVER YOU WANT HERE
+//            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+//            UserMeLogin userMeLogin = new UserMeLogin(id);
+//            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+//            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+//
+//            ActivityCompat.finishAffinity(SPGroup.this);
+//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//            startActivity(intent);
+//        }
+//
+//        @Override
+//        public void onTick(long millisUntilFinished) {
+//        }
+//    }
+//
+//    @Override
+//    public void onUserInteraction() {
+//
+//        super.onUserInteraction();
+//
+//        //Reset the timer on user interaction...
+//        //countDownTimer.cancel();
+//        //countDownTimer.start();
+//    }
 }

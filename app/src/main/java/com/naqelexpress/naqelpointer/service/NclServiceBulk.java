@@ -19,20 +19,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
-
-import org.joda.time.DateTime;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NclService extends Service {
+public class NclServiceBulk extends Service {
 
     protected boolean flag_thread = false;
 
@@ -105,63 +99,31 @@ public class NclService extends Service {
 
             if (result.getCount() > 0) {
 
+                int id = 0;
+                String jsonData = "";
                 if (result.moveToFirst()) {
-
-                    final Ncl ncl = new Ncl();
-                    ncl.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-                    ncl.NclNo = result.getString(result.getColumnIndex("NclNo"));
-                    ncl.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
-                    ncl.UserID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
-                    ncl.PieceCount = Integer.parseInt(result.getString(result.getColumnIndex("PieceCount")));
-                    ncl.WaybillCount = Integer.parseInt(result.getString(result.getColumnIndex("WaybillCount")));
-                    ncl.IsSync = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsSync")));
-
-                    Cursor resultDetail = db.Fill("select * from NclWaybillDetail where NclID = "
-                            + ncl.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
-                        int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            ncl.nclwaybilldetails.add(index,
-                                    new NclWaybillDetail(
-                                            resultDetail.getString(resultDetail.getColumnIndex("WaybillNo")), ncl.ID));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-                    }
-
-                    resultDetail = db.Fill("select * from NclDetail where NclID = " + ncl.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
-                        int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            ncl.ncldetails.add(index,
-                                    new NclDetail(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), ncl.ID));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-                    }
-
-
-                    String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
-                    jsonData = jsonData.replace("Date(-", "Date(");
-                    SaveNcl(db, jsonData, ncl.ID);
+                    id = result.getInt(result.getColumnIndex("ID"));
+                    jsonData = result.getString(result.getColumnIndex("JsonData"));
                 }
 
+                jsonData = jsonData.replace("Date(-", "Date(");
+                SaveNcl(db, jsonData, id);
 
             } else {
+
                 flag_thread = false;
-                android.os.Process.killProcess(android.os.Process.myPid());
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
+
             }
-        } catch (Exception e) {
+            result.close();
+
+        } catch (
+                Exception e) {
 
             flag_thread = false;
         }
+
     }
 
 
@@ -182,8 +144,8 @@ public class NclService extends Service {
 //                        db.deleteNclWayBill(id, getApplicationContext());
 //                        db.deleteNclBarcode(id, getApplicationContext());
                         db.updateNCL(id, getApplicationContext());
-                        db.updateNCLWaybill(id, getApplicationContext());
-                        db.updateNCLBarcode(id, getApplicationContext());
+                        //db.updateNCLWaybill(id, getApplicationContext());
+                        // db.updateNCLBarcode(id, getApplicationContext());
                     }
                     flag_thread = false;
                     db.close();

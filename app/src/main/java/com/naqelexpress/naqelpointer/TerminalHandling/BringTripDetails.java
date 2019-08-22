@@ -57,7 +57,7 @@ import java.util.Map;
 public class BringTripDetails extends Activity implements TripDetailsAdapter.ItemClickListener {
     TripDetailsAdapter adapter;
     private RecyclerView recyclerView;
-    ArrayList<HashMap<String, String>> tripDetails;
+    static ArrayList<HashMap<String, String>> tripDetails;
     private Paint p = new Paint();
     int function = 0;
 
@@ -77,6 +77,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
         camera.setVisibility(View.GONE);
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
         tripDetails = dbConnections.GetTripDetails(getApplicationContext());
 
 
@@ -294,9 +295,10 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
         if (function == 0) {
             Intent intent = new Intent(BringTripDetails.this, TripDetails.class);
             intent.putExtra("tripdata", tripDetails.get(position));
+            intent.putExtra("position", position);
             startActivity(intent);
         } else if (function == 1) {
-            Intent intent = new Intent(BringTripDetails.this, TripArrviedatDest.class);
+            Intent intent = new Intent(BringTripDetails.this, TripArrviedatDestbyNCL.class);
             intent.putExtra("tripdata", tripDetails.get(position));
             startActivity(intent);
         } else {
@@ -430,7 +432,9 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
                         temp.put("function", String.valueOf(function));
                     } else {
                         temp.put("function", String.valueOf(function));
-                        temp.put("ETA", jsonObject1.getString("ETD"));
+                        String date[] = jsonObject1.getString("Date").split("T");
+
+                        temp.put("ETA", date[0] + " " + jsonObject1.getString("ETD"));
                     }
                     temp.put("Origin", jsonObject1.getString("Origin"));
                     temp.put("Destination", jsonObject1.getString("Destination"));

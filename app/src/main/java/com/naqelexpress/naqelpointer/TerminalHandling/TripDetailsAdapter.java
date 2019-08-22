@@ -29,15 +29,21 @@ public class TripDetailsAdapter
     @Override
     public void onBindViewHolder(TripDetailsAdapter.ViewHolder viewHolder, int i) {
 
-        viewHolder.tripcode.setText(BarcodeList.get(i).get("TripCode"));
+
         viewHolder.originid.setText(BarcodeList.get(i).get("Origin"));
         viewHolder.destination.setText(BarcodeList.get(i).get("Destination"));
         viewHolder.dtime.setText(BarcodeList.get(i).get("ETA"));
         viewHolder.vendorname.setText(BarcodeList.get(i).get("Vendor"));
-        if (BarcodeList.get(i).get("function").equals("0"))
+        if (BarcodeList.get(i).get("function").equals("0")) {
             viewHolder.departarrival.setText("Deprt Time : ");
-        else
+            viewHolder.tripcode.setText(BarcodeList.get(i).get("TripCode"));
+        } else {
             viewHolder.departarrival.setText("Arrival Time : ");
+            String tripid = "";
+            if(!BarcodeList.get(i).get("TripID").equals("0"))
+                tripid =  " - " + BarcodeList.get(i).get("TripID");
+            viewHolder.tripcode.setText(BarcodeList.get(i).get("TripCode") + tripid);
+        }
 
 
     }

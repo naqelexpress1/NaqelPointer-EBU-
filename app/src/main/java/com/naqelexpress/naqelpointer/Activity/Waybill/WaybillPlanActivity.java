@@ -416,6 +416,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
         final String arabic = "عزيزي العميل, n\n  رجاء قم بمشاركة موقعك على الرابط المرفق أدناه لنقوم بتوصيل شحنتك.(" + " " + txtWaybillNo.getText().toString()
                 + ") من)" + txtShipperName.getText().toString();
+
         customerlocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

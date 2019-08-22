@@ -331,14 +331,14 @@ public class PickUpActivity extends AppCompatActivity {
         stopService(
                 new Intent(PickUpActivity.this,
                         com.naqelexpress.naqelpointer.service.PickUp.class));
-        if (GlobalVar.GV().GetDivision(getApplicationContext()))
-            if (!isMyServiceRunning(PickUpActivity.class)) {
+        // if (GlobalVar.GV().GetDivision(getApplicationContext()))
+        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PickUp.class)) {
 
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
-                startService(
-                        new Intent(PickUpActivity.this,
-                                com.naqelexpress.naqelpointer.service.PickUp.class));
-            }
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+            startService(
+                    new Intent(PickUpActivity.this,
+                            com.naqelexpress.naqelpointer.service.PickUp.class));
+        }
 
     }
 

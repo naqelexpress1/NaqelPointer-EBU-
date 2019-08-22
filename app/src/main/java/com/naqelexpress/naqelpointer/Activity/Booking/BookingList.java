@@ -112,7 +112,7 @@ public class BookingList extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections.Fill("select * from PickUp where IsSync = 0 and RefNo=" + myBookingList.get(position).RefNo,getApplicationContext());
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + myBookingList.get(position).RefNo,getApplicationContext());
                     if (result.getCount() == 0) {
                         Intent intent = new Intent(getApplicationContext(), BookingDetailActivity.class);
                         Bundle bundle = new Bundle();

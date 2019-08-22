@@ -147,7 +147,7 @@ public class BookingListAdapter extends BaseAdapter {
                         //   jsonObject.put("LanguageID", "");
                         final String jsonData = jsonObject.toString();
 
-                        Cursor result = dbConnections.Fill("select * from PickUp where IsSync = 0 and RefNo=" +
+                        Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" +
                                 itemList.get(acceptposition).RefNo,context);
                         if (result.getCount() == 0) {
 
@@ -178,7 +178,7 @@ public class BookingListAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     DBConnections dbConnections = new DBConnections(context, null);
-                    Cursor result = dbConnections.Fill("select * from PickUp where IsSync = 0 and RefNo=" + itemList.get(position).RefNo,context);
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + itemList.get(position).RefNo,context);
                     if (result.getCount() == 0) {
                         Intent intent = new Intent(context, PickUpActivity.class);
                         Bundle bundle = new Bundle();
@@ -193,6 +193,9 @@ public class BookingListAdapter extends BaseAdapter {
 
                 }
             });
+        }else if(class_.equals("History"))
+        {
+            holder.txtReferenceNo.setText(item.RefNo +" "+ item.ID);
         }
         holder.txtPieces.setText(String.valueOf(item.PicesCount));
         holder.txtWeight.setText(String.valueOf(item.Weight));
@@ -334,7 +337,7 @@ public class BookingListAdapter extends BaseAdapter {
         protected void onPostExecute(String finalJson) {
             if (finalJson != null) {
                 if (finalJson.equals("201 - Created Successfully")) {
-                    pd.dismiss();
+
                     imageView.setImageResource(R.drawable.accpet_job);
                     itemList.get(position).Status = 7;
                     itemList.set(position, itemList.get(position));
@@ -344,6 +347,11 @@ public class BookingListAdapter extends BaseAdapter {
                 GlobalVar.GV().ShowSnackbar(((Activity) context).getWindow().getDecorView().getRootView(), ((Activity) context).getString(R.string.wentwrong), GlobalVar.AlertType.Error);
             }
 
+            if(pd.isShowing() && pd !=null)
+            {
+                pd.dismiss();
+                pd = null;
+            }
             super.onPostExecute(String.valueOf(finalJson));
         }
     }

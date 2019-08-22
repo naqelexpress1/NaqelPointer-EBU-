@@ -1,29 +1,21 @@
 package com.naqelexpress.naqelpointer.Activity.Login;
 
 import android.Manifest;
-import android.accessibilityservice.AccessibilityService;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.provider.Settings;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
-import com.naqelexpress.naqelpointer.AppController;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
@@ -31,10 +23,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.service.LocationService;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 
 public class SplashScreenActivity
         extends AppCompatActivity {

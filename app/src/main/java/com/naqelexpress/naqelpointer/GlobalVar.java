@@ -19,6 +19,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.Settings;
@@ -79,7 +80,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Test - Terminal Handling";
+    public String AppVersion = "1.5.2.0";
     public boolean LoginVariation = false; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -2318,7 +2319,10 @@ public class GlobalVar {
 
         if (GlobalVar.getDivision(context).equals("Express")) {
             return true;
+        } else if (Build.MANUFACTURER.equals("unknown")) {
+            return true;
         }
+
 
 //        boolean gps_enabled = false;
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);

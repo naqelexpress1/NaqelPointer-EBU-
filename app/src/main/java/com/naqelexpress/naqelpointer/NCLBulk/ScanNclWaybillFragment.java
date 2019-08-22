@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.NCL;
+package com.naqelexpress.naqelpointer.NCLBulk;
 
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
@@ -28,7 +28,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BarcodeInfoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.service.NclService;
+import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 
 import org.joda.time.DateTime;
 
@@ -398,30 +398,37 @@ public class ScanNclWaybillFragment extends Fragment {
         if (IsValid()) {
 
             DateTime TimeIn = DateTime.now();
-            Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
+            // Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
             ArrayList<String> waybill = new ArrayList<String>();
-            if (dbConnections.InsertNcl(ncl, getContext())) {
-                int nclId = dbConnections.getMaxID("Ncl", getContext());
-                for (int i = 0; i < PieceCodeList.size(); i++) {
-                    if (!waybill.contains(PieceCodeList.get(i).Waybill)) {
 
-                        waybill.add(PieceCodeList.get(i).Waybill);
-                        NclWaybillDetail nclWaybillDetail =
-                                new NclWaybillDetail(PieceCodeList.get(i).Waybill, nclId);
-                        dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getContext());
+            Ncl ncl = new Ncl();
+            ncl.NclNo = NclShipmentActivity.NclNo;
+            ncl.Date = TimeIn;
+            ncl.UserID = GlobalVar.GV().UserID;
+            ncl.PieceCount = PieceCodeList.size();
+            ncl.WaybillCount = waybill.size();
+            ncl.IsSync = false;
 
-                    }
+            for (int i = 0; i < PieceCodeList.size(); i++) {
+                if (!waybill.contains(PieceCodeList.get(i).Waybill)) {
 
-                    NclDetail nclDetail = new NclDetail(PieceCodeList.get(i).Barcode,
-                            nclId);
-                    dbConnections.InsertNclDetail(nclDetail, getContext());
+                    waybill.add(PieceCodeList.get(i).Waybill);
+                    ncl.nclwaybilldetails.add(i,
+                            new NclWaybillDetail(PieceCodeList.get(i).Waybill, 0));
 
                 }
+                ncl.ncldetails.add(i,
+                        new NclDetail(PieceCodeList.get(i).Barcode, 0));
             }
 
-            if (!isMyServiceRunning(NclService.class)) {
+            String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
+            jsonData = jsonData.replace("Date(-", "Date(");
+
+            dbConnections.InsertNclBulk(jsonData, getContext());
+
+            if (!isMyServiceRunning(NclServiceBulk.class)) {
                 getActivity().startService(
-                        new Intent(getActivity(), NclService.class));
+                        new Intent(getActivity(), NclServiceBulk.class));
 
             }
 
@@ -434,39 +441,6 @@ public class ScanNclWaybillFragment extends Fragment {
 
     }
 
-   /* private void SaveData(String Waybillno, String piecebarcode) {
-        DBConnections dbConnections = new DBConnections(getContext(), null);
-        if (IsValid()) {
-            boolean IsSaved = true;
-
-            DateTime TimeIn = DateTime.now();
-            Ncl ncl = new Ncl(1, 1, TimeIn, NclShipmentActivity.NclNo);
-
-            if (dbConnections.InsertNcl(ncl, getContext())) {
-                int nclId = dbConnections.getMaxID("Ncl", getContext());
-
-                NclWaybillDetail nclWaybillDetail =
-                        new NclWaybillDetail(Waybillno, nclId);
-                dbConnections.InsertNclWaybillDetail(nclWaybillDetail, getContext());
-
-                NclDetail nclDetail = new NclDetail(piecebarcode,
-                        nclId);
-                dbConnections.InsertNclDetail(nclDetail, getContext());
-
-                if (IsSaved) {
-                    if (!isMyServiceRunning(NclService.class)) {
-                        getActivity().startService(
-                                new Intent(getActivity(),
-                                        NclService.class));
-                    }
-
-                }
-            }
-        }
-        dbConnections.close();
-
-
-    }*/
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getContext()

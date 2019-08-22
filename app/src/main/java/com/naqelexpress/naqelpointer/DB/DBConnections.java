@@ -271,7 +271,9 @@ public class DBConnections
                 "\"ReasonID\" Integer NOT NULL ,\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, " +
                 "\"DeliveyStatusID\" Integer NOT NULL)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"Ncl\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"NclNo\" TEXT  NOT NULL,\"UserID\" INTEGER NOT NULL, \"Date\" DATETIME NOT NULL  ,\"PieceCount\" INTEGER NOT NULL, \"WaybillCount\" INTEGER NOT NULL,\"IsSync\" BOOL NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"Ncl\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE," +
+                " \"NclNo\" TEXT  NOT NULL,\"UserID\" INTEGER NOT NULL, \"Date\" DATETIME NOT NULL  ,\"PieceCount\" INTEGER NOT NULL," +
+                " \"WaybillCount\" INTEGER NOT NULL,\"IsSync\" BOOL NOT NULL,JsonData Text )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NclDetail\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"BarCode\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NclID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NclWaybillDetail\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"WaybillNo\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NclID\" INTEGER NOT NULL )");
 
@@ -457,7 +459,9 @@ public class DBConnections
                     "\"ReasonID\" Integer NOT NULL ,\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, " +
                     "\"DeliveyStatusID\" Integer NOT NULL)");
 
-            db.execSQL("CREATE TABLE IF NOT EXISTS \"Ncl\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"NclNo\" TEXT  NOT NULL,\"UserID\" INTEGER NOT NULL, \"Date\" DATETIME NOT NULL  ,\"PieceCount\" INTEGER NOT NULL, \"WaybillCount\" INTEGER NOT NULL,\"IsSync\" BOOL NOT NULL )");
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"Ncl\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, " +
+                    "\"NclNo\" TEXT  NOT NULL,\"UserID\" INTEGER NOT NULL, \"Date\" DATETIME NOT NULL  ,\"PieceCount\" " +
+                    "INTEGER NOT NULL, \"WaybillCount\" INTEGER NOT NULL,\"IsSync\" BOOL NOT NULL,JsonData Text )");
             db.execSQL("CREATE TABLE IF NOT EXISTS \"NclDetail\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"BarCode\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NclID\" INTEGER NOT NULL )");
             db.execSQL("CREATE TABLE IF NOT EXISTS \"NclWaybillDetail\"( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"WaybillNo\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NclID\" INTEGER NOT NULL )");
             //,"SeqNo" INTEGER Default 0
@@ -613,6 +617,8 @@ public class DBConnections
                 db.execSQL("ALTER TABLE UserME ADD COLUMN TruckID INTEGER DEFAULT 0");
             if (!isColumnExist("CheckPoint", "Count"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Count INTEGER Default 0");
+            if (!isColumnExist("Ncl", "JsonData"))
+                db.execSQL("ALTER TABLE Ncl ADD COLUMN JsonData TEXT");
 
         }
 
@@ -4296,6 +4302,22 @@ public class DBConnections
         }
     }
 
+    public boolean updateNCL(int ID, Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("IsSync", "1");
+        try {
+            String args[] = {String.valueOf(ID)};
+            db.update("Ncl", contentValues, "ID=?", args);
+        } catch (Exception e) {
+
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
     public void deleteNclWayBill(int NclID, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4309,6 +4331,22 @@ public class DBConnections
         }
     }
 
+    public boolean updateNCLWaybill(int ID, Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("IsSync", "1");
+        try {
+            String args[] = {String.valueOf(ID)};
+            db.update("NclWaybillDetail", contentValues, "NclID=?", args);
+        } catch (Exception e) {
+
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
     public void deleteNclBarcode(int NclID, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4320,6 +4358,22 @@ public class DBConnections
         } catch (SQLiteException e) {
 
         }
+    }
+
+    public boolean updateNCLBarcode(int ID, Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("IsSync", "1");
+        try {
+            String args[] = {String.valueOf(ID)};
+            db.update("NclDetail", contentValues, "NclID=?", args);
+        } catch (Exception e) {
+
+            return false;
+        }
+        db.close();
+        return true;
     }
 
     public boolean InsertNcl(Ncl instance, Context context) {
@@ -4348,7 +4402,8 @@ public class DBConnections
     public boolean InsertNclWaybillDetail(NclWaybillDetail instance, Context context) {
         long result = 0;
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("WaybillNo", instance.WaybillNo);
             contentValues.put("NclID", instance.NclID);
@@ -4377,6 +4432,30 @@ public class DBConnections
 
         }
         return result != -1;
+    }
+
+    public boolean InsertNclBulk(String instance, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+
+
+            contentValues.put("NclNo", 0);
+            contentValues.put("UserID", 0);
+            contentValues.put("Date", 0);
+            contentValues.put("PieceCount", 0);
+            contentValues.put("WaybillCount", 0);
+            contentValues.put("IsSync", false);
+            contentValues.put("JsonData", instance);
+
+            result = db.insert("Ncl", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+
     }
 
     public boolean InsertAtDestWaybill(int Waybill, String tripid, Context context) {

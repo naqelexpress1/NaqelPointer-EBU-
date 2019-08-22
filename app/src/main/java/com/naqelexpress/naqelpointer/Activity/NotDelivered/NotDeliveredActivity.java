@@ -167,7 +167,7 @@ public class NotDeliveredActivity
                 }
 
                 if (IsSaved) {
-                    if (!isMyServiceRunning(NotDeliveredActivity.class)) {
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.NotDelivery.class)) {
                         startService(
                                 new Intent(NotDeliveredActivity.this,
                                         com.naqelexpress.naqelpointer.service.NotDelivery.class));

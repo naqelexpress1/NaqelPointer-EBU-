@@ -3,8 +3,8 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="5dp"
-    android:layout_margin="10dp">
+    android:layout_margin="10dp"
+    card_view:cardCornerRadius="5dp">
 
     <View
         android:id="@+id/top"
@@ -12,7 +12,7 @@
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
         android:background="@color/mdtp_transparent_black"
-        android:visibility="invisible"/>
+        android:visibility="invisible" />
 
 
     <TextView
@@ -81,10 +81,10 @@
         android:layout_below="@id/tripcode"
         android:layout_gravity="center"
         android:layout_toLeftOf="@id/eta"
-        android:text="Deprt Time : "
+        android:text="Deprt DT : "
         android:textColor="@color/NaqelBlue"
-        android:textSize="16sp"
-        android:textStyle="normal" />
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
 
     <TextView
@@ -94,15 +94,15 @@
         android:layout_below="@id/tripcode"
         android:layout_alignParentEnd="true"
         android:layout_gravity="center"
-        android:text="06:00:00"
+        android:text="2019-08-07 06:00:00"
         android:textColor="@color/NaqelRed"
-        android:textSize="16sp"
-        android:textStyle="normal" />
+        android:textSize="14sp"
+        android:textStyle="bold" />
 
     <View
-        android:layout_below="@id/eta"
         android:layout_width="match_parent"
         android:layout_height="1dp"
+        android:layout_below="@id/eta"
         android:layout_marginTop="5dp"
         android:background="@color/mdtp_transparent_black" />
 

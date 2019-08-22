@@ -24,13 +24,8 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -76,7 +71,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class LoginActivity
         extends AppCompatActivity {
@@ -1051,6 +1045,10 @@ public class LoginActivity
         if (savedInstanceState != null) {
             txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
             txtPassword.setText(savedInstanceState.getString("txtPassword"));
+            if (truck != null) {
+                truck.setText(savedInstanceState.getString("truck"));
+                truckID = savedInstanceState.getInt("truckID");
+            }
         }
         super.onRestoreInstanceState(savedInstanceState);
     }
@@ -1059,8 +1057,10 @@ public class LoginActivity
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("txtEmployID", txtEmployID.getText().toString());
         outState.putString("txtPassword", txtPassword.getText().toString());
-        outState.putString("truck", truck.getText().toString());
-        outState.putInt("truckID", truckID);
+        if (truck != null) {
+            outState.putString("truck", truck.getText().toString());
+            outState.putInt("truckID", truckID);
+        }
 
         super.onSaveInstanceState(outState);
     }

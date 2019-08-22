@@ -70,6 +70,7 @@ public class TripArrviedatDest extends AppCompatActivity implements View.OnClick
 
         txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
         txtBarCode.setHint("Scan TripID");
+
 //        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
 //        txtBarCode.addTextChangedListener(new TextWatcher() {
 //            @Override

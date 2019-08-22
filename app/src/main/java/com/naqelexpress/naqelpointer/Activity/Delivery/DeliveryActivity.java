@@ -308,12 +308,12 @@ public class DeliveryActivity
                                 com.naqelexpress.naqelpointer.service.OnDelivery.class));
 
                 if (IsSaved) {
-                    if (GlobalVar.GV().GetDivision(getApplicationContext()))
-                        if (!isMyServiceRunning(DeliveryActivity.class)) {
-                            startService(
-                                    new Intent(DeliveryActivity.this,
-                                            com.naqelexpress.naqelpointer.service.OnDelivery.class));
-                        }
+                    //if (GlobalVar.GV().GetDivision(getApplicationContext()))
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnDelivery.class)) {
+                        startService(
+                                new Intent(DeliveryActivity.this,
+                                        com.naqelexpress.naqelpointer.service.OnDelivery.class));
+                    }
 
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
                     UpdateMyRouteShipments();

@@ -1309,7 +1309,9 @@ public class GlobalVar {
             i.setPackage("com.whatsapp");
             i.setData(Uri.parse(url));
             if (i.resolveActivity(packageManager) != null) {
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(i);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1324,6 +1326,7 @@ public class GlobalVar {
             smsIntent.setType("vnd.android-dir/mms-sms");
             smsIntent.putExtra("address", phoneNo);
             smsIntent.putExtra("sms_body", msg);
+            smsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(smsIntent);
 
 //            SmsManager smsManager = SmsManager.getDefault();

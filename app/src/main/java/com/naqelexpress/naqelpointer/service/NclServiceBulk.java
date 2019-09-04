@@ -122,6 +122,7 @@ public class NclServiceBulk extends Service {
                 Exception e) {
 
             flag_thread = false;
+            flag_thread = false;
         }
 
     }

@@ -408,6 +408,16 @@ public class ScanNclWaybillFragment extends Fragment {
             ncl.PieceCount = PieceCodeList.size();
             ncl.WaybillCount = waybill.size();
             ncl.IsSync = false;
+            ncl.EmployID = GlobalVar.GV().EmployID;
+            ncl.StationID = GlobalVar.GV().StationID;
+
+            String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
+            String Dest[] = ScanNclNoFragment.txtDestination.getText().toString().split(":");
+            if (Origin.length > 1)
+                ncl.OrgDest = Origin[0];
+            if (Dest.length > 1)
+                ncl.OrgDest = ncl.OrgDest + " / " + Dest[0];
+
 
             for (int i = 0; i < PieceCodeList.size(); i++) {
                 if (!waybill.contains(PieceCodeList.get(i).Waybill)) {

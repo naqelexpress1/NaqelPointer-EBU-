@@ -2,7 +2,6 @@ package com.naqelexpress.naqelpointer.Activity.CourierKPIEBU;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -13,10 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
-import com.naqelexpress.naqelpointer.Activity.TerminalHandling.InventoryHeldOut;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
 import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONArray;
@@ -119,6 +115,8 @@ public class CourierKpi
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
+                // httpURLConnection.setConnectTimeout(6000);
+                // httpURLConnection.setReadTimeout(6000);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();

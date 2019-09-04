@@ -28,13 +28,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
+import android.text.InputType;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.Languages;
@@ -48,6 +51,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.DeliveryStatus;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NoNeedVolumeReason;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.JSON.DataSync;
 import com.naqelexpress.naqelpointer.JSON.ProjectAsyncTask;
@@ -75,13 +79,14 @@ import java.util.Locale;
 import java.util.Random;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "1.5.2.0";
-    public boolean LoginVariation = false; //For EBU only
+    public String AppVersion = "DropDown InCap - Incident";
+    public boolean LoginVariation = true; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -93,6 +98,7 @@ public class GlobalVar {
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     public ArrayList<Integer> haslocation = new ArrayList<>();
+    public int ConnandReadtimeout = 60000;
 
     //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
     //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
@@ -648,6 +654,67 @@ public class GlobalVar {
         return versioncode;
     }
 
+    public boolean CheckDataAvailability(String division, Context context, int EmpID, String pwd, int um) {
+        boolean isvalid = false;
+        DBConnections dbConnections = new DBConnections(context, null);
+        if (division.equals("Courier")) {
+            Cursor result = dbConnections.Fill("select * from Facility Limit 1", context);
+            if (result.getCount() == 0) {
+                isvalid = true;
+                result.close();
+                dbConnections.close();
+                return isvalid;
+            }
+        } else if (division.equals("Express")) {
+            Cursor result = dbConnections.Fill("select * from Contacts Limit 1", context);
+            if (result.getCount() == 0)
+                isvalid = true;
+            result.close();
+            dbConnections.close();
+            return isvalid;
+        } else if (division.equals("IRS")) {
+            Cursor result = dbConnections.Fill("select * from CheckPointType Limit 1", context);
+            if (result.getCount() == 0)
+                isvalid = true;
+            result.close();
+            dbConnections.close();
+            return isvalid;
+        }
+
+
+        Cursor result = dbConnections.Fill("select * from UpdateMenu Limit 1", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            int updateMenu = result.getInt(result.getColumnIndex("MenuChanges"));
+            if (updateMenu != um)
+                isvalid = true;
+        } else
+            isvalid = true;
+
+        result.close();
+        dbConnections.close();
+        return isvalid;
+    }
+
+    public boolean istxtBoxEnabled(Context context) {
+        boolean isvalid = false;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from UserME where EmployID = " + GlobalVar.GV().EmployID
+                + " Limit 1", context);
+
+
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            if (result.getInt(result.getColumnIndex("DisableEnabletxtBox")) == 1)
+                isvalid = true;
+        }
+
+
+        result.close();
+        dbConnections.close();
+        return isvalid;
+    }
+
 //    public static void updateApp(final Activity activity) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 //        builder.setTitle("Info")
@@ -717,7 +784,8 @@ public class GlobalVar {
     public ArrayList<String> CheckPointTypeNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeFNameList = new ArrayList<>();
 
-    public void GetCheckPointTypeList(boolean bringFromServer, final Context context, final View view) {
+    public void GetCheckPointTypeList(boolean bringFromServer, final Context context,
+                                      final View view) {
 
         // if (GlobalVar.GV().CheckPointTypeList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
         if (bringFromServer) {
@@ -766,7 +834,8 @@ public class GlobalVar {
     public ArrayList<String> CheckPointTypeDetailNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDetailFNameList = new ArrayList<>();
 
-    public void GetCheckPointTypeDetailList(boolean bringFromServer, int checkPointTypeID, final Context context, final View view) {
+    public void GetCheckPointTypeDetailList(boolean bringFromServer, int checkPointTypeID,
+                                            final Context context, final View view) {
 
         //com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
         // if (GlobalVar.GV().CheckPointTypeDetailList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
@@ -828,7 +897,8 @@ public class GlobalVar {
     public ArrayList<String> CheckPointTypeDDetailNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDDetailFNameList = new ArrayList<>();
 
-    public void GetCheckPointTypeDDetailList(boolean bringFromServer, int checkPointTypeDetailID, final Context context, final View view) {
+    public void GetCheckPointTypeDDetailList(boolean bringFromServer,
+                                             int checkPointTypeDetailID, final Context context, final View view) {
 
         com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
 //        if (GlobalVar.GV().CheckPointTypeDDetailList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
@@ -888,7 +958,8 @@ public class GlobalVar {
     public ArrayList<String> NoNeedVolumeReasonNameList = new ArrayList<>();
     public ArrayList<String> NoNeedVolumeReasonFNameList = new ArrayList<>();
 
-    public void GetNoNeedVolumeReasonList(boolean bringFromServer, final Context context, final View view) {
+    public void GetNoNeedVolumeReasonList(boolean bringFromServer, final Context context,
+                                          final View view) {
 
 //        if (GlobalVar.GV().NoNeedVolumeReasonList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
 //            if (!GlobalVar.GV().HasInternetAccess)
@@ -1093,7 +1164,8 @@ public class GlobalVar {
         return pwd;
     }
 
-    public void LoadMyRouteShipments(String orderBy, boolean CheckComplaintandDeliveryRequest, Context context, View view) {
+    public void LoadMyRouteShipments(String orderBy,
+                                     boolean CheckComplaintandDeliveryRequest, Context context, View view) {
 
         haslocation.clear();
         MyRouteActivity.places.clear();
@@ -1401,7 +1473,8 @@ public class GlobalVar {
     }
 
 
-    public static ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> getPickupSyncData(Context context) {
+    public static ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> getPickupSyncData
+            (Context context) {
         ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> pickupFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
@@ -1662,7 +1735,8 @@ public class GlobalVar {
     }
 
 
-    private void ReOrderMyRouteShipments(boolean CheckComplaintandDeliveryRequest, final View view, final Context context) {
+    private void ReOrderMyRouteShipments(boolean CheckComplaintandDeliveryRequest,
+                                         final View view, final Context context) {
         //Has Complaint and Has Delivery Request has high priority.
         //Has Complaint
         // Has Delivery Request
@@ -2097,7 +2171,8 @@ public class GlobalVar {
     }
 
 
-    public static boolean deleteContactRawID(ArrayList<HashMap<String, String>> contacts, Context context) {
+    public static boolean deleteContactRawID
+            (ArrayList<HashMap<String, String>> contacts, Context context) {
         // First select raw contact id by given name and family name.
         DBConnections dbConnections = new DBConnections(context, null);
         for (HashMap<String, String> contact : contacts) {
@@ -2234,7 +2309,8 @@ public class GlobalVar {
 
     }
 
-    public static boolean find200Radios5sec(double lat, double lon, int radius, Context context) {
+    public static boolean find200Radios5sec(double lat, double lon, int radius, Context
+            context) {
         boolean isradius = false;
         double foundLatitude = 0.0, foundLongitude = 0.0;
         Location location = GlobalVar.getLastKnownLocation(context);
@@ -2293,7 +2369,8 @@ public class GlobalVar {
     }
 
 
-    public static boolean distFrom(double lat1, double lng1, double lat2, double lng2, Context context) {
+    public static boolean distFrom(double lat1, double lng1, double lat2, double lng2, Context
+            context) {
         double earthRadius = 0.00310686; // miles (or 6371.0 kilometers)
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
@@ -2371,6 +2448,50 @@ public class GlobalVar {
 
     }
 
+    public String getDeviceName() {
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
+            return capitalize(model);
+        } else {
+            return capitalize(manufacturer) + " " + model;
+        }
+    }
+
+    private String capitalize(String s) {
+        if (s == null || s.length() == 0) {
+            return "";
+        }
+        char first = s.charAt(0);
+        if (Character.isUpperCase(first)) {
+            return s;
+        } else {
+            return Character.toUpperCase(first) + s.substring(1);
+        }
+    }
+
+    public static void disableSoftInputFromAppearing(EditText editText) {
+        if (Build.VERSION.SDK_INT >= 11) {
+            editText.setRawInputType(InputType.TYPE_CLASS_TEXT);
+            editText.setTextIsSelectable(true);
+        } else {
+            editText.setRawInputType(InputType.TYPE_NULL);
+            editText.setFocusable(true);
+        }
+    }
+
+    public void Logout(Context context) {
+        DBConnections dbConnections = new DBConnections(context, null);
+        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", context);
+        UserMeLogin userMeLogin = new UserMeLogin(id);
+        dbConnections.UpdateUserMeLogout(userMeLogin, context);
+        dbConnections.close();
+//        android.os.Process.killProcess(android.os.Process.myPid());
+        Intent intent = new Intent(context, SplashScreenActivity.class);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
+
+    }
 //    public static String getDivision(Context context) {
 //        String division = "";
 //

@@ -110,12 +110,34 @@ public class DeliverySheetThirdFragment
                 }
             });
 
+
+            if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
+                btnOpenCamera.setVisibility(View.GONE);
+
+                if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                    txtBarCode.setKeyListener(null);
+                    txtBarCode.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
+                                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                                GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                            } else
+                                startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        }
+                    });
+                } else {
+
+                    GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                }
+            }
             initViews();
             //initDialog();
         }
 
         return rootView;
     }
+
 
     private void initViews() {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
@@ -308,6 +330,8 @@ public class DeliverySheetThirdFragment
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
+                httpURLConnection.setReadTimeout(30000);
+                httpURLConnection.setConnectTimeout(30000);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();

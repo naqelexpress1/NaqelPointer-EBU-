@@ -360,6 +360,7 @@ public class MyRouteShipments implements Parcelable {
         OptimzeSerialNo = in.readInt();
         HasComplaint = in.readByte() != 0;
         HasDeliveryRequest = in.readByte() != 0;
+        Position = in.readInt();
 
     }
 
@@ -583,6 +584,7 @@ public class MyRouteShipments implements Parcelable {
         parcel.writeInt(OptimzeSerialNo);
         parcel.writeByte((byte) (HasComplaint ? 1 : 0));
         parcel.writeByte((byte) (HasDeliveryRequest ? 1 : 0));
+        parcel.writeInt(Position);
     }
 
     public enum UpdateType {

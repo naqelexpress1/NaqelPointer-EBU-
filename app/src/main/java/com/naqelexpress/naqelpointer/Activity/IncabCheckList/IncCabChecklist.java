@@ -5,8 +5,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Rect;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,15 +16,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.naqelexpress.naqelpointer.Activity.ArrivedDest.ArrivedatDestination;
-import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.InventoryControlOnetab;
+import com.naqelexpress.naqelpointer.Activity.Login.FindVehicle;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.FindVehilceObject;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -57,6 +54,7 @@ public class IncCabChecklist extends AppCompatActivity {
     public static HashSet<Integer> selectedreason = new HashSet<>();
     EditText speedorating, fleetno;
     int close = 0;
+    int truckID = 0;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -74,6 +72,19 @@ public class IncCabChecklist extends AppCompatActivity {
         final ImageView image1 = (ImageView) findViewById(R.id.image2);
         final ImageView image2 = (ImageView) findViewById(R.id.image3);
         final ImageView image3 = (ImageView) findViewById(R.id.image4);
+
+        fleetno.setKeyListener(null);
+        ReadFromLocal();
+        fleetno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (vehicles.size() > 0)
+                    RedirectVechicleClass();
+
+
+            }
+        });
+
 
         image.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +165,54 @@ public class IncCabChecklist extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.notdeliveredmenu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    ArrayList<FindVehilceObject> vehicles;
+
+    private void RedirectVechicleClass() {
+        Intent intent = new Intent(this, FindVehicle.class);
+        intent.putExtra("Vehicles", vehicles);
+        startActivityForResult(intent, 99);
+    }
+
+    private void ReadFromLocal() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor result = dbConnections.Fill("select * from Truck", getApplicationContext());
+
+        result.moveToFirst();
+        vehicles = new ArrayList<FindVehilceObject>();
+        vehicles.clear();
+        setDefault();
+        try {
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                do {
+                    FindVehilceObject fvo = new FindVehilceObject();
+                    fvo.ID = result.getInt(result.getColumnIndex("TruckID"));
+                    fvo.Name = result.getString(result.getColumnIndex("Name"));
+                    vehicles.add(fvo);
+                } while (result.moveToNext());
+            } else
+                GlobalVar.GV().Logout(getApplicationContext());
+
+            result.close();
+            dbConnections.close();
+            // RedirectVechicleClass();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private void setDefault() {
+        FindVehilceObject fvo = new FindVehilceObject();
+        fvo.ID = 0;
+        fvo.Name = "At Yard";
+
+        vehicles.add(fvo);
     }
 
     @Override
@@ -515,7 +574,7 @@ public class IncCabChecklist extends AppCompatActivity {
             GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
             GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
             GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
-            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+            // GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
 
         }
         super.onRestoreInstanceState(savedInstanceState);
@@ -530,7 +589,7 @@ public class IncCabChecklist extends AppCompatActivity {
         outState.putString("EmployName", GlobalVar.GV().EmployName);
         outState.putString("EmployStation", GlobalVar.GV().EmployStation);
         outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
-        outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
+//        outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
 
         super.onSaveInstanceState(outState);
     }
@@ -538,5 +597,20 @@ public class IncCabChecklist extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         return;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case 99: {
+                if (resultCode == Activity.RESULT_OK) {
+
+                    fleetno.setText(data.getStringExtra("name"));
+                    truckID = data.getIntExtra("truckid", 0);
+                }
+                break;
+            }
+        }
     }
 }

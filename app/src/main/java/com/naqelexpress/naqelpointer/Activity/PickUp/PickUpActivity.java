@@ -101,6 +101,8 @@ public class PickUpActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    boolean FullyInserted = false;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
@@ -212,16 +214,27 @@ public class PickUpActivity extends AppCompatActivity {
         }
 
         updateLocation();
-        if (dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al)) {
-            int PickUpID = dbConnections.getMaxID("PickUpAuto", getApplicationContext());
-            for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
-                PickUpDetail pickUpDetail = new PickUpDetail(secondFragment.PickUpBarCodeList.get(i), PickUpID);
-                if (!dbConnections.InsertPickUpDetail(pickUpDetail, getApplicationContext())) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
-                    IsSaved = false;
-                    break;
-                }
-            }
+
+        String appendPiececode = "";
+        for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
+            if (i == 0)
+                appendPiececode = secondFragment.PickUpBarCodeList.get(i);
+            else
+                appendPiececode = appendPiececode + "," + secondFragment.PickUpBarCodeList.get(i);
+
+        }
+
+        if (dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode)) {
+            //     int PickUpID = dbConnections.getMaxID("PickUpAuto", getApplicationContext());
+            //   for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
+            //  PickUpDetail pickUpDetail = new PickUpDetail(secondFragment.PickUpBarCodeList.get(i), PickUpID);
+//                if (!dbConnections.InsertPickUpDetail(pickUpDetail, getApplicationContext())) {
+//                    FullyInserted = false;
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
+//                    IsSaved = false;
+//                    break;
+//                }
+            //       }
 
             if (IsSaved) {
                 //GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
@@ -258,10 +271,18 @@ public class PickUpActivity extends AppCompatActivity {
             } else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved), GlobalVar.AlertType.Error);
         } else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
+            GlobalVar.GV().ShowDialog(PickUpActivity.this, "Error", "Pickup Data Not Saved Kindly try again.", true);
+        //GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
 
         dbConnections.close();
 
+    }
+
+    private void insertBarcodeDetails(PickUpDetail pickUpDetail) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        boolean isInsert = dbConnections.InsertPickUpDetail(pickUpDetail, getApplicationContext());
+        if (!isInsert)
+            insertBarcodeDetails(pickUpDetail);
     }
 
     private void updateLocation() {
@@ -677,6 +698,8 @@ public class PickUpActivity extends AppCompatActivity {
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().ConnandReadtimeout);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().ConnandReadtimeout);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();

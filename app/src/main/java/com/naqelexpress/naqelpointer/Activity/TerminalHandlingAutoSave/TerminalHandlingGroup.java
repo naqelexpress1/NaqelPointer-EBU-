@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -16,10 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -212,6 +208,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
     private void fetchgroup(String group) {
 
+
         ArrayList<HashMap<String, String>> fetchdata = new ArrayList<>();
 
         for (int i = 0; i < data.size(); i++) {
@@ -231,8 +228,15 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             Intent intent = new Intent(this, InventoryGroup.class);
             intent.putExtras(bundle);
             startActivity(intent);
-        } else if (group.equals("3")) {
-            Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.SPGroup.class);
+        }
+//        else if (group.equals("3")) {
+//            Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.SPGroup.class);
+//            intent.putExtras(bundle);
+//            startActivity(intent);
+//        }
+        else if (group.equals("4")) {
+            Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.LinehaulGroup.class);
+            bundle.putSerializable("status", data);
             intent.putExtras(bundle);
             startActivity(intent);
         } else {

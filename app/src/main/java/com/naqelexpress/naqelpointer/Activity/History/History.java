@@ -929,6 +929,8 @@ public class History extends Activity {
                 ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto ", getApplicationContext());
             else if (ManualFunction.equals("OnDelivery"))
                 ts = db.Fill("select Count(1) As totalRecord  from OnDelivery ", getApplicationContext());
+            else
+                return;
 
             if (ts != null) {
                 ts.moveToFirst();

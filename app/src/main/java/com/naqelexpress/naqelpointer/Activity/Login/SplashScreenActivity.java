@@ -23,7 +23,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.service.LocationService;
-import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 
 public class SplashScreenActivity
         extends AppCompatActivity {
@@ -42,7 +41,11 @@ public class SplashScreenActivity
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
         dbConnections.DeleteExsistingLogin(getApplicationContext());
-        dbConnections.DeleteTrucks(getApplicationContext());
+        
+//        String DeviceName = GlobalVar.GV().getDeviceName();
+
+        //dbConnections.DeleteTrucks(getApplicationContext());
+        //dbConnections.DeleteTrucksData(getApplicationContext());
 
         dbConnections.close();
 

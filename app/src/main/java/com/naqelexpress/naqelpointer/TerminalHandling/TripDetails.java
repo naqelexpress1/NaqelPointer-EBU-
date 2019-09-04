@@ -1,6 +1,8 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -29,6 +32,8 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
+import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -276,7 +281,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
                 return true;
 
             case R.id.completed:
-                if (trips.get("TripID").equals("null") || trips.get("TripID").equals("0") ) {
+                if (trips.get("TripID").equals("null") || trips.get("TripID").equals("0")) {
                     ShowAlertMessage("TripID is not created , kindly create TripID and try to close", 0);
                     return false;
                 }
@@ -656,6 +661,9 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
                         BringTripDetails.tripDetails.get(tripposition).put("TripID", String.valueOf(jsonObject.getInt("ID")));
                         trips.put("TripID", String.valueOf(jsonObject.getInt("ID")));
+                        String tripId = String.valueOf(jsonObject.getInt("ID"));
+                        SaveData(BringTripDetails.tripDetails.get(tripposition).get("TripCode") + " - tripID - "
+                                + tripId);
                     }
                     ShowAlertMessage(jsonObject.getString("ErrorMessage"), 0);
                 } catch (JSONException e) {
@@ -673,6 +681,80 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
             }
 
         }
+    }
+
+    private void SaveData(String TripID) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        boolean IsSaved = true;
+
+        int reachedsize = 0;
+        int ID = 0;
+        for (String nclno : ncl) {
+
+            if (reachedsize == 20)
+                reachedsize = 0;
+            if (reachedsize == 0) {
+                ID = insertHeader(TripID);
+            }
+            CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(nclno, ID);
+            do {
+                IsSaved = dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
+            } while (!IsSaved);
+
+            reachedsize++;
+        }
+
+
+        if (IsSaved) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+                startService(
+                        new Intent(TripDetails.this,
+                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+            }
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+            finish();
+        } else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
+                    GlobalVar.AlertType.Error);
+
+        dbConnections.close();
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplication()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int insertHeader(String TripID) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        double Latitude = 0;
+        double Longitude = 0;
+        int ID = 0;
+        Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
+        if (location != null) {
+            Latitude = location.getLatitude();
+            Longitude = location.getLongitude();
+        }
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (22, String.valueOf(Latitude),
+                        String.valueOf(Longitude), 0, TripID
+                        , "", 0);
+
+        if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext()))
+            ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+        else
+            insertHeader(TripID);
+
+        dbConnections.close();
+        return ID;
     }
 
     private void ShowAlertMessage(String message, final int finish) {

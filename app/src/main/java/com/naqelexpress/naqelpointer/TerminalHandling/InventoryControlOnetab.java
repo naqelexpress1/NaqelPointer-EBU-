@@ -13,11 +13,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.location.Location;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v4.app.ActivityCompat;
@@ -41,11 +38,9 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointWaybillDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -101,7 +96,8 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
         txtbinlocation.setKeyListener(null);
 
-        txtbinlocation.setVisibility(View.VISIBLE);
+        txtbinlocation.setVisibility(View.GONE);
+
         //checkinternetAvailability();
         //isConnected();
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -109,7 +105,8 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
             StrictMode.setThreadPolicy(policy);
         }
         // isNetworkAvailable();
-        isDeviceonline();
+        //Commented for checking force close issues
+        // isDeviceonline();
 
 
 //        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
@@ -614,8 +611,8 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
                 finish();
             else if (clear == 2) {
                 delrtoreq.clear();
-                inventorycontrol.clear();
-                initViews();
+                //inventorycontrol.clear();
+                //initViews();
             }
 
         }
@@ -759,23 +756,26 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
             isrtoReq = savedInstanceState.getStringArrayList("isrtoReq");
             isHeldout = savedInstanceState.getStringArrayList("isHeldout");
             isdeliveryReq = savedInstanceState.getStringArrayList("isdeliveryReq");
+            lbTotal.setText(savedInstanceState.getString("bin"));
+            inventorycontrol = savedInstanceState.getStringArrayList("inventorycontrol");
+            initViews();
 
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("OriginID", 0);
-                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                new BringNCLData().execute(jsonObject.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("OriginID", 0);
+//                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+//                new BringNCLData().execute(jsonObject.toString());
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        isdeliveryReq.clear();
-        isrtoReq.clear();
+        //isdeliveryReq.clear();
+        //isrtoReq.clear();
         outState.putInt("EmployID", GlobalVar.GV().EmployID);
         outState.putInt("UserID", GlobalVar.GV().UserID);
         outState.putInt("StationID", GlobalVar.GV().StationID);
@@ -786,7 +786,8 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         outState.putStringArrayList("isdeliveryReq", isdeliveryReq);
         outState.putStringArrayList("isHeldout", isHeldout);
         outState.putStringArrayList("isrtoReq", isrtoReq);
-
+        outState.putString("bin", lbTotal.getText().toString());
+        outState.putStringArrayList("inventorycontrol", inventorycontrol);
 
     }
 
@@ -800,7 +801,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         // handler.removeCallbacksAndMessages(null);
-                        isdeviceonlinehandler.removeCallbacksAndMessages(null);
+                        // isdeviceonlinehandler.removeCallbacksAndMessages(null);
                         //countDownTimer.cancel();
                         InventoryControlOnetab.super.onBackPressed();
                     }
@@ -1457,15 +1458,15 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
                             txtbinlocation.setText("No Internet,Error checking internet connection!");
                         }
 
-                        isdeviceonlinehandler.postDelayed(this, 3000);
+                        isdeviceonlinehandler.postDelayed(this, 10000);
                     } catch (Exception e) {
 
-                        isdeviceonlinehandler.postDelayed(this, 3000);
+                        isdeviceonlinehandler.postDelayed(this, 10000);
                         Log.e("Dashboard thread", e.toString());
                     }
 
                 }
-            }, 3000);
+            }, 10000);
         } catch (Exception e) {
 
         }

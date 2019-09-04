@@ -5,27 +5,17 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -36,11 +26,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -84,7 +72,8 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         setContentView(R.layout.notdeliveredsecondfragement);
 
 
-        countDownTimer = new MyCountDownTimer(startTime, interval);
+        //countDownTimer = new MyCountDownTimer(startTime, interval);
+
         lbTotal = (TextView) findViewById(R.id.lbTotal);
         lbTotal.setText("");
         txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
@@ -155,7 +144,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         }
 
         initViews();
-        refreshData();
+        //refreshData();
 
     }
 
@@ -468,7 +457,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 43, lbTotal.getText().toString()
-                            , "" , 0);
+                            , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -542,7 +531,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, refno
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -626,7 +615,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        countDownTimer.cancel();
+                        // countDownTimer.cancel();
                         InventoryHeldIn.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -852,7 +841,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, req
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -861,7 +850,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
 
         }
-        if (!isMyServiceRunning(TerminalHandling.class)) {
+        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
             startService(
                     new Intent(InventoryHeldIn.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
@@ -880,33 +869,33 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         return false;
     }
 
-    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
-    private final long interval = 1 * 1000;
-    MyCountDownTimer countDownTimer;
-
-    public class MyCountDownTimer extends CountDownTimer {
-        public MyCountDownTimer(long startTime, long interval) {
-            super(startTime, interval);
-        }
-
-        @Override
-        public void onFinish() {
-            //DO WHATEVER YOU WANT HERE
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-            UserMeLogin userMeLogin = new UserMeLogin(id);
-            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
-
-            ActivityCompat.finishAffinity(InventoryHeldIn.this);
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-    }
+//    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
+//    private final long interval = 1 * 1000;
+//    MyCountDownTimer countDownTimer;
+//
+//    public class MyCountDownTimer extends CountDownTimer {
+//        public MyCountDownTimer(long startTime, long interval) {
+//            super(startTime, interval);
+//        }
+//
+//        @Override
+//        public void onFinish() {
+//            //DO WHATEVER YOU WANT HERE
+//            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+//            UserMeLogin userMeLogin = new UserMeLogin(id);
+//            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+//            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+//
+//            ActivityCompat.finishAffinity(InventoryHeldIn.this);
+//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//            startActivity(intent);
+//        }
+//
+//        @Override
+//        public void onTick(long millisUntilFinished) {
+//        }
+//    }
 
     @Override
     public void onUserInteraction() {
@@ -914,8 +903,8 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         super.onUserInteraction();
 
         //Reset the timer on user interaction...
-        countDownTimer.cancel();
-        countDownTimer.start();
+        //  countDownTimer.cancel();
+        //  countDownTimer.start();
     }
 
     Handler handler;

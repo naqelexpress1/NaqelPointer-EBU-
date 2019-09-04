@@ -32,7 +32,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -129,12 +128,25 @@ public class FacilityLogin
 
             }
             while (result.moveToNext());
-        }
-
+        } else
+            Logout();
 
         dbConnections.close();
 
     }
+
+    private void Logout() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+        UserMeLogin userMeLogin = new UserMeLogin(id);
+        dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+        dbConnections.close();
+        android.os.Process.killProcess(android.os.Process.myPid());
+        Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+        startActivity(intent);
+
+    }
+
 
     public void GetRegion_FacilityCode(int FTID) {
 

@@ -10,10 +10,8 @@ import android.graphics.Paint;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -32,11 +30,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -93,13 +89,14 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
         txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
         txtbinlocation.setKeyListener(null);
-        txtbinlocation.setVisibility(View.VISIBLE);
+        txtbinlocation.setVisibility(View.GONE);
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        isDeviceonline();
+
+        // isDeviceonline();
 
 //        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
 //        txtBarCode.addTextChangedListener(new TextWatcher() {
@@ -602,7 +599,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 43, lbTotal.getText().toString()
-                            , "" ,0);
+                            , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -676,7 +673,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, refno
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -761,7 +758,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         //countDownTimer.cancel();
-                        isdeviceonlinehandler.removeCallbacksAndMessages(null);
+                        // isdeviceonlinehandler.removeCallbacksAndMessages(null);
                         InventoryHeldIn.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -996,7 +993,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, req
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -1005,7 +1002,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
 
         }
-        if (!isMyServiceRunning(TerminalHandling.class)) {
+        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
             startService(
                     new Intent(InventoryHeldIn.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
@@ -1118,15 +1115,15 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                             txtbinlocation.setText("No Internet,Error checking internet connection!");
                         }
 
-                        isdeviceonlinehandler.postDelayed(this, 3000);
+                        isdeviceonlinehandler.postDelayed(this, 10000);
                     } catch (Exception e) {
 
-                        isdeviceonlinehandler.postDelayed(this, 3000);
+                        isdeviceonlinehandler.postDelayed(this, 10000);
                         Log.e("Dashboard thread", e.toString());
                     }
 
                 }
-            }, 3000);
+            }, 10000);
         } catch (Exception e) {
 
         }

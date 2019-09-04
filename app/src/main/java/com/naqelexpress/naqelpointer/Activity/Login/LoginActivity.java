@@ -299,6 +299,7 @@ public class LoginActivity
     }
 
     public void Login(View view) throws ParseException {
+
         GlobalVar.GV().UserPassword = txtPassword.getText().toString();
         if (GlobalVar.GV().ThereIsMandtoryVersion) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "There is a new version, you have to install it first. Contact IT department if you need any support.", GlobalVar.AlertType.Warning);
@@ -327,12 +328,14 @@ public class LoginActivity
 //            return;
 //        }
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        Cursor result = dbConnections.Fill("select * from Facility ", getApplicationContext());
-        if (result.getCount() == 0)
-            GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
-        else
-            LoginIntoOpenMainPage();
+        //Add Comment for EBU
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        Cursor result = dbConnections.Fill("select * from Facility ", getApplicationContext());
+//        if (result.getCount() == 0)
+//            GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
+//        else
+
+        LoginIntoOpenMainPage();
 //        GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
     }
 
@@ -1045,6 +1048,7 @@ public class LoginActivity
         if (savedInstanceState != null) {
             txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
             txtPassword.setText(savedInstanceState.getString("txtPassword"));
+            //instance = (UserME) savedInstanceState.getSerializable("instance");
             if (truck != null) {
                 truck.setText(savedInstanceState.getString("truck"));
                 truckID = savedInstanceState.getInt("truckID");
@@ -1057,6 +1061,8 @@ public class LoginActivity
     public void onSaveInstanceState(Bundle outState) {
         outState.putString("txtEmployID", txtEmployID.getText().toString());
         outState.putString("txtPassword", txtPassword.getText().toString());
+        //outState.putSerializable("instance", (Serializable) instance);
+
         if (truck != null) {
             outState.putString("truck", truck.getText().toString());
             outState.putInt("truckID", truckID);
@@ -1065,15 +1071,15 @@ public class LoginActivity
         super.onSaveInstanceState(outState);
     }
 
-    private void setSavedInstance(Bundle savedInstanceState) {
-
-        if (savedInstanceState != null) {
-            txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
-            txtPassword.setText(savedInstanceState.getString("txtPassword"));
-            truck.setText(savedInstanceState.getString("truck"));
-            truckID = savedInstanceState.getInt("truckID");
-        }
-    }
+//    private void setSavedInstance(Bundle savedInstanceState) {
+//
+//        if (savedInstanceState != null) {
+//            txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
+//            txtPassword.setText(savedInstanceState.getString("txtPassword"));
+//            truck.setText(savedInstanceState.getString("truck"));
+//            truckID = savedInstanceState.getInt("truckID");
+//        }
+//    }
 
     public void GetUserMEData(int EmployID, String Password) {
         //  if (!GlobalVar.GV().HasInternetAccess)
@@ -1082,6 +1088,7 @@ public class LoginActivity
         GetUserMEDataRequest getUserMEDataRequest = new GetUserMEDataRequest();
         getUserMEDataRequest.EmployID = EmployID;
         getUserMEDataRequest.Passowrd = Password;
+        getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
 
         try {
             String token = FirebaseInstanceId.getInstance().getToken();
@@ -1100,9 +1107,10 @@ public class LoginActivity
     }
 
     int usertype = 0;
+    UserME instance;
 
     private class GetUserMEDataFromServer extends AsyncTask<String, Void, String> {
-        private ProgressDialog progressDialog;
+        //private ProgressDialog progressDialog;
         String result = "";
         StringBuffer buffer;
 
@@ -1173,7 +1181,7 @@ public class LoginActivity
                 if (!getUserMEDataResult.HasError) {
                     // if (GlobalVar.GV().dbConnections != null) {
 
-                    UserME instance = new UserME();
+                    instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;
                     instance.Password = getUserMEDataResult.Password;
@@ -1191,9 +1199,10 @@ public class LoginActivity
                     instance.UsertypeID = getUserMEDataResult.UsertypeId;
                     instance.Menu = getUserMEDataResult.Menu;
                     usertype = getUserMEDataResult.UsertypeId;
+                    instance.DisableEnabletxtBox = getUserMEDataResult.DisableEnabletxtBox;
                     instance.TruckID = truckID;
 
-                    dbConnections.UpdateLastLogin(instance.EmployID, getApplicationContext(), instance.UsertypeID);
+
 //                    dbConnections.close();
 //                    GlobalVar.lastlogin(getApplicationContext(), instance.EmployID);
 
@@ -1204,10 +1213,9 @@ public class LoginActivity
                     GlobalVar.GV().EmployName = instance.EmployName;
                     GlobalVar.GV().EmployStation = instance.StationFName;
 
-
-                    dbConnections.deleteUserME(instance, getApplicationContext(), getWindow().getDecorView().getRootView());
-
-                    dbConnections.InsertUserME(instance, getApplicationContext());
+//                    dbConnections.UpdateLastLogin(instance.EmployID, getApplicationContext(), instance.UsertypeID);
+//                    dbConnections.deleteUserME(instance, getApplicationContext(), getWindow().getDecorView().getRootView());
+//                    dbConnections.InsertUserME(instance, getApplicationContext());
 
 //                    LoginToMainPage(1);
 
@@ -1215,18 +1223,69 @@ public class LoginActivity
 
                     //   }
 
-                    new GetMasterData().execute();
+
+                    dbConnections.InsertAppVersion(getUserMEDataResult.Appversion, getApplicationContext());
+                    dbConnections.close();
+
+                    String division = getUserMEDataResult.Division;
+                    if (division.equals("IRS"))
+                        division = "Courier";
+
+                    if (!getUserMEDataResult.AppName.equals(division) && getUserMEDataResult.EmployID != 19127 ) {
+                        ShowAlertMessage("This Application will support only for " + getUserMEDataResult.AppName + " Employees" +
+                                " kindly contact concern person", 1);
+                        dismissUserMeProgressdialog();
+                        return;
+                    }
+
+
+                    if (GlobalVar.GV().CheckDataAvailability(getUserMEDataResult.Division, getApplicationContext(),
+                            getUserMEDataResult.EmployID, getUserMEDataResult.Password, getUserMEDataResult.UpdateMenu)) {
+                        dismissUserMeProgressdialog();
+                        new GetMasterData().execute();
+                        return;
+                    } else {
+                        if (getUserMEDataResult.AppName.equals(division) ||  getUserMEDataResult.EmployID == 19127) {
+                            if (getUserMEDataResult.Appversion != GlobalVar.VersionCode(getApplicationContext())) {
+                                dismissUserMeProgressdialog();
+                                deleteApk();
+                                updateApp();
+                                return;
+                            } else {
+                                updateUserDetails();
+                                LoginIntoOpenMainPage();
+                            }
+                        } else
+                            ShowAlertMessage("This Application will support only for " + getUserMEDataResult.AppName + " Employees" +
+                                    " kindly contact concern person", 1);
+                    }
 
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Data Not Sync Because :" + getUserMEDataResult.ErrorMessage, GlobalVar.AlertType.Error);
             } else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
 
-            progressDialog.dismiss();
+            dismissUserMeProgressdialog();
             super.onPostExecute(String.valueOf(finalJson));
         }
     }
 
+
+    private void dismissUserMeProgressdialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+
+    private void updateUserDetails() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.UpdateLastLogin(instance.EmployID, getApplicationContext(), instance.UsertypeID);
+        dbConnections.deleteUserME(instance, getApplicationContext(), getWindow().getDecorView().getRootView());
+        dbConnections.InsertUserME(instance, getApplicationContext());
+        dbConnections.close();
+
+    }
 
     private class GetMasterData extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
@@ -1259,7 +1318,8 @@ public class LoginActivity
             try {
                 URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetMasterData");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
-
+                httpURLConnection.setReadTimeout(30000);
+                httpURLConnection.setConnectTimeout(30000);
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
@@ -1317,56 +1377,62 @@ public class LoginActivity
                     DBConnections dbConnections = new DBConnections(context, null);
                     dbConnections.InsertAppVersion(jo.getInt("VersionCode"), context);
                     int versioncode = GlobalVar.VersionCode(context);
+                    int updatemenu = GlobalVar.VersionCode(context);
 
                     if (GlobalVar.GV().EmployID == 19127) //&& GlobalVar.GV().EmployID == 17099
                         versioncode = jo.getInt("VersionCode");
 
+
                     if (jo.getInt("VersionCode") == versioncode) {
-                        if (jo.getInt("ChangesMainMenu") == 1) {
-                            JSONArray station = jsonObject.getJSONArray("Station");
-                            if (station.length() > 0)
-                                new Station(station.toString(), view, context);
+                        // if (jo.getInt("ChangesMainMenu") == 1) {
+                        JSONArray station = jsonObject.getJSONArray("Station");
+                        if (station.length() > 0)
+                            new Station(station.toString(), view, context);
 
-                            JSONArray deliveryStatus = jsonObject.getJSONArray("DeliveyStatus");
-                            if (deliveryStatus.length() > 0)
-                                new DeliveryStatus(deliveryStatus.toString(), view, context);
+                        JSONArray deliveryStatus = jsonObject.getJSONArray("DeliveyStatus");
+                        if (deliveryStatus.length() > 0)
+                            new DeliveryStatus(deliveryStatus.toString(), view, context);
 
-                            JSONArray checkPointType = jsonObject.getJSONArray("CheckPointType");
-                            if (checkPointType.length() > 0)
-                                new CheckPointType(checkPointType.toString(), view, context);
+                        JSONArray checkPointType = jsonObject.getJSONArray("CheckPointType");
+                        if (checkPointType.length() > 0)
+                            new CheckPointType(checkPointType.toString(), view, context);
 
-                            JSONArray checkPointdetail = jsonObject.getJSONArray("CheckPointTypeDetail");
-                            if (checkPointdetail.length() > 0)
-                                new CheckPointTypeDetail(checkPointdetail.toString(), view, context);
+                        JSONArray checkPointdetail = jsonObject.getJSONArray("CheckPointTypeDetail");
+                        if (checkPointdetail.length() > 0)
+                            new CheckPointTypeDetail(checkPointdetail.toString(), view, context);
 
-                            JSONArray typeDDetails = jsonObject.getJSONArray("TypeDDetails");
-                            if (typeDDetails.length() > 0)
-                                new CheckPointTypeDDetail(typeDDetails.toString(), view, context);
+                        JSONArray typeDDetails = jsonObject.getJSONArray("TypeDDetails");
+                        if (typeDDetails.length() > 0)
+                            new CheckPointTypeDDetail(typeDDetails.toString(), view, context);
 
-                            JSONArray noNeedVolume = jsonObject.getJSONArray("NoNeedVolume");
-                            if (noNeedVolume.length() > 0)
-                                new NoNeedVolumeReason(noNeedVolume.toString(), view, context);
+                        JSONArray noNeedVolume = jsonObject.getJSONArray("NoNeedVolume");
+                        if (noNeedVolume.length() > 0)
+                            new NoNeedVolumeReason(noNeedVolume.toString(), view, context);
 
-                            String devision = jsonObject.getString("Division");
-                            dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView());
+                        String devision = jsonObject.getString("Division");
+                        dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView()
+                                , jo.getInt("ChangesMainMenu"));
+                        dbConnections.UpdateMenu(devision, getWindow().getDecorView().getRootView()
+                                , jo.getInt("ChangesMainMenu"));
 
-                            JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveyStatusReason");
-                            if (deliverysubstatus.length() > 0)
-                                new DeliveryStatus(deliverysubstatus.toString(), view, context, 0);
+                        JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveyStatusReason");
+                        if (deliverysubstatus.length() > 0)
+                            new DeliveryStatus(deliverysubstatus.toString(), view, context, 0);
 
-                            JSONArray facility = jsonObject.getJSONArray("Facility");
-                            if (facility.length() > 0)
-                                new FacilityStatus(facility.toString(), view, context);
+                        JSONArray facility = jsonObject.getJSONArray("Facility");
+                        if (facility.length() > 0)
+                            new FacilityStatus(facility.toString(), view, context);
 
-                            JSONArray contacts = jsonObject.getJSONArray("Contacts");
-                            if (contacts.length() > 0)
-                                new Contacts(contacts.toString(), view, context);
+                        JSONArray contacts = jsonObject.getJSONArray("Contacts");
+                        if (contacts.length() > 0)
+                            new Contacts(contacts.toString(), view, context);
 
-                            LoginIntoOpenMainPage();
+                        updateUserDetails();
+                        LoginIntoOpenMainPage();
 
 //                            OpenMainPage(1);
 
-                        }
+                        // }
                     } else {
 //                        GlobalVar.updateApp(LoginActivity.this);
                         deleteApk();
@@ -1501,7 +1567,9 @@ public class LoginActivity
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                httpURLConnection.setConnectTimeout(60000);
+                httpURLConnection.setReadTimeout(30000);
+                httpURLConnection.setConnectTimeout(30000);
+
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();
@@ -1564,6 +1632,7 @@ public class LoginActivity
 
                 ShowAlertMessage("No Internet connection / Something went wrong ", 0);
             }
+
             if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
                 progressDialog = null;

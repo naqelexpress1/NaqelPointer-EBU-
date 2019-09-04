@@ -212,7 +212,15 @@ public class PickUpActivity extends AppCompatActivity {
         }
 
         updateLocation();
-        if (dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al)) {
+        String appendPiececode = "";
+        for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
+            if (i == 0)
+                appendPiececode = secondFragment.PickUpBarCodeList.get(i);
+            else
+                appendPiececode = appendPiececode + "," + secondFragment.PickUpBarCodeList.get(i);
+
+        }
+        if (dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode)) {
             int PickUpID = dbConnections.getMaxID("PickUpAuto", getApplicationContext());
             for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
                 PickUpDetail pickUpDetail = new PickUpDetail(secondFragment.PickUpBarCodeList.get(i), PickUpID);

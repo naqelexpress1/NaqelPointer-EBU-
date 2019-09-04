@@ -234,7 +234,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                ShowAlertMessage(error.toString());
+                ShowAlertMessage(error.toString() , 0);
                 if (progressDialog.isShowing() && progressDialog != null)
                     progressDialog.dismiss();
                 progressDialog.dismiss();
@@ -274,7 +274,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
 
     }
 
-    private void ShowAlertMessage(String message) {
+    private void ShowAlertMessage(String message, final int close) {
         AlertDialog alertDialog = new AlertDialog.Builder(BringTripDetails.this).create();
         alertDialog.setTitle("Error");
         alertDialog.setMessage(message);
@@ -283,6 +283,8 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
                     public void onClick(DialogInterface dialog, int which) {
 
                         dialog.dismiss();
+                        if (close == 1)
+                            finish();
                     }
                 });
         alertDialog.show();
@@ -298,9 +300,14 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
             intent.putExtra("position", position);
             startActivity(intent);
         } else if (function == 1) {
-            Intent intent = new Intent(BringTripDetails.this, TripArrviedatDestbyNCL.class);
-            intent.putExtra("tripdata", tripDetails.get(position));
-            startActivity(intent);
+            if (tripDetails.get(position).get("isReceived").equals("1")) {
+                Intent intent = new Intent(BringTripDetails.this, TripArrviedatDestbyNCL.class);
+                intent.putExtra("tripdata", tripDetails.get(position));
+
+                startActivity(intent);
+            } else {
+                ShowAlertMessage("Kindly Received the Truck in Infotrack" , 1);
+            }
         } else {
             Intent intent = new Intent(BringTripDetails.this, UndoNcl.class);
             intent.putExtra("tripdata", tripDetails.get(position));
@@ -443,13 +450,14 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
 //                    if (jsonObject1.getBoolean("AdHoc"))
 //                        AdHoc = "1";0
                     temp.put("AdHoc", String.valueOf(jsonObject1.getInt("AdHoc")));
+                    temp.put("isReceived", String.valueOf(jsonObject1.getInt("isReceived")));
                     tripDetails.add(temp);
 
                 }
 
                 adapter.notifyDataSetChanged();
             } else
-                ShowAlertMessage("No Trips Belongs your Station, Your Station is " + String.valueOf(GlobalVar.GV().StationID));
+                ShowAlertMessage("No Trips Belongs your Station, Your Station is " + String.valueOf(GlobalVar.GV().StationID), 0);
 
 
         } catch (JSONException e) {

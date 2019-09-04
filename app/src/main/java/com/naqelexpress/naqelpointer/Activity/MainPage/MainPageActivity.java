@@ -111,6 +111,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 //import com.naqelexpress.naqelpointer.Activity.LoadtoDest.LoadtoDestination;
 //import com.naqelexpress.naqelpointer.Activity.LoadtoDest.SyncTripDetails;
 //import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.ArrivedatDestination;
@@ -220,7 +222,10 @@ public class MainPageActivity
         complaint = (TextView) findViewById(R.id.complaint);
 
 
-        setProductivitytext();
+        if (savedInstanceState != null)
+            setSavedinstance(savedInstanceState);
+
+        //setProductivitytext();
 
         if (!GlobalVar.isMyServiceRunning(com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService.class,
                 getApplicationContext())) {
@@ -311,12 +316,13 @@ public class MainPageActivity
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-                                int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-                                UserMeLogin userMeLogin = new UserMeLogin(id);
-                                dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-                                finish();
-                                Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-                                startActivity(intent);
+//                                int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+//                                UserMeLogin userMeLogin = new UserMeLogin(id);
+//                                dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+//                                finish();
+//                                Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//                                startActivity(intent);
+                                Logout();
                             }
                         }).setNegativeButton("Cancel", null).setCancelable(false);
                 AlertDialog alertDialog = builder.create();
@@ -335,62 +341,70 @@ public class MainPageActivity
             menu = menuresult.getInt(menuresult.getColumnIndex("Menu"));
 
         } else {
-            dbConnections.deleteLoginIDs(getApplicationContext());
+//            dbConnections.deleteLoginIDs(getApplicationContext());
+//            menuresult.close();
+//            dbConnections.close();
+//            android.os.Process.killProcess(android.os.Process.myPid());
+//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//            startActivity(intent);
             menuresult.close();
-            dbConnections.close();
-            android.os.Process.killProcess(android.os.Process.myPid());
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
+            Logout();
         }
         menuresult.close();
 
-        if (savedInstanceState == null) {
-            if (getIntent().getIntExtra("getMaster", 0) == 1) {
-                //   GetMasterData();
-                GetMasterData asynthread = new GetMasterData();
-                StartAsyncTaskInParallel(asynthread);
+
+        // if (savedInstanceState == null) {
+
+//            if (getIntent().getIntExtra("getMaster", 0) == 1) {
+//
+//                GetMasterData asynthread = new GetMasterData();
+//                StartAsyncTaskInParallel(asynthread);
+//
+//            } else {
+        Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
+                GlobalVar.GV().EmployID, getApplicationContext());
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            devision = result.getString(result.getColumnIndex("Division"));
+            menu = result.getInt(result.getColumnIndex("Menu"));
+
+            if (GlobalVar.GV().EmployID == 19127) {
+                devision = "Express";
+                menu = 1;
+                LoadMenu();
+            }
+//                    devision = "Express";
+            if (devision.equals("0")) {
+
+                // GetMasterData asynthread = new GetMasterData();
+                //  StartAsyncTaskInParallel(asynthread);
+                Logout();
 
             } else {
-                Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
-                        GlobalVar.GV().EmployID, getApplicationContext());
-                if (result.getCount() > 0) {
-                    result.moveToFirst();
-                    devision = result.getString(result.getColumnIndex("Division"));
-                    menu = result.getInt(result.getColumnIndex("Menu"));
-                    if (GlobalVar.GV().EmployID == 19127) {
-                        devision = "Express";
-                        menu = 1;
-                    }
-//                    devision = "Express";
-                    if (devision.equals("0")) {
-
-                        GetMasterData asynthread = new GetMasterData();
-                        StartAsyncTaskInParallel(asynthread);
-
-                    } else {
-                        int vc = dbConnections.GetAppVersion(getApplicationContext());
-                        int versioncode = GlobalVar.VersionCode(getApplicationContext());
-                        version.setText("Versioncode :-" + String.valueOf(versioncode));
-                        if (devision.equals("Courier")) {
-                            if (vc != versioncode) {
-                                version.setText("Version :-" + " OLD ");
-//                    GlobalVar.updateApp(MainPageActivity.this);
-                                GetMasterData asynthread = new GetMasterData();
-                                StartAsyncTaskInParallel(asynthread);
-                            } else {
-                                LoadMenu();
-                                version.setText("Version :-" + " NEW ");
-                            }
-
-                        } else {
-                            LoadMenu();
-
-                        }
-                    }
+                int vc = dbConnections.GetAppVersion(getApplicationContext());
+                int versioncode = GlobalVar.VersionCode(getApplicationContext());
+                version.setText("Versioncode :-" + String.valueOf(versioncode));
+                //if (devision.equals("Courier")) {
+                if (vc != versioncode && GlobalVar.GV().EmployID != 19127) {
+                    version.setText("Version :-" + " OLD ");
+                    // GlobalVar.updateApp(MainPageActivity.this);
+                    // GetMasterData asynthread = new GetMasterData();
+                    // StartAsyncTaskInParallel(asynthread);
+                    //deleteExsistinguser();
+                    VersionMismatch("Info", "Version is mismatch , kindly Logout & Login again");
+                } else {
+                    LoadMenu();
+                    version.setText("Version :-" + " NEW ");
                 }
+//                    } else {
+//                        LoadMenu();
+//
+//                    }
             }
-
         }
+        //}
+
+        //  }
 //
         Cursor EmployeeInfo = dbConnections.Fill("SELECT *  FROM  EmployInfo where EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
 
@@ -418,6 +432,7 @@ public class MainPageActivity
         // updateApp();
 
     }
+
 
     HashMap<Integer, Integer> itemposition = new HashMap<>();
 
@@ -1726,23 +1741,46 @@ public class MainPageActivity
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
-            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
-            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
-            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
-            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
-            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
-            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
-            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
-            devision = savedInstanceState.getString("devision");
-            installaionfile = savedInstanceState.getString("installaionfile");
+    protected void onStart() {
+        super.onStart();
+        System.out.println("test");
+    }
 
-            itemposition = (HashMap<Integer, Integer>) savedInstanceState.getSerializable("itemposition");
-            LoadMenu();
-        }
-        super.onRestoreInstanceState(savedInstanceState);
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        if (savedInstanceState != null) {
+//            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
+//            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
+//            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
+//            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
+//            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
+//            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
+//            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
+//            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+//            devision = savedInstanceState.getString("devision");
+//            installaionfile = savedInstanceState.getString("installaionfile");
+//
+//            itemposition = (HashMap<Integer, Integer>) savedInstanceState.getSerializable("itemposition");
+//            LoadMenu();
+//        }
+//    }
+
+    private void setSavedinstance(Bundle savedInstanceState) {
+
+        GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
+        GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
+        GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
+        GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
+        GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
+        GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
+        GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
+        GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+        devision = savedInstanceState.getString("devision");
+        installaionfile = savedInstanceState.getString("installaionfile");
+
+        itemposition = (HashMap<Integer, Integer>) savedInstanceState.getSerializable("itemposition");
+        LoadMenu();
     }
 
     @Override
@@ -1861,11 +1899,11 @@ public class MainPageActivity
 
 
                     if (jo.getInt("VersionCode") == versioncode) {
-                        if (jo.getInt("ChangesMainMenu") == 1) {
+                        // if (jo.getInt("ChangesMainMenu") == 1) {
 
-                            fetchmasterdata(jsonObject, view, getApplicationContext());
+                        fetchmasterdata(jsonObject, view, getApplicationContext(), jo.getInt("ChangesMainMenu"));
 
-                        }
+                        // }
                     } else {
                         deleteApk();
 //                            if (GlobalVar.GV().EmployID == 19127)
@@ -1930,7 +1968,7 @@ public class MainPageActivity
     }
 
 
-    private void fetchmasterdata(JSONObject jsonObject, View view, Context context) {
+    private void fetchmasterdata(JSONObject jsonObject, View view, Context context, int updatemenu) {
         try {
             JSONArray station = jsonObject.getJSONArray("Station");
             if (station.length() > 0)
@@ -1963,7 +2001,7 @@ public class MainPageActivity
 
             devision = jsonObject.getString("Division");
             DBConnections dbConnections = new DBConnections(context, null);
-            dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView());
+            dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView(), updatemenu);
             JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveyStatusReason");
             if (deliverysubstatus.length() > 0)
                 new DeliveryStatus(deliverysubstatus.toString(), view, context, 0);
@@ -2249,7 +2287,7 @@ public class MainPageActivity
                             Intent intent = new Intent(Intent.ACTION_VIEW, contentUri);
                             intent.putExtra(Intent.EXTRA_NOT_UNKNOWN_SOURCE, true);
                             intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             startActivity(intent);
 
@@ -2313,6 +2351,7 @@ public class MainPageActivity
     private boolean VersionMatct() {
         if (GlobalVar.GV().EmployID == 19127)
             return true;
+
         boolean valid = true;
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         int vc = dbConnections.GetAppVersion(getApplicationContext());
@@ -2320,6 +2359,7 @@ public class MainPageActivity
         if (vc != versioncode)
             valid = false;
 
+        dbConnections.close();
         return valid;
     }
 
@@ -2403,8 +2443,55 @@ public class MainPageActivity
 
     @Override
     protected void onResume() {
+        deleteExsistinguser();
         setProductivitytext();
         isDeviceonline();
         super.onResume();
     }
+
+    private void deleteExsistinguser() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.DeleteExsistingLogin(getApplicationContext());
+        Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 ", getApplicationContext());
+
+        if (result != null && result.getCount() == 0) {
+            result.close();
+            dbConnections.close();
+            android.os.Process.killProcess(android.os.Process.myPid());
+            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    private void Logout() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+        UserMeLogin userMeLogin = new UserMeLogin(id);
+        dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+        dbConnections.close();
+//        android.os.Process.killProcess(android.os.Process.myPid());
+        Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+
+    }
+
+    private void VersionMismatch(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainPageActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Logout",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                        Logout();
+
+                    }
+                });
+
+        alertDialog.show();
+    }
+
 }

@@ -162,6 +162,30 @@ public class PickUp extends Service {
                     pickUpRequest.LoadTypeID = result.getInt(result.getColumnIndex("LoadTypeID"));
                     pickUpRequest.al = result.getInt(result.getColumnIndex("AL"));
                     pickUpRequest.TruckID = result.getInt(result.getColumnIndex("TruckID"));
+
+                    String piececodes[];
+                    int index = 0;
+                    if (result.getString(result.getColumnIndex("JsonData")) != null) {
+                        piececodes = result.getString(result.getColumnIndex("JsonData")).split(",");
+                        for (String piece : piececodes) {
+                            pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
+                                    (piece));
+                            index++;
+                        }
+                    } else {
+                        Cursor resultDetail = db.Fill("select * from PickUpDetailAuto where PickUpID = " + pickUpRequest.ID, getApplicationContext());
+
+                        if (resultDetail.getCount() > 0) {
+                            resultDetail.moveToFirst();
+                            do {
+                                pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
+                                        (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
+                                index++;
+                            }
+                            while (resultDetail.moveToNext());
+                        }
+                    }
+
                     try {
                         FirebaseApp.initializeApp(this);
                         String token = FirebaseInstanceId.getInstance().getToken();
@@ -170,18 +194,19 @@ public class PickUp extends Service {
                         pickUpRequest.DeviceToken = "";
                     }
 
-                    Cursor resultDetail = db.Fill("select * from PickUpDetailAuto where PickUpID = " + pickUpRequest.ID, getApplicationContext());
 
-                    if (resultDetail.getCount() > 0) {
-                        int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
-                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-                    }
+//                    Cursor resultDetail = db.Fill("select * from PickUpDetailAuto where PickUpID = " + pickUpRequest.ID, getApplicationContext());
+//
+//                    if (resultDetail.getCount() > 0) {
+//                        int index = 0;
+//                        resultDetail.moveToFirst();
+//                        do {
+//                            pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
+//                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
+//                            index++;
+//                        }
+//                        while (resultDetail.moveToNext());
+//                    }
 
                     String jsonData = JsonSerializerDeserializer.serialize(pickUpRequest, true);
                     jsonData = jsonData.replace("Date(-", "Date(");
@@ -219,7 +244,7 @@ public class PickUp extends Service {
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
                         db.deletePickupID(id, getApplicationContext());
-                        db.deletePickupDetails(id, getApplicationContext());
+                        // db.deletePickupDetails(id, getApplicationContext());
                         flag_thread = false;
 
 

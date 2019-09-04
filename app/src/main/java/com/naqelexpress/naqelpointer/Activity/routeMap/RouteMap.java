@@ -515,7 +515,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         // Sensor enabled
         String sensor = "sensor=false";
         String mode = "mode=driving";
-        String key = "key=" + getString(R.string.google_maps_key);
+        String key = "key=" + getString(R.string.google_maps_key_forrute);
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + key;
 

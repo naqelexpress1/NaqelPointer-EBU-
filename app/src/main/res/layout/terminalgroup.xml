@@ -166,7 +166,7 @@
                 android:layout_gravity="center"
 
                 android:gravity="center"
-                android:text="Transit" />
+                android:text="Linehaul" />
         </LinearLayout>
 
         <!--   <Button
@@ -189,7 +189,8 @@
             android:layout_height="100dp"
             android:layout_weight=".3"
             android:clickable="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/group5"

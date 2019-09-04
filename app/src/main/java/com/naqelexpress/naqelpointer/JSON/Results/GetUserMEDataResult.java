@@ -1,7 +1,5 @@
 package com.naqelexpress.naqelpointer.JSON.Results;
 
-import android.view.Menu;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,6 +21,10 @@ public class GetUserMEDataResult
     public String Division;
     public int UsertypeId = 0;
     public int Menu = 0;
+    public int UpdateMenu = 0;
+    public String AppName;
+    public int Appversion;
+    public int DisableEnabletxtBox = 1;
 
     public GetUserMEDataResult(String finalJson) {
         JSONObject jsonObject;
@@ -44,6 +46,10 @@ public class GetUserMEDataResult
             Division = jsonObject.getString("Division");
             UsertypeId = jsonObject.getInt("UserTypeID");
             Menu = jsonObject.getInt("Menu");
+            UpdateMenu = jsonObject.getInt("ChangesMainMenu");
+            AppName = jsonObject.getString("AppName");
+            Appversion = jsonObject.getInt("Appversion");
+            DisableEnabletxtBox = jsonObject.getInt("DisableEnabletxtBox");
 
             HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
             ErrorMessage = jsonObject.getString("ErrorMessage");

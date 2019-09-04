@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:id="@+id/llgroup1"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/group1"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/inventory"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lblinventory"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+
+                android:gravity="center"
+                android:text="Inventory" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llgroup2"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/group2"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/onhold"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lblonhold"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="On Hold" />
+        </LinearLayout>
+
+        <!--  <Button
+              android:id="@+id/group2"
+              android:layout_width="0dp"
+              android:layout_height="70dp"
+              android:layout_marginTop="8dp"
+              android:layout_marginRight="8dp"
+              android:layout_weight=".3"
+              android:drawableTop="@drawable/onhold"
+              android:gravity="left|center_vertical"
+              android:text="On Hold"
+              app:layout_constraintRight_toRightOf="parent"
+              app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+              tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+
+        <LinearLayout
+            android:id="@+id/llgroup3"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/group3"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/shipmentprocessing"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lblsp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:maxLines="2"
+                android:text="Shipment Processing" />
+        </LinearLayout>
+
+        <!--<Button
+            android:id="@+id/group3"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight=".3"
+            android:background="@drawable/shipmentprocessing"
+            android:text=""
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+            tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:id="@+id/llgroup4"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/group4"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/transit"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lbltransist"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+
+                android:gravity="center"
+                android:text="Transit" />
+        </LinearLayout>
+
+        <!--   <Button
+               android:id="@+id/group4"
+               android:layout_width="0dp"
+               android:layout_height="70dp"
+               android:layout_marginTop="8dp"
+               android:layout_marginRight="8dp"
+               android:layout_weight=".3"
+               android:background="@drawable/transit"
+               android:text=""
+               app:layout_constraintRight_toRightOf="parent"
+               app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+               tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+
+        <LinearLayout
+            android:id="@+id/llgroup5"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/group5"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/transportdelay"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lbltrsdelay"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:maxLines="2"
+                android:text="Transport Delay" />
+        </LinearLayout>
+        <!--  <Button
+              android:id="@+id/group5"
+              android:layout_width="0dp"
+              android:layout_height="70dp"
+              android:layout_marginTop="8dp"
+              android:layout_marginRight="8dp"
+              android:layout_weight=".3"
+              android:background="@drawable/transportdelay"
+              android:text=""
+              app:layout_constraintRight_toRightOf="parent"
+              app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+              tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+
+        <LinearLayout
+            android:id="@+id/ncllayout"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ncl"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ncl"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lblncl"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Consolidation" />
+        </LinearLayout>
+
+        <!-- <Button
+             android:id="@+id/ncl"
+             android:layout_width="0dp"
+             android:layout_height="70dp"
+             android:layout_marginTop="8dp"
+             android:layout_marginRight="8dp"
+             android:layout_weight=".3"
+             android:background="@drawable/ncl"
+             android:text="NCL"
+             android:visibility="gone"
+             app:layout_constraintRight_toRightOf="parent"
+             app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+             tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+
+        <LinearLayout
+            android:id="@+id/loadtrotriplayout"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/onhold"
+                android:text=""
+                android:visibility="gone"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <Button
+                android:id="@+id/loadtrotrip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+
+                android:gravity="center"
+                android:text="Load to Trip" />
+        </LinearLayout>
+
+        <!--<Button-->
+        <!--android:id="@+id/loadtrotrip"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="70dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_weight=".3"-->
+        <!--android:text="Load to Trip"-->
+        <!--android:visibility="gone"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"-->
+        <!--tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+        <LinearLayout
+            android:id="@+id/helindlayout"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/onhold"
+                android:text=""
+                android:visibility="gone"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <Button
+                android:id="@+id/heldin"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+
+                android:gravity="center"
+                android:text="Held In" />
+        </LinearLayout>
+
+        <!--<Button-->
+        <!--android:id="@+id/heldin"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="70dp"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_weight=".3"-->
+        <!--android:text="Held In"-->
+        <!--android:visibility="gone"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"-->
+        <!--tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+        <LinearLayout
+            android:id="@+id/arrivedatdestlayout"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/onhold"
+                android:text=""
+                android:visibility="gone"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <Button
+                android:id="@+id/arrivedatdest"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Arrived at Dest" />
+        </LinearLayout>
+
+        <!--<Button
+            android:id="@+id/arrivedatdest"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight=".3"
+            android:text="Arrived at Dest"
+            android:visibility="gone"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+            tools:ignore="HardcodedText,RtlHardcoded" />-->
+
+        <LinearLayout
+            android:id="@+id/heldoutlayout"
+            android:layout_width="0dp"
+            android:layout_height="90dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/heldout"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/onhold"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Held Out" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

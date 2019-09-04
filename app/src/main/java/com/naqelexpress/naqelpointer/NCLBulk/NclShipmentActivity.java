@@ -730,6 +730,16 @@ public class NclShipmentActivity extends AppCompatActivity {
             ncl.UserID = GlobalVar.GV().UserID;
             ncl.PieceCount = ScanNclWaybillFragment.PieceCodeList.size();
 
+            ncl.EmployID = GlobalVar.GV().EmployID;
+            ncl.StationID = GlobalVar.GV().StationID;
+
+            String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
+            String Dest[] = ScanNclNoFragment.txtDestination.getText().toString().split(":");
+            if (Origin.length > 1)
+                ncl.OrgDest = Origin[0];
+            if (Dest.length > 1)
+                ncl.OrgDest = ncl.OrgDest + " / " + Dest[0];
+
             ncl.IsSync = false;
 
             for (int i = 0; i < ScanNclWaybillFragment.PieceCodeList.size(); i++) {

@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -14,10 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -40,7 +35,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
         setContentView(R.layout.inventorygroup);
 
-        countDownTimer = new MyCountDownTimer(startTime, interval);
+        // countDownTimer = new MyCountDownTimer(startTime, interval);
 
         ImageView group1 = (ImageView) findViewById(R.id.group1);
         group1.setOnClickListener(this);
@@ -133,7 +128,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        countDownTimer.cancel();
+                        // countDownTimer.cancel();
                         InventoryGroup.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -214,33 +209,33 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
     }
 
-    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
-    private final long interval = 1 * 1000;
-    MyCountDownTimer countDownTimer;
-
-    public class MyCountDownTimer extends CountDownTimer {
-        public MyCountDownTimer(long startTime, long interval) {
-            super(startTime, interval);
-        }
-
-        @Override
-        public void onFinish() {
-            //DO WHATEVER YOU WANT HERE
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-            UserMeLogin userMeLogin = new UserMeLogin(id);
-            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
-
-            ActivityCompat.finishAffinity(InventoryGroup.this);
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-    }
+//    private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
+//    private final long interval = 1 * 1000;
+//    MyCountDownTimer countDownTimer;
+//
+//    public class MyCountDownTimer extends CountDownTimer {
+//        public MyCountDownTimer(long startTime, long interval) {
+//            super(startTime, interval);
+//        }
+//
+//        @Override
+//        public void onFinish() {
+//            //DO WHATEVER YOU WANT HERE
+//            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+//            UserMeLogin userMeLogin = new UserMeLogin(id);
+//            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+//            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+//
+//            ActivityCompat.finishAffinity(InventoryGroup.this);
+//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+//            startActivity(intent);
+//        }
+//
+//        @Override
+//        public void onTick(long millisUntilFinished) {
+//        }
+//    }
 
     @Override
     public void onUserInteraction() {
@@ -248,7 +243,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
         super.onUserInteraction();
 
         //Reset the timer on user interaction...
-        countDownTimer.cancel();
-        countDownTimer.start();
+        //countDownTimer.cancel();
+        //countDownTimer.start();
     }
 }

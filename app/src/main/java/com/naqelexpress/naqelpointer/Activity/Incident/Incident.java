@@ -33,10 +33,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.naqelexpress.naqelpointer.Activity.Login.FindVehicle;
 import com.naqelexpress.naqelpointer.Activity.routeMap.DirectionsJSONParser;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.FindVehilceObject;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -89,6 +91,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
     ImageView image1, image2, image3, image4;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,6 +120,19 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
         vehicleno = (EditText) findViewById(R.id.vehicleno);
         pendingwaybill = (EditText) findViewById(R.id.pendingwaybillno);
         remarks = (EditText) findViewById(R.id.remarks);
+
+
+        vehicleno.setKeyListener(null);
+        ReadFromLocal();
+        vehicleno.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (vehicles.size() > 0)
+                    RedirectVechicleClass();
+
+
+            }
+        });
 
         Button emergency = (Button) findViewById(R.id.emergency);
         emergency.setOnClickListener(new View.OnClickListener() {
@@ -1185,6 +1201,15 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 }
                 break;
 
+            case 99: {
+                if (resultCode == Activity.RESULT_OK) {
+
+                    vehicleno.setText(data.getStringExtra("name"));
+                    //truckID = data.getIntExtra("truckid", 0);
+                }
+                break;
+            }
+
 
         }
 
@@ -1898,7 +1923,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject();
-                jsonObject.put("ImageName",  sendimages.get(1));
+                jsonObject.put("ImageName", sendimages.get(1));
                 jsonObject.put("FileName", convertimage(1));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -2063,14 +2088,14 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject();
-                jsonObject.put("ImageName",  sendimages.get(2));
+                jsonObject.put("ImageName", sendimages.get(2));
                 jsonObject.put("FileName", convertimage(2));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
 
-            String jsonData =jsonObject.toString();
+            String jsonData = jsonObject.toString();
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
             InputStream ist = null;
@@ -2325,69 +2350,69 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
         }
     }
 
-   /* private class Image1 extends AsyncTask<String, Integer, String> {
+    /* private class Image1 extends AsyncTask<String, Integer, String> {
 
 
-        @Override
-        protected void onPreExecute() {
-            if (progressDialog == null)
-                progressDialog = ProgressDialog.show(Incident.this, "Please wait.", "Uploading Images to Server"
-                        , true);
+         @Override
+         protected void onPreExecute() {
+             if (progressDialog == null)
+                 progressDialog = ProgressDialog.show(Incident.this, "Please wait.", "Uploading Images to Server"
+                         , true);
 
-            super.onPreExecute();
-        }
+             super.onPreExecute();
+         }
 
-        @SuppressWarnings("deprecation")
-        protected String doInBackground(String... params) {
+         @SuppressWarnings("deprecation")
+         protected String doInBackground(String... params) {
 
-            boolean delete = false;
-            int position = 0;
-            try {
+             boolean delete = false;
+             int position = 0;
+             try {
 
-                //delete = CloudStorage.uploadFile("naqeldocuments", GlobalVar.naqelvehicleimagepath + "/" + sendimages.get(position), getApplicationContext());
-
-
-            } catch (Exception e2) {
-                e2.printStackTrace();
-                return "FALSE";
-
-            }
-
-            File sourceFile = new File(GlobalVar.naqelvehicleimagepath + "/" + sendimages.get(position));
-
-            if (!sourceFile.exists()) {
-                return "FALSE";
-
-            } else if (sourceFile.exists() && delete) {
-                deletefile(position);
-            }
+                 //delete = CloudStorage.uploadFile("naqeldocuments", GlobalVar.naqelvehicleimagepath + "/" + sendimages.get(position), getApplicationContext());
 
 
-            return "TRUE";
+             } catch (Exception e2) {
+                 e2.printStackTrace();
+                 return "FALSE";
 
-        }
+             }
 
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            if (result.equals("TRUE"))
-                isFlag_image1 = true;
-            else
-                isFlag_image1 = false;
+             File sourceFile = new File(GlobalVar.naqelvehicleimagepath + "/" + sendimages.get(position));
 
-            isFlag_image1_Compl = true;
-            checkuploadimages();
+             if (!sourceFile.exists()) {
+                 return "FALSE";
 
-        }
-    }*/
-   public String getStringImage(Bitmap bmp) {
-       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-       bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-       byte[] imageBytes = baos.toByteArray();
-       String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
-       return encodedImage;
+             } else if (sourceFile.exists() && delete) {
+                 deletefile(position);
+             }
 
-   }
+
+             return "TRUE";
+
+         }
+
+         @Override
+         protected void onPostExecute(String result) {
+             super.onPostExecute(result);
+             if (result.equals("TRUE"))
+                 isFlag_image1 = true;
+             else
+                 isFlag_image1 = false;
+
+             isFlag_image1_Compl = true;
+             checkuploadimages();
+
+         }
+     }*/
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+
+    }
 
 
    /* private void SendImage(final String image) {
@@ -2449,7 +2474,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             JSONObject jsonObject = null;
             try {
                 jsonObject = new JSONObject();
-                jsonObject.put("ImageName",  sendimages.get(0));
+                jsonObject.put("ImageName", sendimages.get(0));
                 jsonObject.put("FileName", convertimage(0));
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -2573,5 +2598,48 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             e.printStackTrace();
         }
         return image;
+    }
+
+    ArrayList<FindVehilceObject> vehicles;
+
+    private void RedirectVechicleClass() {
+        Intent intent = new Intent(this, FindVehicle.class);
+        intent.putExtra("Vehicles", vehicles);
+        startActivityForResult(intent, 99);
+    }
+
+    private void ReadFromLocal() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor result = dbConnections.Fill("select * from Truck", getApplicationContext());
+
+        result.moveToFirst();
+        vehicles = new ArrayList<FindVehilceObject>();
+        vehicles.clear();
+        setDefault();
+        try {
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                do {
+                    FindVehilceObject fvo = new FindVehilceObject();
+                    fvo.ID = result.getInt(result.getColumnIndex("TruckID"));
+                    fvo.Name = result.getString(result.getColumnIndex("Name"));
+                    vehicles.add(fvo);
+                } while (result.moveToNext());
+            } else
+                GlobalVar.GV().Logout(getApplicationContext());
+
+            result.close();
+            dbConnections.close();
+            // RedirectVechicleClass();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setDefault() {
+        FindVehilceObject fvo = new FindVehilceObject();
+        fvo.ID = 0;
+        fvo.Name = "At Yard";
+        vehicles.add(fvo);
     }
 }

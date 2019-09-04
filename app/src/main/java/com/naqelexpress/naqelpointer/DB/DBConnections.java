@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 74; // Added for Terminal Handling Count Column
+    private static final int Version = 82; // Update Menu for Loading concept
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -89,7 +89,8 @@ public class DBConnections
                 " , \"Password\" TEXT NOT NULL, \"StationID\" INTEGER NOT NULL , \"RoleMEID\" INTEGER, \"StatusID\" INTEGER NOT NULL," +
                 " \"MachineID\" TEXT,  \"EmployName\" TEXT, \"EmployFName\" TEXT, \"MobileNo\" TEXT, \"StationCode\" TEXT, " +
                 "\"StationName\" TEXT, \"StationFName\" TEXT,\"Division\" TEXT DEFAULT 0 ," +
-                "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0 ,  \"TruckID\" INTEGER DEFAULT 0)");
+                "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0 ,  \"TruckID\" INTEGER DEFAULT 0," +
+                " UpdateMenu Integer Default 0 , DisableEnabletxtBox Integer Default 1)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserLogs\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , \"UserID\" INTEGER NOT NULL , \"SuperVisorID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL , \"LogTypeID\" INTEGER NOT NULL , \"CTime\" DATETIME NOT NULL , \"MachineID\" TEXT , \"Remarks\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserMeLogin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE ," +
@@ -319,21 +320,25 @@ public class DBConnections
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                 " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
-                " \"TruckID\" Integer Default 0)");
+                " \"TruckID\" Integer Default 0 , JsonData Text Not Null)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
+                "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpTemp\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL ," +
                 " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                 " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0 ," +
-                " \"TruckID\" Integer Default 0)");
+                " \"TruckID\" Integer Default 0 , JsonData Text Not Null)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailTemp\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Truck\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT," +
                 " \"TruckID\" Interger Not Null,\"IsDate\"  TEXT NOT NULL  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"UpdateMenu\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , " +
+                " \"MenuChanges\" Integer Default 0 )");
 
     }
 
@@ -361,6 +366,10 @@ public class DBConnections
 //        }
 
         if (oldVersion < newVersion) {
+
+            db.execSQL("delete from UserMELogin");
+            db.execSQL("delete from UserME");
+
             //Added by ismail
             this.mDefaultWritableDatabase = db;
             db.execSQL("create table if not exists " + TABLENAME + "(" + COLUMNID
@@ -526,6 +535,9 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"Truck\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT, " +
                     " \"TruckID\" Interger Not Null , \"IsDate\"  TEXT NOT NULL)");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"UpdateMenu\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    " \"MenuChanges\" Integer Default 0 )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -620,6 +632,16 @@ public class DBConnections
             if (!isColumnExist("Ncl", "JsonData"))
                 db.execSQL("ALTER TABLE Ncl ADD COLUMN JsonData TEXT");
 
+            if (!isColumnExist("UserME", "UpdateMenu"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN UpdateMenu Integer DEFAULT 0 ");
+            if (!isColumnExist("UserME", "DisableEnabletxtBox"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN DisableEnabletxtBox  Integer DEFAULT 1 ");
+
+            if (!isColumnExist("PickUpAuto", "JsonData"))
+                db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN JsonData TEXT");
+
+            if (!isColumnExist("PickUpTemp", "JsonData"))
+                db.execSQL("ALTER TABLE PickUpTemp ADD COLUMN JsonData TEXT");
         }
 
 
@@ -812,6 +834,7 @@ public class DBConnections
             contentValues.put("Menu", instance.Menu);
             contentValues.put("Date", GlobalVar.getDate());
             contentValues.put("TruckID", instance.TruckID);
+            contentValues.put("DisableEnabletxtBox", instance.DisableEnabletxtBox);
 
             result = db.insert("UserME", null, contentValues);
             db.close();
@@ -919,14 +942,32 @@ public class DBConnections
     }
 
 
-    public boolean UpdateUserDivision(String division, View view) {
+    public boolean UpdateUserDivision(String division, View view, int UpdateMenu) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         //Put the filed which you want to update.
         contentValues.put("Division", division);
+        contentValues.put("UpdateMenu", UpdateMenu);
         try {
             String args[] = {String.valueOf(GlobalVar.GV().EmployID)};
             db.update("UserME", contentValues, "EmployID=?", args);
+        } catch (Exception e) {
+            GlobalVar.GV().ShowSnackbar(view, e.getMessage(), GlobalVar.AlertType.Error);
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateMenu(String division, View view, int UpdateMenu) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("MenuChanges", UpdateMenu);
+        try {
+            db.delete("UpdateMenu", null, null);
+            // db.update("UpdateMenu", contentValues, null, null);
+            db.insert("UpdateMenu", null, contentValues);
+            db.close();
         } catch (Exception e) {
             GlobalVar.GV().ShowSnackbar(view, e.getMessage(), GlobalVar.AlertType.Error);
             return false;
@@ -964,9 +1005,10 @@ public class DBConnections
 
             try {
                 String args[] = {String.valueOf(instance.ID)};
-                db.update("UserMELogin", contentValues, "ID=?", args);
-                db.delete("UserMELogin", "ID=?", args);
-//                db.execSQL("delete from UserMELogin");
+                //db.update("UserMELogin", contentValues, "ID=?", args);
+                // db.delete("UserMELogin", "ID=?", args);
+                db.execSQL("delete from UserMELogin");
+                db.execSQL("delete from UserME"); // added new
 
             } catch (Exception e) {
                 GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error);
@@ -1096,7 +1138,7 @@ public class DBConnections
     }
 
     //---------------------------------PickUp Table-------------------------------
-    public boolean InsertPickUp(PickUp instance, Context context, int lid, int al) {
+    public boolean InsertPickUp(PickUp instance, Context context, int lid, int al, String JsonData) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -1119,6 +1161,8 @@ public class DBConnections
             contentValues.put("LoadTypeID", lid);
             contentValues.put("AL", al);
             contentValues.put("TruckID", GetTruck(context));
+            contentValues.put("JsonData", JsonData);
+
 //            result = db.insert("PickUp", null, contentValues);
             result = db.insert("PickUpAuto", null, contentValues);
             db.insert("PickUpTemp", null, contentValues);
@@ -1131,13 +1175,16 @@ public class DBConnections
 
     public boolean InsertPickUpDetail(PickUpDetail instance, Context context) {
         long result = 0;
+
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS
+                    | SQLiteDatabase.OPEN_READWRITE);
 
             ContentValues contentValues = new ContentValues();
             contentValues.put("BarCode", instance.BarCode);
             contentValues.put("PickUpID", instance.PickUpID);
             contentValues.put("IsSync", instance.IsSync);
+
             result = db.insert("PickUpDetailAuto", null, contentValues);
             db.insert("PickUpDetailTemp", null, contentValues);
             db.close();
@@ -4961,6 +5008,20 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String args[] = {GlobalVar.getDate()};
             db.delete("Truck", "IsDate!=?", args);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean DeleteTrucksData(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.delete("Truck", null, null);
             db.close();
 
         } catch (SQLiteException e) {

@@ -85,8 +85,33 @@ public class NotDeliveredSecondFragment
                     }
                 }
             });
+//
+
+            if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
+                btnOpenCamera.setVisibility(View.GONE);
+
+                if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                    txtBarCode.setKeyListener(null);
+                    txtBarCode.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
+                                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                                GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                            } else {
+                                Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                                startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                            }
+                        }
+                    });
+                } else {
+
+                    GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                }
+            }
 
             initViews();
+
             //initDialog();
         }
         return rootView;
@@ -125,7 +150,6 @@ public class NotDeliveredSecondFragment
 
         }
     }
-
 
 
     @Override

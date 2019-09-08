@@ -148,6 +148,7 @@ public class NightStock extends Service {
                     nightStock.WaybillsCount = Integer.parseInt(result.getString(result.getColumnIndex("WaybillsCount")));
                     nightStock.IDs = Integer.parseInt(result.getString(result.getColumnIndex("IDs")));
                     nightStock.BIN = result.getString(result.getColumnIndex("BIN"));
+
                     Cursor resultDetail = db.Fill("select * from NightStockWaybillDetail where NightStockID = "
                             + nightStock.ID, getApplicationContext());
 
@@ -209,9 +210,11 @@ public class NightStock extends Service {
 
                 try {
                     if (response.contains("Created")) {
-                        db.deleteNightStockD(id, getApplicationContext());
-                        db.deleteNightStockDWayBill(id, getApplicationContext());
-                        db.deleteNightStockDBarcode(id, getApplicationContext());
+//                        db.deleteNightStockD(id, getApplicationContext());
+//                        db.deleteNightStockDWayBill(id, getApplicationContext());
+//                        db.deleteNightStockDBarcode(id, getApplicationContext());
+
+                        db.updateNightStockID(id, getApplicationContext());
 
                         flag_thread = false;
 

@@ -185,7 +185,7 @@ public class NotDelivery extends Service {
 
 
             } else {
-
+                flag_thread = false;
                 this.stopSelf();
             }
         } catch (Exception e) {
@@ -211,9 +211,11 @@ public class NotDelivery extends Service {
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
 
-                        db.deleteNotDeliveryID(id, getApplicationContext());
-                        db.deleteNotDeliveyDetails(id, getApplicationContext());
+                        // db.deleteNotDeliveryID(id, getApplicationContext());
+                        // db.deleteNotDeliveyDetails(id, getApplicationContext());
+                        db.updateNotDeliveryID(id, getApplicationContext());
                         db.UpdateMyRouteShipmentsNotDeliverd(getApplicationContext(), waybillno);
+
                         if (dsID == 8)
                             db.UpdateMyRouteShipmentsRefused(getApplicationContext(), waybillno);
                         flag_thread = false;
@@ -274,7 +276,7 @@ public class NotDelivery extends Service {
         };
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                60000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

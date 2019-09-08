@@ -100,6 +100,7 @@ public class BookingListAdapter extends BaseAdapter {
         holder.txtReferenceNo.setText(item.RefNo);
 
         if (class_.equals("BookingList")) {
+            holder.txtRequiredDate.setVisibility(View.GONE);
             DateTimeFormatter fmtRD = DateTimeFormat.forPattern("dd-mm-yyyy");
             String dateStringRD = fmtRD.print(itemList.get(position).OfficeUpTo);
 
@@ -148,7 +149,7 @@ public class BookingListAdapter extends BaseAdapter {
                         final String jsonData = jsonObject.toString();
 
                         Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" +
-                                itemList.get(acceptposition).RefNo,context);
+                                itemList.get(acceptposition).RefNo, context);
                         if (result.getCount() == 0) {
 
                             AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -178,7 +179,7 @@ public class BookingListAdapter extends BaseAdapter {
                 @Override
                 public void onClick(View view) {
                     DBConnections dbConnections = new DBConnections(context, null);
-                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + itemList.get(position).RefNo,context);
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + itemList.get(position).RefNo, context);
                     if (result.getCount() == 0) {
                         Intent intent = new Intent(context, PickUpActivity.class);
                         Bundle bundle = new Bundle();
@@ -193,9 +194,26 @@ public class BookingListAdapter extends BaseAdapter {
 
                 }
             });
-        }else if(class_.equals("History"))
-        {
-            holder.txtReferenceNo.setText(item.RefNo +" "+ item.ID);
+        } else if (class_.equals("History")) {
+            DateTimeFormatter fmtRT = DateTimeFormat.forPattern("HH:mm");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                Date dt = formatter.parse(itemList.get(position).PickUpReqDT);
+                DateFormat dfmt = new SimpleDateFormat("dd-MM-yyyy");
+                String dte = dfmt.format(dt);
+
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                String time = fmt.print(DateTime.parse(itemList.get(position).PickUpReqDT));
+
+
+                holder.txtRequiredDate.setText(dte);
+                holder.txtRequiredTime.setText(time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            // holder.txtRequiredDate.setText(item.PickUpReqDT);
+            holder.txtReferenceNo.setText(item.RefNo + " " + item.ID);
         }
         holder.txtPieces.setText(String.valueOf(item.PicesCount));
         holder.txtWeight.setText(String.valueOf(item.Weight));
@@ -347,8 +365,7 @@ public class BookingListAdapter extends BaseAdapter {
                 GlobalVar.GV().ShowSnackbar(((Activity) context).getWindow().getDecorView().getRootView(), ((Activity) context).getString(R.string.wentwrong), GlobalVar.AlertType.Error);
             }
 
-            if(pd.isShowing() && pd !=null)
-            {
+            if (pd.isShowing() && pd != null) {
                 pd.dismiss();
                 pd = null;
             }
@@ -373,8 +390,12 @@ public class BookingListAdapter extends BaseAdapter {
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.accpet_job);
                 else
                     bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.acceptjob);
-            } else
-                bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.jobnotsync);
+            } else {
+                if (Integer.parseInt(params[0]) == 0)
+                    bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.jobnotsync);
+                else
+                    bmp = BitmapFactory.decodeResource(context.getResources(), R.drawable.accpet_job);
+            }
             // final Bitmap bmp = BitmapFactory.decodeFile(params[0]);
             return bmp;
         }

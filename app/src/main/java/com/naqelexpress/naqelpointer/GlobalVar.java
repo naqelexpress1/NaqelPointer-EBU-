@@ -85,7 +85,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "DropDown InCap - Incident";
+    public String AppVersion = "Pickup History";
     public boolean LoginVariation = true; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -99,6 +99,7 @@ public class GlobalVar {
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
+    public int Connandtimeout30000 = 30000;
 
     //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
     //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
@@ -1510,6 +1511,52 @@ public class GlobalVar {
     }
 
 
+    public static ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> getPickupHistory
+            (Context context) {
+        ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> pickupFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from PickUpAuto order by timein desc ", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                com.naqelexpress.naqelpointer.Activity.Booking.Booking pickUpRequest = new com.naqelexpress.naqelpointer.Activity.Booking.Booking();
+                //pickUpRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                pickUpRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("WaybillNo")));
+                int issync = 0;
+                boolean value = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                if (value)
+                    issync = 1;
+                else
+                    issync = 0;
+
+                pickUpRequest.Status = issync;
+                //pickUpRequest.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
+                //pickUpRequest.FromStationID = Integer.parseInt(result.getString(result.getColumnIndex("FromStationID")));
+                //pickUpRequest.ToStationID = Integer.parseInt(result.getString(result.getColumnIndex("ToStationID")));
+                pickUpRequest.PicesCount = Double.parseDouble(result.getString(result.getColumnIndex("PieceCount")));
+                pickUpRequest.Weight = Double.parseDouble(result.getString(result.getColumnIndex("Weight")));
+                //pickUpRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+                //pickUpRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
+                //pickUpRequest.UserMEID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
+                //pickUpRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
+                pickUpRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
+                pickUpRequest.PickUpReqDT = result.getString(result.getColumnIndex("TimeIn"));
+                //pickUpRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                //pickUpRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                //pickUpRequest.CurrentVersion = result.getString(result.getColumnIndex("CurrentVersion"));
+
+                pickupFromLocal.add(pickUpRequest);
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return pickupFromLocal;
+    }
+
+
     public static ArrayList<MyRouteShipments> getDeliverySyncData(Context context) {
         ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
 
@@ -1548,6 +1595,47 @@ public class GlobalVar {
         return OnDeleiveryFromLocal;
     }
 
+    public static ArrayList<MyRouteShipments> getDeliveryHistory(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from OnDelivery order by timein desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+
+                //  onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                ;
+                onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+                //onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+                //   onDeliveryRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
+                //    onDeliveryRequest.IsPartial = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsPartial")));
+                //    onDeliveryRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                //     onDeliveryRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                //     onDeliveryRequest.ReceivedAmt = Double.parseDouble(result.getString(result.getColumnIndex("TotalReceivedAmount")));
+                //onDeliveryRequest.ReceiptNo = result.getString(result.getColumnIndex("ReceiptNo"));
+                //onDeliveryRequest.StopPointsID = Integer.parseInt(result.getString(result.getColumnIndex("StopPointsID")));
+                //     onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
+                //     onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
+
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
+    }
+
+
     public static ArrayList<MyRouteShipments> getNotDeliverySyncData(Context context) {
         ArrayList<MyRouteShipments> NotDeleiveryFromLocal = new ArrayList<>();
 
@@ -1571,6 +1659,64 @@ public class GlobalVar {
         dbConnections.close();
         return NotDeleiveryFromLocal;
     }
+
+    public static ArrayList<MyRouteShipments> getNotDeliveryData(Context context) {
+        ArrayList<MyRouteShipments> NotDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from NotDelivered order by TimeIn desc ", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+
+
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                //  onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+
+                NotDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return NotDeleiveryFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getMultiDeliveryHistory(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from MultiDelivery order by timein desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                //onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                onDeliveryRequest.TypeID = result.getInt(result.getColumnIndex("WaybillsCount"));
+                onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
+    }
+
 
     public static ArrayList<MyRouteShipments> getDeliverySheet(Context context) {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
@@ -1732,6 +1878,32 @@ public class GlobalVar {
         }
         dbConnections.close();
         return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getNightStockHistory(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from NightStock order by CTime desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                //onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                onDeliveryRequest.TypeID = -1;
+                onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
     }
 
 
@@ -2093,6 +2265,13 @@ public class GlobalVar {
     public static String getDate() {
         Calendar calander = Calendar.getInstance();
         SimpleDateFormat simpledateformat = new SimpleDateFormat("dd-MM-yyyy");
+        return simpledateformat.format(calander.getTime());
+    }
+
+    public static String getDateMinus2Days() {
+        Calendar calander = Calendar.getInstance();
+        calander.add(Calendar.DATE, -2);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
         return simpledateformat.format(calander.getTime());
     }
 

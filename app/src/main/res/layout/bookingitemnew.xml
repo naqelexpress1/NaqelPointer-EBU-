@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="10dp"
-    android:background="@color/White"
     android:layout_marginBottom="50dp"
-    >
+    android:background="@color/White">
 
 
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/border">
+        android:background="@drawable/border"
+        tools:ignore="MissingConstraints">
 
 
         <LinearLayout
@@ -57,23 +58,23 @@
                 android:id="@+id/pickup"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/pickupcar"
                 android:layout_weight=".1"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:scaleType="center"
-                android:visibility="gone"/>
+                android:src="@drawable/pickupcar"
+                android:visibility="gone" />
 
             <ImageView
                 android:id="@+id/acceptjob"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:src="@drawable/acceptjob"
                 android:layout_weight=".2"
                 android:background="@null"
                 android:contentDescription="@null"
                 android:scaleType="center"
-                android:visibility="visible"/>
+                android:src="@drawable/acceptjob"
+                android:visibility="visible" />
         </LinearLayout>
 
         <LinearLayout
@@ -101,7 +102,7 @@
                         android:id="@+id/lblClientId"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="0.3"
                         android:text="Req Date"
                         android:textColor="#343538"
                         android:textSize="12sp" />
@@ -113,7 +114,7 @@
                         android:text=":"
                         android:textColor="@android:color/black"
                         android:textSize="15sp"
-                        android:visibility="gone" />
+                        android:visibility="visible" />
 
 
                     <TextView
@@ -125,7 +126,7 @@
                         android:text="05-08-2018"
                         android:textColor="#4d4d4f"
                         android:textSize="12sp"
-                        android:visibility="gone"/>
+                        android:visibility="visible" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -182,9 +183,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="3dp"
             android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
             android:orientation="horizontal"
-            android:weightSum="2"
-            android:layout_marginBottom="3dp">
+            android:weightSum="2">
 
             <LinearLayout
                 android:layout_width="0dp"

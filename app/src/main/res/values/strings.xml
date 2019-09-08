@@ -182,6 +182,7 @@
         <item>Night Stock</item>
         <item>Not Delivery</item>
         <item>OnDelivery</item>
+        <item>MultiDelivery</item>
         <item>Pickup</item>
         <item>Waybill Measurement</item>
     </string-array>

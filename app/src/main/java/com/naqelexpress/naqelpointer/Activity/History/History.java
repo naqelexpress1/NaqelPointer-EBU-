@@ -83,16 +83,21 @@ public class History extends Activity {
             public void onClick(View v) {
 
                 //SyncManulMessage();
-                manualsyncbtn.setEnabled(false);
-                manualsyncbtn.setClickable(false);
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    manualsyncbtn.setEnabled(false);
+                    manualsyncbtn.setClickable(false);
 
-                stopallservice();
-                startAllService();
-                insertManual();
-
+                    stopallservice();
+                    startAllService();
+                    insertManual();
+                } else
+                    GlobalVar.RedirectSettings(History.this);
 
             }
         });
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.DeleteAllSyncData(getApplicationContext());
     }
 
     private void stopallservice() {
@@ -224,6 +229,15 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetOnDeliveryList();
+            } else if (parent.getItemAtPosition(pos).toString().equals("MultiDelivery")) {
+
+                ManualFunction = "MultiDelivery";
+                //insertManual();
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetMultiDeliveryList();
+
             } else if (parent.getItemAtPosition(pos).toString().equals("Not Delivery")) {
                 ManualFunction = "Not Delivery";
                 mydeliverylist = new ArrayList<>();
@@ -272,7 +286,17 @@ public class History extends Activity {
 
     private void GetBookingList() {
         // myBookingList.clear();
-        myBookingList.addAll(GlobalVar.getPickupSyncData(getApplicationContext()));
+        // myBookingList.addAll(GlobalVar.getPickupSyncData(getApplicationContext()));
+        myBookingList.addAll(GlobalVar.getPickupHistory(getApplicationContext()));
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getPickupPieces(myBookingList.get(position).ID);
+
+
+            }
+        });
         if (myBookingList.size() > 0) {
             adapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
@@ -282,27 +306,187 @@ public class History extends Activity {
 
     }
 
+    private ArrayList<String> getPickupPieces(int WaybillNo) {
+
+        ArrayList<String> piececodes = new ArrayList<>();
+
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+        Cursor result = db.Fill("select * from PickUpAuto where WaybillNo = " + WaybillNo, getApplicationContext());
+        result.moveToFirst();
+        String pieces[];
+
+        if (result.getString(result.getColumnIndex("JsonData")) != null) {
+            pieces = result.getString(result.getColumnIndex("JsonData")).split(",");
+            for (String piece : pieces)
+                piececodes.add(piece);
+
+        }
+        result.close();
+        db.close();
+
+        if (piececodes.size() > 0)
+            LoadPieces(piececodes);
+        else
+            GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this " + String.valueOf(WaybillNo), true);
+        return piececodes;
+    }
+
     private void GetOnDeliveryList() {
         // myBookingList.clear();
-        mydeliverylist.addAll(GlobalVar.getDeliverySyncData(getApplicationContext()));
+        // mydeliverylist.addAll(GlobalVar.getDeliverySyncData(getApplicationContext()));getDeliveryHistory
+        mydeliverylist.addAll(GlobalVar.getDeliveryHistory(getApplicationContext()));
         if (mydeliverylist.size() > 0) {
             myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
         } else
             nodata.setVisibility(View.VISIBLE);
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getOnDeliveryPieces(mydeliverylist.get(position).ID, mydeliverylist.get(position).ItemNo);
+
+
+            }
+        });
+    }
+
+    private void GetMultiDeliveryList() {
+
+        mydeliverylist.addAll(GlobalVar.getMultiDeliveryHistory(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getMultiDeliveryPieces(mydeliverylist.get(position).ID);
+
+
+            }
+        });
+    }
+
+    private ArrayList<String> getOnDeliveryPieces(int deliveryID, String WaybillNo) {
+
+        ArrayList<String> piececodes = new ArrayList<>();
+
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+
+        Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID =  " + deliveryID, getApplicationContext());
+        resultDetail.moveToFirst();
+        if (resultDetail.getCount() > 0) {
+            resultDetail.moveToFirst();
+            do {
+                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
+            }
+            while (resultDetail.moveToNext());
+
+
+        }
+
+        resultDetail.close();
+        db.close();
+        if (piececodes.size() > 0)
+            LoadPieces(piececodes);
+        else
+            GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this " + WaybillNo, true);
+        return piececodes;
+    }
+
+    private ArrayList<String> getMultiDeliveryPieces(int ID) {
+
+        ArrayList<String> piececodes = new ArrayList<>();
+
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+
+        Cursor resultDetail = db.Fill("select * from MultiDeliveryWaybillDetail where MultiDeliveryID =  " + ID
+                , getApplicationContext());
+        resultDetail.moveToFirst();
+        if (resultDetail.getCount() > 0) {
+            piececodes.add("WaybillNos");
+            resultDetail.moveToFirst();
+            do {
+                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("WaybillNo")));
+            }
+            while (resultDetail.moveToNext());
+
+
+        }
+
+        resultDetail = db.Fill("select * from MultiDeliveryDetail where MultiDeliveryID =  " + ID
+                , getApplicationContext());
+        resultDetail.moveToFirst();
+        if (resultDetail.getCount() > 0) {
+            piececodes.add("PieceCodes");
+            resultDetail.moveToFirst();
+            do {
+                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
+            }
+            while (resultDetail.moveToNext());
+
+
+        }
+
+        resultDetail.close();
+        db.close();
+        if (piececodes.size() > 0)
+            LoadPieces(piececodes);
+        else
+            GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this ", true);
+        return piececodes;
+    }
+
+    private void GetNotDeliveryList() {
+        //mydeliverylist.addAll(GlobalVar.getNotDeliverySyncData(getApplicationContext()));
+        mydeliverylist.addAll(GlobalVar.getNotDeliveryData(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getNotDeliveryPieces(mydeliverylist.get(position).ID, mydeliverylist.get(position).ItemNo);
+
+
+            }
+        });
 
 
     }
 
-    private void GetNotDeliveryList() {
-        mydeliverylist.addAll(GlobalVar.getNotDeliverySyncData(getApplicationContext()));
-        if (mydeliverylist.size() > 0) {
-            myrouteadapter.notifyDataSetChanged();
-            nodata.setVisibility(View.GONE);
-        } else
-            nodata.setVisibility(View.VISIBLE);
+    private ArrayList<String> getNotDeliveryPieces(int deliveryID, String WaybillNo) {
+
+        ArrayList<String> piececodes = new ArrayList<>();
+
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+
+        Cursor resultDetail = db.Fill("select * from NotDeliveredDetail where NotDeliveredID =  "
+                + deliveryID, getApplicationContext());
+        resultDetail.moveToFirst();
+        if (resultDetail.getCount() > 0) {
+            resultDetail.moveToFirst();
+            do {
+                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
+            }
+            while (resultDetail.moveToNext());
 
 
+        }
+
+        resultDetail.close();
+        db.close();
+        if (piececodes.size() > 0)
+            LoadPieces(piececodes);
+        else
+            GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this " + WaybillNo, true);
+        return piececodes;
     }
 
     private void GetDeliverySheet() {
@@ -348,12 +532,52 @@ public class History extends Activity {
     }
 
     private void GetNightStock() {
-        mydeliverylist.addAll(GlobalVar.getNightStock(getApplicationContext()));
+        mydeliverylist.addAll(GlobalVar.getNightStockHistory(getApplicationContext()));
         if (mydeliverylist.size() > 0) {
             myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
         } else
             nodata.setVisibility(View.VISIBLE);
+
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                GetNightStockPieces(mydeliverylist.get(position).ID);
+
+
+            }
+        });
+
+    }
+
+    private ArrayList<String> GetNightStockPieces(int ID) {
+
+        ArrayList<String> piececodes = new ArrayList<>();
+
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+
+        Cursor resultDetail = db.Fill("select * from NightStockDetail where NightStockID =  " + ID
+                , getApplicationContext());
+        resultDetail.moveToFirst();
+        if (resultDetail.getCount() > 0) {
+            piececodes.add("PieceCodes");
+            resultDetail.moveToFirst();
+            do {
+                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
+            }
+            while (resultDetail.moveToNext());
+
+
+        }
+
+        resultDetail.close();
+        db.close();
+        if (piececodes.size() > 0)
+            LoadPieces(piececodes);
+        else
+            GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this ", true);
+        return piececodes;
     }
 
     private void startAllService() {
@@ -557,7 +781,7 @@ public class History extends Activity {
             totalsize = Integer.parseInt(params[0]);
 
             DBConnections db = new DBConnections(getApplicationContext(), null);
-            Cursor loop = db.Fill("select * from PickUpAuto where IsSync = 0", getApplicationContext());
+            Cursor loop = db.Fill("select * from PickUpAuto where IsSync = 0 order by timein", getApplicationContext());
             loop.moveToFirst();
             do {
                 result = "";
@@ -588,15 +812,26 @@ public class History extends Activity {
                 Cursor resultDetail = db.Fill("select * from PickUpDetailAuto where PickUpID = " +
                         pickUpRequest.ID, getApplicationContext());
 
-                if (resultDetail.getCount() > 0) {
-                    int index = 0;
-                    resultDetail.moveToFirst();
-                    do {
+                String piececodes[];
+                int index = 0;
+                if (loop.getString(loop.getColumnIndex("JsonData")) != null) {
+                    piececodes = loop.getString(loop.getColumnIndex("JsonData")).split(",");
+                    for (String piece : piececodes) {
                         pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
-                                (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
+                                (piece));
                         index++;
                     }
-                    while (resultDetail.moveToNext());
+                } else {
+                    if (resultDetail.getCount() > 0) {
+                        index = 0;
+                        resultDetail.moveToFirst();
+                        do {
+                            pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
+                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
+                            index++;
+                        }
+                        while (resultDetail.moveToNext());
+                    }
                 }
 
                 String jsonData = JsonSerializerDeserializer.serialize(pickUpRequest, true);
@@ -652,8 +887,9 @@ public class History extends Activity {
 
                 if (result.contains("Created")) {
                     moveddata = moveddata + 1;
-                    db.deletePickupID(pickUpRequest.ID, getApplicationContext());
-                    db.deletePickupDetails(pickUpRequest.ID, getApplicationContext());
+                    db.updatePickupbyID(pickUpRequest.ID, getApplicationContext());
+                    //db.deletePickupID(pickUpRequest.ID, getApplicationContext());
+                    //db.deletePickupDetails(pickUpRequest.ID, getApplicationContext());
                 }
                 try {
                     uploaddatacount = uploaddatacount + 1;
@@ -926,7 +1162,7 @@ public class History extends Activity {
 
             Cursor ts = null;
             if (ManualFunction.equals("Pickup"))
-                ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto ", getApplicationContext());
+                ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto where issync = 0 ", getApplicationContext());
             else if (ManualFunction.equals("OnDelivery"))
                 ts = db.Fill("select Count(1) As totalRecord  from OnDelivery ", getApplicationContext());
             else
@@ -949,7 +1185,7 @@ public class History extends Activity {
                     manualsyncbtn.setEnabled(true);
                     manualsyncbtn.setClickable(true);
                     ErrorAlert("No Data",
-                            "All Data Synchronized Successfully"
+                            "All " + ManualFunction + " Data Synchronized Successfully"
                     );
                 }
             } else {
@@ -1011,4 +1247,40 @@ public class History extends Activity {
 
     }
 
+    private void LoadPieces(ArrayList<String> pieces) {
+
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(History.this);
+        builderSingle.setIcon(R.drawable.naqellogowhite);
+        builderSingle.setTitle("Your Scanned Pieces is");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(History.this,
+                android.R.layout.simple_list_item_1);
+        arrayAdapter.addAll(pieces);
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+//                String strName = arrayAdapter.getItem(which);
+//                AlertDialog.Builder builderInner = new AlertDialog.Builder(History.this);
+//                builderInner.setMessage(strName);
+//                builderInner.setTitle("Your Scanned Pieces");
+//                builderInner.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//                builderInner.show();
+            }
+        });
+        builderSingle.show();
+    }
 }

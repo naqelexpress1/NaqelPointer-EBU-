@@ -41,6 +41,7 @@ public class SplashScreenActivity
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
         dbConnections.DeleteExsistingLogin(getApplicationContext());
+
         
 //        String DeviceName = GlobalVar.GV().getDeviceName();
 

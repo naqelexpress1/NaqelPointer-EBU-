@@ -96,15 +96,15 @@ public class TerminalHandling extends Service {
                         updatefile();
 
                     }
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 20000);
                 } catch (Exception e) {
                     flag_thread = false;
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 20000);
                     Log.e("Dashboard thread", e.toString());
                 }
 
             }
-        }, 30000);
+        }, 20000);
 
         return START_STICKY;
     }
@@ -182,7 +182,9 @@ public class TerminalHandling extends Service {
 
             } else {
 
+                flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;
@@ -265,7 +267,7 @@ public class TerminalHandling extends Service {
 
         stringRequest.setShouldCache(false);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                30000,
+                20000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);

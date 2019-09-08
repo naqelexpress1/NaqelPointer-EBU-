@@ -104,7 +104,9 @@ public class DBConnections
                 " \"TotalReceivedAmount\" DOUBLE NOT NULL , \"CashAmount\" DOUBLE NOT NULL DEFAULT 0, \"POSAmount\" DOUBLE NOT NULL DEFAULT 0 ," +
                 " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
+                "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
+
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDelivered\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL ," +
@@ -112,7 +114,8 @@ public class DBConnections
                 " \"IsSync\" BOOL NOT NULL , \"StationID\" INTEGER NOT NULL , \"PiecesCount\" INTEGER NOT NULL ," +
                 " \"DeliveryStatusID\" INTEGER NOT NULL ,\"DeliveryStatusReasonID\" INTEGER NOT NULL, \"Notes\" TEXT, \"Latitude\" TEXT, \"Longitude\" TEXT)");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDeliveredDetail\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"NotDeliveredID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDeliveredDetail\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE ," +
+                " \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"NotDeliveredID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUp\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL ," +
                 " \"ClientID\" INTEGER, \"FromStationID\" INTEGER NOT NULL , \"ToStationID\" INTEGER NOT NULL , " +
@@ -253,7 +256,8 @@ public class DBConnections
                 "\"CTime\" DATETIME NOT NULL  ,\"UserID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL, \"StationID\" INTEGER NOT NULL, " +
                 "\"WaybillsCount\" INTEGER NOT NULL,\"IDs\" NOT NULL DEFAULT 0,\"BIN\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NightStockDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"BarCode\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NightStockID\" INTEGER NOT NULL )");
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"NightStockWaybillDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"WaybillNo\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NightStockID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"NightStockWaybillDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE," +
+                " \"WaybillNo\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"NightStockID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"EmployInfo\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"EmpID\"  INTEGER NOT NULL ,\"EmpName\"  TEXT NOT NULL ,  \"IqamaNumber\"  TEXT NOT NULL," +
@@ -3291,6 +3295,68 @@ public class DBConnections
         }
     }
 
+    public void updatePickupbyID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("PickUpAuto", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
+    public void DeleteAllSyncData(Context context) {
+
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDateMinus2Days(), "1"};
+
+            //Pickup
+            db.delete("PickUpAuto", "date(timein) <? And IsSync  =?", args);
+            //OnDelivery
+            db.execSQL("delete  from OnDeliveryDetail where DeliveryID in  (select ID from OnDelivery " +
+                    "where issync = 1 and date(TimeIn) < date())");
+            db.delete("OnDelivery", "date(TimeIn) <? And IsSync  =?", args);
+
+            //MultiDelivery
+            db.execSQL("delete  from MultiDeliveryWaybillDetail where MultiDeliveryID in  (select ID from MultiDelivery " +
+                    "where issync = 1 and date(TimeIn) < date())");
+            db.execSQL("delete  from MultiDeliveryDetail where MultiDeliveryID in  (select ID from MultiDelivery " +
+                    "where issync = 1 and date(TimeIn) < date())");
+            db.delete("MultiDelivery", "date(TimeIn) <? And IsSync  =?", args);
+
+            //NotDeliver Data
+            db.execSQL("delete  from NotDeliveredDetail where NotDeliveredID in  (select ID from NotDelivered " +
+                    "where issync = 1 and date(TimeIn) < date())");
+            db.delete("NotDelivered", "date(TimeIn) <? And IsSync  =?", args);
+
+            //NightStock
+            db.execSQL("delete  from NightStockWaybillDetail where NightStockID in  (select ID from NightStock " +
+                    "where issync = 1 and date(CTime) < date())");
+            db.execSQL("delete  from NightStockDetail where NightStockID in  (select ID from NightStock " +
+                    "where issync = 1 and date(CTime) < date())");
+            db.delete("NightStock", "date(CTime) <? And IsSync  =?", args);
+
+
+            db.close();
+
+        } catch (SQLiteException e) {
+            System.out.println(e);
+        }
+
+    }
+
+
     public void deleteonDeliveryID(int ID, Context context) {
         try {
 
@@ -3305,6 +3371,26 @@ public class DBConnections
         }
 
     }
+
+    public void updateOnDeliveryID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("OnDelivery", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
 
     public void deleteDeliveyDetails(int deliveryID, Context context) {
         try {
@@ -3345,6 +3431,25 @@ public class DBConnections
             db.close();
         } catch (SQLiteException e) {
 
+        }
+    }
+
+    public void updateNotDeliveryID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("NotDelivered", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
         }
     }
 
@@ -3414,6 +3519,26 @@ public class DBConnections
 
         }
     }
+
+    public void updateMultiDeliveryID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("MultiDelivery", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
 
     public void deleteMultiDeliveryWayBill(int MultiDeliveryID, Context context) {
         try {
@@ -4180,6 +4305,26 @@ public class DBConnections
 
         }
     }
+
+    public void updateNightStockID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("NightStock", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
 
     public void deleteNightStockDWayBill(int MultiDeliveryID, Context context) {
         try {

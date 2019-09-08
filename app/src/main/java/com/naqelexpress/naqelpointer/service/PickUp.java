@@ -243,8 +243,9 @@ public class PickUp extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deletePickupID(id, getApplicationContext());
+                        //db.deletePickupID(id, getApplicationContext());
                         // db.deletePickupDetails(id, getApplicationContext());
+                        db.updatePickupbyID(id, getApplicationContext());
                         flag_thread = false;
 
 

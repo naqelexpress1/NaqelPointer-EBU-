@@ -232,7 +232,7 @@ public class MultiDeliveryActivity extends AppCompatActivity {
                 }
 
                 if (IsSaved) {
-                    if (!isMyServiceRunning(MultiDeliveryActivity.class)) {
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.MultiDelivery.class)) {
                         startService(
                                 new Intent(MultiDeliveryActivity.this,
                                         com.naqelexpress.naqelpointer.service.MultiDelivery.class));
@@ -460,6 +460,8 @@ public class MultiDeliveryActivity extends AppCompatActivity {
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().ConnandReadtimeout);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().ConnandReadtimeout);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();

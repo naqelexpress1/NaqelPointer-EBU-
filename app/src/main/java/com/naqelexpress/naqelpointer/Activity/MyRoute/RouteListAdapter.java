@@ -21,7 +21,11 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RouteListAdapter
@@ -76,8 +80,6 @@ public class RouteListAdapter
 
         ViewHolder holder = (ViewHolder) convertView.getTag();
         MyRouteShipments item = getItem(position);
-
-
 
 
         holder.lbSerial.setText(String.valueOf(getItemId(position) + 1));
@@ -164,9 +166,38 @@ public class RouteListAdapter
 
         } else {
             holder.txtWaybill.setText("Waybill No\n" + item.ItemNo);
+            holder.txtType.setVisibility(View.VISIBLE);
             holder.imgHasComplaint.setVisibility(View.GONE);
+            holder.imgHasDeliveryRequest.setVisibility(View.VISIBLE);
+            holder.txtExpectedTime.setVisibility(View.VISIBLE);
+
+            if (item.IsDelivered) {
+                holder.imgHasDeliveryRequest.setImageResource(R.drawable.accpet_job);
+            } else
+                holder.imgHasDeliveryRequest.setImageResource(R.drawable.jobnotsync);
+
+            // holder.imgHasComplaint.setVisibility(View.GONE);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                Date dt = formatter.parse(item.ExpectedTime.toString());
+
+                DateFormat dfmt = new SimpleDateFormat("dd-MM-yyyy");
+                String dte = dfmt.format(dt);
+
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                String time = fmt.print(item.ExpectedTime);
+
+                holder.txtExpectedTime.setText(dte + " " + time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (item.TypeID != 0) {
+                holder.txtType.setVisibility(View.VISIBLE);
+                holder.txtWaybill.setText("Waybillcount " + String.valueOf(item.TypeID) + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
+                holder.txtType.setText("Pieces Count " + String.valueOf(item.PiecesCount));
+            }
             holder.imgHasLocation.setVisibility(View.GONE);
-            holder.txtExpectedTime.setVisibility(View.GONE);
             holder.lbDeliveryDate.setVisibility(View.GONE);
             holder.txtAmount.setVisibility(View.GONE);
 
@@ -194,7 +225,6 @@ public class RouteListAdapter
             imgHasDeliveryRequest = (ImageView) view.findViewById(R.id.imgHasRequest);
             header = (TextView) view.findViewById(R.id.changesheader);
             cl = (ConstraintLayout) view.findViewById(R.id.changeView);
-
 
 
             view.setTag(this);

@@ -190,9 +190,10 @@ public class MultiDelivery extends Service {
 
                 try {
                     if (response.contains("Created")) {
-                        db.deleteMultiDeliveryID(id, getApplicationContext());
-                        db.deleteMultiDeliveryWayBill(id, getApplicationContext());
-                        db.deleteMultiDeliveryBarcode(id, getApplicationContext());
+                        db.updateMultiDeliveryID(id, getApplicationContext());
+                        //db.deleteMultiDeliveryID(id, getApplicationContext());
+                        // db.deleteMultiDeliveryWayBill(id, getApplicationContext());
+                        // db.deleteMultiDeliveryBarcode(id, getApplicationContext());
                         flag_thread = false;
 
 
@@ -251,7 +252,7 @@ public class MultiDelivery extends Service {
         };
         stringRequest.setShouldCache(false);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                60000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);

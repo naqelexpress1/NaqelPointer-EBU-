@@ -187,6 +187,7 @@ public class OnDelivery extends Service {
 
 
                     }
+
                     String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
                     jsonData = jsonData.replace("Date(-", "Date(");
                     SaveOnDelivery(db, jsonData, onDeliveryRequest.ID, onDeliveryRequest.WaybillNo);
@@ -194,7 +195,7 @@ public class OnDelivery extends Service {
 
 
             } else {
-
+                flag_thread = false;
                 this.stopSelf();
             }
         } catch (Exception e) {
@@ -219,8 +220,9 @@ public class OnDelivery extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteonDeliveryID(id, getApplicationContext());
-                        db.deleteDeliveyDetails(id, getApplicationContext());
+                        db.updateOnDeliveryID(id, getApplicationContext());
+                        //db.deleteonDeliveryID(id, getApplicationContext());
+                        //db.deleteDeliveyDetails(id, getApplicationContext());
                         db.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), waybillno, id);
                         flag_thread = false;
 
@@ -280,7 +282,7 @@ public class OnDelivery extends Service {
         };
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                60000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

@@ -120,8 +120,6 @@ public class NclServiceBulk extends Service {
 
         } catch (
                 Exception e) {
-
-            flag_thread = false;
             flag_thread = false;
         }
 
@@ -202,7 +200,7 @@ public class NclServiceBulk extends Service {
         };
         stringRequest.setShouldCache(false);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                30000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);

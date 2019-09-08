@@ -1413,6 +1413,8 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setReadTimeout(30000);
+                    httpURLConnection.setConnectTimeout(30000);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();

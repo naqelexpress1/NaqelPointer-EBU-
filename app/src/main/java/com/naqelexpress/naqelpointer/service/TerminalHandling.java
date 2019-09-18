@@ -267,7 +267,7 @@ public class TerminalHandling extends Service {
 
         stringRequest.setShouldCache(false);
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                20000,
+                GlobalVar.GV().ConnandReadtimeout50000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(stringRequest);

@@ -155,6 +155,7 @@ public class NotDelivery extends Service {
                     notDeliveredRequest.DeliveryStatusID = Integer.parseInt(result.getString(result.getColumnIndex("DeliveryStatusID")));
                     notDeliveredRequest.DeliveryStatusReasonID = result.getInt(result.getColumnIndex("DeliveryStatusReasonID"));
                     notDeliveredRequest.Notes = result.getString(result.getColumnIndex("Notes"));
+                    notDeliveredRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
 
                     try {
                         FirebaseApp.initializeApp(this);
@@ -163,19 +164,33 @@ public class NotDelivery extends Service {
                     } catch (Exception e) {
                         notDeliveredRequest.DeviceToken = "";
                     }
-                    Cursor resultDetail = db.Fill("select * from NotDeliveredDetail where NotDeliveredID = " + notDeliveredRequest.ID, getApplicationContext());
 
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
+                    try {
                         int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            notDeliveredRequest.NotDeliveredDetails.add(index, new NotDeliveredDetail
-                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode")), notDeliveredRequest.ID));
+                        String barcode[] = notDeliveredRequest.Barcode.split("\\,");
+                        for (String piececode : barcode) {
+                            notDeliveredRequest.NotDeliveredDetails.add(index,
+                                    new NotDeliveredDetail(piececode, notDeliveredRequest.ID));
                             index++;
                         }
-                        while (resultDetail.moveToNext());
+
+                    } catch (Exception e) {
+                        System.out.println(e);
                     }
+
+//                    Cursor resultDetail = db.Fill("select * from NotDeliveredDetail where NotDeliveredID = " + notDeliveredRequest.ID, getApplicationContext());
+//
+//                    if (resultDetail.getCount() > 0) {
+//                        resultDetail.moveToFirst();
+//                        int index = 0;
+//                        resultDetail.moveToFirst();
+//                        do {
+//                            notDeliveredRequest.NotDeliveredDetails.add(index, new NotDeliveredDetail
+//                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode")), notDeliveredRequest.ID));
+//                            index++;
+//                        }
+//                        while (resultDetail.moveToNext());
+//                    }
 
 
                     String jsonData = JsonSerializerDeserializer.serialize(notDeliveredRequest, true);
@@ -187,6 +202,7 @@ public class NotDelivery extends Service {
             } else {
                 flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;

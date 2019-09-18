@@ -285,6 +285,7 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
                 Cursor barcodecursor = dbConnections.Fill("select * from BarCode Where WayBillNo = '" +
                         result.getString(result.getColumnIndex("ItemNo"))
                         + "'", getContext());
+
                 JSONArray jsonArray = new JSONArray();
                 if (barcodecursor.getCount() > 0) {
                     barcodecursor.moveToFirst();

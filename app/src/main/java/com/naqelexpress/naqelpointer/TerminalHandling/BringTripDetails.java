@@ -309,7 +309,8 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
                 ShowAlertMessage("Kindly Received the Truck in Infotrack" , 1);
             }
         } else {
-            Intent intent = new Intent(BringTripDetails.this, UndoNcl.class);
+            //Intent intent = new Intent(BringTripDetails.this, UndoNcl.class);
+            Intent intent = new Intent(BringTripDetails.this, UndoNclbyScan.class);
             intent.putExtra("tripdata", tripDetails.get(position));
             startActivity(intent);
         }

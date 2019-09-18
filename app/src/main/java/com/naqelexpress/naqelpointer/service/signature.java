@@ -148,8 +148,9 @@ public class signature extends Service {
                 uploadimage();
 
             } else {
-
+                flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;

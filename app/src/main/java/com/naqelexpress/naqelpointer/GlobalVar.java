@@ -85,8 +85,8 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Pickup History";
-    public boolean LoginVariation = true; //For EBU only
+    public String AppVersion = "2.6.0.0";
+    public boolean LoginVariation = false; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -100,6 +100,7 @@ public class GlobalVar {
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
     public int Connandtimeout30000 = 30000;
+    public int ConnandReadtimeout50000 = 50000;
 
     //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
     //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
@@ -1786,6 +1787,44 @@ public class GlobalVar {
 
         DBConnections dbConnections = new DBConnections(context, null);
         Cursor result = dbConnections.Fill("select * from LoadtoDestination", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("WayBill");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                        onDeliveryRequest.ItemNo = obj.getString("WaybillNo");
+
+                        DeliverySheetFromLocal.add(onDeliveryRequest);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getLoadtoDestHistory(Context context) {
+
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from LoadtoDestination ", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {

@@ -94,7 +94,7 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                 @Override
                 public void onClick(View v) {
 //                    checkPointTypeDDetailSpinnerDialog.showSpinerDialog(false);
-                    if (CheckPointTypeID != 20) {
+                    if (CheckPointTypeID != 20 && CheckPointTypeDetailID !=37) {
                         txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
                         checkPointTypeDDetailSpinnerDialog.showSpinerDialog(false);
                     } else {
@@ -166,6 +166,7 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                         txtlength.setVisibility(View.GONE);
                     }
 
+
                     if (CheckPointTypeID == 20) {
                         txtCheckPointTypeDetail.setVisibility(View.GONE);
                         txtCheckPointTypeDDetail.setVisibility(View.GONE);
@@ -230,9 +231,16 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                                 CheckPointTypeDDetailID = 1;
                                 txtCheckPointTypeDDetail.setVisibility(View.VISIBLE);
                             } else {
-                                CheckPointTypeDDetailID = 0;
-                                txtCheckPointTypeDDetail.setText("");
-                                txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
+                                if (CheckPointTypeDetailID == 37) {
+                                    txtCheckPointTypeDDetail.setText("");
+                                    txtCheckPointTypeDDetail.setVisibility(View.VISIBLE);
+                                    txtCheckPointTypeDDetail.requestFocus();
+                                    txtCheckPointTypeDDetail.setInputType(InputType.TYPE_CLASS_TEXT);
+                                } else {
+                                    CheckPointTypeDDetailID = 0;
+                                    txtCheckPointTypeDDetail.setText("");
+                                    txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
+                                }
 
                             }
 

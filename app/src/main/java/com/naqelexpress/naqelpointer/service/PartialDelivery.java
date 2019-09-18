@@ -163,6 +163,7 @@ public class PartialDelivery extends Service {
                     onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
                     onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
                     onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
+                    onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
 
                     try {
                         FirebaseApp.initializeApp(this);
@@ -172,7 +173,32 @@ public class PartialDelivery extends Service {
                         onDeliveryRequest.DeviceToken = "";
                     }
 
-                    Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
+                    try {
+                        int index = 0;
+                        String barcode[] = onDeliveryRequest.Barcode.split("\\,");
+                        for (String piececode : barcode) {
+
+                            Cursor wid = db.Fill("select * from BarCode where BarCode = '" + piececode + "'"
+                                    , getApplicationContext());
+
+                            int WayBillID = 0;
+                            if (wid.getCount() > 0) {
+                                wid.moveToFirst();
+                                WayBillID = wid.getInt(wid.getColumnIndex("WayBillID"));
+                            }
+                            wid.close();
+
+                            onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
+                                    new OnDeliveryDetailRequest(piececode, WayBillID));
+
+                            index++;
+                        }
+
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+
+                    /*Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
 
                     if (resultDetail.getCount() > 0) {
                         resultDetail.moveToFirst();
@@ -195,7 +221,7 @@ public class PartialDelivery extends Service {
                         while (resultDetail.moveToNext());
 
 
-                    }
+                    }*/
                     String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
                     jsonData = jsonData.replace("Date(-", "Date(");
                     SaveOnDelivery(db, jsonData, onDeliveryRequest.ID, onDeliveryRequest.WaybillNo);
@@ -203,8 +229,9 @@ public class PartialDelivery extends Service {
 
 
             } else {
-
+                flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;
@@ -230,8 +257,11 @@ public class PartialDelivery extends Service {
                     String updateDeliver = response.getString("ErrorMessage");
                     if (IsSync && !HasError) {
 
-                        db.deleteonDeliveryID(id, getApplicationContext());
-                        db.deleteDeliveyDetails(id, getApplicationContext());
+                        //db.deleteonDeliveryID(id, getApplicationContext());
+                        //db.deleteDeliveyDetails(id, getApplicationContext());
+
+                        db.updateOnDeliveryID(id, getApplicationContext());
+
                         if (updateDeliver.equals("Complete")) {
                             db.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), waybillno, id);
                         } else {

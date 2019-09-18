@@ -29,7 +29,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.UpdateLocation;
@@ -144,10 +143,20 @@ public class NotDeliveredActivity
             dbConnections.UpdateProductivity_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
 
+            String Barcode = "";
+
+            for (int i = 0; i < secondFragment.NotDeliveredBarCodeList.size(); i++) {
+                if (i == 0)
+                    Barcode = secondFragment.NotDeliveredBarCodeList.get(i);
+                else
+                    Barcode = Barcode + "," + secondFragment.NotDeliveredBarCodeList.get(i);
+            }
+
+
             boolean IsSaved = true;
             NotDelivered notDelivered = new NotDelivered(firstFragment.txtWaybillNo.getText().toString(), 0,
                     TimeIn, DateTime.now(), String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.ReasonID,
-                    firstFragment.txtNotes.getText().toString(), 0);
+                    firstFragment.txtNotes.getText().toString(), 0, Barcode);
 
             Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());
             if (result.getCount() > 0)
@@ -155,7 +164,8 @@ public class NotDeliveredActivity
 
             updateLocation();
             if (dbConnections.InsertNotDelivered(notDelivered, getApplicationContext())) {
-                int NotDeeliveredID = dbConnections.getMaxID("NotDelivered", getApplicationContext());
+
+                /*int NotDeeliveredID = dbConnections.getMaxID("NotDelivered", getApplicationContext());
                 for (int i = 0; i < secondFragment.NotDeliveredBarCodeList.size(); i++) {
                     NotDeliveredDetail notDeliveredDetail = new NotDeliveredDetail(secondFragment.NotDeliveredBarCodeList.get(i),
                             NotDeeliveredID);
@@ -164,7 +174,7 @@ public class NotDeliveredActivity
                         IsSaved = false;
                         break;
                     }
-                }
+                }*/
 
                 if (IsSaved) {
                     if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.NotDelivery.class)) {
@@ -176,7 +186,9 @@ public class NotDeliveredActivity
                     finish();
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved), GlobalVar.AlertType.Error);
-            }
+            } else
+                GlobalVar.GV().ShowDialog(NotDeliveredActivity.this, "Error", "Your data not sucessfully registered" +
+                        ",kindly try again to save.", true);
         }
 
     }

@@ -163,6 +163,7 @@ public class OnDelivery extends Service {
                     onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
                     onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
                     onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
+                    onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
 
                     try {
                         FirebaseApp.initializeApp(this);
@@ -172,21 +173,36 @@ public class OnDelivery extends Service {
                         onDeliveryRequest.DeviceToken = "";
                     }
 
-                    Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
+                    try {
                         int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
+                        String barcode[] = onDeliveryRequest.Barcode.split("\\,");
+                        for (String piececode : barcode) {
+
                             onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
-                                    new OnDeliveryDetailRequest(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), 0));
+                                    new OnDeliveryDetailRequest(piececode, 0));
+
                             index++;
                         }
-                        while (resultDetail.moveToNext());
 
-
+                    } catch (Exception e) {
+                        System.out.println(e);
                     }
+
+//                    Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
+//
+//                    if (resultDetail.getCount() > 0) {
+//                        resultDetail.moveToFirst();
+//                        int index = 0;
+//                        resultDetail.moveToFirst();
+//                        do {
+//                            onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
+//                                    new OnDeliveryDetailRequest(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), 0));
+//                            index++;
+//                        }
+//                        while (resultDetail.moveToNext());
+//
+//
+//                    }
 
                     String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
                     jsonData = jsonData.replace("Date(-", "Date(");
@@ -197,6 +213,7 @@ public class OnDelivery extends Service {
             } else {
                 flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;

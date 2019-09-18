@@ -24,6 +24,7 @@ public class OnDeliveryRequest {
     public int al;
     public String DeviceToken = "";
     public String ST = "";
+    public String Barcode = "";
 
     //    public String ReceiptNo ;
 //    public int StopPointsID ;

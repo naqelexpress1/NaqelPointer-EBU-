@@ -38,49 +38,54 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
-        dbConnections.DeleteExsistingLogin(getApplicationContext());
 
-        
+        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
+            dbConnections.DeleteExsistingLogin(getApplicationContext());
+            dbConnections.DeleteAllSyncData(getApplicationContext());
+
 //        String DeviceName = GlobalVar.GV().getDeviceName();
 
-        //dbConnections.DeleteTrucks(getApplicationContext());
-        //dbConnections.DeleteTrucksData(getApplicationContext());
+            //dbConnections.DeleteTrucks(getApplicationContext());
+            //dbConnections.DeleteTrucksData(getApplicationContext());
 
-        dbConnections.close();
-
-
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            dbConnections.close();
 
 
-        if (GlobalVar.GV().IsEnglish())
-            imageView.setImageResource(R.drawable.naqellogowhite);
-        else
-            imageView.setImageResource(R.drawable.naqellogowhitear);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
 
 
-        Thread myThread = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    sleep(2000);
-
-                    loginPage();
+            if (GlobalVar.GV().IsEnglish())
+                imageView.setImageResource(R.drawable.naqellogowhite);
+            else
+                imageView.setImageResource(R.drawable.naqellogowhitear);
 
 
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            Thread myThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        sleep(2000);
+
+                        loginPage();
+
+
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        };
-        myThread.start();
+            };
+            myThread.start();
 
-        if (savedInstanceState != null)
-            setSavedInstance(savedInstanceState);
+            if (savedInstanceState != null)
+                setSavedInstance(savedInstanceState);
 
+        } else
 
+            GlobalVar.RedirectSettings(SplashScreenActivity.this);
     }
 
 

@@ -24,6 +24,8 @@ import com.naqelexpress.naqelpointer.Activity.MyRoute.RouteListAdapter;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
+import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
+import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryDetailRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
@@ -32,6 +34,9 @@ import com.naqelexpress.naqelpointer.JSON.Request.PickUpRequest;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -130,13 +135,13 @@ public class History extends Activity {
                             com.naqelexpress.naqelpointer.service.DeliverysheetbyPiece.class));
 
         }
-        if (GetDivision()) {
-
-            stopService(
-                    new Intent(History.this,
-                            com.naqelexpress.naqelpointer.service.Deliverysheet.class));
-
-        }
+//        if (GetDivision()) {
+//
+//            stopService(
+//                    new Intent(History.this,
+//                            com.naqelexpress.naqelpointer.service.Deliverysheet.class));
+//
+//        }
         if (!GetDivision()) {
 
             stopService(
@@ -150,7 +155,6 @@ public class History extends Activity {
                     new Intent(History.this,
                             com.naqelexpress.naqelpointer.service.NightStock.class));
         }
-
 
         stopService(
                 new Intent(History.this,
@@ -221,6 +225,7 @@ public class History extends Activity {
                 adapter = new BookingListAdapter(History.this, myBookingList, "History");
                 mapListview.setAdapter(adapter);
                 GetBookingList();
+
             } else if (parent.getItemAtPosition(pos).toString().equals("OnDelivery")) {
 
                 ManualFunction = "OnDelivery";
@@ -229,6 +234,7 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetOnDeliveryList();
+
             } else if (parent.getItemAtPosition(pos).toString().equals("MultiDelivery")) {
 
                 ManualFunction = "MultiDelivery";
@@ -376,16 +382,12 @@ public class History extends Activity {
 
         DBConnections db = new DBConnections(getApplicationContext(), null);
 
-        Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID =  " + deliveryID, getApplicationContext());
-        resultDetail.moveToFirst();
+        Cursor resultDetail = db.Fill("select * from OnDelivery where ID =  " + deliveryID, getApplicationContext());
         if (resultDetail.getCount() > 0) {
             resultDetail.moveToFirst();
-            do {
-                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
-            }
-            while (resultDetail.moveToNext());
-
-
+            String split[] = resultDetail.getString(resultDetail.getColumnIndex("Barcode")).split("\\,");
+            for (String piece : split)
+                piececodes.add(piece);
         }
 
         resultDetail.close();
@@ -467,18 +469,20 @@ public class History extends Activity {
 
         DBConnections db = new DBConnections(getApplicationContext(), null);
 
-        Cursor resultDetail = db.Fill("select * from NotDeliveredDetail where NotDeliveredID =  "
-                + deliveryID, getApplicationContext());
-        resultDetail.moveToFirst();
+        Cursor resultDetail = db.Fill("select * from NotDelivered where ID =  " + deliveryID, getApplicationContext());
+
+        //if (resultDetail.getCount() > 0) {
+        //   resultDetail.moveToFirst();
+        //   do {
         if (resultDetail.getCount() > 0) {
             resultDetail.moveToFirst();
-            do {
-                piececodes.add(resultDetail.getString(resultDetail.getColumnIndex("BarCode")));
-            }
-            while (resultDetail.moveToNext());
-
-
+            String split[] = resultDetail.getString(resultDetail.getColumnIndex("Barcode")).split("\\,");
+            for (String piece : split)
+                piececodes.add(piece);
         }
+        //   }
+        //    while (resultDetail.moveToNext());
+        // }
 
         resultDetail.close();
         db.close();
@@ -582,18 +586,20 @@ public class History extends Activity {
 
     private void startAllService() {
 
-        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.ArrivedatDest.class)) {
+        if (!GetDivision()) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.ArrivedatDest.class)) {
 
-            startService(
-                    new Intent(History.this,
-                            com.naqelexpress.naqelpointer.service.ArrivedatDest.class));
-        }
+                startService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.ArrivedatDest.class));
+            }
 
-        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.AtOrigin.class)) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.AtOrigin.class)) {
 
-            startService(
-                    new Intent(History.this,
-                            com.naqelexpress.naqelpointer.service.AtOrigin.class));
+                startService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.AtOrigin.class));
+            }
         }
         if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.CheckPoint.class)) {
             startService(
@@ -642,9 +648,9 @@ public class History extends Activity {
 
         if (!GetDivision()) {
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnDelivery.class)) {
-//                startService(
-//                        new Intent(History.this,
-//                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
+                startService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
             }
         } else {
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PartialDelivery.class)) {
@@ -660,11 +666,11 @@ public class History extends Activity {
         }
 
 
-//            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PickUp.class)) {
-//                startService(
-//                        new Intent(History.this,
-//                                com.naqelexpress.naqelpointer.service.PickUp.class));
-//            }
+        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PickUp.class)) {
+            startService(
+                    new Intent(History.this,
+                            com.naqelexpress.naqelpointer.service.PickUp.class));
+        }
 
         if (GetDivision()) {
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
@@ -717,6 +723,7 @@ public class History extends Activity {
 
         if (GlobalVar.GV().EmployID == 19127)
             return false;
+
         if (division.equals("Express"))
             return false;
         else
@@ -847,6 +854,8 @@ public class History extends Activity {
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().Connandtimeout30000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().Connandtimeout30000);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();
@@ -915,7 +924,7 @@ public class History extends Activity {
                 }
 
                 DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto", getApplicationContext());
+                Cursor ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto Where Issync = 0", getApplicationContext());
                 ts.moveToFirst();
                 int tls = 0;
                 try {
@@ -925,6 +934,11 @@ public class History extends Activity {
                 }
 
                 if (tls > 0) {
+
+                    startService(
+                            new Intent(History.this,
+                                    com.naqelexpress.naqelpointer.service.PickUp.class));
+
                     ErrorAlert("Something went wrong",
                             "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
                     );
@@ -1019,22 +1033,33 @@ public class History extends Activity {
                 onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
                 onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
                 onDeliveryRequest.DeviceToken = "";
+                onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
 
-                Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
-
-                if (resultDetail.getCount() > 0) {
-                    resultDetail.moveToFirst();
+                try {
                     int index = 0;
-                    resultDetail.moveToFirst();
-                    do {
+                    String barcode[] = onDeliveryRequest.Barcode.split("\\,");
+                    for (String piececode : barcode) {
+
+                        Cursor wid = db.Fill("select * from BarCode where BarCode = '" + piececode + "'"
+                                , getApplicationContext());
+
+                        int WayBillID = 0;
+                        if (wid.getCount() > 0) {
+                            wid.moveToFirst();
+                            WayBillID = wid.getInt(wid.getColumnIndex("WayBillID"));
+                        }
+                        wid.close();
+
                         onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
-                                new OnDeliveryDetailRequest(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), 0));
+                                new OnDeliveryDetailRequest(piececode, WayBillID));
+
                         index++;
                     }
-                    while (resultDetail.moveToNext());
 
-
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
+
                 String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
                 jsonData = jsonData.replace("Date(-", "Date(");
 
@@ -1117,7 +1142,234 @@ public class History extends Activity {
                 }
 
                 DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery", getApplicationContext());
+                Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
+                ts.moveToFirst();
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+
+                    StartOnDeliveryService();
+
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                } else {
+                    ErrorAlert("No Data",
+                            "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                }
+                ts.close();
+                db.close();
+                manualsyncbtn.setEnabled(true);
+                manualsyncbtn.setClickable(true);
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+        }
+    }
+
+    private class SaveDeliverybyManualCBU extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            moveddata = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(History.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+            Cursor result = db.Fill("select * from OnDelivery where IsSync = 0", getApplicationContext());
+            result.moveToFirst();
+            do {
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+
+                OnDeliveryRequest onDeliveryRequest = new OnDeliveryRequest();
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.WaybillNo = result.getString(result.getColumnIndex("WaybillNo"));
+                onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
+
+                onDeliveryRequest.PiecesCount = Integer.parseInt(result.getString(result.getColumnIndex("PiecesCount")));
+                onDeliveryRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+                onDeliveryRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
+                onDeliveryRequest.EmployID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
+                onDeliveryRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
+                onDeliveryRequest.IsPartial = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsPartial")));
+                onDeliveryRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                onDeliveryRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                onDeliveryRequest.ReceivedAmt = Double.parseDouble(result.getString(result.getColumnIndex("TotalReceivedAmount")));
+                //onDeliveryRequest.ReceiptNo = result.getString(result.getColumnIndex("ReceiptNo"));
+                //onDeliveryRequest.StopPointsID = Integer.parseInt(result.getString(result.getColumnIndex("StopPointsID")));
+                onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
+                onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
+                onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
+                onDeliveryRequest.DeviceToken = "";
+                onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
+
+                try {
+                    int index = 0;
+                    String barcode[] = onDeliveryRequest.Barcode.split("\\,");
+                    for (String piececode : barcode) {
+
+                        Cursor wid = db.Fill("select * from BarCode where BarCode = '" + piececode + "'"
+                                , getApplicationContext());
+
+                        int WayBillID = 0;
+                        if (wid.getCount() > 0) {
+                            wid.moveToFirst();
+                            WayBillID = wid.getInt(wid.getColumnIndex("WayBillID"));
+                        }
+                        wid.close();
+
+                        onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
+                                new OnDeliveryDetailRequest(piececode, WayBillID));
+
+                        index++;
+                    }
+
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
+
+                String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "PartialDelivery");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().Connandtimeout30000);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().Connandtimeout30000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+
+                try {
+                    JSONObject response = new JSONObject(returnresult);
+                    boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
+                    boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
+                    String updateDeliver = response.getString("ErrorMessage");
+                    if (IsSync && !HasError) {
+                        moveddata = moveddata + 1;
+
+                        db.updateOnDeliveryID(onDeliveryRequest.ID, getApplicationContext());
+
+                        if (updateDeliver.equals("Complete")) {
+                            db.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), onDeliveryRequest.WaybillNo, onDeliveryRequest.ID);
+                        } else {
+                            db.UpdateMyRouteShipmentsIsPartialDelivered(getApplicationContext(), onDeliveryRequest.WaybillNo, onDeliveryRequest.ID);
+                        }
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                try {
+                    uploaddatacount = uploaddatacount + 1;
+                } catch (Exception e) {
+
+                }
+                publishProgress((int) ((uploaddatacount * 100) / totalsize));
+
+            } while (result.moveToNext());
+
+            result.close();
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
                 ts.moveToFirst();
                 int tls = 0;
                 try {
@@ -1161,11 +1413,28 @@ public class History extends Activity {
 
 
             Cursor ts = null;
-            if (ManualFunction.equals("Pickup"))
+            if (ManualFunction.equals("Pickup")) {
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.PickUp.class));
+
                 ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto where issync = 0 ", getApplicationContext());
-            else if (ManualFunction.equals("OnDelivery"))
-                ts = db.Fill("select Count(1) As totalRecord  from OnDelivery ", getApplicationContext());
-            else
+            } else if (ManualFunction.equals("OnDelivery")) {
+
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.PartialDelivery.class));
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
+
+                ts = db.Fill("select Count(1) As totalRecord  from OnDelivery where issync = 0", getApplicationContext());
+            } else if (ManualFunction.equals("Not Delivery")) {
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.NotDelivery.class));
+                ts = db.Fill("select Count(1) As totalRecord  from NotDelivered Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+            } else
                 return;
 
             if (ts != null) {
@@ -1179,8 +1448,13 @@ public class History extends Activity {
 
                 if (totalsize > 0 && ManualFunction.equals("Pickup")) {
                     new SavePickupbyManual().execute(String.valueOf(totalsize));
-                } else if (totalsize > 0 && ManualFunction.equals("OnDelivery"))
-                    new SaveDeliverybyManual().execute(String.valueOf(totalsize));
+                } else if (totalsize > 0 && ManualFunction.equals("OnDelivery")) {
+                    if (GlobalVar.getDivision(getApplicationContext()).equals("Express"))
+                        new SaveDeliverybyManual().execute(String.valueOf(totalsize));
+                    else
+                        new SaveDeliverybyManualCBU().execute(String.valueOf(totalsize));
+                } else if (totalsize > 0 && ManualFunction.equals("Not Delivery"))
+                    new SaveNotDeliverybyManual().execute(String.valueOf(totalsize));
                 else {
                     manualsyncbtn.setEnabled(true);
                     manualsyncbtn.setClickable(true);
@@ -1202,6 +1476,245 @@ public class History extends Activity {
             manualsyncbtn.setEnabled(true);
             manualsyncbtn.setClickable(true);
             System.out.println(e);
+        }
+
+    }
+
+    private class SaveNotDeliverybyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            moveddata = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(History.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+            JSONArray jsonArray = new JSONArray();
+            JSONObject data = new JSONObject();
+
+            int Limit = 30;
+            double loopcount = Float.parseFloat(params[0]) / 30f;
+            int loop = (int) Math.ceil(loopcount);
+            int Offset = 0;
+
+            for (int i = 0; i < loop; i++) {
+
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+                Cursor result = db.Fill("select * from NotDelivered  Where IsSync = 0 Limit " + Limit + " oFFset " + Offset, getApplicationContext()); //where IsSync = 0
+                result.moveToFirst();
+
+                try {
+
+                    do {
+                        NotDelivered notDeliveredRequest = new NotDelivered();
+                        notDeliveredRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                        notDeliveredRequest.WaybillNo = String.valueOf(result.getString(result.getColumnIndex("WaybillNo")));
+                        notDeliveredRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
+                        notDeliveredRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
+                        notDeliveredRequest.UserID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
+                        notDeliveredRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
+                        notDeliveredRequest.PiecesCount = Integer.parseInt(result.getString(result.getColumnIndex("PiecesCount")));
+                        notDeliveredRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                        notDeliveredRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                        notDeliveredRequest.DeliveryStatusID = Integer.parseInt(result.getString(result.getColumnIndex("DeliveryStatusID")));
+                        notDeliveredRequest.DeliveryStatusReasonID = result.getInt(result.getColumnIndex("DeliveryStatusReasonID"));
+                        notDeliveredRequest.Notes = result.getString(result.getColumnIndex("Notes"));
+                        notDeliveredRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
+
+                        try {
+                            int index = 0;
+                            String barcode[] = notDeliveredRequest.Barcode.split("\\,");
+                            for (String piececode : barcode) {
+                                notDeliveredRequest.NotDeliveredDetails.add(index,
+                                        new NotDeliveredDetail(piececode, notDeliveredRequest.ID));
+                                index++;
+                            }
+
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+                        JSONObject jsonData = new JSONObject(JsonSerializerDeserializer.serialize(notDeliveredRequest, true));
+                        jsonArray.put(jsonData);
+                    } while (result.moveToNext());
+
+                    data.put("NotDelivered", jsonArray);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String jsonData = data.toString();
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendNotDeliveredDataToServerBulk");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(12000);
+                    httpURLConnection.setReadTimeout(12000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+                try {
+                    JSONObject jsonObject = new JSONObject(returnresult);
+                    boolean IsSync = Boolean.parseBoolean(jsonObject.getString("IsSync"));
+                    boolean HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
+                    if (IsSync && !HasError) {
+                        String rIDs[] = jsonObject.getString("ErrorMessage").split("\\,");
+                        for (String id : rIDs) {
+
+                            Cursor waybill_result = db.Fill("select * from NotDelivered where ID = " + id, getApplicationContext());
+
+                            if (waybill_result.getCount() > 0) {
+                                waybill_result.moveToFirst();
+                                String waybillno = waybill_result.getString(waybill_result.getColumnIndex("WaybillNo"));
+                                int dsID = waybill_result.getInt(waybill_result.getColumnIndex("DeliveryStatusID"));
+
+                                db.updateNotDeliveryID(Integer.parseInt(id), getApplicationContext());
+
+                                db.UpdateMyRouteShipmentsNotDeliverd(getApplicationContext(), waybillno);
+
+                                if (dsID == 8)
+                                    db.UpdateMyRouteShipmentsRefused(getApplicationContext(), waybillno);
+                            }
+                            waybill_result.close();
+                        }
+
+                        moveddata = moveddata + result.getCount();
+                    }
+                    uploaddatacount = uploaddatacount + result.getCount();
+
+                    publishProgress((int) ((uploaddatacount * 100) / totalsize));
+                    Offset = Offset + Limit;
+                } catch (JSONException e) {
+                    result.close();
+                    uploaddatacount = uploaddatacount + result.getCount();
+                }
+                result.close();
+            }
+
+
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select Count(1) As totalRecord  from NotDelivered Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+                ts.moveToFirst();
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    // StartOnDeliveryService();
+                    startService(
+                            new Intent(History.this,
+                                    com.naqelexpress.naqelpointer.service.NotDelivery.class));
+
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                } else {
+                    ErrorAlert("No Data",
+                            "All Not Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                }
+                ts.close();
+                db.close();
+                manualsyncbtn.setEnabled(true);
+                manualsyncbtn.setClickable(true);
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
         }
 
     }

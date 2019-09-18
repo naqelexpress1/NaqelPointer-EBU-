@@ -1533,8 +1533,8 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setReadTimeout(30000);
-                    httpURLConnection.setConnectTimeout(30000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().ConnandReadtimeout50000);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().ConnandReadtimeout50000);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();

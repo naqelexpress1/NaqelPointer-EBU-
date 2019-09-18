@@ -418,7 +418,7 @@ public class MainPageActivity
         if (devision.equals("Express")) {
             try {
                 boolean isvalid = dbConnections.isInCabCheckList(getApplicationContext(), GlobalVar.GV().EmployID);
-                if (isvalid) {
+                if (isvalid && GlobalVar.GV().EmployID != 19127) {
                     Intent chat = new Intent(getApplicationContext(), IncCabChecklist.class);
                     chat.putExtra("close", 0);
                     startActivityForResult(chat, 1);

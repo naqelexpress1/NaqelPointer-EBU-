@@ -22,6 +22,7 @@ public class NotDelivered {
     public String Longitude = "";
     public String DeviceToken = "";
     public int DeliveryStatusReasonID = 0;
+    public String Barcode = "";
 
     public List<NotDeliveredDetail> NotDeliveredDetails;
 
@@ -35,7 +36,7 @@ public class NotDelivered {
 
     public NotDelivered(String waybillNo, int piecesCount, DateTime timeIn,
                         DateTime timeOut, String latitude, String longitude, int deliveryStatusID, String notes,
-                        int DeliveryStatusReasonID) {
+                        int DeliveryStatusReasonID, String barcode) {
         WaybillNo = waybillNo;
         PiecesCount = piecesCount;
         TimeIn = timeIn;
@@ -45,5 +46,6 @@ public class NotDelivered {
         DeliveryStatusID = deliveryStatusID;
         Notes = notes;
         this.DeliveryStatusReasonID = DeliveryStatusReasonID;
+        this.Barcode = barcode;
     }
 }

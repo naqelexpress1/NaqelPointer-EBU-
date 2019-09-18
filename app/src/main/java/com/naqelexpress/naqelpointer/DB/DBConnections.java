@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 82; // Update Menu for Loading concept
+    private static final int Version = 83; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -102,17 +102,20 @@ public class DBConnections
                 " \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" INTEGER NOT NULL , \"EmployID\" INTEGER NOT NULL , " +
                 "\"StationID\" INTEGER NOT NULL , \"IsPartial\" BOOL NOT NULL  DEFAULT 0, \"Latitude\" TEXT, \"Longitude\" TEXT ," +
                 " \"TotalReceivedAmount\" DOUBLE NOT NULL , \"CashAmount\" DOUBLE NOT NULL DEFAULT 0, \"POSAmount\" DOUBLE NOT NULL DEFAULT 0 ," +
-                " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0)");
+                " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0 , Barcode Text)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDelivered\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL ," +
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDelivered\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
+                "\"WaybillNo\" TEXT NOT NULL ," +
                 " \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , \"UserID\" INTEGER NOT NULL ," +
                 " \"IsSync\" BOOL NOT NULL , \"StationID\" INTEGER NOT NULL , \"PiecesCount\" INTEGER NOT NULL ," +
-                " \"DeliveryStatusID\" INTEGER NOT NULL ,\"DeliveryStatusReasonID\" INTEGER NOT NULL, \"Notes\" TEXT, \"Latitude\" TEXT, \"Longitude\" TEXT)");
+                " \"DeliveryStatusID\" INTEGER NOT NULL ,\"DeliveryStatusReasonID\" INTEGER NOT NULL, \"Notes\" TEXT, " +
+                "\"Latitude\" TEXT, \"Longitude\" TEXT , Barcode Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDeliveredDetail\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE ," +
                 " \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"NotDeliveredID\" INTEGER NOT NULL )");
@@ -646,6 +649,13 @@ public class DBConnections
 
             if (!isColumnExist("PickUpTemp", "JsonData"))
                 db.execSQL("ALTER TABLE PickUpTemp ADD COLUMN JsonData TEXT");
+
+            if (!isColumnExist("LoadtoDestination", "TimeIn"))
+                db.execSQL("ALTER TABLE LoadtoDestination ADD COLUMN TimeIn DATETIME");
+            if (!isColumnExist("NotDelivered", "Barcode"))
+                db.execSQL("ALTER TABLE NotDelivered ADD COLUMN Barcode Text");
+            if (!isColumnExist("OnDelivery", "Barcode"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN Barcode Text");
         }
 
 
@@ -1098,6 +1108,7 @@ public class DBConnections
             contentValues.put("POSAmount", instance.POSAmount);
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("AL", al);
+            contentValues.put("Barcode", instance.Barcode);
 
             result = db.insert("OnDelivery", null, contentValues);
             db.close();
@@ -1297,6 +1308,7 @@ public class DBConnections
             contentValues.put("Notes", intstance.Notes);
             contentValues.put("Latitude", intstance.Latitude);
             contentValues.put("Longitude", intstance.Longitude);
+            contentValues.put("Barcode", intstance.Barcode);
 
             result = db.insertOrThrow("NotDelivered", null, contentValues);
             db.close();
@@ -3326,6 +3338,7 @@ public class DBConnections
             //OnDelivery
             db.execSQL("delete  from OnDeliveryDetail where DeliveryID in  (select ID from OnDelivery " +
                     "where issync = 1 and date(TimeIn) < date())");
+
             db.delete("OnDelivery", "date(TimeIn) <? And IsSync  =?", args);
 
             //MultiDelivery
@@ -3336,8 +3349,12 @@ public class DBConnections
             db.delete("MultiDelivery", "date(TimeIn) <? And IsSync  =?", args);
 
             //NotDeliver Data
-            db.execSQL("delete  from NotDeliveredDetail where NotDeliveredID in  (select ID from NotDelivered " +
-                    "where issync = 1 and date(TimeIn) < date())");
+//            db.execSQL("delete  from NotDeliveredDetail where NotDeliveredID in  (select ID from NotDelivered " +
+//                    "where issync = 1 and date(TimeIn) < date())");
+//            db.delete("NotDelivered", "date(TimeIn) <? And IsSync  =?", args);
+
+            //NotDeliver Data
+            //db.execSQL("delete  from  NotDelivered where issync = 1 and date(TimeIn) < date()");
             db.delete("NotDelivered", "date(TimeIn) <? And IsSync  =?", args);
 
             //NightStock
@@ -3369,7 +3386,6 @@ public class DBConnections
         } catch (SQLiteException e) {
 
         }
-
     }
 
     public void updateOnDeliveryID(int ID, Context context) {

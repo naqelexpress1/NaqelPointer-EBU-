@@ -90,6 +90,7 @@ public class CallRecord extends Service {
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
+            @SuppressLint("InvalidWakeLockTag")
             public void run() {
                 // new DownloadJSON().execute();
                 PowerManager mgr = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -167,9 +168,10 @@ public class CallRecord extends Service {
 
 
             } else {
-
-                this.stopSelf();
                 wakeLock.release();
+                flag_thread = false;
+                this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;

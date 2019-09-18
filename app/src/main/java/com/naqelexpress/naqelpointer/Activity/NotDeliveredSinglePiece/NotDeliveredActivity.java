@@ -1,7 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.NotDeliveredSinglePiece;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +10,6 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,7 +17,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -30,7 +27,6 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.UpdateLocation;
@@ -61,7 +57,6 @@ public class NotDeliveredActivity
         TimeIn = DateTime.now();
 
 
-
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -90,33 +85,32 @@ public class NotDeliveredActivity
         }
 
 
-            Button save = (Button) findViewById(R.id.save);
-            save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                        if (firstFragment.txtWaybillNo.getText().toString().length() == 0) {
-                            GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Please Enter Waybill Correctly", true);
-                            return;
-                        }
-                        String waybillno = firstFragment.txtWaybillNo.getText().toString().substring(0, 8);
-                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + waybillno + "'",
-                                getApplicationContext());
-                        if (result.getCount() > 0) {
-                            result.moveToFirst();
-                            boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
-                            if (!isdelivered) {
-                                SaveData();
-                            } else
-                                GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Already Delivered this Waybill", true);
-                        } else
+        Button save = (Button) findViewById(R.id.save);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    if (firstFragment.txtWaybillNo.getText().toString().length() == 0) {
+                        GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Please Enter Waybill Correctly", true);
+                        return;
+                    }
+                    String waybillno = firstFragment.txtWaybillNo.getText().toString().substring(0, 8);
+                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + waybillno + "'",
+                            getApplicationContext());
+                    if (result.getCount() > 0) {
+                        result.moveToFirst();
+                        boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+                        if (!isdelivered) {
                             SaveData();
+                        } else
+                            GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Already Delivered this Waybill", true);
                     } else
-                        GlobalVar.RedirectSettings(NotDeliveredActivity.this);
-                }
-            });
-
+                        SaveData();
+                } else
+                    GlobalVar.RedirectSettings(NotDeliveredActivity.this);
+            }
+        });
 
 
     }
@@ -164,11 +158,19 @@ public class NotDeliveredActivity
         if (IsValid()) {
             dbConnections.UpdateProductivity_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
+            String Barcode = "";
+
+            for (int i = 0; i < firstFragment.ShipmentBarCodeList.size(); i++) {
+                if (i == 0)
+                    Barcode = firstFragment.ShipmentBarCodeList.get(i);
+                else
+                    Barcode = Barcode + "," + firstFragment.ShipmentBarCodeList.get(i);
+            }
 
             boolean IsSaved = true;
             NotDelivered notDelivered = new NotDelivered(firstFragment.txtWaybillNo.getText().toString(), 0,
                     TimeIn, DateTime.now(), String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.ReasonID,
-                    firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId);
+                    firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId, Barcode);
 
             Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());
             if (result.getCount() > 0)
@@ -176,8 +178,11 @@ public class NotDeliveredActivity
 
             updateLocation();
 
+
             if (dbConnections.InsertNotDelivered(notDelivered, getApplicationContext())) {
-                int NotDeeliveredID = dbConnections.getMaxID("NotDelivered", getApplicationContext());
+
+                //we are facing the problem change the concept of old one
+               /* int NotDeeliveredID = dbConnections.getMaxID("NotDelivered", getApplicationContext());
                 for (int i = 0; i < firstFragment.ShipmentBarCodeList.size(); i++) {
                     NotDeliveredDetail notDeliveredDetail = new NotDeliveredDetail(firstFragment.ShipmentBarCodeList.get(i),
                             NotDeeliveredID);
@@ -186,7 +191,7 @@ public class NotDeliveredActivity
                         IsSaved = false;
                         break;
                     }
-                }
+                }*/
 
                 if (IsSaved) {
                     if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.NotDelivery.class)) {
@@ -198,7 +203,9 @@ public class NotDeliveredActivity
                     finish();
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved), GlobalVar.AlertType.Error);
-            }
+            } else
+                GlobalVar.GV().ShowDialog(NotDeliveredActivity.this, "Error", "Your data not sucessfully registered" +
+                        ",kindly try again to save.", true);
         }
 
     }

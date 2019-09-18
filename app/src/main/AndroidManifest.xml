@@ -740,6 +740,13 @@
             android:theme="@style/AppTheme" />
 
         <activity
+            android:name=".TerminalHandling.UndoNclbyScan"
+            android:label="Undo Ncl"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+
+        <activity
             android:name=".TerminalHandling.TripArrviedatDestbyNCL"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"

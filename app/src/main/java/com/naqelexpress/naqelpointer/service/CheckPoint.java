@@ -183,7 +183,9 @@ public class CheckPoint extends Service {
 
             } else {
 
+                flag_thread = false;
                 this.stopSelf();
+                android.os.Process.killProcess(android.os.Process.myPid());
             }
         } catch (Exception e) {
             flag_thread = false;

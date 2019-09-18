@@ -173,8 +173,8 @@ public class TerminalHandlingBulk extends Service {
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
-                httpURLConnection.setReadTimeout(30000);
-                httpURLConnection.setConnectTimeout(30000);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().ConnandReadtimeout50000);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().ConnandReadtimeout50000);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();
 

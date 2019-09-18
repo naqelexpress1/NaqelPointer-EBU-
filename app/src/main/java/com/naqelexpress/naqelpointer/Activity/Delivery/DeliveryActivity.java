@@ -33,7 +33,6 @@ import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.OnDelivery;
-import com.naqelexpress.naqelpointer.DB.DBObjects.OnDeliveryDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.ActualLocation;
@@ -53,8 +52,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
-import retrofit2.http.HTTP;
 
 import static com.naqelexpress.naqelpointer.R.id.container;
 
@@ -270,6 +267,16 @@ public class DeliveryActivity
             double CashAmount = 0;
             double TotalAmount;
 
+            String Barcode = "";
+
+            for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {
+                if (i == 0)
+                    Barcode = thirdFragment.DeliveryBarCodeList.get(i);
+                else
+                    Barcode = Barcode + "," + thirdFragment.DeliveryBarCodeList.get(i);
+            }
+
+
             if (!secondFragment.txtPOS.getText().toString().equals(""))
                 POSAmount = GlobalVar.GV().getDoubleFromString(secondFragment.txtPOS.getText().toString());
             if (!secondFragment.txtCash.getText().toString().equals(("")))
@@ -281,7 +288,7 @@ public class DeliveryActivity
                     TimeIn,
                     DateTime.now(),
                     String.valueOf(Latitude), String.valueOf(Longitude),
-                    TotalAmount, CashAmount, POSAmount);
+                    TotalAmount, CashAmount, POSAmount, Barcode);
 
             if (DeliveryFirstFragment.al == 1) {
                 dbConnections.InsertActualLocation(WaybillNo, String.valueOf(Latitude), String.valueOf(Longitude), getApplicationContext());
@@ -295,19 +302,20 @@ public class DeliveryActivity
 
             updateLocation();
             if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al)) {
-                int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
-                for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {
-                    OnDeliveryDetail onDeliveryDetail = new OnDeliveryDetail(thirdFragment.DeliveryBarCodeList.get(i), DeliveryID);
-                    if (!dbConnections.InsertOnDeliveryDetail(onDeliveryDetail, getApplicationContext())) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
-                        IsSaved = false;
-                        break;
-                    }
-                }
 
-                stopService(
-                        new Intent(DeliveryActivity.this,
-                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
+//                int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
+//                for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {
+//                    OnDeliveryDetail onDeliveryDetail = new OnDeliveryDetail(thirdFragment.DeliveryBarCodeList.get(i), DeliveryID);
+//                    if (!dbConnections.InsertOnDeliveryDetail(onDeliveryDetail, getApplicationContext())) {
+//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
+//                        IsSaved = false;
+//                        break;
+//                    }
+//                }
+
+//                stopService(
+//                        new Intent(DeliveryActivity.this,
+//                                com.naqelexpress.naqelpointer.service.OnDelivery.class));
 
                 if (IsSaved) {
                     //if (GlobalVar.GV().GetDivision(getApplicationContext()))
@@ -329,7 +337,8 @@ public class DeliveryActivity
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved), GlobalVar.AlertType.Error);
             } else
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
+                GlobalVar.GV().ShowDialog(DeliveryActivity.this, "Error", "Your data not sucessfully registered" +
+                        ",kindly try again to save.", true);
         }
         dbConnections.close();
     }

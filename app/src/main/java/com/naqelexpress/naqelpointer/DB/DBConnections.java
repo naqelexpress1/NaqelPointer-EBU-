@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 83; // Change the concept of deliver and not deliver
+    private static final int Version = 86; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -376,6 +376,10 @@ public class DBConnections
 
             db.execSQL("delete from UserMELogin");
             db.execSQL("delete from UserME");
+            db.execSQL("delete from NotDelivered");
+            db.execSQL("delete from NotDeliveredDetail");
+            db.execSQL("delete from OnDelivery");
+            db.execSQL("delete from OnDeliveryDetail");
 
             //Added by ismail
             this.mDefaultWritableDatabase = db;

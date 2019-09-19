@@ -19,7 +19,7 @@ android {
         targetSdkVersion 29
         versionName '2.6.0.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 260
+        versionCode 400
     }
     buildTypes {
 

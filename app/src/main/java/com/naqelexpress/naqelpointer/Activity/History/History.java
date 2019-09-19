@@ -101,8 +101,8 @@ public class History extends Activity {
             }
         });
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        dbConnections.DeleteAllSyncData(getApplicationContext());
+        //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        //dbConnections.DeleteAllSyncData(getApplicationContext());
     }
 
     private void stopallservice() {

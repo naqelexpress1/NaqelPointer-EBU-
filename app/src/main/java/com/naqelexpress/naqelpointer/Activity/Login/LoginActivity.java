@@ -1231,7 +1231,12 @@ public class LoginActivity
                     if (division.equals("IRS"))
                         division = "Courier";
 
-                    if (!getUserMEDataResult.AppName.equals(division) && getUserMEDataResult.EmployID != 19127 ) {
+                    String AppName = getUserMEDataResult.AppName;
+                    if (AppName.equals("TH"))
+                        AppName = "Courier";
+
+
+                    if (!AppName.equals(division) && getUserMEDataResult.EmployID != 19127) {
                         ShowAlertMessage("This Application will support only for " + getUserMEDataResult.AppName + " Employees" +
                                 " kindly contact concern person", 1);
                         dismissUserMeProgressdialog();
@@ -1245,7 +1250,7 @@ public class LoginActivity
                         new GetMasterData().execute();
                         return;
                     } else {
-                        if (getUserMEDataResult.AppName.equals(division) ||  getUserMEDataResult.EmployID == 19127) {
+                        if (getUserMEDataResult.AppName.equals(division) || getUserMEDataResult.EmployID == 19127) {
                             if (getUserMEDataResult.Appversion != GlobalVar.VersionCode(getApplicationContext())) {
                                 dismissUserMeProgressdialog();
                                 deleteApk();

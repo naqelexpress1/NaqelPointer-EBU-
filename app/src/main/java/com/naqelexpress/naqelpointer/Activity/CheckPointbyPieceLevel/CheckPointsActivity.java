@@ -27,7 +27,6 @@ import android.view.ViewGroup;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointWaybillDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -148,11 +147,11 @@ public class CheckPointsActivity extends AppCompatActivity {
 
 
                 if (IsSaved) {
-                    stopService(
-                            new Intent(CheckPointsActivity.this,
-                                    com.naqelexpress.naqelpointer.service.CheckPoint.class));
+//                    stopService(
+//                            new Intent(CheckPointsActivity.this,
+//                                    com.naqelexpress.naqelpointer.service.CheckPoint.class));
 
-                    if (!isMyServiceRunning(CheckPointsActivity.class)) {
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.CheckPoint.class)) {
                         startService(
                                 new Intent(CheckPointsActivity.this,
                                         com.naqelexpress.naqelpointer.service.CheckPoint.class));

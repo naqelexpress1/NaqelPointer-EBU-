@@ -86,7 +86,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
 
     public String AppVersion = "2.6.0.0";
-    public boolean LoginVariation = false; //For EBU only
+    public boolean LoginVariation = true; //For EBU only
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;

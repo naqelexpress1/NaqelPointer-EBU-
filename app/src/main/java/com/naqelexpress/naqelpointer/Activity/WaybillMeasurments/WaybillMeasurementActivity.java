@@ -81,7 +81,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         Ssize = (EditText) findViewById(R.id.txtSameSize1);
 
         txtReason.setVisibility(View.INVISIBLE);
-        constraintLayout.setVisibility(View.INVISIBLE);
+        constraintLayout.setVisibility(View.GONE);
         history = new ArrayList<>();
         historyhide = new ArrayList<>();
 
@@ -98,11 +98,11 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     txtReason.setVisibility(View.VISIBLE);
-                    constraintLayout.setVisibility(View.INVISIBLE);
+                    constraintLayout.setVisibility(View.GONE);
                     btnStart.setVisibility(View.INVISIBLE);
                 } else {
                     txtReason.setVisibility(View.INVISIBLE);
-                    constraintLayout.setVisibility(View.INVISIBLE);
+                    constraintLayout.setVisibility(View.GONE);
                     btnStart.setVisibility(View.VISIBLE);
                 }
             }
@@ -139,18 +139,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isValidToContinue()) {
-                    txtReason.setVisibility(View.INVISIBLE);
-                    chNoVolume.setVisibility(View.INVISIBLE);
-                    ReasonID = 0;
-                    constraintLayout.setVisibility(View.VISIBLE);
-                    btnStart.setVisibility(View.INVISIBLE);
-                    txtRemaining.setText(txtTotalPieces.getText());
-                    txtTotalPieces.setEnabled(false);
-                    history = new ArrayList<>();
-                    historyhide = new ArrayList<>();
-                    TotalHistory = 0;
-                    txtSameSize.setText(String.valueOf(history.size() + 1));
-                    txtSameSize.setKeyListener(null);
+                    visibleWeightModule();
                 }
             }
         });
@@ -158,71 +147,8 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         btnPlus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Integer.parseInt(txtRemaining.getText().toString()) >= GlobalVar.GV().getIntegerFromString(Ssize.getText().toString())) {
-                    if (Integer.parseInt(txtTotalPieces.getText().toString()) - Integer.parseInt(txtSameSize.getText().toString()) != 0)
-                        validEnteredSize(true);
-                    else {
-                        double lenght = GlobalVar.GV().getDoubleFromString(txtLength.getText().toString());
-                        if (txtLength.getText().toString().equals("") || lenght <= 0) {
-                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of length " + txtLength.getText().toString(), GlobalVar.AlertType.Error);
-                            return;
-                        }
 
-                        double height = GlobalVar.GV().getDoubleFromString(txtHeight.getText().toString());
-                        if (txtHeight.getText().toString().equals("") || height <= 0) {
-                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Height " + txtHeight.getText().toString(), GlobalVar.AlertType.Error);
-                            return;
-                        }
-
-                        double width = GlobalVar.GV().getDoubleFromString(txtWidth.getText().toString());
-                        if (txtWidth.getText().toString().equals("") || width <= 0) {
-                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Width " + txtWidth.getText().toString(), GlobalVar.AlertType.Error);
-                            return;
-                        }
-
-
-                        int ssize = GlobalVar.GV().getIntegerFromString(Ssize.getText().toString());
-                        int r = 0;
-                        String re = "0";
-                        String ss = "0";
-                        if (ssize > 0) {
-                            r = GlobalVar.GV().getIntegerFromString(txtRemaining.getText().toString());
-                            re = String.valueOf(r - ssize);
-                            ss = String.valueOf(ssize + GlobalVar.GV().getIntegerFromString(txtSameSize.getText().toString()));
-                        } else
-                            ssize = 1;
-
-                        int sameSize = GlobalVar.GV().getIntegerFromString(txtSameSize.getText().toString());
-
-                        int asd = sameSize;
-                        for (int i = 0; i < ssize; i++) {
-                            history.add(new WaybillMeasurementDetail(asd, width, lenght, height, 0));
-                            asd = asd + 1;
-                        }
-                        historyhide.add(new WaybillMeasurementDetail(ssize, width, lenght, height, 0));
-                        TotalHistory = history.size();
-
-
-                        btnPlus.setVisibility(View.GONE);
-                        btnNext.setVisibility(View.VISIBLE);
-                        btnPrevious.setVisibility(View.VISIBLE);
-                        CurrentIndex++;
-
-                        txtRemaining.setText("0");
-                        Ssize.setText("0");
-
-                        txtSameSize.setText(String.valueOf(history.get(history.size() - 1).PiecesCount));
-                        txtWidth.setText(String.valueOf(history.get(history.size() - 1).Width));
-                        txtHeight.setText(String.valueOf(history.get(history.size() - 1).Height));
-                        txtLength.setText(String.valueOf(history.get(history.size() - 1).Length));
-
-                        lbIndex.setText("Index " + String.valueOf(history.size()));
-                        CurrentIndex = history.size();
-
-
-                    }
-                } else
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Samesize less than or equal to Remaining", GlobalVar.AlertType.Error);
+                initialCalculation();
             }
         });
 
@@ -271,26 +197,118 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         });
     }
 
-    private void validEnteredSize(boolean clear) {
+    private void visibleWeightModule() {
+
+        txtReason.setVisibility(View.INVISIBLE);
+        chNoVolume.setVisibility(View.INVISIBLE);
+        ReasonID = 0;
+        constraintLayout.setVisibility(View.VISIBLE);
+        btnStart.setVisibility(View.INVISIBLE);
+        txtRemaining.setText(txtTotalPieces.getText());
+        txtTotalPieces.setEnabled(false);
+        history = new ArrayList<>();
+        historyhide = new ArrayList<>();
+        TotalHistory = 0;
+        txtSameSize.setText(String.valueOf(history.size() + 1));
+        txtSameSize.setKeyListener(null);
+
+    }
+
+    private boolean initialCalculation() {
+
+        if (Integer.parseInt(txtRemaining.getText().toString()) >= GlobalVar.GV().getIntegerFromString(Ssize.getText().toString())) {
+            if (Integer.parseInt(txtTotalPieces.getText().toString()) - Integer.parseInt(txtSameSize.getText().toString()) != 0)
+                return validEnteredSize(true);
+            else {
+                double lenght = GlobalVar.GV().getDoubleFromString(txtLength.getText().toString());
+                if (txtLength.getText().toString().equals("") || lenght <= 0) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of length " + txtLength.getText().toString(), GlobalVar.AlertType.Error);
+                    return false;
+                }
+
+                double height = GlobalVar.GV().getDoubleFromString(txtHeight.getText().toString());
+                if (txtHeight.getText().toString().equals("") || height <= 0) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Height " + txtHeight.getText().toString(), GlobalVar.AlertType.Error);
+                    return false;
+                }
+
+                double width = GlobalVar.GV().getDoubleFromString(txtWidth.getText().toString());
+                if (txtWidth.getText().toString().equals("") || width <= 0) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Width " + txtWidth.getText().toString(), GlobalVar.AlertType.Error);
+                    return false;
+                }
+
+
+                int ssize = GlobalVar.GV().getIntegerFromString(Ssize.getText().toString());
+                int r = 0;
+                String re = "0";
+                String ss = "0";
+                if (ssize > 0) {
+                    r = GlobalVar.GV().getIntegerFromString(txtRemaining.getText().toString());
+                    re = String.valueOf(r - ssize);
+                    ss = String.valueOf(ssize + GlobalVar.GV().getIntegerFromString(txtSameSize.getText().toString()));
+                } else
+                    ssize = 1;
+
+                int sameSize = GlobalVar.GV().getIntegerFromString(txtSameSize.getText().toString());
+
+                int asd = sameSize;
+                for (int i = 0; i < ssize; i++) {
+                    history.add(new WaybillMeasurementDetail(asd, width, lenght, height, 0));
+                    asd = asd + 1;
+                }
+                historyhide.add(new WaybillMeasurementDetail(ssize, width, lenght, height, 0));
+                TotalHistory = history.size();
+
+
+                btnPlus.setVisibility(View.GONE);
+                btnNext.setVisibility(View.VISIBLE);
+                btnPrevious.setVisibility(View.VISIBLE);
+                CurrentIndex++;
+
+                txtRemaining.setText("0");
+                Ssize.setText("0");
+
+                txtSameSize.setText(String.valueOf(history.get(history.size() - 1).PiecesCount));
+                txtWidth.setText(String.valueOf(history.get(history.size() - 1).Width));
+                txtHeight.setText(String.valueOf(history.get(history.size() - 1).Height));
+                txtLength.setText(String.valueOf(history.get(history.size() - 1).Length));
+
+                lbIndex.setText("Index " + String.valueOf(history.size()));
+                CurrentIndex = history.size();
+
+
+            }
+        } else {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Samesize less" +
+                    " than or equal to Remaining", GlobalVar.AlertType.Error);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean validEnteredSize(boolean clear) {
 
         if (txtRemaining.getText().toString().equals("0"))
-            return;
+            return false;
+
         double lenght = GlobalVar.GV().getDoubleFromString(txtLength.getText().toString());
         if (txtLength.getText().toString().equals("") || lenght <= 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of length " + txtLength.getText().toString(), GlobalVar.AlertType.Error);
-            return;
+            return false;
         }
 
         double height = GlobalVar.GV().getDoubleFromString(txtHeight.getText().toString());
         if (txtHeight.getText().toString().equals("") || height <= 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Height " + txtHeight.getText().toString(), GlobalVar.AlertType.Error);
-            return;
+            return false;
         }
 
         double width = GlobalVar.GV().getDoubleFromString(txtWidth.getText().toString());
         if (txtWidth.getText().toString().equals("") || width <= 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to check the value of Width " + txtWidth.getText().toString(), GlobalVar.AlertType.Error);
-            return;
+            return false;
         }
 
         int TotalPieces = GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString());
@@ -357,6 +375,11 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         } else
 
             lbIndex.setText("Index " + String.valueOf(history.size() + 1));
+
+        if (TotalPieces - TotalHistory == 0)
+            return true;
+        else
+            return false;
     }
 
     private void setReason() {
@@ -396,7 +419,8 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.mnuSave:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
-                    SaveData();
+                    //SaveData();
+                    IsValid();
                 else
                     GlobalVar.RedirectSettings(WaybillMeasurementActivity.this);
                 return true;
@@ -405,13 +429,16 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         }
     }
 
-    private void SaveData() {
-        boolean IsSaved = true;
+
+    private void IsValid() {
+
+
         GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
 
         if (txtWaybillNo.getText().toString().equals("") ||
                 txtWaybillNo.getText().toString().length() < 8) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the Waybill No ", GlobalVar.AlertType.Error);
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                    "You have to enter the Waybill No ", GlobalVar.AlertType.Error);
             return;
         }
 
@@ -420,23 +447,45 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the Total Pieces", GlobalVar.AlertType.Error);
             return;
         }
-        double weight = 0.0;
-        if (txtWeight.getText().toString().length() > 0)
-            weight = Double.parseDouble(txtWeight.getText().toString());
+
 
         if (chNoVolume.isChecked() && ReasonID <= 0) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the reason", GlobalVar.AlertType.Error);
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                    "You have to enter the reason", GlobalVar.AlertType.Error);
             return;
         }
         if (!chNoVolume.isChecked()) {
 
-            int remaining = GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString());
-            int rem = remaining - history.size();
-            if (rem > 0) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the remaining pieces " + txtRemaining.getText().toString(), GlobalVar.AlertType.Error);
+            if (constraintLayout.getVisibility() == View.VISIBLE) {
+
+                if (initialCalculation())
+                    SaveData();
+
+//                int remaining = GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString());
+//                int rem = remaining - history.size();
+//                if (rem > 0) {
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter" +
+//                            " the remaining pieces " + txtRemaining.getText().toString(), GlobalVar.AlertType.Error);
+//                    return;
+//                }
+
+            } else {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                        "You have to press start Button", GlobalVar.AlertType.Error);
                 return;
             }
         }
+
+
+    }
+
+    private void SaveData() {
+
+        boolean IsSaved = true;
+
+        double weight = 0.0;
+        if (txtWeight.getText().toString().length() > 0)
+            weight = Double.parseDouble(txtWeight.getText().toString());
 
         WaybillMeasurement waybillMeasurement = new WaybillMeasurement(GlobalVar.GV().getIntegerFromString(txtWaybillNo.getText().toString()),
                 GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString()), "Samsung Mobile",
@@ -585,11 +634,11 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
             if (savedInstanceState.getBoolean("chNoVolume")) {
                 txtReason.setVisibility(View.VISIBLE);
-                constraintLayout.setVisibility(View.INVISIBLE);
+                constraintLayout.setVisibility(View.GONE);
                 btnStart.setVisibility(View.INVISIBLE);
             } else {
                 txtReason.setVisibility(View.INVISIBLE);
-                constraintLayout.setVisibility(View.INVISIBLE);
+                constraintLayout.setVisibility(View.GONE);
                 btnStart.setVisibility(View.VISIBLE);
             }
             // if (!chNoVolume.isChecked())

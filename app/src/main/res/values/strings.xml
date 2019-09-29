@@ -236,4 +236,73 @@
 
     <!--</string-array>-->
 
+
+    <string name="incabheader"><u>DAILY  PRE &amp; POST  TRIP TRUCK  CHECK LIST</u> .</string>
+
+    <string-array name="incabarray">
+
+        <item>Front-Header001</item>
+        <item>WindScreen</item>
+        <item>Wiper</item>
+        <item>Head Light LH</item>
+        <item>Head Light RH</item>
+        <item>Front Indicator LH</item>
+        <item>Front Indicator RH</item>
+        <item>Logo</item>
+        <item>Number Plate</item>
+
+        <item>Right side-Header002</item>
+        <item>Door Indicator</item>
+        <item>Side mirror</item>
+        <item>Door handile with lock</item>
+        <item>Side Light</item>
+        <item>Side Barrier</item>
+        <item>Reflecting Tape</item>
+        <item>Tire</item>
+        <item>Wall nut</item>
+
+        <item>Back-Header003</item>
+        <item>Tale light assemble RH</item>
+        <item>Tale light assemble LH</item>
+        <item>Fleet No</item>
+        <item>Logo</item>
+        <item>Door Lock</item>
+
+        <item>Left Side-Header004</item>
+        <item>Side Door  Condition</item>
+        <item>Tire</item>
+        <item>Wall Nut</item>
+        <item>Side Barrier</item>
+        <item>Reflecting Tape</item>
+        <item>Side Light</item>
+        <item>Door Indicator</item>
+        <item>Door handile with lock</item>
+        <item>Logo</item>
+        <item>Fleet No</item>
+        <item>Side mirror</item>
+        <item>Cabin Lock</item>
+
+        <item>Inside Cabin-Header005</item>
+        <item>Cabin Light</item>
+        <item>Jack &amp; wheel spanner</item>
+        <item>Fire extinguisher</item>
+        <item>Tool Kit</item>
+        <item>Spare wheel</item>
+        <item>Istemara</item>
+        <item>Insurance</item>
+        <item>First aid box</item>
+        <item>Seat Belt</item>
+
+        <item>Inspection-Header006</item>
+        <item>Engine oil</item>
+        <item>Coolant</item>
+        <item>Break Oil</item>
+        <item>A/C Condition</item>
+        <item>Break Foot</item>
+        <item>Parking Break</item>
+        <item>Dash Board Warnings</item>
+
+    </string-array>
+
+
 </resources>

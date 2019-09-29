@@ -757,11 +757,20 @@
             android:label="Consolidation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".TerminalHandling.LinehaulGroup"
             android:label="Linehaul"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+
+        <activity
+            android:name=".Activity.InCabNew.IncCabChecklist"
+            android:label="Linehaul"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

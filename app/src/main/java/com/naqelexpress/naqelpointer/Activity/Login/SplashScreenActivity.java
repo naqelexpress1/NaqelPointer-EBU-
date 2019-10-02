@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.naqelexpress.naqelpointer.Activity.InCabNew.IncCabChecklist;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -71,11 +70,7 @@ public class SplashScreenActivity
                     try {
                         sleep(2000);
 
-                        //loginPage();
-
-                        Intent intent = new Intent(getApplicationContext(), IncCabChecklist.class);
-                        startActivity(intent);
-
+                        loginPage();
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();

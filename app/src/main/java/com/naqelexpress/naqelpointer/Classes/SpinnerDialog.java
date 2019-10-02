@@ -57,6 +57,7 @@ public class SpinnerDialog
         final EditText searchBox = (EditText) v.findViewById(R.id.searchBox);
         if(IsNumberOnly)
             searchBox.setInputType(InputType.TYPE_CLASS_NUMBER);
+
         final ArrayAdapter<String> adapter = new ArrayAdapter<>(context, R.layout.items_view, items);
 
         listView.setAdapter(adapter);

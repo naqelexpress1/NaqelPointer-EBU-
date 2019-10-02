@@ -17,26 +17,27 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginTop="5dp"
         android:background="@drawable/border"
         android:gravity="center">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="3dp"
-            android:layout_marginTop="5dp"
             android:orientation="horizontal"
-            android:weightSum="1">
+            android:weightSum="1"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
-                android:layout_marginTop="5dp"
                 android:layout_weight="0.5"
                 android:orientation="horizontal"
-                android:weightSum="0.5">
+                android:weightSum="0.5"
+               >
 
                 <TextView
 
@@ -50,7 +51,7 @@
                 <EditText
                     android:id="@+id/date"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight=".35" />
 
             </LinearLayout>
@@ -59,7 +60,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
-                android:layout_marginTop="5dp"
                 android:layout_weight="0.5"
                 android:orientation="horizontal"
                 android:weightSum="0.5">
@@ -76,7 +76,7 @@
                 <EditText
                     android:id="@+id/staff"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight=".35" />
 
             </LinearLayout>
@@ -85,9 +85,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="match_parent"
             android:layout_marginStart="3dp"
-            android:layout_marginTop="5dp"
             android:orientation="horizontal"
             android:weightSum="1">
 
@@ -95,7 +94,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
-                android:layout_marginTop="5dp"
                 android:layout_weight="0.5"
                 android:orientation="horizontal"
                 android:weightSum="0.5">
@@ -112,7 +110,7 @@
                 <EditText
                     android:id="@+id/fleetNo"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight=".35" />
 
             </LinearLayout>
@@ -121,7 +119,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="3dp"
-                android:layout_marginTop="5dp"
                 android:layout_weight="0.5"
                 android:orientation="horizontal"
                 android:weightSum="0.5">
@@ -175,7 +172,8 @@
                 android:src="@drawable/vehicleleft"
                 android:text="MARK EXISTING DAMAGES BELOW"
                 android:textSize="18sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -183,6 +181,7 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 android:weightSum="1">
 
                 <ImageView
@@ -208,6 +207,7 @@
                 android:layout_marginStart="3dp"
                 android:layout_marginTop="5dp"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 android:weightSum="1">
 
                 <ImageView

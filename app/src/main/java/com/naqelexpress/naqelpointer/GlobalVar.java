@@ -85,8 +85,12 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "2.6.0.0";
-    public boolean LoginVariation = true; //For EBU only
+    public String AppVersion = "TH - 4.0.0";
+    public boolean LoginVariation = false; //For EBU only
+    //For TH APP Enable true and AppIDForTH is 0
+    public boolean IsTerminalApp = true; //For EBU only
+    public int AppIDForTH = 1;
+    //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;

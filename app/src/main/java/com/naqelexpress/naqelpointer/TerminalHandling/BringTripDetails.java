@@ -234,7 +234,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                ShowAlertMessage(error.toString() , 0);
+                ShowAlertMessage(error.toString(), 0);
                 if (progressDialog.isShowing() && progressDialog != null)
                     progressDialog.dismiss();
                 progressDialog.dismiss();
@@ -306,7 +306,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
 
                 startActivity(intent);
             } else {
-                ShowAlertMessage("Kindly Received the Truck in Infotrack" , 1);
+                ShowAlertMessage("Kindly Received the Truck in Infotrack", 1);
             }
         } else {
             //Intent intent = new Intent(BringTripDetails.this, UndoNcl.class);

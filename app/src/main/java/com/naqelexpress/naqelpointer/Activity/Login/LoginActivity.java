@@ -796,7 +796,9 @@ public class LoginActivity
 
             try {
                 installaionfile = "naqelpointer.apk";
-                if (!GetDivision())
+                if (GlobalVar.GV().IsTerminalApp)
+                    installaionfile = "terminalapp.apk";
+                else if (!GetDivision())
                     installaionfile = "naqelpointerEBU.apk";
 
                 URL url = new URL(GlobalVar.GV().NaqelApk + installaionfile);
@@ -1090,6 +1092,7 @@ public class LoginActivity
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
 
+
         try {
             String token = FirebaseInstanceId.getInstance().getToken();
             getUserMEDataRequest.DeviceToken = token;
@@ -1250,7 +1253,7 @@ public class LoginActivity
                         new GetMasterData().execute();
                         return;
                     } else {
-                        if (getUserMEDataResult.AppName.equals(division) || getUserMEDataResult.EmployID == 19127) {
+                        if (AppName.equals(division) || getUserMEDataResult.EmployID == 19127) {
                             if (getUserMEDataResult.Appversion != GlobalVar.VersionCode(getApplicationContext())) {
                                 dismissUserMeProgressdialog();
                                 deleteApk();

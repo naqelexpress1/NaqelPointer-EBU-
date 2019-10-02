@@ -70,7 +70,8 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
 
     public EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, vehicleno, pendingwaybill, remarks;
-    SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
+    SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog,
+            remarksspinnerdialog;
     public int CheckPointTypeID = 0, CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
 
     public ArrayList<Integer> CheckPointTypeList = new ArrayList<>();
@@ -84,6 +85,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
     public ArrayList<Integer> CheckPointTypeDDetailList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDDetailNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDDetailFNameList = new ArrayList<>();
+    public ArrayList<String> Remarks = new ArrayList<>();
 
     String imagenames[] = {"plateno.png", "image1.png", "image2.png", "image3.png"};
 
@@ -174,6 +176,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
         txtCheckPointType.setInputType(InputType.TYPE_NULL);
         txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
         txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
+        remarks.setInputType(InputType.TYPE_NULL);
 
         // txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
         // txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
@@ -199,6 +202,13 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             }
         });
 
+        remarks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                remarksspinnerdialog.showSpinerDialog(false);
+            }
+        });
+
 
         if (GlobalVar.GV().IsEnglish())
             checkPointTypeSpinnerDialog = new SpinnerDialog(Incident.this, CheckPointTypeNameList,
@@ -214,6 +224,9 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             checkPointTypeDDetailSpinnerDialog = new SpinnerDialog(Incident.this, CheckPointTypeDDetailNameList,
                     "Select Request Action", R.style.DialogAnimations_SmileWindow);
 
+
+        remarksspinnerdialog = new SpinnerDialog(Incident.this, Remarks,
+                "Select Remarks", R.style.DialogAnimations_SmileWindow);
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -295,6 +308,15 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             }
         });
+
+        remarksspinnerdialog.bindOnSpinerListener(new OnSpinerItemClick() {
+            @Override
+            public void onClick(String item, int position) {
+                remarks.setText(Remarks.get(position));
+
+            }
+        });
+
 
 //        requestLocation();
 //        LatLng origin = new LatLng(24.5536940493677, 46.86225289318732);
@@ -470,6 +492,13 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             return;
         }
 
+        if (remarks.getText().toString().replace(" ", "").length() == 0) {
+            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+            GlobalVar.ShowDialog(Incident.this, "Please Select Mandatory Field",
+                    "Kindly choose Remark from a list", true);
+            return;
+        }
+
 //        if (pendingwaybill.getText().toString().length() > 0) {
 //            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
 //            GlobalVar.ShowDialog(Incident.this, "Please Select Mandatory Field", "Kindly Enter Pending Waybill Number or 0", true);
@@ -481,6 +510,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
             return;
         }
+
 
         if (sendimages.size() == 0) {
             GlobalVar.ShowDialog(Incident.this, "Info", "Kindly please Capture Vehicle Plate Number Image", true);
@@ -1659,12 +1689,15 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
         CheckPointTypeList.clear();
         CheckPointTypeDetailNameList.clear();
         CheckPointTypeDetailList.clear();
+        Remarks.clear();
 
         try {
 
             JSONArray sreason = jsonObject.getJSONArray("SReason");
             JSONArray reason = jsonObject.getJSONArray("Reason");
             JSONArray action = jsonObject.getJSONArray("Action");
+            JSONArray remarks = jsonObject.getJSONArray("Remarks");
+
             if (reason.length() > 0) {
                 for (int i = 0; i < reason.length(); i++) {
                     JSONObject jsonObject1 = reason.getJSONObject(i);
@@ -1702,6 +1735,20 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
                     CheckPointTypeDDetailNameList.add(jsonObject1.getString("Name"));
                     CheckPointTypeDDetailList.add(jsonObject1.getInt("ID"));
+
+                }
+
+            }
+
+            if (remarks.length() > 0) {
+                for (int i = 0; i < remarks.length(); i++) {
+                    JSONObject jsonObject1 = remarks.getJSONObject(i);
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("ID", jsonObject1.getString("ID"));
+                    temp.put("Name", jsonObject1.getString("Name"));
+
+                    Remarks.add(jsonObject1.getString("Name"));
+
 
                 }
 

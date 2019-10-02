@@ -767,7 +767,7 @@
 
         <activity
             android:name=".Activity.InCabNew.IncCabChecklist"
-            android:label="Linehaul"
+            android:label="Incab"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
 

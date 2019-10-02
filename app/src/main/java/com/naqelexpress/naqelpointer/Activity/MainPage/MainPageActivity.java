@@ -684,6 +684,9 @@ public class MainPageActivity
         if (devision.equals("Express") || devision.equals("IRS")) {
             tl.setVisibility(View.GONE);
             tl1.setVisibility(View.GONE);
+        } else if (GlobalVar.GV().IsTerminalApp) {
+            tl.setVisibility(View.GONE);
+            tl1.setVisibility(View.GONE);
         } else if (devision.equals("Courier")) {
             tl.setVisibility(View.VISIBLE);
             tl1.setVisibility(View.VISIBLE);
@@ -2176,7 +2179,9 @@ public class MainPageActivity
 
             try {
                 installaionfile = "naqelpointer.apk";
-                if (!GetDivision())
+                if (GlobalVar.GV().IsTerminalApp)
+                    installaionfile = "terminalapp.apk";
+                else if (!GetDivision())
                     installaionfile = "naqelpointerEBU.apk";
 
                 URL url = new URL(GlobalVar.GV().NaqelApk + installaionfile);

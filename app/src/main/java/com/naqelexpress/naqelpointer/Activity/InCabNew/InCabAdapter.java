@@ -156,6 +156,10 @@ public class InCabAdapter
 //                                reason.get(id).put("ischecked", "1");
 //                                selectedreason.add((Integer) buttonView.getTag());
                                 notok.setChecked(false);
+//                                int id = (Integer) buttonView.getId();
+//                                //int pos = (Integer) buttonView.getTag();
+//                                reason.get(id).put("ischecked", "0");
+//                                selectedreason.remove(new Integer((Integer) buttonView.getTag()));
 
 
                             } else {

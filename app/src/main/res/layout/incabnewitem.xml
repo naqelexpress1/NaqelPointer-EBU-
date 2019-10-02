@@ -26,10 +26,12 @@
 
             android:textStyle="bold" />
 
+
         <CheckBox
             android:id="@+id/check1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="0.15"
             android:gravity="center"
             android:textColor="#343538"

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Naqel Pointer</string>
+    <string name="app_nameTH">Terminal Handling</string>
     <string name="lbWelcome">Welcome to Naqel Pointer</string>
     <string name="txtEmployIDHint">Employ ID</string>
     <string name="txtPasswordHint">Password</string>

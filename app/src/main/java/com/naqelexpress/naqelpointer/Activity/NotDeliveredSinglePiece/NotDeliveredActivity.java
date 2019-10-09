@@ -102,11 +102,18 @@ public class NotDeliveredActivity
                         result.moveToFirst();
                         boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
                         if (!isdelivered) {
-                            SaveData();
+                            boolean isupdatedelivered = result.getInt(result.getColumnIndex("UpdateDeliverScan")) > 0;
+                            if (!isupdatedelivered)
+                                SaveData();
+                            else
+                                GlobalVar.ShowDialog(NotDeliveredActivity.this, "You cannot scan again", "Delivery Scan Updated Against this waybill", true);
                         } else
                             GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Already Delivered this Waybill", true);
                     } else
                         SaveData();
+
+                    result.close();
+                    dbConnections.close();
                 } else
                     GlobalVar.RedirectSettings(NotDeliveredActivity.this);
             }
@@ -249,6 +256,11 @@ public class NotDeliveredActivity
                 isValid = false;
             } else if (firstFragment.DeliveryStatussubReason.size() > 0 && firstFragment.subReasonId == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Sub reason",
+                        GlobalVar.AlertType.Error);
+                isValid = false;
+            } else if (firstFragment.txtsubReason.getHint().toString().equals("Choose Date") &&
+                    firstFragment.txtNotes.getText().toString().length() == 0) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);
                 isValid = false;
             }

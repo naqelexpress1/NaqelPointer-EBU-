@@ -85,11 +85,11 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "TH - 4.0.0";
+    public String AppVersion = "Test For Perfomance";
     public boolean LoginVariation = false; //For EBU only
     //For TH APP Enable true and AppIDForTH is 0
-    public boolean IsTerminalApp = true; //For EBU only
-    public int AppIDForTH = 1;
+    public boolean IsTerminalApp = false; //For EBU only
+    public int AppIDForTH = 0;
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -97,7 +97,8 @@ public class GlobalVar {
     public boolean ThereIsMandtoryVersion = false;
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V1/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://192.168.1.127:49981/Api/Pointer/";
-    public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";

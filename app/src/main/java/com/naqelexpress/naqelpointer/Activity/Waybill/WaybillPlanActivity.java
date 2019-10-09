@@ -300,8 +300,10 @@ public class WaybillPlanActivity extends AppCompatActivity
         if (GetDivision()) {
             String waybillno = txtWaybillNo.getText().toString().substring(0, 8);
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            Cursor result = dbConnections.Fill("select PiecesCount from MyRouteShipments Where ItemNo = '" + waybillno + "'",
+            Cursor result = dbConnections.Fill("select PiecesCount from MyRouteShipments Where ItemNo = '"
+                            + waybillno + "'",
                     getApplicationContext());
+
             if (result.getCount() > 0) {
                 result.moveToFirst();
                 if (result.getInt(result.getColumnIndex("PiecesCount")) > 1) {

@@ -17,6 +17,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -115,7 +116,7 @@ public class CheckPointsActivity extends AppCompatActivity {
             boolean IsSaved = true;
 
             String ref = "";
-            if (firstFragment.CheckPointTypeID == 9) {
+            if (firstFragment.CheckPointTypeID == 9 || firstFragment.CheckPointTypeID == 19) {
                 ref = firstFragment.txtCheckPointTypeDetail.getText().toString();
             } else if (firstFragment.CheckPointTypeID == 7) {
                 ref = firstFragment.txtCheckPointTypeDDetail.getText().toString();
@@ -161,6 +162,9 @@ public class CheckPointsActivity extends AppCompatActivity {
 
                     resetAllFields(1);
 
+
+
+
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
                             GlobalVar.AlertType.Error);
@@ -189,7 +193,8 @@ public class CheckPointsActivity extends AppCompatActivity {
                     GlobalVar.AlertType.Error);
             return false;
         } else if ((firstFragment.txtCheckPointTypeDetail.getVisibility() == View.VISIBLE &&
-                firstFragment.CheckPointTypeDetailID == 0) && firstFragment.CheckPointTypeID != 9) {
+                firstFragment.CheckPointTypeDetailID == 0) && firstFragment.CheckPointTypeID != 9 &&
+                firstFragment.CheckPointTypeID != 19) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
@@ -244,6 +249,9 @@ public class CheckPointsActivity extends AppCompatActivity {
                 return false;
             }
         }
+
+
+
         if (firstFragment.CheckPointTypeID == 7) {
             if (firstFragment.txtCheckPointTypeDDetail.getText().toString().replace(" ", "").length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter Reason",

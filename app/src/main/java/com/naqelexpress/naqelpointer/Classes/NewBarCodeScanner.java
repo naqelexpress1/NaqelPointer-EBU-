@@ -35,7 +35,7 @@ public class NewBarCodeScanner extends AppCompatActivity
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        setContentView(R.layout.newbarcodescanner);
+        setContentView(R.layout.newbarcodescannerlands);
 
         if (state != null) {
             mFlash = state.getBoolean(FLASH_STATE, false);

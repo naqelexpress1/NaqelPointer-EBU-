@@ -75,13 +75,19 @@ public class CheckPointsFirstFragment
             txtCheckPointTypeDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (CheckPointTypeID != 9) {
+                    if (CheckPointTypeID != 9 && CheckPointTypeID != 19) {
                         txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
                         checkPointTypeDetailSpinnerDialog.showSpinerDialog(false);
                     } else {
-                        txtCheckPointTypeDetail.requestFocus();
-                        txtCheckPointTypeDetail.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
-                        txtCheckPointTypeDetail.setInputType(InputType.TYPE_CLASS_NUMBER);
+                        if (CheckPointTypeID == 9) {
+                            txtCheckPointTypeDetail.requestFocus();
+                            txtCheckPointTypeDetail.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+                            txtCheckPointTypeDetail.setInputType(InputType.TYPE_CLASS_NUMBER);
+                        } else if (CheckPointTypeID == 9) {
+                            txtCheckPointTypeDetail.requestFocus();
+                            txtCheckPointTypeDetail.setFilters(new InputFilter[]{new InputFilter.LengthFilter(50)});
+                            txtCheckPointTypeDetail.setInputType(InputType.TYPE_CLASS_TEXT);
+                        }
                     }
                 }
             });
@@ -160,12 +166,15 @@ public class CheckPointsFirstFragment
                     txtCheckPointTypeDDetail.setText("");
 
                     txtCheckPointTypeDetail.setVisibility(View.GONE);
+                    txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
+
+                    txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
                     txtCheckPointTypeDDetail.setVisibility(View.GONE);
 
                     CheckPointTypeDetailID = 0;
                     CheckPointTypeDDetailID = 0;
 
-                    if (CheckPointTypeID != 9) {
+                    if (CheckPointTypeID != 9 && CheckPointTypeID != 19) {
                         GetCheckPointTypeDetailList();
 
                         txtCheckPointTypeDetail.setText("");

@@ -260,9 +260,30 @@ public class DeliveryActivity
 
     private void isSaved() {
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        boolean IsSaved = true;
         String WaybillNo = firstFragment.txtWaybillNo.getText().toString();
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+
+        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + WaybillNo + "'",
+                getApplicationContext());
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+            if (!isdelivered) {
+                boolean isupdatedelivered = result.getInt(result.getColumnIndex("UpdateDeliverScan")) > 0;
+                if (isupdatedelivered) {
+                    GlobalVar.ShowDialog(DeliveryActivity.this, "You cannot scan again",
+                            "Delivery Scan Updated Against this waybill", true);
+                    return;
+                }
+            } else {
+                GlobalVar.ShowDialog(DeliveryActivity.this, "Info", "Already Delivered this Waybill", true);
+                return;
+            }
+        }
+
+        boolean IsSaved = true;
+
         String ReceiverName = String.valueOf(secondFragment.txtReceiverName.getText().toString());
 
         double POSAmount = 0;
@@ -297,7 +318,7 @@ public class DeliveryActivity
         }
 
         dbConnections.UpdateProductivity_Delivered(GlobalVar.getDate(), getApplicationContext());
-        Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + WaybillNo + "' and HasComplaint = 1", getApplicationContext());
+        result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + WaybillNo + "' and HasComplaint = 1", getApplicationContext());
         if (result.getCount() > 0)
             dbConnections.UpdateComplaint_Delivered(GlobalVar.getDate(), getApplicationContext());
 
@@ -357,6 +378,7 @@ public class DeliveryActivity
         } else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving), GlobalVar.AlertType.Error);
 
+        result.close();
         dbConnections.close();
     }
 

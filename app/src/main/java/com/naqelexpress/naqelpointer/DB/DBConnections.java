@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 86; // Change the concept of deliver and not deliver
+    private static final int Version = 87; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -155,7 +155,7 @@ public class DBConnections
                 "\"HasDeliveryRequest\" BOOL ,\"DDate\" TEXT NOT NULL,\"EmpID\" INTEGER NOT NULL,\"Weight\" TEXT NOT NULL," +
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
-                "\"Refused\" BOOL , \"PartialDelivered\" BOOL )");
+                "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -660,6 +660,9 @@ public class DBConnections
                 db.execSQL("ALTER TABLE NotDelivered ADD COLUMN Barcode Text");
             if (!isColumnExist("OnDelivery", "Barcode"))
                 db.execSQL("ALTER TABLE OnDelivery ADD COLUMN Barcode Text");
+
+            if (!isColumnExist("MyRouteShipments", "UpdateDeliverScan"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN UpdateDeliverScan BOOL ");
         }
 
 
@@ -1114,12 +1117,45 @@ public class DBConnections
             contentValues.put("AL", al);
             contentValues.put("Barcode", instance.Barcode);
 
+
             result = db.insert("OnDelivery", null, contentValues);
+            if (result != -1)
+                update_DeliveryScan(context, String.valueOf(instance.WaybillNo));
+
             db.close();
         } catch (SQLiteException e) {
 
         }
         return result != -1;
+    }
+
+    public void update_DeliveryScan(Context context, String Waybill) {
+        String args[] = {String.valueOf(Waybill)};
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        try {
+
+            Cursor mnocursor = Fill("select * from MyRouteShipments where ItemNo='" + Waybill + "'", context);
+
+            if (mnocursor.getCount() > 0) {
+                ContentValues contentValues = new ContentValues();
+
+                contentValues.put("UpdateDeliverScan", true);
+
+                try {
+
+                    db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
+
+                } catch (Exception e) {
+
+
+                }
+            }
+        } catch (SQLiteException e) {
+
+        }
+        db.close();
+
     }
 
     public boolean InsertOnDeliveryDetail(OnDeliveryDetail instance, Context context) {

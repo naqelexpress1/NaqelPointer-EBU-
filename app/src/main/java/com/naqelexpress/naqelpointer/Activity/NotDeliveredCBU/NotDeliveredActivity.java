@@ -148,7 +148,8 @@ public class NotDeliveredActivity
                     TimeIn, DateTime.now(), String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.ReasonID,
                     firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId, Barcode);
 
-            Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());
+            Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" +
+                    firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());
             if (result.getCount() > 0)
                 dbConnections.UpdateComplaint_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
@@ -180,7 +181,7 @@ public class NotDeliveredActivity
                     finish();
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved), GlobalVar.AlertType.Error);
-            }else
+            } else
                 GlobalVar.GV().ShowDialog(NotDeliveredActivity.this, "Error", "Your data not sucessfully registered" +
                         ",kindly try again to save.", true);
         }
@@ -228,6 +229,11 @@ public class NotDeliveredActivity
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Sub reason",
                         GlobalVar.AlertType.Error);
                 isValid = false;
+            } else if (firstFragment.txtsubReason.getHint().toString().equals("Choose Date") &&
+                    firstFragment.txtNotes.getText().toString().length() == 0) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
+                        GlobalVar.AlertType.Error);
+                isValid = false;
             }
 
             if (secondFragment.NotDeliveredBarCodeList.size() == 0) {
@@ -272,7 +278,11 @@ public class NotDeliveredActivity
                         result.moveToFirst();
                         boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
                         if (!isdelivered) {
-                            SaveData();
+                            boolean isupdatedelivered = result.getInt(result.getColumnIndex("UpdateDeliverScan")) > 0;
+                            if (!isupdatedelivered)
+                                SaveData();
+                            else
+                                GlobalVar.ShowDialog(NotDeliveredActivity.this, "You cannot scan again", "Delivery Scan Updated Against this waybill", true);
                         } else
                             GlobalVar.ShowDialog(NotDeliveredActivity.this, "Info", "Already Delivered this Waybill", true);
                     } else

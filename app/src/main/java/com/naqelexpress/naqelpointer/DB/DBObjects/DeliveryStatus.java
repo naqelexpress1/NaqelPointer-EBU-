@@ -15,6 +15,7 @@ public class DeliveryStatus {
     public String Code;
     public String Name;
     public String FName;
+    public int SeqOrder ;
     //Need exceptions for Express and Exceptions for Couriers
 
 //    public DeliveryStatus(int ID)
@@ -67,6 +68,7 @@ public class DeliveryStatus {
                         instance.Code = jsonObject.getString("Code");
                         instance.Name = jsonObject.getString("Name");
                         instance.FName = jsonObject.getString("FName");
+                        instance.SeqOrder = jsonObject.getInt("Priority");
 
                         dbConnections.InsertDeliveryStatus(instance, context);
                     } catch (JSONException ignored) {

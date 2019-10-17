@@ -85,7 +85,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Test For Perfomance";
+    public String AppVersion = "Barcode For Validation Ds";
     public boolean LoginVariation = false; //For EBU only
     //For TH APP Enable true and AppIDForTH is 0
     public boolean IsTerminalApp = false; //For EBU only
@@ -97,8 +97,8 @@ public class GlobalVar {
     public boolean ThereIsMandtoryVersion = false;
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V1/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://192.168.1.127:49981/Api/Pointer/";
-    //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
-    public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
@@ -665,7 +665,7 @@ public class GlobalVar {
         boolean isvalid = false;
         DBConnections dbConnections = new DBConnections(context, null);
         if (division.equals("Courier")) {
-            Cursor result = dbConnections.Fill("select * from Facility Limit 1", context);
+            Cursor result = dbConnections.Fill("select * from DeliveryStatus Limit 1", context);
             if (result.getCount() == 0) {
                 isvalid = true;
                 result.close();

@@ -64,7 +64,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 87; // Change the concept of deliver and not deliver
+    private static final int Version = 89; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -108,7 +108,8 @@ public class DBConnections
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
+                "\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT , SeqOrder INTEGER )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NotDelivered\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
                 "\"WaybillNo\" TEXT NOT NULL ," +
@@ -376,10 +377,11 @@ public class DBConnections
 
             db.execSQL("delete from UserMELogin");
             db.execSQL("delete from UserME");
-            db.execSQL("delete from NotDelivered");
-            db.execSQL("delete from NotDeliveredDetail");
-            db.execSQL("delete from OnDelivery");
-            db.execSQL("delete from OnDeliveryDetail");
+            //db.execSQL("delete from NotDelivered");
+            //db.execSQL("delete from NotDeliveredDetail");
+            //db.execSQL("delete from OnDelivery");
+            //db.execSQL("delete from OnDeliveryDetail");
+            db.execSQL("delete from DeliveryStatus");
 
             //Added by ismail
             this.mDefaultWritableDatabase = db;
@@ -663,6 +665,9 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteShipments", "UpdateDeliverScan"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN UpdateDeliverScan BOOL ");
+
+            if (!isColumnExist("DeliveryStatus", "SeqOrder"))
+                db.execSQL("ALTER TABLE DeliveryStatus ADD COLUMN SeqOrder Integer ");
         }
 
 
@@ -1408,6 +1413,7 @@ public class DBConnections
             contentValues.put("Code", instance.Code);
             contentValues.put("Name", instance.Name);
             contentValues.put("FName", instance.FName);
+            contentValues.put("SeqOrder", instance.SeqOrder);
             result = db.insert("DeliveryStatus", null, contentValues);
             db.close();
         } catch (SQLiteException e) {

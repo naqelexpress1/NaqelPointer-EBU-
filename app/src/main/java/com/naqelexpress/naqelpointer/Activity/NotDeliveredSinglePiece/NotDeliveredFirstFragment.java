@@ -345,7 +345,7 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
 
-        Cursor result = dbConnections.Fill("select * from DeliveryStatus", getContext());
+        Cursor result = dbConnections.Fill("select * from DeliveryStatus order by SeqOrder", getContext());
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {

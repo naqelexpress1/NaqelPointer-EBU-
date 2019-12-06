@@ -222,7 +222,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         bundle.putString("group", "Group " + group);
 
         if (group.equals("1")) {
-            Intent intent = new Intent(this, InventoryGroup.class);
+            Intent intent = new Intent(this,  InventoryGroup.class);
             intent.putExtras(bundle);
             startActivity(intent);
         } else if (group.equals("3")) {

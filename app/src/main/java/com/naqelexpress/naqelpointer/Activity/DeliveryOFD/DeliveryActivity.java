@@ -688,6 +688,7 @@ public class DeliveryActivity
             firstFragment = (DeliveryFirstFragment) getSupportFragmentManager().getFragment(savedInstanceState, "firstFragment");
             secondFragment = (DeliverySecondFragment) getSupportFragmentManager().getFragment(savedInstanceState, "secondFragment");
             thirdFragment = (DeliveryThirdFragment) getSupportFragmentManager().getFragment(savedInstanceState, "thirdFragment");
+            thirdFragment.DeliveryBarCodeList = savedInstanceState.getStringArrayList("BarCodeList");
             GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
             GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
             GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
@@ -705,8 +706,10 @@ public class DeliveryActivity
 
         getSupportFragmentManager().putFragment(outState, "firstFragment", firstFragment);
         getSupportFragmentManager().putFragment(outState, "secondFragment", secondFragment);
-        if (thirdFragment != null)
+        if (thirdFragment != null) {
             getSupportFragmentManager().putFragment(outState, "thirdFragment", thirdFragment);
+            outState.putStringArrayList("BarCodeList", thirdFragment.DeliveryBarCodeList);
+        }
         outState.putDouble("Latitude", Latitude);
         outState.putDouble("Longitude", Longitude);
         outState.putBundle("bundle", bundle);

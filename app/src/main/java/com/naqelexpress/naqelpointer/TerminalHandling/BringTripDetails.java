@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import Error.ErrorReporter;
+
 /**
  * Created by Hasna on 8/7/18.
  */
@@ -64,6 +66,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.notdeliveredsecondfragement);
 
 

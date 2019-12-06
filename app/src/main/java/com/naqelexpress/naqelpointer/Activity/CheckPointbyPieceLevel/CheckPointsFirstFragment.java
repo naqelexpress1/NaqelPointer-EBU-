@@ -34,8 +34,8 @@ public class CheckPointsFirstFragment
     public EditText txtCheckPointType, txtCheckPointTypeDDetail;
     public static EditText txtCheckPointTypeDetail;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
-    public int CheckPointTypeID = 0, CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
-
+    public int CheckPointTypeID = 0, CheckPointTypeDDetailID = 0;
+    public static int CheckPointTypeDetailID = 0;
     public ArrayList<Integer> CheckPointTypeList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeFNameList = new ArrayList<>();
@@ -72,6 +72,7 @@ public class CheckPointsFirstFragment
                 }
             });
 
+            CheckPointTypeDetailID = 0;
             txtCheckPointTypeDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -317,6 +318,9 @@ public class CheckPointsFirstFragment
         CheckPointTypeList.clear();// = new ArrayList<>();
         CheckPointTypeNameList.clear();// = new ArrayList<>();
         CheckPointTypeFNameList.clear();// = new ArrayList<>();
+
+
+        //For High Value Alarm
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
 

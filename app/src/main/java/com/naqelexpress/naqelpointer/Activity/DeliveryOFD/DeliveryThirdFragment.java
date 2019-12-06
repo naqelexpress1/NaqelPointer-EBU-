@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -30,6 +31,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
+import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -235,13 +237,32 @@ public class DeliveryThirdFragment extends Fragment {
     private void AddNewPiece() {
         if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
             if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
-                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+
+                if (!IsDelivered(txtBarCode.getText().toString())) {
+                    DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+                    lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
 
 //                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
 
-                txtBarCode.setText("");
-                initViews();
+                    txtBarCode.setText("");
+                    initViews();
+                } else {
+                    GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is already delivered " +
+                            "cannot scan again")
+
+                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+//                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+                                    txtBarCode.setText("");
+                                }
+                            })
+                            .setCancelable(true);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
             } else {
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                 AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
@@ -315,5 +336,22 @@ public class DeliveryThirdFragment extends Fragment {
             initViews();
             //  initDialog();
         }
+    }
+
+    private boolean IsDelivered(String pieceno) {
+        boolean isdeliver = false;
+
+
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+
+
+        Cursor result = dbConnections.Fill("select * from BarCode Where BarCode = '" + pieceno + "'",
+                getContext());
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            isdeliver = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+        }
+        return isdeliver;
+
     }
 }

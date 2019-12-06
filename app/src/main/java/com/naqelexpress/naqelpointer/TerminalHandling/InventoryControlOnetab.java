@@ -59,6 +59,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import  Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
@@ -82,6 +83,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.inventory);
 

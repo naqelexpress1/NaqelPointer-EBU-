@@ -1,14 +1,17 @@
 package com.naqelexpress.naqelpointer.NCLBulk;
 
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -185,13 +188,13 @@ public class ScanNclWaybillFragment extends Fragment {
         adapter = new NclAdapter(PieceCodeList);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        // initSwipe();
+        initSwipe();
     }
 
- /*   private void removeWaybill(String waybillNo) {
+    private void removeWaybill(String waybillNo) {
         int index = WaybillList.indexOf(waybillNo);
         WaybillList.remove(index);
-    }*/
+    }
 
     public boolean IsDuplicate(String pieceCode) {
         boolean result = false;
@@ -204,7 +207,7 @@ public class ScanNclWaybillFragment extends Fragment {
         return result;
     }
 
-  /*  private void initSwipe() {
+    private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)//| ItemTouchHelper.RIGHT)
         {
             @Override
@@ -225,8 +228,10 @@ public class ScanNclWaybillFragment extends Fragment {
                                 public void onClick(DialogInterface dialogInterface, int which) {
                                     String waybillNo = adapter.GetWaybillNo(position);
                                     removeWaybill(waybillNo);
+                                    isduplicate.remove(PieceCodeList.get(position).Barcode);
                                     adapter.removeItem(position);
-                                    lbTotal.setText(getString(R.string.lbCount) + PieceCodeList.size());
+                                    lbTotal.setText(getString(R.string.lbCount) + adapter.getItemCount());
+                                    PiecesCount = PiecesCount - 1;
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -246,7 +251,7 @@ public class ScanNclWaybillFragment extends Fragment {
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }*/
+    }
 
     private class BringBarcodeInfo extends AsyncTask<String, Void, String> {
         private ProgressDialog progressDialog;

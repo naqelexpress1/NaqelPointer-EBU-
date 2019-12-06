@@ -25,6 +25,8 @@ public class GetUserMEDataResult
     public String AppName;
     public int Appversion;
     public int DisableEnabletxtBox = 1;
+    public int CountryID = 0;
+    public String CountryCode;
 
     public GetUserMEDataResult(String finalJson) {
         JSONObject jsonObject;
@@ -50,6 +52,8 @@ public class GetUserMEDataResult
             AppName = jsonObject.getString("AppName");
             Appversion = jsonObject.getInt("Appversion");
             DisableEnabletxtBox = jsonObject.getInt("DisableEnabletxtBox");
+            CountryID = jsonObject.getInt("CountryID");
+            CountryCode = jsonObject.getString("CountryCode");
 
             HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
             ErrorMessage = jsonObject.getString("ErrorMessage");

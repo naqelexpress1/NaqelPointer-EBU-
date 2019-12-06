@@ -80,11 +80,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import  Error.ErrorReporter;
 
 public class NclShipmentActivity extends AppCompatActivity {
 
     ScanNclNoFragment firstFragment;
-    ScanNclWaybillFragment secondFragment;
+    ScanNclWaybillFragmentRemoveValidation secondFragment;
     private Bundle bundle;
     DateTime TimeIn;
     public static String NclNo = "0";
@@ -94,6 +95,8 @@ public class NclShipmentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
+
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
         bundle = getIntent().getExtras();
@@ -646,13 +649,13 @@ public class NclShipmentActivity extends AppCompatActivity {
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-//        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Continue",
-//                new DialogInterface.OnClickListener() {
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Continue",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
 //                        SaveDataCompleteJob(0);
-//                    }
-//                });
+                    }
+                });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit without Save",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -711,6 +714,14 @@ public class NclShipmentActivity extends AppCompatActivity {
 
                     }
                 });
+        alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Continue",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                });
 
         alertDialog.show();
     }
@@ -728,7 +739,7 @@ public class NclShipmentActivity extends AppCompatActivity {
             ncl.NclNo = NclShipmentActivity.NclNo;
             ncl.Date = TimeIn;
             ncl.UserID = GlobalVar.GV().UserID;
-            ncl.PieceCount = ScanNclWaybillFragment.PieceCodeList.size();
+            ncl.PieceCount = ScanNclWaybillFragmentRemoveValidation.PieceCodeList.size();
 
             ncl.EmployID = GlobalVar.GV().EmployID;
             ncl.StationID = GlobalVar.GV().StationID;
@@ -742,19 +753,19 @@ public class NclShipmentActivity extends AppCompatActivity {
 
             ncl.IsSync = false;
 
-            for (int i = 0; i < ScanNclWaybillFragment.PieceCodeList.size(); i++) {
-                if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
-
-                    waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
-                    ncl.nclwaybilldetails.add(i,
-                            new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, 0));
-
-                }
+            for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation.PieceCodeList.size(); i++) {
+//                if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
+//
+//                    waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
+//                    ncl.nclwaybilldetails.add(i,
+//                            new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, 0));
+//
+//                }
                 ncl.ncldetails.add(i,
-                        new NclDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Barcode, 0));
+                        new NclDetail(ScanNclWaybillFragmentRemoveValidation.PieceCodeList.get(i).Barcode, 0));
             }
             ncl.WaybillCount = waybill.size();
-            
+
             String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
             jsonData = jsonData.replace("Date(-", "Date(");
 
@@ -869,7 +880,7 @@ public class NclShipmentActivity extends AppCompatActivity {
                     return firstFragment;
                 case 1:
                     if (secondFragment == null) {
-                        secondFragment = new ScanNclWaybillFragment();
+                        secondFragment = new ScanNclWaybillFragmentRemoveValidation();
                         secondFragment.setArguments(bundle);
                     }
                     return secondFragment;

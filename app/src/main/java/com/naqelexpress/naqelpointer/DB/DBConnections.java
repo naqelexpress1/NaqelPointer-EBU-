@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
 import android.view.View;
 
@@ -64,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 89; // Change the concept of deliver and not deliver
+    private static final int Version = 91; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -90,7 +91,8 @@ public class DBConnections
                 " \"MachineID\" TEXT,  \"EmployName\" TEXT, \"EmployFName\" TEXT, \"MobileNo\" TEXT, \"StationCode\" TEXT, " +
                 "\"StationName\" TEXT, \"StationFName\" TEXT,\"Division\" TEXT DEFAULT 0 ," +
                 "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0 ,  \"TruckID\" INTEGER DEFAULT 0," +
-                " UpdateMenu Integer Default 0 , DisableEnabletxtBox Integer Default 1)");
+                " UpdateMenu Integer Default 0 , DisableEnabletxtBox Integer Default 1 ," +
+                "CountryID Interger , CountryCode TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserLogs\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , \"UserID\" INTEGER NOT NULL , \"SuperVisorID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL , \"LogTypeID\" INTEGER NOT NULL , \"CTime\" DATETIME NOT NULL , \"MachineID\" TEXT , \"Remarks\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserMeLogin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE ," +
@@ -348,6 +350,12 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UpdateMenu\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , " +
                 " \"MenuChanges\" Integer Default 0 )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"WaybillNo\"  TEXt NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+
     }
 
     public int getVersion() {
@@ -551,6 +559,12 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"UpdateMenu\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE , " +
                     " \"MenuChanges\" Integer Default 0 )");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -668,9 +682,36 @@ public class DBConnections
 
             if (!isColumnExist("DeliveryStatus", "SeqOrder"))
                 db.execSQL("ALTER TABLE DeliveryStatus ADD COLUMN SeqOrder Integer ");
+
+            if (!isColumnExist("UserME", "CountryID"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN CountryID Integer DEFAULT 0 ");
+            if (!isColumnExist("UserME", "CountryCode"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN CountryCode Text ");
         }
 
 
+    }
+
+
+    public Cursor getStationID(int EmployID, Context context) {
+        // int StationID = 0;
+        Cursor cursor = null;
+        try {
+            String selectQuery = "SELECT CountryID , CountryCode FROM UserME Where EmployID = " + EmployID + "  ORDER BY ID DESC LIMIT 1";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            cursor = db.rawQuery(selectQuery, null);
+
+
+//            if (cursor.getCount() > 0) {
+//                cursor.moveToFirst();
+//                StationID = cursor.getInt(cursor.getColumnIndex("StationID"));
+//            }
+            // cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return cursor;
     }
 
     public boolean EmployeInfo(int EmpID, String EmpName, String IqamaNumber, String MobileNo, int StationID, String ImageName, Context context) {
@@ -861,7 +902,8 @@ public class DBConnections
             contentValues.put("Date", GlobalVar.getDate());
             contentValues.put("TruckID", instance.TruckID);
             contentValues.put("DisableEnabletxtBox", instance.DisableEnabletxtBox);
-
+            contentValues.put("CountryID", instance.CountryID);
+            contentValues.put("CountryCode", instance.CountryCode);
             result = db.insert("UserME", null, contentValues);
             db.close();
 
@@ -5236,5 +5278,121 @@ public class DBConnections
         }
         return result != -1;
     }
+
+    public boolean InsertDeliverReq(int waybillno, String barcode, String ValidDate, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("WaybillNo", waybillno);
+            contentValues.put("BarCode", barcode);
+            contentValues.put("InsertedDate", GlobalVar.GV().getCurrentDateTime());
+            contentValues.put("ValidDate", ValidDate);
+
+
+            result = db.insert("DeliverReq", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public  void insertDelBulk(JSONArray deliveryReq, Context context) {
+        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (int i = 0; i < deliveryReq.length(); i++) {
+            //generate some values
+            try {
+
+                JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
+                String insdate[] = jsonObject1.getString("InsertedDate").split("T");
+                stmt.bindString(1, String.valueOf(jsonObject1.getInt("WaybillNo")));
+                stmt.bindString(2, jsonObject1.getString("BarCode"));
+                stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
+                stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
+
+                long entryID = stmt.executeInsert();
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
+    }
+
+    public  void insertReqBulk(JSONArray rtoReq, Context context) {
+        String sql = "insert into RtoReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (int i = 0; i < rtoReq.length(); i++) {
+            //generate some values
+            try {
+                JSONObject jsonObject1 = rtoReq.getJSONObject(i);
+                stmt.bindString(1, String.valueOf(jsonObject1.getInt("WayBillNo")));
+                stmt.bindString(2, jsonObject1.getString("BarCode"));
+                stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
+                stmt.bindString(4, GlobalVar.GV().getDateAdd1Day());
+
+                long entryID = stmt.executeInsert();
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
+    }
+
+    public boolean InsertRtoReq(int waybillno, String barcode, String ValidDate, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("WaybillNo", waybillno);
+            contentValues.put("BarCode", barcode);
+            contentValues.put("InsertedDate", GlobalVar.GV().getCurrentDateTime());
+            contentValues.put("ValidDate", ValidDate);
+
+            result = db.insert("RtoReq", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public void deleteDeliverRtoReqData(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from DeliverReq");
+            db.execSQL("delete from RtoReq");
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
 
 }

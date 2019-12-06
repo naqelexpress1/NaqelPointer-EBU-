@@ -99,6 +99,11 @@ public class MyRouteShipments implements Parcelable {
         JSONArray AppVersion = null;
         int complaint = 0;
         int request = 0;
+        int CountryID = 0;
+        String CountryCode = "";
+
+
+        DBConnections dbConnections = new DBConnections(context, null);
 
         try {
             JSONObject jsonObjectHeader = new JSONObject(finalJson);
@@ -108,11 +113,19 @@ public class MyRouteShipments implements Parcelable {
             AppVersion = jsonObjectHeader.getJSONArray("AppVersion");
             if (AppVersion.length() > 0) {
                 JSONObject jo = AppVersion.getJSONObject(0);
-                DBConnections dbConnections = new DBConnections(context, null);
+
                 dbConnections.InsertAppVersion(jo.getInt("VersionCode"), context);
-                dbConnections.close();
+
             }
 
+            Cursor cursor = dbConnections.getStationID(GlobalVar.GV().EmployID, context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                CountryID = cursor.getInt(cursor.getColumnIndex("CountryID"));
+                CountryCode = cursor.getString(cursor.getColumnIndex("CountryCode"));
+            }
+
+            cursor.close();
 
         } catch (JSONException e) {
             GlobalVar.GV().ShowSnackbar(view, "No Data with this ID", GlobalVar.AlertType.Error);
@@ -120,7 +133,7 @@ public class MyRouteShipments implements Parcelable {
             e.printStackTrace();
             return;
         }
-        DBConnections dbConnections = new DBConnections(context, null);
+
         MyRouteActivity.places.clear();
         LatLng ll = null;
         //Places place = new Places();
@@ -171,11 +184,17 @@ public class MyRouteShipments implements Parcelable {
 
                 instance.ConsigneeName = jsonObject.getString("ConsigneeName");
                 instance.ConsigneeFName = jsonObject.getString("ConsigneeFName");
-                instance.ConsigneePhoneNumber = ValidateMobileNo(jsonObject.getString("ConsigneePhoneNumber"));
+                if (CountryID == 1) {
+                    instance.ConsigneePhoneNumber = ValidateMobileNo(jsonObject.getString("ConsigneePhoneNumber"));
+                    instance.ConsigneeMobile = ValidateMobileNo(jsonObject.getString("ConsigneeMobile"));
+                } else {
+                    instance.ConsigneePhoneNumber = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneePhoneNumber"), CountryCode);
+                    instance.ConsigneeMobile = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneeMobile"), CountryCode);
+                }
                 instance.ConsigneeFirstAddress = jsonObject.getString("ConsigneeFirstAddress");
                 instance.ConsigneeSecondAddress = jsonObject.getString("ConsigneeSecondAddress");
                 instance.ConsigneeNear = jsonObject.getString("ConsigneeNear");
-                instance.ConsigneeMobile = ValidateMobileNo(jsonObject.getString("ConsigneeMobile"));
+
 
                 String dt = jsonObject.getString("Date");
                 String result = dt.replaceAll("^/Date\\(", "");
@@ -286,17 +305,23 @@ public class MyRouteShipments implements Parcelable {
                     ArrayList<String> MNos = new ArrayList<>();
                     if (!instance.ConsigneeMobile.equals("null") && instance.ConsigneeMobile != null && !instance.ConsigneeMobile.equals("0")
                             && instance.ConsigneeMobile.length() > 0) {
-
-                        MNos.add(ValidateMobileNo(instance.ConsigneeMobile));
+                        if (CountryID == 1)
+                            MNos.add(ValidateMobileNo(instance.ConsigneeMobile));
+                        else
+                            MNos.add(ValidateMobileNoOtherCountry(instance.ConsigneeMobile, CountryCode));
                     }
                     if (!instance.ConsigneePhoneNumber.equals("null") && instance.ConsigneePhoneNumber != null &&
                             !instance.ConsigneePhoneNumber.equals("0") && instance.ConsigneePhoneNumber.length() > 0) {
-                        MNos.add(ValidateMobileNo(instance.ConsigneePhoneNumber));
+                        if (CountryID == 1)
+                            MNos.add(ValidateMobileNo(instance.ConsigneePhoneNumber));
+                        else
+                            MNos.add(ValidateMobileNoOtherCountry(instance.ConsigneeMobile, CountryCode));
                     }
                     if (MNos.size() > 0)
                         addMobileNumber(String.valueOf(i + 1) + " - " + instance.ItemNo, MNos, instance.ItemNo, context);
                 }
             }
+
             for (int i = 0; i < BarCode.length(); i++) {
                 JSONObject temp = BarCode.getJSONObject(i);
                 String barcode = temp.getString("BarCode");
@@ -529,6 +554,22 @@ public class MyRouteShipments implements Parcelable {
                 }
                 //else
 //                    mobileno = mobileno;
+            }
+
+        }
+
+        return mobileno;
+    }
+
+    private String ValidateMobileNoOtherCountry(String mobileno, String CountryCode) {
+
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0 && !mobileno.equals("0")) {
+            if (mobileno.length() >= 9) {
+                String mno = mobileno.substring(mobileno.length() - 9, mobileno.length());
+
+                mobileno = "+"+CountryCode + mno;
+
+
             }
 
         }

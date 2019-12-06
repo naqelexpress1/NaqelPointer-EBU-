@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.CheckPointbyPieceLevel;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -26,10 +28,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.BarcodeInfoRequest;
+import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
 import com.naqelexpress.naqelpointer.R;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
@@ -68,8 +80,19 @@ public class CheckPointsThirdFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-                        AddNewPiece();
+                    if (txtBarCode != null && txtBarCode.getText().length() == 13) {
+
+                        if (CheckPointsFirstFragment.CheckPointTypeDetailID == 54) {
+                            BarcodeInfoRequest barcodeInfoRequest = new BarcodeInfoRequest();
+                            barcodeInfoRequest.Barcode = Long.parseLong(txtBarCode.getText().toString());
+                            String jsonData = JsonSerializerDeserializer.serialize(barcodeInfoRequest, true);
+                            new BringBarcodeInfo().execute(jsonData);
+                        } else
+
+                            AddNewPiece();
+//
+                    }
+                    //AddNewPiece();
                 }
             });
 
@@ -307,4 +330,87 @@ public class CheckPointsThirdFragment
 //        });
 //        txtBarCodePiece = (EditText)view.findViewById(R.id.txtWaybilll);
 //    }
+
+    private class BringBarcodeInfo extends AsyncTask<String, Void, String> {
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILinkForHighValueAlarm + "GetBarcodeInfo");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            //progressDialog.dismiss();
+            super.onPostExecute(String.valueOf(finalJson));
+            if (finalJson != null) {
+                BarcodeInfoResult barcodeInfoResult = new BarcodeInfoResult(finalJson);
+
+                AddNewPiece();
+
+                if (barcodeInfoResult.DecalaredValue >= 1000) {
+                    try {
+                        GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
+                    } catch (Exception e) {
+
+                    }
+
+                }
+            }
+        }
+    }
 }

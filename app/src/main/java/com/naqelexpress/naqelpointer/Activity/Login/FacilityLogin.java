@@ -54,6 +54,8 @@ public class FacilityLogin
         setContentView(R.layout.facility);
 
 
+
+
         city = (Spinner) findViewById(R.id.citycode);
         facility = (Spinner) findViewById(R.id.facilitycode);
         facility.setOnItemSelectedListener(this);

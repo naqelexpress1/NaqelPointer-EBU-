@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.BuildConfig;
@@ -1094,8 +1095,9 @@ public class LoginActivity
 
 
         try {
+            FirebaseApp.initializeApp(this);
             String token = FirebaseInstanceId.getInstance().getToken();
-            getUserMEDataRequest.DeviceToken = token;
+                getUserMEDataRequest.DeviceToken = token;
         } catch (Exception e) {
             getUserMEDataRequest.DeviceToken = "";
         }
@@ -1202,6 +1204,9 @@ public class LoginActivity
                     instance.UsertypeID = getUserMEDataResult.UsertypeId;
                     instance.Menu = getUserMEDataResult.Menu;
                     usertype = getUserMEDataResult.UsertypeId;
+                    instance.CountryID = getUserMEDataResult.CountryID;
+                    instance.CountryCode = getUserMEDataResult.CountryCode;
+
                     instance.DisableEnabletxtBox = getUserMEDataResult.DisableEnabletxtBox;
                     instance.TruckID = truckID;
 

@@ -39,6 +39,8 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
+        //  String time = GlobalVar.GV().getCurrentDateTime();
+
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

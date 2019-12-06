@@ -381,7 +381,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                             new Intent(InventoryHeldIn.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
-                    if (!isMyServiceRunning(TerminalHandling.class)) {
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                         startService(
                                 new Intent(InventoryHeldIn.this,
                                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));

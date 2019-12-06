@@ -70,6 +70,7 @@ import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -85,9 +86,9 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "Barcode For Validation Ds";
+    public String AppVersion = "CBU : 2.6.3.3";
     public boolean LoginVariation = false; //For EBU only
-    //For TH APP Enable true and AppIDForTH is 0
+    //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For EBU only
     public int AppIDForTH = 0;
     //
@@ -98,6 +99,7 @@ public class GlobalVar {
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V1/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://192.168.1.127:49981/Api/Pointer/";
     public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
@@ -2312,11 +2314,58 @@ public class GlobalVar {
         return simpledateformat.format(calander.getTime());
     }
 
+    public static String getCurrentDateTime() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        String datetime = dateformat.format(c.getTime());
+
+        return datetime;
+    }
+
     public static String getDateMinus2Days() {
         Calendar calander = Calendar.getInstance();
         calander.add(Calendar.DATE, -2);
         SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
         return simpledateformat.format(calander.getTime());
+    }
+
+    public static String getDateAdd1Day(String add1day) {
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar c = Calendar.getInstance();
+            c.setTime(sdf.parse(add1day));
+            c.add(Calendar.DATE, 1);  // number of days to add
+            add1day = sdf.format(c.getTime());  // dt is now the new date
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return add1day;
+
+//        Calendar calander = Calendar.getInstance();
+//        calander.add(Calendar.DATE, 1);
+//        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+//        return simpledateformat.format(calander.getTime());
+    }
+
+    public static String getDateAdd1Day() {
+        Calendar calander = Calendar.getInstance();
+        calander.add(Calendar.DATE, 1);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpledateformat.format(calander.getTime());
+    }
+
+    public static boolean IsAllowtoScan(String reporttime) {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        String getCurrentDateTime = sdf.format(c.getTime());
+        //String getMyTime = "2019/12/05 16:31";
+
+        if (getCurrentDateTime.compareTo(reporttime) < 0)
+            return true;
+        else
+            return false;
     }
 
     public static String getDivision(Context context) {
@@ -2361,24 +2410,44 @@ public class GlobalVar {
         if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
             return true;
 
-        int valid = android.provider.Settings.System.getInt(context.getContentResolver(),
-                android.provider.Settings.System.AUTO_TIME, 0); // 1 means Enabled
-        if (valid == 1)
-            return true;
+        int isValidAutoTimeZone = 0;
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            isValidAutoTimeZone =
+                    android.provider.Settings.System.getInt(context.getContentResolver(),
+                            Settings.Global.AUTO_TIME_ZONE, 0); // 1 means Enabled
+        } else {
+            android.provider.Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.AUTO_TIME_ZONE, 0); // 1 means Enabled
+        }
+        if (isValidAutoTimeZone == 1) {
+            int isvalidAutotime = 0;
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+
+                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
+                        Settings.Global.AUTO_TIME, 0); // 1 means Enabled
+            } else {
+                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
+                        Settings.System.AUTO_TIME, 0); // 1 means Enabled
+            }
+            if (isvalidAutotime == 1) {
+                return true;
+            }
+
+        }
 //        else {
 //            if (GlobalVar.GV().EmployID == 90189)
 //                return true;
 //            else
 //                return false;
 //        }
-        else return false;
+        return false;
 
     }
 
     public static void RedirectSettings(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Info")
-                .setMessage("Kindly Enable Automatic Network Provider Date/Time")
+                .setMessage("Kindly Enable Automatic Network Provider DateTime & TimeZone")
                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {

@@ -704,7 +704,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 //            return false;
 //        }
 
-        if (txtbinlocation.getText().toString().replace(" ", "").length() == 0) {
+        if (lbTotal.getText().toString().replace(" ", "").length() == 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan Bin Location",
                     GlobalVar.AlertType.Error);
             return false;

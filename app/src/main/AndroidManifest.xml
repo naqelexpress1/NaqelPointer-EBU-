@@ -30,7 +30,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
 
     <permission android:name="android.permission.INTERNET" />
 
@@ -627,6 +628,12 @@
 
         <activity
             android:name=".TerminalHandling.InventoryControlOnetab"
+            android:label="Inventory Control"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name=".TerminalHandling.InventoryControl_LocalValidation"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />

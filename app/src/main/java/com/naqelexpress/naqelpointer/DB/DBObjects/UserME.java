@@ -20,6 +20,8 @@ public class UserME {
     public int Menu = 0;
     public int TruckID = 0;
     public int DisableEnabletxtBox = 1;
+    public int CountryID = 0;
+    public String CountryCode;
 
     public UserME() {
         StatusID = 1;

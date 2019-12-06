@@ -17,9 +17,9 @@ android {
         applicationId "com.naqelexpress.naqelpointer"
         minSdkVersion 21
         targetSdkVersion 29
-        versionName '2.6.0.0'
+        versionName '2.6.1.3'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 260
+        versionCode 263
     }
     buildTypes {
 
@@ -83,7 +83,7 @@ dependencies {
     //noinspection GradleCompatible
     implementation 'com.android.support:design:28.0.0-rc02'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.google.code.gson:gson:2.4'
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation group: 'org.apache.httpcomponents', name: 'httpmime', version: '4.3.1'
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.3.0'

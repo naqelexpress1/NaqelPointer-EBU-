@@ -160,6 +160,19 @@ public class NotDeliveredActivity
         }
     }
 
+    private boolean IsDelivered(String pieceno) {
+        boolean isdeliver = false;
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor result = dbConnections.Fill("select * from BarCode Where BarCode = '" + pieceno + "'",
+                getApplicationContext());
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            isdeliver = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+        }
+        return isdeliver;
+
+    }
+
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
@@ -168,10 +181,29 @@ public class NotDeliveredActivity
             String Barcode = "";
 
             for (int i = 0; i < firstFragment.ShipmentBarCodeList.size(); i++) {
-                if (i == 0)
-                    Barcode = firstFragment.ShipmentBarCodeList.get(i);
-                else
-                    Barcode = Barcode + "," + firstFragment.ShipmentBarCodeList.get(i);
+                if (!IsDelivered(firstFragment.ShipmentBarCodeList.get(i))) {
+                    if (i == 0)
+                        Barcode = firstFragment.ShipmentBarCodeList.get(i);
+                    else
+                        Barcode = Barcode + "," + firstFragment.ShipmentBarCodeList.get(i);
+                } else {
+                    GlobalVar.GV().MakeSound(this.getApplicationContext(), R.raw.wrongbarcodescan);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.getApplicationContext());
+                    builder.setMessage("This piece(" + firstFragment.ShipmentBarCodeList.get(i) + ") is " +
+                            "already delivered cannot scan again")
+
+                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+
+                                }
+                            })
+                            .setCancelable(true);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    return;
+                }
+
             }
 
             boolean IsSaved = true;

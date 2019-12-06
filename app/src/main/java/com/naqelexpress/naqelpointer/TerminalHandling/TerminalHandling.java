@@ -51,6 +51,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
@@ -77,7 +78,7 @@ public class TerminalHandling extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
         Intent intent = this.getIntent();

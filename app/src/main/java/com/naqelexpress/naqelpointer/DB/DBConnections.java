@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 91; // Change the concept of deliver and not deliver
+    private static final int Version = 94; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -356,6 +356,12 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DeniedWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnHoldWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
+
     }
 
     public int getVersion() {
@@ -390,6 +396,7 @@ public class DBConnections
             //db.execSQL("delete from OnDelivery");
             //db.execSQL("delete from OnDeliveryDetail");
             db.execSQL("delete from DeliveryStatus");
+
 
             //Added by ismail
             this.mDefaultWritableDatabase = db;
@@ -564,6 +571,12 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DeniedWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"OnHoldWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -1077,6 +1090,7 @@ public class DBConnections
                 // db.delete("UserMELogin", "ID=?", args);
                 db.execSQL("delete from UserMELogin");
                 db.execSQL("delete from UserME"); // added new
+                db.execSQL("delete from FacilityLoggedIn ");
 
             } catch (Exception e) {
                 GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error);
@@ -5300,7 +5314,7 @@ public class DBConnections
         return result != -1;
     }
 
-    public  void insertDelBulk(JSONArray deliveryReq, Context context) {
+    public void insertDelBulk(JSONArray deliveryReq, Context context) {
         String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
@@ -5332,7 +5346,7 @@ public class DBConnections
         db.close();
     }
 
-    public  void insertReqBulk(JSONArray rtoReq, Context context) {
+    public void insertReqBulk(JSONArray rtoReq, Context context) {
         String sql = "insert into RtoReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
@@ -5394,5 +5408,62 @@ public class DBConnections
         }
     }
 
+    public void insertDeniedBulk(JSONArray rtoReq, Context context) {
+        String sql = "insert into DeniedWaybills (WaybillNo, BarCode, InsertedDate) values (?, ?, ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
 
+        for (int i = 0; i < rtoReq.length(); i++) {
+            //generate some values
+            try {
+                JSONObject jsonObject1 = rtoReq.getJSONObject(i);
+                stmt.bindString(1, String.valueOf(jsonObject1.getInt("WayBillNo")));
+                stmt.bindString(2, jsonObject1.getString("BarCode"));
+                stmt.bindString(3, GlobalVar.getDate());
+
+                long entryID = stmt.executeInsert();
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
+    }
+
+    public void deleteDenied(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {GlobalVar.getDate()};
+            db.delete("DeniedWaybills", "InsertedDate!=?", args);
+            //db.execSQL("delete from DeniedWaybills");
+            db.close();
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public void deleteAllDenied(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from DeniedWaybills");
+            db.close();
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
 }

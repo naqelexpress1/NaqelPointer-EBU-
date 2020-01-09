@@ -203,6 +203,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
 
         // Intent intent = new Intent(this, InventoryControlOnetab.class);
+       // Intent intent = new Intent(this, InventoryControl_LocalValidation.class);
         Intent intent = new Intent(this, InventoryControl_LocalValidation.class);
         intent.putExtras(bundle);
         startActivity(intent);

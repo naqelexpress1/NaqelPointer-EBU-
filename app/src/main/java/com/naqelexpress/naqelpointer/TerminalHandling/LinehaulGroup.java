@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.NCLBlockWaybills.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;

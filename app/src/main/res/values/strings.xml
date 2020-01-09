@@ -305,5 +305,11 @@
 
     </string-array>
 
+    <string-array name="heldoutReasons">
+        <item>Handover to outlet</item>
+        <item>Miscode</item>
+        <item>Urgent delivery</item>
+        <item> Handover to claim</item>
+    </string-array>
 
 </resources>

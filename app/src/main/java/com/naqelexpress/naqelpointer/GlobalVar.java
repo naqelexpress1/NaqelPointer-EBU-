@@ -86,11 +86,11 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU : 2.6.3.3";
+    public String AppVersion = "TH : Gateway Block Waybills";
     public boolean LoginVariation = false; //For EBU only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For EBU only
-    public int AppIDForTH = 0;
+    public boolean IsTerminalApp = true; //For EBU only
+    public int AppIDForTH = 1;
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -427,7 +427,7 @@ public class GlobalVar {
         Thread t = new Thread() {
             public void run() {
 
-                MediaPlayer barcodeSound = MediaPlayer.create(context, url);
+                final MediaPlayer barcodeSound = MediaPlayer.create(context, url);
                 barcodeSound.start();
                 //barcodeSound.stop();
                 barcodeSound.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -437,6 +437,7 @@ public class GlobalVar {
 
                             mp.stop();
                             mp.release();
+                            barcodeSound.stop();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -2358,7 +2359,7 @@ public class GlobalVar {
 
     public static boolean IsAllowtoScan(String reporttime) {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
         String getCurrentDateTime = sdf.format(c.getTime());
         //String getMyTime = "2019/12/05 16:31";
 

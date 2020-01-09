@@ -95,6 +95,8 @@ public class LoginActivity
             setContentView(R.layout.login);
 
 
+        boolean asd = GlobalVar.GV().IsAllowtoScan("Upto : 2019-12-11 16.30".replace("Upto : ", ""));
+
         //GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -1097,7 +1099,7 @@ public class LoginActivity
         try {
             FirebaseApp.initializeApp(this);
             String token = FirebaseInstanceId.getInstance().getToken();
-                getUserMEDataRequest.DeviceToken = token;
+            getUserMEDataRequest.DeviceToken = token;
         } catch (Exception e) {
             getUserMEDataRequest.DeviceToken = "";
         }
@@ -1233,7 +1235,7 @@ public class LoginActivity
 
 
                     dbConnections.InsertAppVersion(getUserMEDataResult.Appversion, getApplicationContext());
-                    dbConnections.close();
+
 
                     String division = getUserMEDataResult.Division;
                     if (division.equals("IRS"))
@@ -1248,7 +1250,19 @@ public class LoginActivity
                         ShowAlertMessage("This Application will support only for " + getUserMEDataResult.AppName + " Employees" +
                                 " kindly contact concern person", 1);
                         dismissUserMeProgressdialog();
+                        dbConnections.close();
                         return;
+                    }
+
+                    if (AppName.equals("Courier")) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(finalJson);
+                            dbConnections.deleteAllDenied(getApplicationContext());
+                            dbConnections.insertDeniedBulk(jsonObject.getJSONArray("DeniedWaybills"), getApplicationContext());
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
 

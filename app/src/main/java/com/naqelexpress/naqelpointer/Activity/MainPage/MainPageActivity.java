@@ -305,6 +305,13 @@ public class MainPageActivity
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
+        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
+            dbConnections.DeleteExsistingLogin(getApplicationContext());
+            dbConnections.DeleteAllSyncData(getApplicationContext());
+            dbConnections.deleteDenied(getApplicationContext());
+        }
+
         btnSignOut = (FloatingActionButton) findViewById(R.id.btnSignOut);
 
         btnSignOut.setOnClickListener(new View.OnClickListener() {

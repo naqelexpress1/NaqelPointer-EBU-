@@ -13,8 +13,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,16 +25,16 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -47,6 +45,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 // Created by Ismail on 21/03/2018.
 
@@ -54,7 +53,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
-
+    private Spinner heldoutreasons;
 
     TextView lbTotal;
     private EditText txtBarCode, txtbinlocation;
@@ -67,6 +66,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
     private RecyclerView recyclerView;
     private DataAdapter adapter;
     private Paint p = new Paint();
+    List<String> heldoutlist, heldoutid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +113,25 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                 }
             }
         });
+
+        heldoutreasons = (Spinner) findViewById(R.id.heloutreason);
+        heldoutreasons.setVisibility(View.VISIBLE);
+        heldoutlist = new ArrayList<String>();
+
+        heldoutlist.add("Handover to outlet");
+        heldoutlist.add("Miscode");
+        heldoutlist.add("Urgent delivery");
+        heldoutlist.add("Handover to claim");
+        heldoutid = new ArrayList<String>();
+        heldoutid.add("47");
+        heldoutid.add("48");
+        heldoutid.add("49");
+        heldoutid.add("50");
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, heldoutlist);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        heldoutreasons.setAdapter(dataAdapter);
 
     }
 
@@ -186,7 +205,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
             txtBarCode.setText("");
         }
 
-        if (delrtoreq.size() == 40) {
+        if (delrtoreq.size() == 20) {
             SaveData(2);
         }
 
@@ -271,13 +290,48 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         switch (item.getItemId()) {
             case R.id.mnuSave:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                    //SaveData();
+                    ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2, "");
+                } else
+                    GlobalVar.RedirectSettings(InventoryHeldOut.this);
+                return true;
+            case R.id.manual:
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                    ErrorAlert("Info", "Are yo sure want to upload Manual?", 3, "");
                 } else
                     GlobalVar.RedirectSettings(InventoryHeldOut.this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldOut.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (clear == 0) {
+                            txtBarCode.setText("");
+                            txtBarCode.requestFocus();
+                        } else if (clear == 2)
+                            SaveData(1);
+                        else if (clear == 3)
+                            // insertManual1();
+                            // insertManual1();
+
+                            if (delrtoreq.size() == 20) {
+                                SaveData(2);
+                            }
+//                        if (piececode.length() > 0)
+//                            SaveData(piececode, title);
+                    }
+                });
+
+        alertDialog.show();
     }
 
     public double Latitude = 0;
@@ -301,7 +355,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 44, ""
-                            , "" , 0);
+                            , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -349,8 +403,9 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                     jsonObject.put("IsSync", false);
                     jsonObject.put("EmployID", GlobalVar.GV().EmployID);
                     jsonObject.put("Date", DateTime.now());
-                    jsonObject.put("TerminalHandlingScanStatusID", 20);
-                    jsonObject.put("TerminalHandlingScanStatusReasonID", 44);
+                    jsonObject.put("TerminalHandlingScanStatusID", 24);
+                    jsonObject.put("TerminalHandlingScanStatusReasonID",
+                            heldoutid.get(heldoutreasons.getSelectedItemPosition()));
                     jsonObject.put("AppVersion", GlobalVar.GV().AppVersion);
                     jsonObject.put("Latitude", String.valueOf(Latitude));
                     jsonObject.put("Longitude", String.valueOf(Longitude));
@@ -373,7 +428,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                 e.printStackTrace();
             }
 
-            dbConnections.InsertTerminalHandlingBulk(data.toString(), getApplicationContext() , delrtoreq.size());
+            dbConnections.InsertTerminalHandlingBulk(data.toString(), getApplicationContext(), delrtoreq.size());
 
 
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
@@ -463,7 +518,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                       // countDownTimer.cancel();
+                        // countDownTimer.cancel();
                         InventoryHeldOut.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);

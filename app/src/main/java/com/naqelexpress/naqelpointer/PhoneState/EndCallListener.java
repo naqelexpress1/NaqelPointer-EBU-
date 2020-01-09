@@ -26,6 +26,8 @@ class EndCallListener extends PhoneStateListener {
         if (TelephonyManager.CALL_STATE_IDLE == state) {
             //when this state occurs, and your flag is set, restart your app
             Log.i("", "IDLE");
+
+
         }
     }
 }

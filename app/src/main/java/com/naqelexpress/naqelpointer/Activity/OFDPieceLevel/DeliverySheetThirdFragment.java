@@ -3,6 +3,7 @@ package com.naqelexpress.naqelpointer.Activity.OFDPieceLevel;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -28,6 +29,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
+import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -60,6 +62,7 @@ public class DeliverySheetThirdFragment
     private int edit_position;
     private View view;
     private boolean add = false;
+    public ArrayList<String> pieceDenied = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,13 @@ public class DeliverySheetThirdFragment
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            if (GlobalVar.ValidateAutomacticDate(getContext())) {
+                dbConnections.DeleteFacilityLoggedIn(getContext());
+                dbConnections.DeleteExsistingLogin(getContext());
+                dbConnections.DeleteAllSyncData(getContext());
+                dbConnections.deleteDenied(getContext());
+            }
 
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -91,7 +101,12 @@ public class DeliverySheetThirdFragment
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (txtBarCode != null && txtBarCode.getText().length() == 13) {
-                        new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                        if (!pieceDenied.contains(txtBarCode.getText().toString()))
+                            new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                        else {
+                            GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                            ShowAlertMessage("ON HOLD WAYBILL CONTACT YOU SUPERVISOR");
+                        }
                     }
                 }
             });
@@ -135,6 +150,7 @@ public class DeliverySheetThirdFragment
             //initDialog();
         }
 
+        ReadFromLocal();
         return rootView;
     }
 
@@ -413,7 +429,7 @@ public class DeliverySheetThirdFragment
 
     private void ShowAlertMessage(String Message) {
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-        alertDialog.setTitle(getResources().getString(R.string.app_name));
+        alertDialog.setTitle("Info");
         alertDialog.setMessage(Message);
         alertDialog.setCancelable(false);
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
@@ -424,5 +440,37 @@ public class DeliverySheetThirdFragment
                     }
                 });
         alertDialog.show();
+    }
+
+    private void ReadFromLocal() {
+
+
+        pieceDenied.clear();
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        Cursor result = dbConnections.Fill("select * from DeniedWaybills", getContext());
+        try {
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+
+                do {
+
+                    pieceDenied.add(result.getString(result.getColumnIndex("BarCode")));
+
+                } while (result.moveToNext());
+            } else {
+
+            }
+
+            result.close();
+
+            result.close();
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

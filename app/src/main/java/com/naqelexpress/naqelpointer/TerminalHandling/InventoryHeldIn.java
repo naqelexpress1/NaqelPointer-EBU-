@@ -163,6 +163,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
+        bringdata.setVisibility(View.GONE);
 
 //        try {
 //            JSONObject jsonObject = new JSONObject();
@@ -547,7 +548,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                     jsonObject.put("IsSync", false);
                     jsonObject.put("EmployID", GlobalVar.GV().EmployID);
                     jsonObject.put("Date", DateTime.now());
-                    jsonObject.put("TerminalHandlingScanStatusID", 20);
+                    jsonObject.put("TerminalHandlingScanStatusID", 23);
                     jsonObject.put("TerminalHandlingScanStatusReasonID", Integer.parseInt(temp.get("Status")));
                     jsonObject.put("AppVersion", GlobalVar.GV().AppVersion);
                     jsonObject.put("Latitude", String.valueOf(Latitude));

@@ -38,9 +38,11 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -64,7 +66,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation extends AppCompatActivity implements View.OnClickListener {
+public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatActivity implements View.OnClickListener {
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
@@ -94,6 +96,9 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
         inserteddate = (TextView) findViewById(R.id.inserteddate);
         validupto = (TextView) findViewById(R.id.validupto);
+        rtoreqcount.setVisibility(View.GONE);
+        inserteddate.setVisibility(View.GONE);
+        validupto.setVisibility(View.GONE);
 
         lbTotal.setText("");
 
@@ -113,27 +118,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        // isNetworkAvailable();
-        //Commented for checking force close issues
-        // isDeviceonline();
 
-
-//        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
-//        txtBarCode.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (txtBarCode != null && txtBarCode.getText().length() == 13)
-//                    AddNewPiece();
-//            }
-//        });
 
         txtBarCode.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -155,11 +140,11 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GlobalVar.GV().checkPermission(InventoryControl_LocalValidation.this, GlobalVar.PermissionType.Camera)) {
+                if (!GlobalVar.GV().checkPermission(InventoryControl_LocalValidationReleaseWaybills.this, GlobalVar.PermissionType.Camera)) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(InventoryControl_LocalValidation.this, GlobalVar.PermissionType.Camera);
+                    GlobalVar.GV().askPermission(InventoryControl_LocalValidationReleaseWaybills.this, GlobalVar.PermissionType.Camera);
                 } else {
-                    Intent intent = new Intent(InventoryControl_LocalValidation.this, NewBarCodeScanner.class);
+                    Intent intent = new Intent(InventoryControl_LocalValidationReleaseWaybills.this, NewBarCodeScanner.class);
                     startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                 }
             }
@@ -173,32 +158,13 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
             @Override
             public void onClick(View v) {
 
-                try {
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("OriginID", 0);
-                    jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                    new BringNCLData().execute(jsonObject.toString());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                UserME nclNoReq = new UserME();
+                nclNoReq.EmployID = GlobalVar.GV().EmployID;
+
+                OnHoldNCL(nclNoReq);
             }
         });
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
-        Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
-        if (result.getCount() > 0) {
-            ReadFromLocal(result, dbConnections);
 
-        } else {
-            try {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("OriginID", 0);
-                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                new BringNCLData().execute(jsonObject.toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
 
     }
 
@@ -212,6 +178,118 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         //initSwipe();
+    }
+
+    public void OnHoldNCL(UserME nclNoRequest) {
+        String jsonData = JsonSerializerDeserializer.serialize(nclNoRequest, true);
+        new OnHoldWaybills().execute(jsonData);
+
+    }
+
+    private class OnHoldWaybills extends AsyncTask<String, Void, String> {
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+
+        @Override
+        protected void onPreExecute() {
+            //progressDialog = ProgressDialog.show(getContext().getApplicationContext(), "Please wait.", "Ncl No Generating.", true);
+
+            progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
+            //progressDialog.setMax(100);
+            progressDialog.setMessage("Please wait.");
+            progressDialog.setTitle("Collecting OnHold Waybills.");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "ReleaseonHoldShipments");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            progressDialog.dismiss();
+            super.onPostExecute(String.valueOf(finalJson));
+            if (finalJson != null) {
+
+                JSONObject jsonObject = null;
+                try {
+                    jsonObject = new JSONObject(finalJson);
+                    fetchonhlodshipments(jsonObject.getJSONArray("ReleaseWaybills"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public static ArrayList<String> pieceDenied = new ArrayList<>();
+
+    private void fetchonhlodshipments(JSONArray waybills) {
+
+        for (int i = 0; i < waybills.length(); i++) {
+            //generate some values
+            try {
+                JSONObject jsonObject1 = waybills.getJSONObject(i);
+                pieceDenied.add(jsonObject1.getString("BarCode"));
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        delreqcount.setText("Bayan Count : " + String.valueOf(waybills.length()));
+
+
     }
 
     @Override
@@ -261,18 +339,24 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         //isConnected();
 //        isNetworkAvailable();
 
-        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ",""))) { //validupto.getText().toString()
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
-                return;
-            }
-        } else {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
-            return;
-        }
+//        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
+//            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ",""))) { //validupto.getText().toString()
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
+//                return;
+//            }
+//        } else {
+//            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//            GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
+//            return;
+//        }
 
+        if (pieceDenied.contains(txtBarCode.getText().toString())) {
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+            ErrorAlert("Info",
+                    "Bayan Created for this Piece Barcode(" + txtBarCode.getText().toString() + ")"
+            );
+        }
 
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
@@ -427,7 +511,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_LocalValidation.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this);
                     builder.setTitle("Confirm Deleting")
                             .setMessage("Are you sure you want to delete?")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -495,13 +579,13 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
+                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
                 return true;
             case R.id.manual:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to upload Manual?", 3, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
+                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
                 return true;
 
             default:
@@ -630,7 +714,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                     jsonObject.put("StatusID", 0);
                     jsonObject.put("UserID", GlobalVar.GV().UserID);
                     jsonObject.put("stationID", GlobalVar.GV().StationID);
-                    jsonObject.put("Reference", temp.get("Ref"));
+                    jsonObject.put("Reference", temp.get("Ref") + " Held by Customs Required ID ");
 
                     jsonArray.put(jsonObject);
 
@@ -651,7 +735,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
                 startService(
-                        new Intent(InventoryControl_LocalValidation.this,
+                        new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                                 com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
             }
             if (clear == 1)
@@ -685,7 +769,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
                 if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                     startService(
-                            new Intent(InventoryControl_LocalValidation.this,
+                            new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandling.class));
                 }
             }
@@ -760,7 +844,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
 
@@ -860,7 +944,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                         // handler.removeCallbacksAndMessages(null);
                         // isdeviceonlinehandler.removeCallbacksAndMessages(null);
                         //countDownTimer.cancel();
-                        InventoryControl_LocalValidation.super.onBackPressed();
+                        InventoryControl_LocalValidationReleaseWaybills.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -886,7 +970,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         protected void onPreExecute() {
 
             if (progressDialog == null)
-                progressDialog = ProgressDialog.show(InventoryControl_LocalValidation.this,
+                progressDialog = ProgressDialog.show(InventoryControl_LocalValidationReleaseWaybills.this,
                         "Please wait.", "Bringing Delivery Request data...", true);
             super.onPreExecute();
 
@@ -1089,7 +1173,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void LoadDivisionError(final int callfunction) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Something went wrong");
         alertDialog.setMessage("Kindly Check your Internet Connection,Scan Inventory press Cancel");
@@ -1118,7 +1202,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1156,11 +1240,11 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         somethingwrong = false;
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         ids.clear();
@@ -1258,7 +1342,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
             }
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
 //            startService(
@@ -1271,7 +1355,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1304,7 +1388,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         }
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
     }
@@ -1356,7 +1440,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
         dbConnections.deleteUserME(GlobalVar.GV().EmployID);
 
-        ActivityCompat.finishAffinity(InventoryControl_LocalValidation.this);
+        ActivityCompat.finishAffinity(InventoryControl_LocalValidationReleaseWaybills.this);
         Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
         startActivity(intent);
 
@@ -1419,7 +1503,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 //                progressDialog = ProgressDialog.show(InventoryControlOnetab.this,
 //                        "Please wait.", "Your data is inserting by Manual...", true);
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidation.this);
+                progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
                 progressDialog.setMessage("your request is being process...");
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progressDialog.setMax(100);
@@ -1613,7 +1697,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
             uploaddatacount = 0;
             if (progressDialog == null) {
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidation.this);
+                progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
                 progressDialog.setTitle("Request is being process,please wait...");
                 progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -1746,7 +1830,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                             "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
                     );
                     startService(
-                            new Intent(InventoryControl_LocalValidation.this,
+                            new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
                 } else {
                     ErrorAlert("No Data",
@@ -1769,7 +1853,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     private void insertManual1() {
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         try {

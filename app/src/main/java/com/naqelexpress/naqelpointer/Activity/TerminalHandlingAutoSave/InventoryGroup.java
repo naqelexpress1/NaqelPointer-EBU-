@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -14,13 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.TerminalHandling.TerminalHandling;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -176,7 +170,8 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.heldin:
 
-                Intent heldin = new Intent(InventoryGroup.this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldIn.class);
+                Intent heldin = new Intent(InventoryGroup.this,
+                        com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldIn.class);
                 startActivity(heldin);
 
                 break;
@@ -209,10 +204,18 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
 
         //Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControlOnetab.class); //com.naqelexpress.naqelpointer.TerminalHandling.
-       /// Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
-        Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationReleaseWaybills.class); //com.naqelexpress.naqelpointer.TerminalHandling.
-        intent.putExtras(bundle);
-        startActivity(intent);
+        // Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+        if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+            Intent intent = new Intent(this,
+                    com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationReleaseWaybills.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+            intent.putExtras(bundle);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(this,
+                    com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
 
 
     }

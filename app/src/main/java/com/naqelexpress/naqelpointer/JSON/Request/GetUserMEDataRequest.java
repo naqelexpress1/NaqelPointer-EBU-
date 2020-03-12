@@ -11,5 +11,6 @@ public class GetUserMEDataRequest {
     public String DeviceToken = "";
     public String AndroidID = "";
     public int FacilityID = 0;
+    public int Odometer = 0;
 
 }

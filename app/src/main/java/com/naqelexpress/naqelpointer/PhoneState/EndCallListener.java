@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.PhoneState;
 
+import android.content.Intent;
 import android.telephony.PhoneStateListener;
 import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
@@ -19,6 +20,7 @@ class EndCallListener extends PhoneStateListener {
         if (TelephonyManager.CALL_STATE_RINGING == state) {
             Log.i("", "RINGING, number: " + incomingNumber);
         }
+
         if (TelephonyManager.CALL_STATE_OFFHOOK == state) {
             //wait for phone to go offhook (probably set a boolean flag) so you know your app initiated the call.
             Log.i("", "OFFHOOK");

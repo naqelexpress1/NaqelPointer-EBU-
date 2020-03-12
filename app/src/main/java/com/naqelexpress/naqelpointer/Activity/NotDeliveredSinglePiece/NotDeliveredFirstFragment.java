@@ -21,13 +21,10 @@ import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialogReason;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
-import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -186,8 +183,6 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
 //            });
 
 
-
-
             Bundle bundle = getArguments();
 
             if (bundle != null) {
@@ -316,6 +311,7 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
     private void opencalender() {
 
         Calendar now = Calendar.getInstance();
+        now.add(Calendar.DATE, 1);
         DatePickerDialog dpd = DatePickerDialog.newInstance(
                 NotDeliveredFirstFragment.this,
                 now.get(Calendar.YEAR), // Initial year selection
@@ -325,7 +321,6 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
         );
 
         dpd.setMinDate(now);
-
         dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
     }
 

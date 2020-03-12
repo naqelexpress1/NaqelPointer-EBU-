@@ -1,12 +1,14 @@
 package com.naqelexpress.naqelpointer.Activity.PickUp;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -379,7 +381,7 @@ public class PickUpFirstFragment
         final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "Please wait.", "Downloading Client Details.", true);
 
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "BringLoadType";
+        String URL = GlobalVar.GV().NaqelPointerAPILink + "BringLoadTypeValidateClient"; //BringLoadType
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -397,6 +399,20 @@ public class PickUpFirstFragment
                             HashMap<String, String> temp = new HashMap<>();
                             temp.put("LoadTypeID", String.valueOf(jsonObject.get("LoadTypeID")));
                             temp.put("Name", String.valueOf(jsonObject.get("Name")));
+                            if(jsonObject.getInt("BlockClient") == 1)
+                            {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("Info")
+                                        .setMessage("Mentioned Client is Block,kindly contact Operational team.")
+                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int which) {
+                                                getActivity().finish();
+                                            }
+                                        }).setNegativeButton("Cancel", null).setCancelable(false);
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
+                            }
                             clientdetails.add(temp);
                         }
 

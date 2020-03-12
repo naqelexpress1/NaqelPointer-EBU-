@@ -1,24 +1,31 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,9 +37,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
+import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -51,16 +60,18 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import Error.ErrorReporter;
+
 // Created by Ismail on 21/03/2018.
 
-public class InventoryHeldInOld extends AppCompatActivity implements View.OnClickListener {
+public class InventoryHeldInOLD extends AppCompatActivity implements View.OnClickListener {
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
     HashMap<String, String> trips = new HashMap<>();
-    TextView lbTotal;
-    private EditText txtBarCode, txtbinlocation;
+    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto;
+    private EditText txtBarCode;//, txtbinlocation;
     public ArrayList<String> inventorycontrol = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
@@ -73,30 +84,39 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        setContentView(R.layout.inventory);
-
-
-        //countDownTimer = new MyCountDownTimer(startTime, interval);
+        setContentView(R.layout.inventory_new);
 
         lbTotal = (TextView) findViewById(R.id.lbTotal);
-        lbTotal.setText("");
-        txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
-        txtBarCode.setKeyListener(null);
-        txtBarCode.setHint("Bin / Piece Barcode");
-        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25)});
-        txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
-        txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
-        txtbinlocation.setKeyListener(null);
-        txtbinlocation.setVisibility(View.GONE);
+        delreqcount = (TextView) findViewById(R.id.delreqcount);
+        rtoreqcount = (TextView) findViewById(R.id.rtoreqcount);
 
+        inserteddate = (TextView) findViewById(R.id.inserteddate);
+        validupto = (TextView) findViewById(R.id.validupto);
+
+        lbTotal.setText("");
+
+        txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
+        txtBarCode.setHint("Bin / Piece Barcode");
+        txtBarCode.setKeyListener(null);
+        txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
+        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25)});
+        // txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
+        // txtbinlocation.setKeyListener(null);
+
+        //txtbinlocation.setVisibility(View.GONE);
+
+        //checkinternetAvailability();
+        //isConnected();
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-
+        // isNetworkAvailable();
+        //Commented for checking force close issues
         // isDeviceonline();
+
 
 //        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
 //        txtBarCode.addTextChangedListener(new TextWatcher() {
@@ -130,20 +150,20 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 return false;
             }
         });
+
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GlobalVar.GV().checkPermission(InventoryHeldInOld.this, GlobalVar.PermissionType.Camera)) {
+                if (!GlobalVar.GV().checkPermission(InventoryHeldInOLD.this, GlobalVar.PermissionType.Camera)) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(InventoryHeldInOld.this, GlobalVar.PermissionType.Camera);
+                    GlobalVar.GV().askPermission(InventoryHeldInOLD.this, GlobalVar.PermissionType.Camera);
                 } else {
-                    Intent intent = new Intent(InventoryHeldInOld.this, NewBarCodeScanner.class);
+                    Intent intent = new Intent(InventoryHeldInOLD.this, NewBarCodeScanner.class);
                     startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                 }
             }
         });
-
 
         Intent intent = getIntent();
         trips = (HashMap<String, String>) intent.getSerializableExtra("tripdata");
@@ -163,20 +183,25 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 }
             }
         });
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
+        Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
+        if (result.getCount() > 0) {
+            ReadFromLocal(result, dbConnections);
 
-//        try {
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("OriginID", 0);
-//            jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-//            new BringNCLData().execute(jsonObject.toString());
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-
-        initViews();
-        // refreshData();
+        } else {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("OriginID", 0);
+                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                new BringNCLData().execute(jsonObject.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
+
 
     private void initViews() {
         recyclerView = (RecyclerView) findViewById(R.id.card_recycler_view);
@@ -186,7 +211,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         adapter = new DataAdapter(inventorycontrol);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        // initSwipe();
+        //initSwipe();
     }
 
     @Override
@@ -207,22 +232,57 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         }
     }
 
+    /*  public boolean isNetworkAvailable() {
+
+          try {
+              HttpURLConnection urlc = (HttpURLConnection)
+                      (new URL("http://clients3.google.com/generate_204")
+                              .openConnection());
+              urlc.setRequestProperty("User-Agent", "Android");
+              urlc.setRequestProperty("Connection", "close");
+              urlc.setConnectTimeout(1500);
+              urlc.connect();
+  //                return (urlc.getResponseCode() == 204 &&
+  //                        urlc.getContentLength() == 0);
+              if (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0) {
+                  txtbinlocation.setText("Device is Online!");
+                  return true;
+              }
+          } catch (IOException e) {
+              Log.e("", "Error checking internet connection", e);
+              txtbinlocation.setText("Error checking internet connection!");
+          }
+
+          txtbinlocation.setText("No Internet!");
+          return false;
+      }
+  */
     private void AddNewPiece() {
-//        if (inventorycontrol.size() == 50) {
-//            ErrorAlert("Info", "Kindly save the Data and Scan Again");
-//            return;
-//        }
+        //isConnected();
+//        isNetworkAvailable();
+
+        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
+            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
+                return;
+            }
+        } else {
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            GlobalVar.RedirectSettings(InventoryHeldInOLD.this);
+            return;
+        }
 
 
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+
             lbTotal.setText(txtBarCode.getText().toString());
-            txtBarCode.setText("");
             txtBarCode.requestFocus();
+            txtBarCode.setText("");
             inventorycontrol.clear();
             initViews();
             return;
         }
-
 
         try {
             double convert = Double.parseDouble(txtBarCode.getText().toString());
@@ -236,6 +296,12 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             return;
         }
 
+        if (txtBarCode.getText().toString().length() <= 12) {
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            return;
+        }
         if (lbTotal.getText().toString().replace(" ", "").length() == 0) {
             GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan Bin Location",
@@ -246,11 +312,11 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             return;
         }
 
+
         boolean rtoreq = false;
         if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
             if (isrtoReq.contains(txtBarCode.getText().toString())) {
                 rtoreq = true;
-
 
                 if (!isHeldout.contains(txtBarCode.getText().toString())) {
                     isHeldout.add(txtBarCode.getText().toString());
@@ -260,11 +326,11 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                     temp.put("Ref", "Request For Delivery & RTO");
                     delrtoreq.add(temp);
                     inventorycontrol.add(txtBarCode.getText().toString());
-
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
                     initViews();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                } else
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                }
                 ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0, txtBarCode.getText().toString());
 
             } else {
@@ -278,10 +344,11 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                     delrtoreq.add(temp);
                     inventorycontrol.add(txtBarCode.getText().toString());
                     initViews();
-
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                } else
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                }
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                 ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
             }
 
@@ -300,10 +367,11 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                     delrtoreq.add(temp);
                     inventorycontrol.add(txtBarCode.getText().toString());
                     initViews();
-
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                } else
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+                }
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
                 ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0, txtBarCode.getText().toString());
                 return;
             }
@@ -311,6 +379,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 13) {
+
                 // SaveData(txtBarCode.getText().toString());
 
                 HashMap<String, String> temp = new HashMap<>();
@@ -320,12 +389,17 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 delrtoreq.add(temp);
 
                 inventorycontrol.add(0, txtBarCode.getText().toString());
-//                lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
+                // lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
                 txtBarCode.setText("");
                 txtBarCode.requestFocus();
                 initViews();
-//                if (inventorycontrol.size() > 5)
-//                    inventorycontrol.remove(5);
+                // if (inventorycontrol.size() > 5)
+                //     inventorycontrol.remove(5);
+            } else {
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                txtBarCode.setText("");
+                txtBarCode.requestFocus();
+                return;
             }
         } else {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
@@ -340,7 +414,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
     }
 
-  /*  private void initSwipe() {
+    private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)//| ItemTouchHelper.RIGHT)
         {
             @Override
@@ -353,14 +427,14 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryHeldIn.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryHeldInOLD.this);
                     builder.setTitle("Confirm Deleting")
                             .setMessage("Are you sure you want to delete?")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int which) {
                                     adapter.removeItem(position);
-                                   // lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
+                                    lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
                                 }
                             })
                             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -404,7 +478,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }*/
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -421,14 +495,15 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryHeldInOld.this);
+                    GlobalVar.RedirectSettings(InventoryHeldInOLD.this);
                 return true;
             case R.id.manual:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to upload Manual?", 3, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryHeldInOld.this);
+                    GlobalVar.RedirectSettings(InventoryHeldInOLD.this);
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -518,6 +593,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         dbConnections.close();
     }*/
 
+
     private void SaveData(int clear) { //43 heldin , 44 heldout
 
         if (delrtoreq.size() == 0) {
@@ -526,7 +602,6 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             );
             return;
         }
-
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
             requestLocation();
@@ -576,15 +651,15 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
                 startService(
-                        new Intent(InventoryHeldInOld.this,
+                        new Intent(InventoryHeldInOLD.this,
                                 com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
             }
             if (clear == 1)
                 finish();
             else if (clear == 2) {
                 delrtoreq.clear();
-                inventorycontrol.clear();
-                initViews();
+                //inventorycontrol.clear();
+                //initViews();
             }
 
         }
@@ -598,7 +673,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             requestLocation();
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
-                            String.valueOf(Longitude), 43, lbTotal.getText().toString()
+                            String.valueOf(Longitude), 0, lbTotal.getText().toString()
                             , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
@@ -610,7 +685,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
                 if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                     startService(
-                            new Intent(InventoryHeldInOld.this,
+                            new Intent(InventoryHeldInOLD.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandling.class));
                 }
             }
@@ -620,7 +695,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
 
     private void resetAllData() {
-        lbTotal.setText(getString(R.string.lbCount) + " 0");
+        // lbTotal.setText(getString(R.string.lbCount) + " 0");
         inventorycontrol.clear();
         delrtoreq.clear();
         adapter.notifyDataSetChanged();
@@ -685,7 +760,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryHeldInOld.this,
+                    new Intent(InventoryHeldInOLD.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
 
@@ -728,13 +803,32 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             isrtoReq = savedInstanceState.getStringArrayList("isrtoReq");
             isHeldout = savedInstanceState.getStringArrayList("isHeldout");
             isdeliveryReq = savedInstanceState.getStringArrayList("isdeliveryReq");
+            lbTotal.setText(savedInstanceState.getString("bin"));
+            inventorycontrol = savedInstanceState.getStringArrayList("inventorycontrol");
 
+            inserteddate.setText(savedInstanceState.getString("inserteddate"));
+            validupto.setText(savedInstanceState.getString("validupto"));
+            delreqcount.setText(savedInstanceState.getString("delreqcount"));
+            rtoreqcount.setText(savedInstanceState.getString("rtoreqcount"));
+
+            initViews();
+
+//            try {
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("OriginID", 0);
+//                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+//                new BringNCLData().execute(jsonObject.toString());
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        //isdeliveryReq.clear();
+        //isrtoReq.clear();
         outState.putInt("EmployID", GlobalVar.GV().EmployID);
         outState.putInt("UserID", GlobalVar.GV().UserID);
         outState.putInt("StationID", GlobalVar.GV().StationID);
@@ -745,6 +839,12 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         outState.putStringArrayList("isdeliveryReq", isdeliveryReq);
         outState.putStringArrayList("isHeldout", isHeldout);
         outState.putStringArrayList("isrtoReq", isrtoReq);
+        outState.putString("bin", lbTotal.getText().toString());
+        outState.putString("inserteddate", inserteddate.getText().toString());
+        outState.putString("validupto", validupto.getText().toString());
+        outState.putString("delreqcount", delreqcount.getText().toString());
+        outState.putString("rtoreqcount", rtoreqcount.getText().toString());
+        outState.putStringArrayList("inventorycontrol", inventorycontrol);
 
     }
 
@@ -757,9 +857,10 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        //countDownTimer.cancel();
+                        // handler.removeCallbacksAndMessages(null);
                         // isdeviceonlinehandler.removeCallbacksAndMessages(null);
-                        InventoryHeldInOld.super.onBackPressed();
+                        //countDownTimer.cancel();
+                        InventoryHeldInOLD.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -785,7 +886,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         protected void onPreExecute() {
 
             if (progressDialog == null)
-                progressDialog = ProgressDialog.show(InventoryHeldInOld.this,
+                progressDialog = ProgressDialog.show(InventoryHeldInOLD.this,
                         "Please wait.", "Bringing Delivery Request data...", true);
             super.onPreExecute();
 
@@ -805,9 +906,9 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(120000);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
-                httpURLConnection.setConnectTimeout(60000);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -852,9 +953,65 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             if (result != null) {
 
                 try {
+
+                    // JsonObject convertedObject = new Gson().fromJson(result, JsonObject.class);
+                    //JsonObject jsonObject = (JsonObject) new JsonParser().parse("YourJsonString");
+
+
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.getBoolean("HasError")) {
-                        fetchData(jsonObject);
+                        //fetchData(jsonObject);
+                        try {
+
+
+                            JSONArray deliveryReq = jsonObject.getJSONArray("DeliveryReq");
+
+                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                            dbConnections.deleteDeliverRtoReqData(getApplicationContext());
+
+                            if (deliveryReq.length() > 0) {
+
+                                dbConnections.insertDelBulk(deliveryReq, getApplicationContext());
+                                // isdeliveryReq.clear();
+//                                for (int i = 0; i < deliveryReq.length(); i++) {
+//                                    JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
+//                                    // isdeliveryReq.add(jsonObject1.getString("WayBillNo"));
+//                                    // isdeliveryReq.add(jsonObject1.getString("WayBillNo"));
+//                                    // isdeliveryReq.add(jsonObject1.getString("BarCode"));
+//                                    // String insertdata[] = jsonObject1.getString("InsertedDate").split("T");
+//                                    dbConnections.InsertDeliverReq(jsonObject1.getInt("WayBillNo"),
+//                                            jsonObject1.getString("BarCode"), GlobalVar.GV().getDateAdd1Day() + " 16:30:", getApplicationContext());
+//
+//                                    //tripdata.add(temp);
+//                                }
+                            }
+
+                            JSONArray rtoreq = jsonObject.getJSONArray("RTOReq");
+
+                            int rtolength = rtoreq.length();
+                            if (rtolength > 0) {
+                                dbConnections.insertReqBulk(rtoreq, getApplicationContext());
+//                                // isrtoReq.clear();
+//                                for (int i = 0; i < 1; i++) {
+//                                    JSONObject jsonObject1 = rtoreq.getJSONObject(i);
+////                    isrtoReq.add(jsonObject1.getString("WayBillNo"));
+//                                    // isrtoReq.add(jsonObject1.getString("BarCode"));
+//                                    //tripdata.add(temp);
+//                                    //String insertdata[] = jsonObject1.getString("InsertedDate").split("T");
+//                                    dbConnections.InsertRtoReq(jsonObject1.getInt("WayBillNo"),
+//                                            jsonObject1.getString("BarCode"), GlobalVar.GV().getDateAdd1Day() + " 16:30:", getApplicationContext());
+//
+//                                }
+                            }
+
+
+                            Cursor delreq = dbConnections.Fill("select * from RtoReq", getApplicationContext());
+                            ReadFromLocal(delreq, dbConnections);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
                     }
 
@@ -865,7 +1022,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                 System.out.println(result);
             } else {
 
-                LoadDivisionError();
+                LoadDivisionError(0);
             }
             if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
@@ -878,18 +1035,25 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
     private void fetchData(JSONObject jsonObject) {
 
-
         try {
+
 
             JSONArray deliveryReq = jsonObject.getJSONArray("DeliveryReq");
 
-            if (deliveryReq.length() > 0) {
-                isdeliveryReq.clear();
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.deleteDeliverRtoReqData(getApplicationContext());
 
+            if (deliveryReq.length() > 0) {
+
+                // isdeliveryReq.clear();
                 for (int i = 0; i < deliveryReq.length(); i++) {
                     JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
-//                    isdeliveryReq.add(jsonObject1.getString("WayBillNo"));
-                    isdeliveryReq.add(jsonObject1.getString("BarCode"));
+                    // isdeliveryReq.add(jsonObject1.getString("WayBillNo"));
+                    // isdeliveryReq.add(jsonObject1.getString("WayBillNo"));
+                    // isdeliveryReq.add(jsonObject1.getString("BarCode"));
+                    // String insertdata[] = jsonObject1.getString("InsertedDate").split("T");
+                    dbConnections.InsertDeliverReq(jsonObject1.getInt("WayBillNo"),
+                            jsonObject1.getString("BarCode"), GlobalVar.GV().getDateAdd1Day() + " 16:30:", getApplicationContext());
 
                     //tripdata.add(temp);
                 }
@@ -897,16 +1061,25 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
             JSONArray rtoreq = jsonObject.getJSONArray("RTOReq");
 
-            if (rtoreq.length() > 0) {
-                isrtoReq.clear();
-                for (int i = 0; i < rtoreq.length(); i++) {
+            int rtolength = rtoreq.length();
+            if (rtolength > 0) {
+
+                // isrtoReq.clear();
+                for (int i = 0; i < 1; i++) {
                     JSONObject jsonObject1 = rtoreq.getJSONObject(i);
 //                    isrtoReq.add(jsonObject1.getString("WayBillNo"));
-                    isrtoReq.add(jsonObject1.getString("BarCode"));
+                    // isrtoReq.add(jsonObject1.getString("BarCode"));
                     //tripdata.add(temp);
+                    //String insertdata[] = jsonObject1.getString("InsertedDate").split("T");
+                    dbConnections.InsertRtoReq(jsonObject1.getInt("WayBillNo"),
+                            jsonObject1.getString("BarCode"), GlobalVar.GV().getDateAdd1Day() + " 16:30:", getApplicationContext());
+
                 }
             }
 
+
+            Cursor result = dbConnections.Fill("select * from RtoReq", getApplicationContext());
+            ReadFromLocal(result, dbConnections);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -915,26 +1088,27 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
     }
 
-    private void LoadDivisionError() {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOld.this).create();
+    private void LoadDivisionError(final int callfunction) {
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOLD.this).create();
         alertDialog.setCancelable(false);
-        alertDialog.setTitle("Info.");
-        alertDialog.setMessage("Kindly Check your Internet Connection,please try again");
+        alertDialog.setTitle("Something went wrong");
+        alertDialog.setMessage("Kindly Check your Internet Connection,Scan Inventory press Cancel");
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        try {
-                            JSONObject jsonObject = new JSONObject();
-                            jsonObject.put("OriginID", 0);
-                            jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                            new BringNCLData().execute(jsonObject.toString());
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        if (callfunction == 0)
+                            try {
+                                JSONObject jsonObject = new JSONObject();
+                                jsonObject.put("OriginID", 0);
+                                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                                new BringNCLData().execute(jsonObject.toString());
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         dialog.dismiss();
                     }
                 });
-        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Close",
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -944,7 +1118,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
     }
 
     private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOld.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOLD.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -955,7 +1129,10 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                         if (clear == 0) {
                             txtBarCode.setText("");
                             txtBarCode.requestFocus();
-                        } else if (clear == 2)
+                        }
+                        // if (piececode.length() > 0)
+                        //     SaveData(piececode, title);
+                        else if (clear == 2)
                             SaveData(1);
                         else if (clear == 3)
                             insertManual1();
@@ -963,184 +1140,27 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                         if (delrtoreq.size() == 20) {
                             SaveData(2);
                         }
-//                        if (piececode.length() > 0)
-//                            SaveData(piececode, title);
+
                     }
                 });
 
         alertDialog.show();
-    }
-
-    private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOld.this).create();
-        alertDialog.setCancelable(false);
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-
-        alertDialog.show();
-    }
-
-    private void SaveData(String PieceCode, String req) {
-
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-
-        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
-                (20, String.valueOf(Latitude),
-                        String.valueOf(Longitude), 44, req
-                        , "", 0);
-
-        if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
-            int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
-
-            CheckPointBarCodeDetails waybills = new CheckPointBarCodeDetails(PieceCode, ID);
-            dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
-
-        }
-        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
-            startService(
-                    new Intent(InventoryHeldInOld.this,
-                            com.naqelexpress.naqelpointer.service.TerminalHandling.class));
-        }
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getApplication()
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager
-                .getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //private long startTime = 30 * 60 * 1000; // 15 MINS IDLE TIME
-    //private final long interval = 1 * 1000;
-    //MyCountDownTimer countDownTimer;
-
- /*   public class MyCountDownTimer extends CountDownTimer {
-        public MyCountDownTimer(long startTime, long interval) {
-            super(startTime, interval);
-        }
-
-        @Override
-        public void onFinish() {
-            //DO WHATEVER YOU WANT HERE
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-            UserMeLogin userMeLogin = new UserMeLogin(id);
-            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
-
-            ActivityCompat.finishAffinity(InventoryHeldIn.this);
-            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-            startActivity(intent);
-        }
-
-        @Override
-        public void onTick(long millisUntilFinished) {
-        }
-    }*/
-
-    @Override
-    public void onUserInteraction() {
-
-        super.onUserInteraction();
-
-        //Reset the timer on user interaction...
-        //countDownTimer.cancel();
-        //countDownTimer.start();
-    }
-
-    Handler handler;
-
-  /*  private void refreshData() {
-        handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                // new DownloadJSON().execute();
-                try {
-                    try {
-                        JSONObject jsonObject = new JSONObject();
-                        jsonObject.put("OriginID", 0);
-                        jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                        new BringNCLData().execute(jsonObject.toString());
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-                    handler.postDelayed(this, 15 * 60 * 1000);
-                } catch (Exception e) {
-
-                    handler.postDelayed(this, 15 * 60 * 1000);
-                    Log.e("Dashboard thread", e.toString());
-                }
-
-            }
-        }, 15 * 60 * 1000);
-    }*/
-
-    Handler isdeviceonlinehandler;
-
-    private void isDeviceonline() {
-        try {
-            isdeviceonlinehandler = new Handler();
-            isdeviceonlinehandler.postDelayed(new Runnable() {
-                public void run() {
-                    // new DownloadJSON().execute();
-                    try {
-
-                        try {
-                            HttpURLConnection urlc = (HttpURLConnection)
-                                    (new URL("http://clients3.google.com/generate_204")
-                                            .openConnection());
-                            urlc.setRequestProperty("User-Agent", "Android");
-                            urlc.setRequestProperty("Connection", "close");
-                            urlc.setConnectTimeout(1500);
-                            urlc.connect();
-                            if (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0) {
-                                txtbinlocation.setText("Device is Online!");
-
-                            } else
-                                txtbinlocation.setText("No Internet!");
-                        } catch (IOException e) {
-                            Log.e("", "Error checking internet connection", e);
-                            txtbinlocation.setText("No Internet,Error checking internet connection!");
-                        }
-
-                        isdeviceonlinehandler.postDelayed(this, 10000);
-                    } catch (Exception e) {
-
-                        isdeviceonlinehandler.postDelayed(this, 10000);
-                        Log.e("Dashboard thread", e.toString());
-                    }
-
-                }
-            }, 10000);
-        } catch (Exception e) {
-
-        }
-
     }
 
     ArrayList<Integer> ids = new ArrayList<>();
     ArrayList<Integer> ids1 = new ArrayList<>();
+    int totalsize = 0;
+    boolean isRunning = false, somethingwrong = false;
 
     private void insertManual() {
+        somethingwrong = false;
 
         stopService(
-                new Intent(InventoryHeldInOld.this,
+                new Intent(InventoryHeldInOLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
         stopService(
-                new Intent(InventoryHeldInOld.this,
+                new Intent(InventoryHeldInOLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         ids.clear();
@@ -1149,7 +1169,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
             Cursor result = db.Fill("select * from CheckPoint where IsSync = 0 order by ID Limit 20 ", getApplicationContext());
-            int count = 0; //result.getCount()
+            int count = 0;//result.getCount()
             if (count > 0) {
 
                 JSONArray jsonArray = new JSONArray();
@@ -1203,59 +1223,236 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
 
             } else {
 
-                Cursor result1 = db.Fill("select * from TerminalHandling order by ID Limit 1 ", getApplicationContext());
+                Cursor loop = db.Fill("select * from TerminalHandling order by ID", getApplicationContext());
+                Cursor ts = db.Fill("select SUM(Count) As totalRecord  from TerminalHandling", getApplicationContext());
+                ts.moveToFirst();
+                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+                ts.close();
 
-                if (result1.getCount() > 0) {
+                if (loop.getCount() > 0) {
 
-                    if (result1.moveToFirst()) {
+                    loop.moveToFirst();
+                    do {
 
-
-                        String jsonData = result1.getString(result1.getColumnIndex("Json"));
-                        int ID = result1.getInt(result1.getColumnIndex("ID"));
+                        if (somethingwrong)
+                            break;
+                        String jsonData = loop.getString(loop.getColumnIndex("Json"));
+                        int jsonlegth = loop.getInt(loop.getColumnIndex("Count"));
+                        int ID = loop.getInt(loop.getColumnIndex("ID"));
                         ids.add(ID);
                         jsonData = jsonData.replace("Date(-", "Date(");
 
-                        new SaveAtTerminalHandling().execute(jsonData.toString());
-                    }
+
+                        new SaveAtTerminalHandling().execute(jsonData, String.valueOf(jsonlegth));
+
+
+                    } while (loop.moveToNext());
                 } else {
                     ErrorAlert("No Data",
                             "All Data Synchronized Successfully"
                     );
                 }
-            }
 
+                loop.close();
+
+
+            }
             startService(
-                    new Intent(InventoryHeldInOld.this,
+                    new Intent(InventoryHeldInOLD.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
-            startService(
-                    new Intent(InventoryHeldInOld.this,
-                            com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
+//            startService(
+//                    new Intent(InventoryControlOnetab.this,
+//                            com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
         } catch (Exception e) {
             System.out.println(e);
         }
 
     }
 
-    private class SaveAtTerminalHandling extends AsyncTask<String, Void, String> {
+    private void ErrorAlert(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryHeldInOLD.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void SaveData(String PieceCode, String req) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (20, String.valueOf(Latitude),
+                        String.valueOf(Longitude), 44, req
+                        , "", 0);
+
+        if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+            int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+
+            CheckPointBarCodeDetails waybills = new CheckPointBarCodeDetails(PieceCode, ID);
+            dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
+
+        }
+        if (!isMyServiceRunning(TerminalHandling.class)) {
+            startService(
+                    new Intent(InventoryHeldInOLD.this,
+                            com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+        }
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplication()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+   /* private long startTime = 1; // 15 MINS IDLE TIME
+    private final long interval = 1 * 1000;
+    MyCountDownTimer countDownTimer;
+
+    public class MyCountDownTimer extends CountDownTimer {
+        public MyCountDownTimer(long startTime, long interval) {
+            super(startTime, interval);
+        }
+
+        @Override
+        public void onFinish() {
+            //DO WHATEVER YOU WANT HERE
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+            UserMeLogin userMeLogin = new UserMeLogin(id);
+            dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+            dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+
+            ActivityCompat.finishAffinity(InventoryControlOnetab.this);
+            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+            startActivity(intent);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+        }
+    }*/
+
+    private void deleteEmploy() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
+        UserMeLogin userMeLogin = new UserMeLogin(id);
+        dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
+        dbConnections.deleteUserME(GlobalVar.GV().EmployID);
+
+        ActivityCompat.finishAffinity(InventoryHeldInOLD.this);
+        Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
+        startActivity(intent);
+
+    }
+
+    @Override
+    public void onUserInteraction() {
+
+        super.onUserInteraction();
+
+        // isdeviceonlinehandler.removeCallbacksAndMessages(null);
+        //Reset the timer on user interaction...
+        // countDownTimer.cancel();
+        // countDownTimer.start();
+    }
+
+    // Handler handler;
+    Handler isdeviceonlinehandler;
+
+   /* private void refreshData() {
+        handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // new DownloadJSON().execute();
+                try {
+                    try {
+                        JSONObject jsonObject = new JSONObject();
+                        jsonObject.put("OriginID", 0);
+                        jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                        new BringNCLData().execute(jsonObject.toString());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    handler.postDelayed(this, 15 * 60 * 1000);
+                } catch (Exception e) {
+
+                    handler.postDelayed(this, 15 * 60 * 1000);
+                    Log.e("Dashboard thread", e.toString());
+                }
+
+            }
+        }, 15 * 60 * 1000);
+    }*/
+
+    int uploaddatacount = 0;
+
+    private class SaveAtTerminalHandling extends AsyncTask<String, Integer, String> {
         String result = "";
         StringBuffer buffer;
         int id = 0;
         String jsonData = "";
 
+
         @Override
         protected void onPreExecute() {
 
-            if (progressDialog == null)
-                progressDialog = ProgressDialog.show(InventoryHeldInOld.this,
-                        "Please wait.", "Your data is inserting by Manual...", true);
+
+            if (progressDialog == null) {
+//                progressDialog = ProgressDialog.show(InventoryControlOnetab.this,
+//                        "Please wait.", "Your data is inserting by Manual...", true);
+
+                progressDialog = new ProgressDialog(InventoryHeldInOLD.this);
+                progressDialog.setMessage("your request is being process...");
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setIndeterminate(true);
+                progressDialog.show();
+
+            }
+
             super.onPreExecute();
 
         }
 
         @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
         protected String doInBackground(String... params) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             jsonData = params[0];
+            try {
+                uploaddatacount = uploaddatacount + Integer.parseInt(params[1]);
+            } catch (Exception e) {
+
+            }
 
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
@@ -1307,6 +1504,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             return null;
         }
 
+        @SuppressLint("WrongThread")
         @Override
         protected void onPostExecute(String finalJson) {
             try {
@@ -1334,24 +1532,75 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                         }
                     }
 
+                    publishProgress((int) ((uploaddatacount * 100) / totalsize));
                     super.onPostExecute(String.valueOf(finalJson));
 
+                } else {
+                    somethingwrong = true;
+                    LoadDivisionError(1);
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
                 }
+                isRunning = false;
 
-                insertManual();
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
+                //insertManual();
+                //publishProgress("" + (int) ((totalSize * 100) / FileSize));
+
+
+//                if (progressDialog != null && progressDialog.isShowing()) {
+//                    progressDialog.dismiss();
+//                    progressDialog = null;
+//                }
 
             } catch (Exception e) {
-                insertManual();
+                System.out.println(e);
+                //  insertManual();
             }
         }
     }
 
-    int totalsize = 0;
-    int uploaddatacount = 0;
+   /* private void isDeviceonline() {
+        try {
+            isdeviceonlinehandler = new Handler();
+            isdeviceonlinehandler.postDelayed(new Runnable() {
+                public void run() {
+                    try {
+
+                        try {
+                            HttpURLConnection urlc = (HttpURLConnection)
+                                    (new URL("http://clients3.google.com/generate_204")
+                                            .openConnection());
+                            urlc.setRequestProperty("User-Agent", "Android");
+                            urlc.setRequestProperty("Connection", "close");
+                            urlc.setConnectTimeout(1500);
+                            urlc.connect();
+
+                            if (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0) {
+                                txtbinlocation.setText("Device is Online!");
+
+                            } else
+                                txtbinlocation.setText("No Internet!");
+                        } catch (IOException e) {
+                            Log.e("", "Error checking internet connection", e);
+                            txtbinlocation.setText("No Internet,Error checking internet connection!");
+                        }
+
+                        isdeviceonlinehandler.postDelayed(this, 10000);
+                    } catch (Exception e) {
+
+                        isdeviceonlinehandler.postDelayed(this, 10000);
+                        Log.e("Dashboard thread", e.toString());
+                    }
+
+                }
+            }, 10000);
+        } catch (Exception e) {
+
+        }
+
+    }*/
 
     private class SaveAtTerminalHandlingbyManual extends AsyncTask<String, Integer, String> {
         String result = "";
@@ -1364,7 +1613,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
             uploaddatacount = 0;
             if (progressDialog == null) {
 
-                progressDialog = new ProgressDialog(InventoryHeldInOld.this);
+                progressDialog = new ProgressDialog(InventoryHeldInOLD.this);
                 progressDialog.setTitle("Request is being process,please wait...");
                 progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -1497,7 +1746,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
                             "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
                     );
                     startService(
-                            new Intent(InventoryHeldInOld.this,
+                            new Intent(InventoryHeldInOLD.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
                 } else {
                     ErrorAlert("No Data",
@@ -1520,7 +1769,7 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
     private void insertManual1() {
 
         stopService(
-                new Intent(InventoryHeldInOld.this,
+                new Intent(InventoryHeldInOLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         try {
@@ -1550,4 +1799,59 @@ public class InventoryHeldInOld extends AppCompatActivity implements View.OnClic
         }
 
     }
+
+    private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
+
+
+        isrtoReq.clear();
+        try {
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+
+                do {
+
+                    isrtoReq.add(result.getString(result.getColumnIndex("BarCode")));
+                    try {
+                        validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 16:30");
+                        inserteddate.setText("DLD : " + result.getString(result.getColumnIndex("InsertedDate")));
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+
+                } while (result.moveToNext());
+            }
+            result.close();
+
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq ", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                isdeliveryReq.clear();
+                cursor.moveToFirst();
+                do {
+
+                    isdeliveryReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    try {
+                        validupto.setText("Upto : " + cursor.getString(cursor.getColumnIndex("ValidDate")) + " 16:30");
+                        inserteddate.setText("DLD : " + cursor.getString(cursor.getColumnIndex("InsertedDate")));
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+                } while (cursor.moveToNext());
+            }
+
+
+            delreqcount.setText("DEL Count : " + String.valueOf(isdeliveryReq.size()));
+            rtoreqcount.setText("RTO Count : " + String.valueOf(isrtoReq.size()));
+
+            cursor.close();
+            result.close();
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }

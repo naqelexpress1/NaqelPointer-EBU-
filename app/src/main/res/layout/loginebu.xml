@@ -64,7 +64,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
         android:ems="10"
-        android:hint=""
+        android:hint="Enter truck ID"
         android:inputType="textAutoComplete"
         android:text=""
         app:layout_constraintHorizontal_bias="0.0"
@@ -73,6 +73,22 @@
         app:layout_constraintTop_toBottomOf="@+id/txtPassword"
         tools:ignore="HardcodedText,RtlHardcoded" />
 
+    <EditText
+        android:id="@+id/odometer"
+        style="@style/NaqelPointer.EditText"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Enter Odometer"
+        android:inputType="textAutoComplete"
+        android:text=""
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@+id/txtEmployID"
+        app:layout_constraintTop_toBottomOf="@+id/txtPassword"
+        tools:ignore="HardcodedText,RtlHardcoded" />
 
     <!--
 

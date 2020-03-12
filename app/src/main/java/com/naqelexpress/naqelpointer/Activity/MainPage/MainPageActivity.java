@@ -454,8 +454,8 @@ public class MainPageActivity
 //            cellIcon = new int[11];
 
         } else if (devision.equals("IRS")) {
-            cellTitle = new String[3];
-            cellIcon = new int[3];
+            cellTitle = new String[5];
+            cellIcon = new int[5];
         } else if (devision.equals("Express")) {
             if (menu == 0) {
                 cellTitle = new String[18];
@@ -601,15 +601,19 @@ public class MainPageActivity
             }
 
         }
+
         if (devision.equals("IRS")) {
             cellTitle[0] = getResources().getString(R.string.CustomsClearance);
             cellTitle[1] = getResources().getString(R.string.PickUpActivity);//CBU 5;
             cellTitle[2] = "Change Password";//CBU 5;
+            cellTitle[3] = "Hisory";//13
+            cellTitle[4] = "Terminal Handling";//13
 
             itemposition.put(0, 10);
             itemposition.put(1, 5);
             itemposition.put(2, 24);
-
+            itemposition.put(3, 13);
+            itemposition.put(4, 23);
         }
 
         if (devision.equals("Courier") || devision.equals("Express")) {
@@ -684,6 +688,8 @@ public class MainPageActivity
             cellIcon[0] = R.drawable.customclearence; //CBU
             cellIcon[1] = R.drawable.pickup; //CBU
             cellIcon[2] = R.drawable.contacts; //CBU
+            cellIcon[3] = R.drawable.pendingdata; //CBU
+            cellIcon[4] = R.drawable.terminalhandeling; //CBU
         }
         if (devision.length() > 0 && !devision.equals("0"))
             MainPageNavigation();

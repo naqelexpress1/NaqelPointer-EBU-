@@ -23,6 +23,8 @@ import com.naqelexpress.naqelpointer.Activity.Booking.BookingListAdapter;
 import com.naqelexpress.naqelpointer.Activity.MyRoute.RouteListAdapter;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointWaybillDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
@@ -71,6 +73,7 @@ public class History extends Activity {
         nodata = (TextView) findViewById(R.id.nodata);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
+
         ArrayAdapter<CharSequence> adapter;
         if (!GetDivision())
             adapter = ArrayAdapter.createFromResource(
@@ -101,12 +104,16 @@ public class History extends Activity {
             }
         });
 
+
         //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         //dbConnections.DeleteAllSyncData(getApplicationContext());
     }
 
     private void stopallservice() {
 
+        stopService(
+                new Intent(History.this,
+                        com.naqelexpress.naqelpointer.service.NclServiceBulk.class));
 
         stopService(
                 new Intent(History.this,
@@ -208,6 +215,9 @@ public class History extends Activity {
                 new Intent(History.this,
                         com.naqelexpress.naqelpointer.service.signature.class));
 
+        stopService(
+                new Intent(History.this,
+                        com.naqelexpress.naqelpointer.service.CheckPoint.class));
 
     }
 
@@ -280,6 +290,25 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetNightStock();
+            } else if (parent.getItemAtPosition(pos).toString().equals("CheckPoint")) {
+
+                ManualFunction = "CheckPoint";
+                //insertManual();
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetCheckPointData();
+
+            }
+            if (parent.getItemAtPosition(pos).toString().equals("Consolidation")) {
+
+                ManualFunction = "Consolidation";
+                //insertManual();
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetConsolidationList();
+
             }
 
 
@@ -312,6 +341,18 @@ public class History extends Activity {
 
     }
 
+    private void GetConsolidationList() {
+
+        mydeliverylist.addAll(GlobalVar.getNCLNotSyncData(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
+
+    }
+
     private ArrayList<String> getPickupPieces(int WaybillNo) {
 
         ArrayList<String> piececodes = new ArrayList<>();
@@ -335,6 +376,27 @@ public class History extends Activity {
         else
             GlobalVar.ShowDialog(History.this, "Info", "No Pieces under this " + String.valueOf(WaybillNo), true);
         return piececodes;
+    }
+
+    private void GetCheckPointData() {
+        // myBookingList.clear();
+        // mydeliverylist.addAll(GlobalVar.getDeliverySyncData(getApplicationContext()));getDeliveryHistory
+        mydeliverylist.addAll(GlobalVar.getCheckpointData(getApplicationContext()));
+
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getOnDeliveryPieces(mydeliverylist.get(position).ID, mydeliverylist.get(position).ItemNo);
+
+
+            }
+        });
     }
 
     private void GetOnDeliveryList() {
@@ -585,6 +647,10 @@ public class History extends Activity {
     }
 
     private void startAllService() {
+
+        stopService(
+                new Intent(History.this,
+                        com.naqelexpress.naqelpointer.service.NclServiceBulk.class));
 
         if (!GetDivision()) {
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.ArrivedatDest.class)) {
@@ -1434,6 +1500,17 @@ public class History extends Activity {
                         new Intent(History.this,
                                 com.naqelexpress.naqelpointer.service.NotDelivery.class));
                 ts = db.Fill("select Count(1) As totalRecord  from NotDelivered Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+            } else if (ManualFunction.equals("CheckPoint")) {
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.CheckPoint.class));
+                ts = db.Fill("select Count(1) As totalRecord  from CheckPoint Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+            } else if (ManualFunction.equals("Consolidation")) {
+                stopService(
+                        new Intent(History.this,
+                                com.naqelexpress.naqelpointer.service.NclServiceBulk.class));
+
+                ts = db.Fill("select Count(1) As totalRecord  from NCL where issync = 0 ", getApplicationContext());
             } else
                 return;
 
@@ -1455,6 +1532,8 @@ public class History extends Activity {
                         new SaveDeliverybyManualCBU().execute(String.valueOf(totalsize));
                 } else if (totalsize > 0 && ManualFunction.equals("Not Delivery"))
                     new SaveNotDeliverybyManual().execute(String.valueOf(totalsize));
+                else if (totalsize > 0 && ManualFunction.equals("CheckPoint"))
+                    new SyncCheckpointbyManual().execute(String.valueOf(totalsize));
                 else {
                     manualsyncbtn.setEnabled(true);
                     manualsyncbtn.setClickable(true);
@@ -1703,6 +1782,243 @@ public class History extends Activity {
                 } else {
                     ErrorAlert("No Data",
                             "All Not Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                }
+                ts.close();
+                db.close();
+                manualsyncbtn.setEnabled(true);
+                manualsyncbtn.setClickable(true);
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
+        }
+
+    }
+
+    private class SyncCheckpointbyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            moveddata = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(History.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+            int Limit = 1;
+            double loopcount = Float.parseFloat(params[0]) / 1f;
+            int loop = (int) Math.ceil(loopcount);
+            int Offset = 0;
+            String jsonData = "";
+            int ID = 0;
+
+            for (int i = 0; i < loop; i++) {
+
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+                Cursor result = db.Fill("select * from CheckPoint  Where IsSync = 0 Limit " + Limit, getApplicationContext()); //where IsSync = 0
+                result.moveToFirst();
+
+
+                final com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint();
+                checkPoint.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                ID = checkPoint.ID;
+                checkPoint.CheckPointTypeID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeID")));
+                checkPoint.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+                checkPoint.EmployID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
+                checkPoint.IsSync = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsSync")));
+                checkPoint.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                checkPoint.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                checkPoint.CheckPointTypeDetailID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
+                checkPoint.CheckPointTypeDDetailID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDDetailID")));
+                checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
+
+                Cursor resultDetail = db.Fill("select * from CheckPointWaybillDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
+                if (resultDetail.getCount() > 0) {
+                    resultDetail.moveToFirst();
+                    int index = 0;
+                    resultDetail.moveToFirst();
+                    do {
+                        checkPoint.CheckPointWaybillDetails.add(index,
+                                new CheckPointWaybillDetails(resultDetail.getString(resultDetail.getColumnIndex("WaybillNo")),
+                                        checkPoint.ID));
+                        index++;
+                    }
+                    while (resultDetail.moveToNext());
+                }
+
+                resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
+                if (resultDetail.getCount() > 0) {
+                    resultDetail.moveToFirst();
+                    int index = 0;
+                    resultDetail.moveToFirst();
+                    do {
+                        checkPoint.CheckPointBarCodeDetails.add(index, new CheckPointBarCodeDetails(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), checkPoint.ID));
+                        index++;
+                    }
+                    while (resultDetail.moveToNext());
+                }
+
+
+                jsonData = JsonSerializerDeserializer.serialize(checkPoint, true);
+                jsonData = jsonData.replace("Date(-", "Date(");
+                //SaveCheckPoint(db, jsonData, checkPoint.ID);
+
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "CheckPointByPieceLevel");
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setConnectTimeout(12000);
+                    httpURLConnection.setReadTimeout(12000);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+                try {
+                    //JSONObject jsonObject = new JSONObject(returnresult);
+
+                    try {
+                        if (returnresult.contains("Created")) {
+                            db.deleteCheckPointID(ID, getApplicationContext());
+                            db.deleteCheckPointWayBill(ID, getApplicationContext());
+                            db.deleteCheckPointBarcode(ID, getApplicationContext());
+
+                            moveddata = moveddata + result.getCount();
+                        }
+                        // db.close();
+                    } catch (Exception e) {
+
+//                            if (db != null)
+//                                db.close();
+                        e.printStackTrace();
+                        uploaddatacount = uploaddatacount + result.getCount();
+                    }
+
+
+                    uploaddatacount = uploaddatacount + result.getCount();
+                    publishProgress((int) ((uploaddatacount * 100) / totalsize));
+                    Offset = Offset + Limit;
+                } catch (Exception e) {
+                    //result.close();
+                    uploaddatacount = uploaddatacount + result.getCount();
+                }
+
+                if (result != null)
+                    result.close();
+            }
+
+            if (db != null)
+                db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select Count(1) As totalRecord  from CheckPoint Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+                ts.moveToFirst();
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    // StartOnDeliveryService();
+                    startService(
+                            new Intent(History.this,
+                                    com.naqelexpress.naqelpointer.service.CheckPoint.class));
+
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                } else {
+                    ErrorAlert("No Data",
+                            "All Checkpoint Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
                 }
                 ts.close();
                 db.close();

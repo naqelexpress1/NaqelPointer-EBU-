@@ -20,6 +20,8 @@ import com.naqelexpress.naqelpointer.R;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+//import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+
 // Created by Ismail on 21/03/2018.
 
 public class LinehaulGroup extends AppCompatActivity implements View.OnClickListener {
@@ -179,8 +181,13 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                 fetchgroup("5");
                 break;
             case R.id.ncl:
-                Intent intent = new Intent(this, NclShipmentActivity.class);
-                startActivity(intent);
+                if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent intent = new Intent(this, NclShipmentActivity.class);
+                    startActivity(intent);
+                } else {
+                    Intent intent = new Intent(this, com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity.class);
+                    startActivity(intent);
+                }
                 break;
             case R.id.loadtrotrip:
                 Intent tripdetails = new Intent(LinehaulGroup.this, BringTripDetails.class);

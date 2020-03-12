@@ -434,6 +434,14 @@ public class PickUpActivity extends AppCompatActivity {
                 return false;
             }
 
+            if(firstFragment.txtClientID.getText().toString() == null || firstFragment.txtClientID.getText().toString().length() ==0)
+            {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                        "Kindly enter ClientID ", GlobalVar.AlertType.Error);
+                isValid = false;
+                return false;
+            }
+
         }
 
         return isValid;

@@ -190,9 +190,12 @@
     <string-array name="reportCBU">
         <item>Delivery Sheet</item>
         <item>Not Delivery</item>
+        <item>Night Stock</item>
         <item>OnDelivery</item>
         <item>Pickup</item>
         <item>Waybill Measurement</item>
+        <item>CheckPoint</item>
+        <item>Consolidation</item>
     </string-array>
 
     <string name="ns_scanshipment">Scan Shipment</string>

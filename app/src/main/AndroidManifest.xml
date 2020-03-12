@@ -38,10 +38,6 @@
 
     <uses-feature android:name="android.hardware.location.gps" />
 
-
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-
     <uses-permission
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
@@ -89,7 +85,8 @@
         android:logo="@mipmap/ic_launcher"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon">
 
         <uses-library
             android:name="org.apache.http.legacy"

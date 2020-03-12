@@ -3,6 +3,7 @@ package com.naqelexpress.naqelpointer.Activity.Delivery;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -589,6 +591,21 @@ public class DeliveryFirstFragment
             if (finalJson != null) {
                 WaybillDetailsResult waybillDetailsResult = new WaybillDetailsResult(finalJson);
 
+                if(waybillDetailsResult.BlockClient ==1)
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Info")
+                            .setMessage("Mentioned Client is Block,kindly contact Operational team.")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                                    getActivity().finish();
+                                }
+                            }).setNegativeButton("Cancel", null).setCancelable(false);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                    return;
+                }
                 txtBillingType.setText(getResources().getString(R.string.txtBillingType) + waybillDetailsResult.BillingType);
                 txtCODAmount.setText(getResources().getString(R.string.txtCODAmount) + waybillDetailsResult.CODAmount);
                 txtWeight.setText(getResources().getString(R.string.txtWeight) + waybillDetailsResult.Weight);

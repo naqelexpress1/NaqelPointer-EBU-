@@ -3466,6 +3466,8 @@ public class DBConnections
                     "where issync = 1 and date(CTime) < date())");
             db.delete("NightStock", "date(CTime) <? And IsSync  =?", args);
 
+            db.delete("NCL", "date(Date) <? And IsSync  =?", args);
+
 
             db.close();
 
@@ -4744,7 +4746,7 @@ public class DBConnections
         return result != -1;
     }
 
-    public boolean InsertNclBulk(String instance, Context context) {
+    public boolean InsertNclBulk(String instance, Context context, int PieceCount) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4753,8 +4755,8 @@ public class DBConnections
 
             contentValues.put("NclNo", 0);
             contentValues.put("UserID", 0);
-            contentValues.put("Date", 0);
-            contentValues.put("PieceCount", 0);
+            contentValues.put("Date", DateTime.now().toString());
+            contentValues.put("PieceCount", PieceCount);
             contentValues.put("WaybillCount", 0);
             contentValues.put("IsSync", false);
             contentValues.put("JsonData", instance);

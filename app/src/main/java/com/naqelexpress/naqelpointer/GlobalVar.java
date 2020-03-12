@@ -86,11 +86,11 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "TH : Gateway Block Waybills";
-    public boolean LoginVariation = false; //For EBU only
+    public String AppVersion = "EBU : Pickup and ODOmeter";
+    public boolean LoginVariation = true; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For EBU only
-    public int AppIDForTH = 1;
+    public boolean IsTerminalApp = false; //For TH only
+    public int AppIDForTH = 0; //for TH only 1
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -1700,6 +1700,7 @@ public class GlobalVar {
         return NotDeleiveryFromLocal;
     }
 
+
     public static ArrayList<MyRouteShipments> getMultiDeliveryHistory(Context context) {
         ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
 
@@ -1951,6 +1952,76 @@ public class GlobalVar {
         }
         dbConnections.close();
         return OnDeleiveryFromLocal;
+    }
+
+
+    public static ArrayList<MyRouteShipments> getCheckpointData(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from CheckPointBarCodeDetails", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("BarCode")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("BarCode"));
+
+                //  onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
+                onDeliveryRequest.IsDelivered = false;
+
+
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getNCLNotSyncData(Context context) {
+
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from NCL", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("JsonData")));
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("ncldetails");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                        onDeliveryRequest.ItemNo = obj.getString("BarCode");
+                        if (result.getInt(result.getColumnIndex("IsSync")) == 0)
+                            onDeliveryRequest.IsDelivered = false;
+                        else
+                            onDeliveryRequest.IsDelivered = true;
+                        DeliverySheetFromLocal.add(onDeliveryRequest);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
     }
 
 

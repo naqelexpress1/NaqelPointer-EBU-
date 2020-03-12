@@ -17,7 +17,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -163,8 +162,6 @@ public class CheckPointsActivity extends AppCompatActivity {
                     resetAllFields(1);
 
 
-
-
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
                             GlobalVar.AlertType.Error);
@@ -249,7 +246,6 @@ public class CheckPointsActivity extends AppCompatActivity {
                 return false;
             }
         }
-
 
 
         if (firstFragment.CheckPointTypeID == 7) {

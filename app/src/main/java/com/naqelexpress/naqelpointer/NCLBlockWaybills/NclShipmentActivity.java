@@ -770,7 +770,7 @@ public class NclShipmentActivity extends AppCompatActivity {
             String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
             jsonData = jsonData.replace("Date(-", "Date(");
 
-            dbConnections.InsertNclBulk(jsonData, getApplicationContext());
+            dbConnections.InsertNclBulk(jsonData, getApplicationContext(), ncl.PieceCount);
 
             if (!isMyServiceRunning(NclServiceBulk.class)) {
                 startService(
@@ -1124,7 +1124,7 @@ public class NclShipmentActivity extends AppCompatActivity {
 
     int totalsize = 0, uploaddatacount = 0;
 
-    private void NCLbyManual() {
+    /*private void NCLbyManual() {
 
         totalsize = 0;
         stopService(
@@ -1157,5 +1157,209 @@ public class NclShipmentActivity extends AppCompatActivity {
             System.out.println(e);
         }
 
+    }*/
+
+    private void NCLbyManual() {
+
+        totalsize = 0;
+        stopService(
+                new Intent(NclShipmentActivity.this,
+                        NclServiceBulk.class));
+
+        try {
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+
+            Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
+            ts.moveToFirst();
+            try {
+                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+            } catch (Exception e) {
+                totalsize = 0;
+            }
+            ts.close();
+
+            if (totalsize > 0) {
+                // new NCLbyManual().execute(String.valueOf(totalsize));
+                new NCLBulkbyManual().execute(String.valueOf(totalsize));
+            } else {
+                ErrorAlert("No Data",
+                        "All Data Synchronized Successfully"
+                );
+            }
+            db.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+    private class NCLBulkbyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(NclShipmentActivity.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+            Cursor result = db.Fill("select * from Ncl where IsSync = 0 order by ID", getApplicationContext());
+            result.moveToFirst();
+            int id = 0, piececount = 0;
+            do {
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+                String jsonData = "";
+                if (result.moveToFirst()) {
+                    id = result.getInt(result.getColumnIndex("ID"));
+                    piececount = result.getInt(result.getColumnIndex("PieceCount"));
+                    jsonData = result.getString(result.getColumnIndex("JsonData"));
+                }
+
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"); //LoadtoDestination
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+
+                if (returnresult.contains("Created")) {
+                    moveddata = moveddata + piececount;
+                    db.updateNCL(id, getApplicationContext());
+                    //db.deleteNcl(id, getApplicationContext());
+                    //db.deleteNclWayBill(ncl.ID, getApplicationContext());
+                    //db.deleteNclBarcode(id, getApplicationContext());
+                }
+                try {
+                    uploaddatacount = uploaddatacount + piececount;
+                } catch (Exception e) {
+
+                }
+                publishProgress((int) ((uploaddatacount * 100) / totalsize));
+
+            } while (result.moveToNext());
+
+            result.close();
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
+                ts.moveToFirst();
+                //int totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
+                    );
+                    startService(
+                            new Intent(NclShipmentActivity.this,
+                                    NclServiceBulk.class));
+                } else {
+
+                    SavedSucessfully("No Data",
+                            "All Data Synchronized Successfully");
+                }
+                ts.close();
+                db.close();
+
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
+        }
     }
 }

@@ -564,10 +564,10 @@ public class MyRouteActivity
             InputStream ist = null;
 
             try {
-                String function = "BringDeliverySheetbyOFDPiece";
+                String function = "BringDeliverySheetbyOFDPiece"; //CBU division
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
-                    function = "BringMyRouteShipments";
+                    function = "BringMyRouteShipments"; //EBU Divison
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence
                 URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + function); //Geofence

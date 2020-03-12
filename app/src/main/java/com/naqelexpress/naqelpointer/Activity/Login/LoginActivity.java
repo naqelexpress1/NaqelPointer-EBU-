@@ -81,7 +81,7 @@ public class LoginActivity
     Button btnLogin, btnForgotPassword, btnScan;
     EditText txtEmployID, txtPassword;
 
-    EditText truck;
+    EditText truck , odometer;
     ArrayList<FindVehilceObject> vehicles;
     int truckID = 0;
 
@@ -103,6 +103,7 @@ public class LoginActivity
 
 //        int empid = GlobalVar.getlastlogin(getApplicationContext());
         btnLogin = (Button) findViewById(R.id.btnLogin);
+
         btnForgotPassword = (Button) findViewById(R.id.btnForgotPassword);
         btnScan = (Button) findViewById(R.id.btnScan);
         btnScan.setOnClickListener(new View.OnClickListener() {
@@ -228,6 +229,7 @@ public class LoginActivity
 
 
             truck = (EditText) findViewById(R.id.truckid);
+            odometer = (EditText) findViewById(R.id.odometer);
             truck.setKeyListener(null);
             truck.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -321,6 +323,11 @@ public class LoginActivity
         }
         if (GlobalVar.GV().LoginVariation && truck.getText().toString().equals("")) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select Fleet Number", GlobalVar.AlertType.Warning);
+            return;
+        }
+        if (GlobalVar.GV().LoginVariation && odometer.getText().toString().equals("")) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                    "You have to enter Odometer", GlobalVar.AlertType.Warning);
             return;
         }
 //        if (txtPassword.getText().toString().equals("123456")) {
@@ -1094,6 +1101,7 @@ public class LoginActivity
         getUserMEDataRequest.EmployID = EmployID;
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
+        getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
 
 
         try {

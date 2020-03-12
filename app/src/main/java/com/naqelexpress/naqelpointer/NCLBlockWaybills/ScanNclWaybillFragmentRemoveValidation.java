@@ -451,7 +451,7 @@ public class ScanNclWaybillFragmentRemoveValidation extends Fragment {
             String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
             jsonData = jsonData.replace("Date(-", "Date(");
 
-            dbConnections.InsertNclBulk(jsonData, getContext());
+            dbConnections.InsertNclBulk(jsonData, getContext(),PieceCodeList.size());
 
             if (!isMyServiceRunning(NclServiceBulk.class)) {
                 getActivity().startService(

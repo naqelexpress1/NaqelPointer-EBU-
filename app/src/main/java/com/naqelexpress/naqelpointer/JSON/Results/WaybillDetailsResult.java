@@ -26,6 +26,7 @@ public class WaybillDetailsResult
     private LocationCoordinate locationCoordinate;
     public boolean signrequired = false;
     public  String ClientName = "";
+    public  int BlockClient = 0;
 
     public ArrayList<String> BarCodeList = new ArrayList<String>();
 
@@ -40,6 +41,7 @@ public class WaybillDetailsResult
             jsonObject = new JSONObject(finalJson);
 
             ID = Integer.parseInt(jsonObject.getString("ID"));
+            BlockClient = jsonObject.getInt("BlockClient");
             WaybillNo = Integer.parseInt(jsonObject.getString("WaybillNo"));
             PiecesCount = (int) Double.parseDouble(jsonObject.getString("PiecesCount"));
             Weight = Double.parseDouble(jsonObject.getString("Weight"));

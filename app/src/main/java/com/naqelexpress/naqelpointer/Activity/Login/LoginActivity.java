@@ -1101,6 +1101,8 @@ public class LoginActivity
         getUserMEDataRequest.EmployID = EmployID;
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
+
+        if (GlobalVar.GV().LoginVariation)
         getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
 
 

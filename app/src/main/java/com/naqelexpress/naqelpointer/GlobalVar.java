@@ -86,11 +86,11 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "EBU : Pickup and ODOmeter";
-    public boolean LoginVariation = true; //For EBU true only
+    public String AppVersion = "CBU : Manual Install - 18-03-2020";
+    public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH only
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH only
+    public int AppIDForTH = 1; //for TH only 1
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;

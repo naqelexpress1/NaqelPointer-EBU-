@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 94; // Change the concept of deliver and not deliver
+    private static final int Version = 95; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -276,7 +276,7 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"FacilityID\" Integer NOT NULL , \"Code\" Text NOT NULL , \"Name\" Text NOT NULL , \"Station\" Integer Not Null , " +
-                "\"FacilityTypeID\" Integer Not Null, \"FacilityTypeName\" TEXT )");
+                "\"FacilityTypeID\" Integer Not Null, \"FacilityTypeName\" TEXT , \"CountryCode\" TEXT ,  \"CountryName\" TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatusReason\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
                 "\"ReasonID\" Integer NOT NULL ,\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, " +
@@ -700,6 +700,12 @@ public class DBConnections
                 db.execSQL("ALTER TABLE UserME ADD COLUMN CountryID Integer DEFAULT 0 ");
             if (!isColumnExist("UserME", "CountryCode"))
                 db.execSQL("ALTER TABLE UserME ADD COLUMN CountryCode Text ");
+
+            if (!isColumnExist("Facility", "CountryCode"))
+                db.execSQL("ALTER TABLE Facility ADD COLUMN CountryCode Text ");
+
+            if (!isColumnExist("Facility", "CountryName"))
+                db.execSQL("ALTER TABLE Facility ADD COLUMN CountryName Text ");
         }
 
 
@@ -4472,7 +4478,8 @@ public class DBConnections
         }
     }
 
-    public boolean InsertFacility(int FacilityID, String Code, String Fname, int StationID, int FtypeID, String FTName, Context context) {
+    public boolean InsertFacility(int FacilityID, String Code, String Fname, int StationID, int FtypeID,
+                                  String FTName,String ConCode , String ConName , Context context) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4483,6 +4490,8 @@ public class DBConnections
             contentValues.put("Station", StationID);
             contentValues.put("FacilityTypeID", FtypeID);
             contentValues.put("FacilityTypeName", FTName);
+            contentValues.put("CountryCode", ConCode);
+            contentValues.put("CountryName", ConName);
             result = db.insert("Facility", null, contentValues);
             db.close();
         } catch (SQLiteException e) {

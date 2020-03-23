@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.MiscodeSearch.Miscode;
 import com.naqelexpress.naqelpointer.R;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 
@@ -94,7 +96,11 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                 @Override
                 public void onClick(View v) {
 //                    checkPointTypeDDetailSpinnerDialog.showSpinerDialog(false);
-                    if (CheckPointTypeID != 20 && CheckPointTypeDetailID !=37) {
+                    if (CheckPointTypeID == 11) {
+
+                        Intent intent = new Intent(getActivity(), Miscode.class);
+                        getActivity().startActivity(intent);
+                    } else if (CheckPointTypeID != 20 && CheckPointTypeDetailID != 37) {
                         txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
                         checkPointTypeDDetailSpinnerDialog.showSpinerDialog(false);
                     } else {

@@ -60,9 +60,11 @@ public class FacilityStatus {
                         String Fname = jsonObject.getString("Name");
                         int StationID = jsonObject.getInt("StationID");
                         int FtypeID = jsonObject.getInt("FacilityTypeId");
+                        String ConCode = jsonObject.getString("CountryCode");
+                        String ConName = jsonObject.getString("CountryName");
                         String FTName = "";
 
-                        dbConnections.InsertFacility(FacilityID, Code, Fname, StationID, FtypeID, FTName, context);
+                        dbConnections.InsertFacility(FacilityID, Code, Fname, StationID, FtypeID, FTName, ConCode, ConName, context);
 
                     } catch (JSONException ignored) {
                     }

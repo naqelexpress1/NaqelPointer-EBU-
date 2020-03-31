@@ -82,12 +82,12 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:hint="Enter Odometer"
-        android:inputType="textAutoComplete"
+        android:inputType="number"
         android:text=""
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@+id/txtEmployID"
-        app:layout_constraintTop_toBottomOf="@+id/txtPassword"
+        app:layout_constraintTop_toBottomOf="@+id/truckid"
         tools:ignore="HardcodedText,RtlHardcoded" />
 
     <!--
@@ -119,7 +119,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/truckid"
+        app:layout_constraintTop_toBottomOf="@+id/odometer"
         tools:ignore="RtlHardcoded">
 
         <Button

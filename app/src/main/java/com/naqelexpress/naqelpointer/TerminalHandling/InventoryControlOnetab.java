@@ -59,7 +59,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import  Error.ErrorReporter;
+
+import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 

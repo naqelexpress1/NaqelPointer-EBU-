@@ -1,7 +1,5 @@
 package com.naqelexpress.naqelpointer.JSON.Request;
 
-import java.lang.annotation.Target;
-
 /**
  * Created by sofan on 12/03/2018.
  */

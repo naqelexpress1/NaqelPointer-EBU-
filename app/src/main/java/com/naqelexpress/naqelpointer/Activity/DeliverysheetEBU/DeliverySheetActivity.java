@@ -32,21 +32,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation.ArrivedatDestination;
-import com.naqelexpress.naqelpointer.Activity.AtOriginDelete.AtOriginDelete;
-import com.naqelexpress.naqelpointer.Activity.AtOriginNew.AtOrigin;
-import com.naqelexpress.naqelpointer.Activity.AtOriginNew.FirstFragment;
-import com.naqelexpress.naqelpointer.Activity.AtOriginNew.SecondFragment;
-import com.naqelexpress.naqelpointer.Activity.CustomerRating.CustomerRatings;
 import com.naqelexpress.naqelpointer.Activity.DeliverySheetPartial.DeliverySheet;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -68,12 +53,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class DeliverySheetActivity
         extends AppCompatActivity {

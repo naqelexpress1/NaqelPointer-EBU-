@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/popup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/NaqelBlue"
+    android:orientation="vertical"
+    android:padding="5dp">
+
+
+    <EditText
+        android:id="@+id/iqamaid"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:hint="Iqama ID"
+        android:maxLength="10"
+        android:padding="1dp"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/phoneno"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:hint="Phone No"
+        android:padding="1dp"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:inputType="number"/>
+
+
+    <EditText
+        android:id="@+id/receivername"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:hint="Receiver Name"
+        android:padding="1dp"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:inputType="text"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/NaqelBlue"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="0.5"
+            android:background="@color/gray_btn_bg_color"
+            android:gravity="center"
+            android:padding="1dp"
+            android:text="Ok"
+            android:textColor="@color/mdtp_transparent_black"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:layout_weight="0.5"
+            android:background="@color/gray_btn_bg_color"
+            android:gravity="center"
+            android:padding="1dp"
+            android:text="Cancel"
+            android:textColor="@color/mdtp_transparent_black"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+    </LinearLayout>
+</LinearLayout>

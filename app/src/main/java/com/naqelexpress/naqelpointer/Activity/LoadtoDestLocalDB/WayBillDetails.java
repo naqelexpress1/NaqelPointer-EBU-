@@ -19,7 +19,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class WayBillDetails extends Fragment // implements ResultInterface
 {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+
     package="com.naqelexpress.naqelpointer">
 
 
@@ -79,14 +80,16 @@
     <application
         android:name=".ApplicationController"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+
         android:label="@string/app_name"
         android:largeHeap="true"
         android:logo="@mipmap/ic_launcher"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        tools:replace="android:appComponentFactory"
+        android:appComponentFactory="whateverString"
+        >
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -98,6 +101,10 @@
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
+
+        <meta-data
+            android:name="com.google.android.gms.wallet.api.enabled"
+            android:value="true" />
 
 
         <provider
@@ -143,29 +150,36 @@
         <activity
             android:name=".Activity.Login.LoginActivity"
             android:label="@string/LoginActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Booking.BookingPlanActivity"
             android:label="Booking Details"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.MainPage.MainPageActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Waybill.WaybillPlanActivity"
             android:label="Waybill Details"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Notification.NotificationActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Breaks.BreaksActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.MyRoute.MyRouteActivity"
             android:label="My Route"
             android:screenOrientation="portrait"
-            android:theme="@style/myroute.NoActionBar">
+            android:theme="@style/myroute.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
 
             <meta-data
                 android:name="android.app.searchable"
@@ -185,7 +199,8 @@
 
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -212,11 +227,13 @@
         <activity
             android:name=".Activity.Login.ForgotPasswordActivity"
             android:label="@string/ForgotPasswordActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.MapList.GoogleMapsActivity"
             android:label="@string/title_activity_google_maps"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -226,46 +243,54 @@
             android:name=".Activity.Delivery.DeliveryActivity"
             android:label="@string/DeliveryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Waybill.ConsigneeAddressTranslationActivity"
             android:label="@string/ConsigneeAddressTranslationActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.CheckPointNew.CheckPointsActivity"
             android:label="@string/CheckPointsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.CheckPointbyPieceLevel.CheckPointsActivity"
             android:label="@string/CheckPointsActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.MultiDelivery.MultiDeliveryActivity"
             android:label="@string/MultiDeliveryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.AtOrigin.AtOrigin"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.NotDelivered.NotDeliveredActivity"
             android:label="@string/NotDelivered"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.NotDeliveredCBU.NotDeliveredActivity"
             android:label="@string/NotDelivered"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.NotDeliveredSinglePiece.NotDeliveredActivity"
@@ -277,71 +302,88 @@
             android:name=".Activity.PickUp.PickUpActivity"
             android:label="@string/title_activity_pick_up"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.GoogleMap.ShipmentsMapActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.ShipmentPicking.ShipmentPickingActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.ShipmentPicking.ShipmentPickingSelectingDialog"
             android:label="@string/SelectingShipments"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Settings.SettingActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.DeliverySheet.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.DeliverysheetEBU.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.OFDPieceLevel.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.MyAccount.MyAccountActivity"
             android:label="My Account"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.CheckCOD.CODCheckingActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.DataActivity.ShowDataActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.PendingMoney.PendingMoneyActivity"
             android:label="Pending COD"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Classes.NewBarCodeScanner"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Classes.NewBarCodeScannerForVS"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Classes.BarcodeScan"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.CheckPoint.CheckPointActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.WaybillMeasurments.WaybillMeasurementActivity"
             android:label="@string/WaybillMeasurementActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.Booking.BookingList"
             android:label="@string/title_activity_booking_list" />
@@ -352,41 +394,49 @@
             android:name=".Activity.LoadtoDestLocalDB.LoadtoDestination"
             android:label="LoadtoDest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.LoadtoDestLocalDB.Summery"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.LoadtoDestLocalDB.TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.LoadtoDestLocalDB.SyncTripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.LoadtoDest.LoadtoDestination"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.LoadtoDest.Summery"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.LoadtoDest.TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.LoadtoDest.SyncTripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <!-- comment by ismail and added <activity android:name=".MainActivity"></activity> -->
@@ -398,74 +448,86 @@
         <activity
             android:name=".Activity.DigitalSign.Signature"
             android:screenOrientation="landscape"
-            android:theme="@style/trans" />
+            android:theme="@style/trans"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.AtOriginNew.AtOrigin"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.AtOriginusingLocalDB.AtOrigin"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.AtOriginDelete.AtOriginDelete"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.Login.UpdatePassword"
             android:label="Update Password"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.Login.UpdatePasswordModule"
             android:label="Update Password"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".ContactNo.Contact"
             android:label="Contact Details"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.ArrivedDest.ArrivedatDestination"
             android:label="Arrived at Destination"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.ArrivedatDestNew.ArrivedatDestination"
             android:label="Arrived at Destination"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.ArrivedatDestNoValidation.ArrivedatDestination"
             android:label="ArrivedatDest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.ValidationDS.ValidationDS"
             android:label="Arrived at Destination"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.Login.EmployeeInformation"
             android:label="Employee Information"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
@@ -476,203 +538,240 @@
             android:name=".Activity.EBURoute.DeliverySheet"
             android:label="DeliverySheet"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.SuggestDeliverysheet.MyRouteActivity"
             android:label="Suggest Deliverysheet"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.Incident.Incident"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.NightStock.NSScanShipmentActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.Login.FacilityLogin"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.PickupPieceLevel.PickUpActivity"
             android:label="@string/title_activity_pick_up"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.DeliveryOFD.DeliveryActivity"
             android:label="@string/DeliveryActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.TerminalHandling.TerminalHandling"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.TerminalHandlingGroup"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.NCL.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.NCLAutoSave.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.BringTripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.TerminalHandling.TripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.InventoryHeldIn"
             android:label="Inventory Held - IN"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.InventoryHeldOut"
             android:label="Inventory Held OUT"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.InventoryGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandling.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TerminalHandling"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TerminalHandlingGroup"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.BringTripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldIn"
             android:label="Inventory Held - IN"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldOut"
             android:label="Inventory Held OUT"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryControlOnetab"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.InventoryControlOnetab"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.InventoryControl_LocalValidation"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".TerminalHandling.InventoryControl_LocalValidationReleaseWaybills"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.InventoryHeldIn"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.InventoryHeldOut"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".NCL.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".TerminalHandling.TerminalHandling"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.BringTripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".TerminalHandling.TripDetails"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity android:name=".MainActivity" />
         <activity android:name=".RoomsListActivity" />
@@ -688,108 +787,126 @@
             android:name=".Activity.CustomerRating.CustomerRatings"
             android:label="Ratings"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.CourierKPIEBU.CourierKpi"
             android:label="KPI"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".Activity.DeliverySheetPartial.DeliverySheet"
             android:label="KPI"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.CloseTruck"
             android:label="Close Truck"
             android:screenOrientation="portrait"
-            android:theme="@style/myDialog" />
+            android:theme="@style/myDialog"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.UndoNcl"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.IncabCheckList.IncCabChecklist"
             android:label="InCabChecklist"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".Activity.Login.FindVehicle"
             android:label="Choose Truck"
             android:screenOrientation="portrait"
-            android:theme="@style/myroute.NoActionBar" />
+            android:theme="@style/myroute.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.CloseTruck"
             android:label="Close Truck"
             android:screenOrientation="portrait"
-            android:theme="@style/myDialog" />
+            android:theme="@style/myDialog"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.UndoNcl"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.UndoNclbyScan"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".TerminalHandling.TripArrviedatDestbyNCL"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".NCLBulk.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".NCLBlockWaybills.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".TerminalHandling.LinehaulGroup"
             android:label="Linehaul"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <activity
             android:name=".Activity.InCabNew.IncCabChecklist"
             android:label="Incab"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
 
         <activity
             android:name=".MiscodeSearch.Miscode"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeMiscode.NoActionBar">
+            android:theme="@style/AppThemeMiscode.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -799,6 +916,19 @@
             </intent-filter>
         </activity>
 
+
+        <activity
+            android:name=".Activity.BookingCBU.BookingList"
+            android:label="@string/title_activity_booking_list" />
+
+        <activity android:name=".Activity.BookingCBU.BookingDetailActivity" />
+
+        <activity
+            android:name=".PaymentGateway.StcPaymentGateway"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity"
+
+            />
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

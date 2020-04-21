@@ -32,6 +32,7 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.OnDelivery;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.PaymentGateway.StcPaymentGateway;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.ActualLocation;
 import com.naqelexpress.naqelpointer.service.LocationService;
@@ -50,6 +51,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static com.naqelexpress.naqelpointer.R.id.container;
 
@@ -156,7 +159,7 @@ public class DeliveryActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.notdeliveredmenu, menu);
+        inflater.inflate(R.menu.ondeliverypayment, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -195,6 +198,22 @@ public class DeliveryActivity
                         GlobalVar.RedirectSettings(DeliveryActivity.this);
                 }
 
+                return true;
+            case R.id.stcPay:
+
+                if (bundle.getString("BT").equals("COD")) {
+                    Intent mIntent = new Intent(this, StcPaymentGateway.class);
+                    Bundle mBundle = new Bundle();
+                    mBundle.putString("WaybillNo", bundle.getString("WaybillNo"));
+                    mBundle.putDouble("COD", bundle.getDouble("COD"));
+                    mIntent.putExtras(mBundle);
+                    startActivity(mIntent);
+                } else {
+                    new SweetAlertDialog(DeliveryActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Info")
+                            .setContentText("This is not COD waybill,kindly try with COD waybill")
+                            .show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -319,11 +338,21 @@ public class DeliveryActivity
 
         dbConnections.UpdateProductivity_Delivered(GlobalVar.getDate(), getApplicationContext());
         result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + WaybillNo + "' and HasComplaint = 1", getApplicationContext());
+
+
         if (result.getCount() > 0)
             dbConnections.UpdateComplaint_Delivered(GlobalVar.getDate(), getApplicationContext());
 
         updateLocation();
-        if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al)) {
+
+        String iqamaid = "", phoneno = "", rname = "";
+        if (secondFragment.Isnootp) {
+            iqamaid = secondFragment.iqamaid.getText().toString();
+            phoneno = secondFragment.phoneno.getText().toString();
+            rname = secondFragment.receivername.getText().toString();
+        }
+        if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al,
+                iqamaid, phoneno, rname)) {
 
 //            int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
 //            for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {
@@ -440,6 +469,49 @@ public class DeliveryActivity
                 isValid = false;
                 return isValid;
             }
+
+            String division = GlobalVar.getDivision(getApplicationContext());
+
+            if (GlobalVar.GV().isneedOtp) {
+                if (division.equals("Courier") && !secondFragment.Isnootp) {
+                    if (secondFragment.txtotpno.getText().toString().equals("")) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the OTPNo", GlobalVar.AlertType.Error);
+//                GlobalVar.GV().ShowMessage(this,"You have to enter the Receiver Name", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    } else {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + DeliveryFirstFragment.txtWaybillNo.getText().toString() + "'",
+                                getApplicationContext());
+
+                        if (result.getCount() > 0) {
+                            result.moveToFirst();
+                            int otpno = result.getInt(result.getColumnIndex("OTPNo"));
+                            if (otpno != Integer.parseInt(secondFragment.txtotpno.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Entered OTPNo is wrong , kindly contact Supervisor", GlobalVar.AlertType.Error);
+                                isValid = false;
+                                return isValid;
+
+                            }
+                        }
+                    }
+                } else if (secondFragment.Isnootp) {
+                    if (secondFragment.iqamaid.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Iqama No", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    } else if (secondFragment.phoneno.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Mobile No", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    } else if (secondFragment.receivername.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Name", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    }
+                }
+            }
+
         }
 
         if (thirdFragment != null)
@@ -525,6 +597,8 @@ public class DeliveryActivity
                 case 1:
                     if (secondFragment == null) {
                         secondFragment = new DeliverySecondFragment();
+                        if (bundle != null)
+                            firstFragment.setArguments(bundle);
                         return secondFragment;
                     } else {
                         return secondFragment;
@@ -664,6 +738,7 @@ public class DeliveryActivity
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
         }
+
     }
 
     @Override

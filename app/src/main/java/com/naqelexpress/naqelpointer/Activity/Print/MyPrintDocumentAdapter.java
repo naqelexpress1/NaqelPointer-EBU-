@@ -18,9 +18,11 @@ import android.print.pdf.PrintedPdfDocument;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 /**

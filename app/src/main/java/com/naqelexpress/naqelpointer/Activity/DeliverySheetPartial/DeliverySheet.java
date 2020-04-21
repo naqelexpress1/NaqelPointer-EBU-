@@ -18,8 +18,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import com.naqelexpress.naqelpointer.Activity.CustomerRating.CustomerRatings;
-import com.naqelexpress.naqelpointer.Activity.TerminalHandling.FirstFragment;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.OnCLoadingForDDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.OnCLoadingForDWaybill;
@@ -28,12 +26,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class DeliverySheet
         extends AppCompatActivity {

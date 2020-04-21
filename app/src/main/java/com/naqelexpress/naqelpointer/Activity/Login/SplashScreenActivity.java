@@ -41,9 +41,11 @@ public class SplashScreenActivity
 
         //  String time = GlobalVar.GV().getCurrentDateTime();
 
+
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.InsertDomain(getApplicationContext());
             dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
             dbConnections.DeleteExsistingLogin(getApplicationContext());
             dbConnections.DeleteAllSyncData(getApplicationContext());

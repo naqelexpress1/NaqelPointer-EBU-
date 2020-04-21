@@ -1,18 +1,5 @@
 package com.naqelexpress.naqelpointer.JSON.Results;
 
-import android.database.Cursor;
-import android.view.View;
-
-import com.naqelexpress.naqelpointer.DB.DBObjects.NoNeedVolumeReason;
-import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
-
-import org.joda.time.DateTime;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 public class StationResult
     extends DefaultResult
 {

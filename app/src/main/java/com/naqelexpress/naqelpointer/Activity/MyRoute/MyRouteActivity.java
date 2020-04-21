@@ -1027,6 +1027,8 @@ public class MyRouteActivity
                 Bundle bundle = new Bundle();
                 bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
                 bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+                bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
+                bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
                 bundle.putInt("position", position);
                 intent.putExtras(bundle);
                 startActivity(intent);

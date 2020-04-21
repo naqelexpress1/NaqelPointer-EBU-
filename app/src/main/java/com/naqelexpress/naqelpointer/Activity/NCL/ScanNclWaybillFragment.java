@@ -1,11 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.NCL;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.util.Output;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -22,13 +19,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BarcodeInfoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
-import com.naqelexpress.naqelpointer.JSON.Results.NclNoResult;
 import com.naqelexpress.naqelpointer.R;
 
 import java.io.BufferedReader;
@@ -39,7 +34,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static android.app.Activity.RESULT_OK;
 

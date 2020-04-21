@@ -48,4 +48,17 @@
         android:textStyle="bold"
         android:typeface="monospace" />
 
+    <TextView
+        android:id="@+id/resendotp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="center"
+        android:padding="1dp"
+        android:text="Resend OTP"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:typeface="monospace" />
+
 </LinearLayout>

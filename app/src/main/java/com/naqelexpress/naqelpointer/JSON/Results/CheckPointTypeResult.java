@@ -3,8 +3,6 @@ package com.naqelexpress.naqelpointer.JSON.Results;
 import android.content.Context;
 import android.view.View;
 
-import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointType;
 import com.naqelexpress.naqelpointer.GlobalVar;
 
 import org.json.JSONArray;

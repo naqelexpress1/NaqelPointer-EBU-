@@ -81,7 +81,7 @@ public class LoginActivity
     Button btnLogin, btnForgotPassword, btnScan;
     EditText txtEmployID, txtPassword;
 
-    EditText truck , odometer;
+    EditText truck, odometer;
     ArrayList<FindVehilceObject> vehicles;
     int truckID = 0;
 
@@ -123,6 +123,7 @@ public class LoginActivity
         txtEmployID = (EditText) findViewById(R.id.txtEmployID);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
 
+        GlobalVar.ResetTriedCount();
 
 //        if (savedInstanceState != null)
 //            setSavedInstance(savedInstanceState);
@@ -1103,7 +1104,7 @@ public class LoginActivity
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
 
         if (GlobalVar.GV().LoginVariation)
-        getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
+            getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
 
 
         try {
@@ -1126,15 +1127,23 @@ public class LoginActivity
     int usertype = 0;
     UserME instance;
 
+
     private class GetUserMEDataFromServer extends AsyncTask<String, Void, String> {
         //private ProgressDialog progressDialog;
         String result = "";
         StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
 
-            progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.", "Bringing User Details.", true);
+            progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
+                    "Bringing User Details.", true);
+            //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            // DomainURL = dbConnections.GetPrimaryDomain(getApplicationContext());
+            //DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            DomainURL = GlobalVar.GV().NaqelPointerAPILink;
         }
 
         @Override
@@ -1144,16 +1153,23 @@ public class LoginActivity
             OutputStream dos = null;
             InputStream ist = null;
 
+
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetUserMEData");
+
+                URL url = new URL(DomainURL + "GetUserMEData");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                httpURLConnection.setDoInput(true);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.connect();
-
+                try {
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                } catch (java.net.NoRouteToHostException se) {
+                    System.out.println(se);
+                }
                 dos = httpURLConnection.getOutputStream();
                 httpURLConnection.getOutputStream();
                 dos.write(jsonData.getBytes());
@@ -1168,6 +1184,9 @@ public class LoginActivity
                 }
                 return String.valueOf(buffer);
             } catch (Exception ignored) {
+                //buffer.append(ignored.toString());
+                isInternetAvailable = ignored.toString();
+                // System.out.println(ignored);
             } finally {
                 try {
                     if (ist != null)
@@ -1194,6 +1213,7 @@ public class LoginActivity
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             if (finalJson != null) {
 
+                GlobalVar.ResetTriedCount();
                 GetUserMEDataResult getUserMEDataResult = new GetUserMEDataResult(finalJson);
                 if (!getUserMEDataResult.HasError) {
                     // if (GlobalVar.GV().dbConnections != null) {
@@ -1299,8 +1319,19 @@ public class LoginActivity
 
                 } else
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Data Not Sync Because :" + getUserMEDataResult.ErrorMessage, GlobalVar.AlertType.Error);
-            } else
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+                }
+
+            }
 
             dismissUserMeProgressdialog();
             super.onPostExecute(String.valueOf(finalJson));
@@ -1327,6 +1358,8 @@ public class LoginActivity
     private class GetMasterData extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
         private ProgressDialog progressDialog;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -1334,6 +1367,8 @@ public class LoginActivity
             if (progressDialog == null)
                 progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
                         "Bringing Master Details.", true);
+            //DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+             DomainURL = GlobalVar.GV().NaqelPointerAPILink;
             super.onPreExecute();
 
         }
@@ -1353,10 +1388,10 @@ public class LoginActivity
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetMasterData");
+                URL url = new URL(DomainURL + "GetMasterData");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(30000);
-                httpURLConnection.setConnectTimeout(30000);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
@@ -1405,6 +1440,7 @@ public class LoginActivity
             super.onPostExecute("");
             if (result != null) {
 
+                GlobalVar.ResetTriedCount();
                 try {
                     Context context = getApplicationContext();
                     JSONObject jsonObject = new JSONObject(result);
@@ -1464,6 +1500,10 @@ public class LoginActivity
                         if (contacts.length() > 0)
                             new Contacts(contacts.toString(), view, context);
 
+                        JSONArray CityLists = jsonObject.getJSONArray("CityLists");
+                        if (CityLists.length() > 0)
+                            dbConnections.insertCityBulk(CityLists, getApplicationContext());
+
                         updateUserDetails();
                         LoginIntoOpenMainPage();
 
@@ -1480,7 +1520,16 @@ public class LoginActivity
                     e.printStackTrace();
                 }
             } else {
-                LoadDivisionError();
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                    }
+                    LoadDivisionError();
+                }
             }
             if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();

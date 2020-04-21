@@ -25,6 +25,10 @@ public class OnDeliveryRequest {
     public String DeviceToken = "";
     public String ST = "";
     public String Barcode = "";
+    public String IqamaID = "";
+    public String PhoneNo = "";
+    public String IqamaName = "";
+    public int DeliverySheetID = 0;
 
     //    public String ReceiptNo ;
 //    public int StopPointsID ;

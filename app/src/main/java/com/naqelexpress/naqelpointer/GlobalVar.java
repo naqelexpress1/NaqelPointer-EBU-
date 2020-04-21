@@ -86,8 +86,10 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "EBU :For Testing - 30-03-2020";
-    public boolean LoginVariation = true; //For EBU true only
+    public String AppVersion = "CBU : 2.6.6.0 19-04-2020";
+    public static int triedTimes = 0;
+    public static int triedTimesCondition = 2;
+    public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH only
     public int AppIDForTH = 0; //for TH only 1
@@ -98,7 +100,9 @@ public class GlobalVar {
     public boolean ThereIsMandtoryVersion = false;
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V1/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://192.168.1.127:49981/Api/Pointer/";
-    public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink = "http://35.244.2.170/NaqelPointer/api/pointer/";
+    //public String NaqelPointerAPILink = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
+    public String NaqelPointerAPILink2 = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
     public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
@@ -108,6 +112,11 @@ public class GlobalVar {
     public int ConnandReadtimeout = 60000;
     public int Connandtimeout30000 = 30000;
     public int ConnandReadtimeout50000 = 50000;
+
+    public int loadbalance_Contimeout = 180000;
+    public int loadbalance_ConRedtimeout = 180000;
+
+    public boolean isneedOtp = false;
 
     //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
     //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
@@ -1419,6 +1428,18 @@ public class GlobalVar {
             Toast.makeText(context, ex.getMessage().toString(),
                     Toast.LENGTH_LONG).show();
             ex.printStackTrace();
+        }
+    }
+
+    public static void SendSMSbydefault(String mobileno, String text, Context context) {
+        try {
+            Uri uri = Uri.parse("smsto:" + mobileno);
+            Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+            intent.putExtra("sms_body", text);
+            intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -2869,5 +2890,16 @@ public class GlobalVar {
 //        }
 //        return division;
 //    }
+
+    public static void ResetTriedCount() {
+        triedTimes = 0;
+
+    }
+
+    public String GetDomainURL(Context context) {
+        DBConnections dbConnections = new DBConnections(context, null);
+        return dbConnections.GetPrimaryDomain(context);
+
+    }
 
 }

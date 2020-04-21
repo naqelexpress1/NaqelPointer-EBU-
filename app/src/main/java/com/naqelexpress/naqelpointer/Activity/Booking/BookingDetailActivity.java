@@ -55,6 +55,7 @@ public class BookingDetailActivity extends AppCompatActivity
         setContentView(R.layout.bookingdetailnew);
         Bundle bundle = getIntent().getExtras();
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);

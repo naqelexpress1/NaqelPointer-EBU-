@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.Waybill;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -8,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,19 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class WaybillPlanActivity extends AppCompatActivity
         implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -53,6 +68,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     public double Latitude = 0;
     public double Longitude = 0;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +78,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
         mapFragment.getMapAsync(this);
 
         txtWaybillNo = (TextView) findViewById(R.id.txtWaybilll);
@@ -415,6 +432,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         final TextView customerlocation = (TextView) layout.findViewById(R.id.customerlocation);
         final TextView frontofthedoor = (TextView) layout.findViewById(R.id.frontofthedoor);
         final TextView cssupport = (TextView) layout.findViewById(R.id.cssupport);
+        final TextView resndotp = (TextView) layout.findViewById(R.id.resendotp);
 
         final String arabic = "عزيزي العميل, n\n  رجاء قم بمشاركة موقعك على الرابط المرفق أدناه لنقوم بتوصيل شحنتك.(" + " " + txtWaybillNo.getText().toString()
                 + ") من)" + txtShipperName.getText().toString();
@@ -437,7 +455,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.doorPredefinedMsg)
                         + " " + txtWaybillNo.getText().toString() + getString(R.string.doorPredefinedMsg1)
                         + txtShipperName.getText().toString() + getString(R.string.doorPredefinedMsg2)
-                        + txtWaybillNo.getText().toString()+ "\n\n\n" + arabic , getApplicationContext());
+                        + txtWaybillNo.getText().toString() + "\n\n\n" + arabic, getApplicationContext());
                 popup.dismiss();
             }
         });
@@ -445,7 +463,45 @@ public class WaybillPlanActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
-                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) +"\n\n\n" + arabic, getApplicationContext());
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) + "\n\n\n" + arabic, getApplicationContext());
+                popup.dismiss();
+            }
+        });
+
+        resndotp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + txtWaybillNo.getText().toString() + "'",
+                        getApplicationContext());
+
+                int otpno = 0;
+                if (result.getCount() > 0) {
+                    result.moveToFirst();
+                    otpno = result.getInt(result.getColumnIndex("OTPNo"));
+                    if (otpno == 9081988)
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Dont have OTP No for this waybillno " + txtWaybillNo.getText().toString() + ", kindly contact Supervisor", GlobalVar.AlertType.Error);
+                    else {
+                        //GlobalVar.GV().SendSMSbydefault(mobileno, "Your Delivery ID Verification Code is :" + String.valueOf(otpno), getApplicationContext());
+                        JSONObject jsonObject = new JSONObject();
+
+                        try {
+                            jsonObject.put("WaybillNo", Integer.parseInt(txtWaybillNo.getText().toString()));
+                            jsonObject.put("EmployID", result.getInt(result.getColumnIndex("DeliverySheetID")));
+                            jsonObject.put("Message", otpno);
+                            jsonObject.put("MobileNo", mobileno);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        new ResendOtpNo().execute(jsonObject.toString());
+                    }
+                } else
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Dont have OTP No for this waybillno " + txtWaybillNo.getText().toString() + ", kindly contact Supervisor", GlobalVar.AlertType.Error);
+
+                //GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) +"\n\n\n" + arabic, getApplicationContext());
                 popup.dismiss();
             }
         });
@@ -479,4 +535,111 @@ public class WaybillPlanActivity extends AppCompatActivity
         p.x = location[0];
         p.y = location[1];
     }
+
+    private class ResendOtpNo extends AsyncTask<String, Void, String> {
+        String result = "";
+        StringBuffer buffer;
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+            progressDialog = ProgressDialog.show(WaybillPlanActivity.this,
+                    "Please wait.", "Your Request has been process, kindly be patient  ", true);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "ResendOTPtoConsignee");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().ConnandReadtimeout);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().ConnandReadtimeout);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            super.onPostExecute(String.valueOf(finalJson));
+
+            if (finalJson != null) {
+                JSONObject jsonObject;
+                try {
+                    jsonObject = new JSONObject(finalJson);
+
+
+                    if (jsonObject.getInt("ID") == 103) {
+
+                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Info")
+                                .setContentText(jsonObject.getString("Name"))
+                                .show();
+                    } else {
+                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("Info")
+                                .setContentText(jsonObject.getString("Name"))
+                                .show();
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+                }
+            } else {
+                new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                        .setTitleText("Info")
+                        .setContentText("something went wrong/check your Internet/server is busy,kindly try again later")
+                        .show();
+            }
+            progressDialog.dismiss();
+        }
+    }
+
 }

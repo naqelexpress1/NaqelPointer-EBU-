@@ -2,7 +2,6 @@ package com.naqelexpress.naqelpointer.JSON.Request;
 
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

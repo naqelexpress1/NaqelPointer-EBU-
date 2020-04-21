@@ -2,11 +2,9 @@
 package com.naqelexpress.naqelpointer.Classes;
 
 import android.app.Notification;
-
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.graphics.Color;
 
 public class NotificationHelper extends ContextWrapper {
     private NotificationManager manager;

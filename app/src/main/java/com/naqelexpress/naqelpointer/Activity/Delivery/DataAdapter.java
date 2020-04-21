@@ -6,14 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.Waybill;
-import com.naqelexpress.naqelpointer.Activity.DeliverysheetEBU.DeliverySheetActivity;
-import com.naqelexpress.naqelpointer.Activity.SuggestDeliverysheet.DeliverySheet;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 
 public class DataAdapter
         extends RecyclerView.Adapter<DataAdapter.ViewHolder> {

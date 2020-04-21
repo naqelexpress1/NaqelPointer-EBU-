@@ -12,16 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.ArrivedatDestination;
-import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.SingleItem;
-import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.Waybill;
 import com.naqelexpress.naqelpointer.R;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

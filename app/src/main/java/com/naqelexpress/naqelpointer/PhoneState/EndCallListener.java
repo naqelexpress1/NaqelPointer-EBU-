@@ -1,12 +1,8 @@
 package com.naqelexpress.naqelpointer.PhoneState;
 
-import android.content.Intent;
 import android.telephony.PhoneStateListener;
-import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-
-import com.itextpdf.text.Utilities;
 
 /**
  * Created by Hasna on 3/10/19.

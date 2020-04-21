@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;

@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.JSON.Request;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
+
 import org.joda.time.DateTime;
 
 /**

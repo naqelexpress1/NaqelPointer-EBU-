@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 95; // Change the concept of deliver and not deliver
+    private static final int Version = 102; // Change the concept of deliver and not deliver
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -104,7 +104,8 @@ public class DBConnections
                 " \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" INTEGER NOT NULL , \"EmployID\" INTEGER NOT NULL , " +
                 "\"StationID\" INTEGER NOT NULL , \"IsPartial\" BOOL NOT NULL  DEFAULT 0, \"Latitude\" TEXT, \"Longitude\" TEXT ," +
                 " \"TotalReceivedAmount\" DOUBLE NOT NULL , \"CashAmount\" DOUBLE NOT NULL DEFAULT 0, \"POSAmount\" DOUBLE NOT NULL DEFAULT 0 ," +
-                " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0 , Barcode Text)");
+                " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0 , Barcode Text , IqamaID Text , PhoneNo Text , IqamaName Text," +
+                "DeliverySheetID Integer)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
@@ -158,7 +159,7 @@ public class DBConnections
                 "\"HasDeliveryRequest\" BOOL ,\"DDate\" TEXT NOT NULL,\"EmpID\" INTEGER NOT NULL,\"Weight\" TEXT NOT NULL," +
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
-                "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL )");
+                "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -361,6 +362,12 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnHoldWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"CityLists\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"CityCode\"  TEXT  ,CityName  TEXT   , CountryCode TEXT , StationID INTEGER , CountryID INTEGER )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
     }
 
@@ -578,6 +585,12 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"OnHoldWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"CityLists\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"CityCode\"  TEXT  ,CityName  TEXT   , CountryCode TEXT , StationID INTEGER , CountryID INTEGER )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -625,6 +638,10 @@ public class DBConnections
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN Notification INTEGER ");
             if (!isColumnExist("MyRouteShipments", "Refused"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN Refused BOOL ");
+            if (!isColumnExist("MyRouteShipments", "OTPNo"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN OTPNo  INTEGER ");
+            if (!isColumnExist("MyRouteShipments", "IqamaLength"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IqamaLength  INTEGER ");
 
             if (!isColumnExist("WaybillMeasurement", "UserID"))
                 db.execSQL("ALTER TABLE WaybillMeasurement ADD COLUMN UserID INTEGER ");
@@ -706,6 +723,17 @@ public class DBConnections
 
             if (!isColumnExist("Facility", "CountryName"))
                 db.execSQL("ALTER TABLE Facility ADD COLUMN CountryName Text ");
+
+            if (!isColumnExist("OnDelivery", "IqamaID"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN IqamaID Text ");
+
+            if (!isColumnExist("OnDelivery", "PhoneNo"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN PhoneNo Text ");
+
+            if (!isColumnExist("OnDelivery", "IqamaName"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN IqamaName Text ");
+            if (!isColumnExist("OnDelivery", "DeliverySheetID"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN DeliverySheetID Integer ");
         }
 
 
@@ -772,7 +800,9 @@ public class DBConnections
         try {
 
             SQLiteDatabase db = getReadableDatabase();
-            return db.rawQuery(Query, null);
+            synchronized ("dblock") {
+                return db.rawQuery(Query, null);
+            }
         } catch (SQLiteException e) {
             System.out.println(e);
 
@@ -1160,10 +1190,18 @@ public class DBConnections
 //    }
 
     //---------------------------------On Delivery Table-------------------------------
-    public boolean InsertOnDelivery(OnDelivery instance, Context context, int al) {
+    public boolean InsertOnDelivery(OnDelivery instance, Context context, int al, String iqamaid, String PhoneNo, String IqamaName) {
 
         long result = 0;
+        int DsID = 0;
 
+        Cursor ds = Fill("select * from MyRouteShipments where ItemNo = '" + instance.WaybillNo + "' Limit 1", context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            DsID = ds.getInt(ds.getColumnIndex("DeliverySheetID"));
+
+        }
+        ds.close();
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
@@ -1183,6 +1221,10 @@ public class DBConnections
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("AL", al);
             contentValues.put("Barcode", instance.Barcode);
+            contentValues.put("IqamaID", iqamaid);
+            contentValues.put("PhoneNo", PhoneNo);
+            contentValues.put("IqamaName", IqamaName);
+            contentValues.put("DeliverySheetID", DsID);
 
 
             result = db.insert("OnDelivery", null, contentValues);
@@ -2332,6 +2374,8 @@ public class DBConnections
             contentValues.put("POS", instance.POS);
             contentValues.put("Notification", 0);
             contentValues.put("Refused", false);
+            contentValues.put("OTPNo", instance.OtpNo);
+            contentValues.put("IqamaLength", instance.IqamaLength);
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
                 contentValues.put("OptimzeSerialNo", 0);
@@ -4479,7 +4523,7 @@ public class DBConnections
     }
 
     public boolean InsertFacility(int FacilityID, String Code, String Fname, int StationID, int FtypeID,
-                                  String FTName,String ConCode , String ConName , Context context) {
+                                  String FTName, String ConCode, String ConName, Context context) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4495,7 +4539,7 @@ public class DBConnections
             result = db.insert("Facility", null, contentValues);
             db.close();
         } catch (SQLiteException e) {
-
+            System.out.println(e);
         }
         return result != -1;
     }
@@ -5325,6 +5369,7 @@ public class DBConnections
         return result != -1;
     }
 
+    //Bulk Insert
     public void insertDelBulk(JSONArray deliveryReq, Context context) {
         String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -5357,6 +5402,7 @@ public class DBConnections
         db.close();
     }
 
+    //Bulk Insert
     public void insertReqBulk(JSONArray rtoReq, Context context) {
         String sql = "insert into RtoReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -5477,4 +5523,157 @@ public class DBConnections
 
         }
     }
+
+    public void insertCityBulk(JSONArray city, Context context) {
+        String sql = "insert into CityLists (CityCode, CityName, CountryCode, StationID , CountryID) values (?, ?, ?, ? ,?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (int i = 0; i < city.length(); i++) {
+            //generate some values
+            try {
+
+                JSONObject jsonObject1 = city.getJSONObject(i);
+
+                stmt.bindString(1, jsonObject1.getString("CityCode"));
+                stmt.bindString(2, jsonObject1.getString("CityName"));
+                stmt.bindString(3, jsonObject1.getString("CountryCode"));
+                stmt.bindString(4, jsonObject1.getString("StationID"));
+                stmt.bindString(5, jsonObject1.getString("CountryID"));
+
+                long entryID = stmt.executeInsert();
+
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
+    }
+
+    public boolean InsertDomain(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context);
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            domian.add("https://mobilepointerapi2.naqelexpress.com/Api/Pointer/");
+            domian.add("https://mobilepointerapi1.naqelexpress.com/Api/Pointer/");
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public int CountDomainURL(Context context) {
+        int Count = 0;
+        try {
+            Cursor cursor = Fill("select Name  from DomainURL ", context);
+            if (cursor.getCount() > 0) {
+                Count = cursor.getCount();
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+
+        return Count;
+    }
+
+    public String GetPrimaryDomain(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes(int triedtimes, String domainname, Context context) {
+
+        GlobalVar.ResetTriedCount();
+        UpdateExsistingIsPrimary(domainname, context);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        if (triedtimes == 2) {
+
+            if (domainname.contains("mobilepointerapi2.naqelexpress.com")) {
+                contentValues.put("Name", "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/");
+                domainname = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";
+            } else {
+                contentValues.put("Name", "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/");
+                domainname = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/";
+
+            }
+            contentValues.put("Isprimary", 1);
+        } else
+            contentValues.put("Istried", triedtimes);
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimary(String domainname, Context context) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+
 }

@@ -36,11 +36,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.WayBillDetails;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.service.ArrivedatDest;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -63,7 +61,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static com.naqelexpress.naqelpointer.R.id.container;
-import static com.naqelexpress.naqelpointer.R.id.waybill;
 
 public class ArrivedatDestination extends AppCompatActivity {
 

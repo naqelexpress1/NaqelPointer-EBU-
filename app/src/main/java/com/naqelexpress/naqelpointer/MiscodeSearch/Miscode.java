@@ -23,7 +23,6 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.TerminalHandling.FirstFragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Miscode extends AppCompatActivity implements MiscodeAdapter.ContactsAdapterListener {
@@ -75,7 +74,31 @@ public class Miscode extends AppCompatActivity implements MiscodeAdapter.Contact
 
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        Cursor result = dbConnections.Fill("select * from Facility", getApplicationContext());
+//        Cursor result = dbConnections.Fill("select * from Facility", getApplicationContext());
+//
+//        contactList.clear();
+//
+//
+//        // refreshing recycler view
+//
+//
+//        if (result.getCount() > 0) {
+//            result.moveToFirst();
+//            do {
+//                MiscodeModel items = new MiscodeModel();
+//
+//                HashMap<String, String> temp = new HashMap<>();
+//
+//                items.setFacilityID(result.getInt(result.getColumnIndex("FacilityID")));
+//                items.setCountrycode(result.getString(result.getColumnIndex("CountryCode")));
+//                items.setCityname(result.getString(result.getColumnIndex("Name")));
+//                items.setCitycode(result.getString(result.getColumnIndex("Code")));
+//                contactList.add(items);
+//            }
+//            while (result.moveToNext());
+//        }
+
+        Cursor result = dbConnections.Fill("select * from CityLists", getApplicationContext());
 
         contactList.clear();
 
@@ -88,16 +111,17 @@ public class Miscode extends AppCompatActivity implements MiscodeAdapter.Contact
             do {
                 MiscodeModel items = new MiscodeModel();
 
-                HashMap<String, String> temp = new HashMap<>();
 
-                items.setFacilityID(result.getInt(result.getColumnIndex("FacilityID")));
+
+                items.setFacilityID(result.getInt(result.getColumnIndex("StationID")));
                 items.setCountrycode(result.getString(result.getColumnIndex("CountryCode")));
-                items.setCityname(result.getString(result.getColumnIndex("Name")));
-                items.setCitycode(result.getString(result.getColumnIndex("Code")));
+                items.setCityname(result.getString(result.getColumnIndex("CityName")));
+                items.setCitycode(result.getString(result.getColumnIndex("CityCode")));
                 contactList.add(items);
             }
             while (result.moveToNext());
         }
+
 
         if (contactList.size() > 0)
             mAdapter.notifyDataSetChanged();

@@ -61,7 +61,7 @@ public class DeliveryFirstFragment
 
     public static ArrayList<String> ShipmentBarCodeList = new ArrayList<>();
     public static EditText txtWaybillNo;
-    private TextView txtConsigneeName;
+    public static TextView txtConsigneeName;
     public TextView txtBillingType;
     private TextView txtCODAmount;
     private TextView txtWeight;
@@ -83,6 +83,7 @@ public class DeliveryFirstFragment
     boolean signrequired = false;
     static int al = 0;
     public static String Lat = "0", Longi = "0";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -387,42 +388,48 @@ public class DeliveryFirstFragment
         }
     }
 
+
     private void GetWayBillInfo() {
-        String waybillno = txtWaybillNo.getText().toString().substring(0, 8);
-        DBConnections dbConnections = new DBConnections(getContext(), null);
-        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + waybillno + "'",
-                getContext());
+        try {
 
-        if (result.getCount() > 0) {
 
-            ReadFromLocal(result, dbConnections);
-        } else {
-            GlobalVar.hideKeyboardFrom(getContext(), rootView);
-            GetWaybillDetailsRequest getWaybillDetailsRequest = new GetWaybillDetailsRequest();
-            NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
-            try {
-                getWaybillDetailsRequest.WaybillNo = Integer.parseInt(String.valueOf(nf.parse(txtWaybillNo.getText().toString())));
+            String waybillno = txtWaybillNo.getText().toString();//.substring(0, 8);
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + waybillno + "'",
+                    getContext());
 
-            } catch (ParseException e) {
-                e.printStackTrace();
+            if (result.getCount() > 0) {
+
+                ReadFromLocal(result, dbConnections);
+            } else {
+                GlobalVar.hideKeyboardFrom(getContext(), rootView);
+                GetWaybillDetailsRequest getWaybillDetailsRequest = new GetWaybillDetailsRequest();
+                NumberFormat nf = NumberFormat.getInstance(Locale.ENGLISH);
+                try {
+                    getWaybillDetailsRequest.WaybillNo = Integer.parseInt(String.valueOf(nf.parse(txtWaybillNo.getText().toString())));
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                JSONObject jsonObject = new JSONObject();
+                try {
+
+                    jsonObject.put("WaybillNo", getWaybillDetailsRequest.WaybillNo);
+                    jsonObject.put("AppTypeID", getWaybillDetailsRequest.AppTypeID);
+                    jsonObject.put("AppVersion", getWaybillDetailsRequest.AppVersion);
+                    jsonObject.put("LanguageID", getWaybillDetailsRequest.LanguageID);
+                    String jsonData = jsonObject.toString();
+
+                    new GetWaybillDetailsInfo().execute(jsonData);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-
-            JSONObject jsonObject = new JSONObject();
-            try {
-
-                jsonObject.put("WaybillNo", getWaybillDetailsRequest.WaybillNo);
-                jsonObject.put("AppTypeID", getWaybillDetailsRequest.AppTypeID);
-                jsonObject.put("AppVersion", getWaybillDetailsRequest.AppVersion);
-                jsonObject.put("LanguageID", getWaybillDetailsRequest.LanguageID);
-                String jsonData = jsonObject.toString();
-
-                new GetWaybillDetailsInfo().execute(jsonData);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
-
 
     }
 

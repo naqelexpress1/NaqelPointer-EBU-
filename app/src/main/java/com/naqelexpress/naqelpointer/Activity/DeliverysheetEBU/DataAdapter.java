@@ -9,8 +9,6 @@ import android.widget.TextView;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 
 public class DataAdapter
         extends RecyclerView.Adapter<DataAdapter.ViewHolder> {

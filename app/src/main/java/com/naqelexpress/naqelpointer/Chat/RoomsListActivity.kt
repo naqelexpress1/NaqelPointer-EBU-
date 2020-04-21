@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import com.naqelexpress.naqelpointer.ApplicationController.currentUser
+import com.naqelexpress.naqelpointer.Chat.ProgressDialog
 //import com.naqelexpress.naqelpointer.AppController.Companion.currentUser
 import com.pusher.chatkit.AndroidChatkitDependencies
 import com.pusher.chatkit.ChatListeners
@@ -14,8 +16,6 @@ import com.pusher.chatkit.ChatkitTokenProvider
 import com.pusher.chatkit.rooms.Room
 import com.pusher.util.Result
 import kotlinx.android.synthetic.main.activity_rooms_list.*
-import com.naqelexpress.naqelpointer.ApplicationController.currentUser
-import com.naqelexpress.naqelpointer.Chat.ProgressDialog
 
 class RoomsListActivity : AppCompatActivity() {
     val adapter = RoomsAdapter()

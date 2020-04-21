@@ -25,7 +25,6 @@ import android.widget.TextView;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class FirstFrgament extends Fragment {
 

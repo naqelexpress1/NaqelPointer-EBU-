@@ -165,6 +165,11 @@ public class PartialDelivery extends Service {
                     onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
                     onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
 
+                    onDeliveryRequest.IqamaID = result.getString(result.getColumnIndex("IqamaID"));
+                    onDeliveryRequest.PhoneNo = result.getString(result.getColumnIndex("PhoneNo"));
+                    onDeliveryRequest.IqamaName = result.getString(result.getColumnIndex("IqamaName"));
+                    onDeliveryRequest.DeliverySheetID = result.getInt(result.getColumnIndex("DeliverySheetID"));
+
                     try {
                         FirebaseApp.initializeApp(this);
                         String token = FirebaseInstanceId.getInstance().getToken();

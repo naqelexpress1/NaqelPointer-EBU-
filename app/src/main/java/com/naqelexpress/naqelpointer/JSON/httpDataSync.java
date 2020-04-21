@@ -5,8 +5,6 @@ package com.naqelexpress.naqelpointer.JSON;
  */
 
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Classes.AsyncResponse;
 

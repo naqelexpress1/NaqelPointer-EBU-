@@ -67,6 +67,7 @@ public class FacilityStatus {
                         dbConnections.InsertFacility(FacilityID, Code, Fname, StationID, FtypeID, FTName, ConCode, ConName, context);
 
                     } catch (JSONException ignored) {
+
                     }
                 }
             }

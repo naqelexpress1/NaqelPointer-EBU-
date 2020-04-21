@@ -11,9 +11,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.GetPasswordRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.DefaultResult;
 import com.naqelexpress.naqelpointer.R;
 

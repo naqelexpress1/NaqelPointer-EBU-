@@ -81,7 +81,8 @@ public class MyRouteShipments implements Parcelable {
     public String Weight = "";
     public int POS = 0;
     public int Position = 0;
-
+    public int OtpNo = 0;
+    public int IqamaLength = 0;
 
     public MyRouteShipments() {
 
@@ -232,7 +233,8 @@ public class MyRouteShipments implements Parcelable {
                 instance.PODTypeName = jsonObject.getString("PODTypeName");
                 instance.PiecesCount = String.valueOf(jsonObject.getString("PiecesCount"));
                 instance.Weight = String.valueOf(jsonObject.getString("Weight"));
-
+                instance.OtpNo = jsonObject.getInt("OTPNO");
+                instance.IqamaLength = jsonObject.getInt("IqamaLength");
                 if (jsonObject.getInt("Complaint") != 0) {
                     instance.HasComplaint = true;
                     complaint = complaint + 1;

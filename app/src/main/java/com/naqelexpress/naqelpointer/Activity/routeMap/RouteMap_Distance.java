@@ -9,8 +9,6 @@ import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.R;
 
-import java.util.ArrayList;
-
 /**
  * Created by Hasna on 7/24/18.
  */

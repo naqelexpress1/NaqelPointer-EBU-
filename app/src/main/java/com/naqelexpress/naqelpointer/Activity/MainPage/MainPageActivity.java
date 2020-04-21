@@ -1063,8 +1063,13 @@ public class MainPageActivity
                     case 11:
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
-                                Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
-                                startActivity(bookingList);
+                                if (!GetDivision()) {
+                                    Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
+                                    startActivity(bookingList);
+                                } else {
+                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+                                    startActivity(bookingList);
+                                }
                             } else {
                                 GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                         , true);

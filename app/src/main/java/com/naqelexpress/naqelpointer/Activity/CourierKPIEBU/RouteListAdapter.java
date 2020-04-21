@@ -1,22 +1,15 @@
 package com.naqelexpress.naqelpointer.Activity.CourierKPIEBU;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.naqelexpress.naqelpointer.DB.DBObjects.SuggestMyRouteShipments;
 import com.naqelexpress.naqelpointer.R;
-
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class RouteListAdapter
         extends BaseAdapter {

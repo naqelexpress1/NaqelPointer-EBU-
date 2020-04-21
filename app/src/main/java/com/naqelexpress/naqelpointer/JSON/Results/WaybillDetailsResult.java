@@ -25,8 +25,8 @@ public class WaybillDetailsResult
     private String CityFName = "";
     private LocationCoordinate locationCoordinate;
     public boolean signrequired = false;
-    public  String ClientName = "";
-    public  int BlockClient = 0;
+    public String ClientName = "";
+    public int BlockClient = 0;
 
     public ArrayList<String> BarCodeList = new ArrayList<String>();
 
@@ -41,7 +41,14 @@ public class WaybillDetailsResult
             jsonObject = new JSONObject(finalJson);
 
             ID = Integer.parseInt(jsonObject.getString("ID"));
-            BlockClient = jsonObject.getInt("BlockClient");
+
+            try {
+                BlockClient = jsonObject.getInt("BlockClient");
+
+            } catch (Exception e) {
+
+            }
+
             WaybillNo = Integer.parseInt(jsonObject.getString("WaybillNo"));
             PiecesCount = (int) Double.parseDouble(jsonObject.getString("PiecesCount"));
             Weight = Double.parseDouble(jsonObject.getString("Weight"));
@@ -56,7 +63,7 @@ public class WaybillDetailsResult
             Near = jsonObject.getString("Near");
             CityName = jsonObject.getString("CityName");
             CityFName = jsonObject.getString("CityFName");
-            ClientName =   jsonObject.getString("ClientName");
+            ClientName = jsonObject.getString("ClientName");
             //if (jsonObject.getInt("ClientID") == 9018270)
             if (jsonObject.getInt("Sign") == 1)
                 signrequired = true;

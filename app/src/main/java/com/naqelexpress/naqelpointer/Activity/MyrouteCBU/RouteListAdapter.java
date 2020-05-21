@@ -1,17 +1,14 @@
-package com.naqelexpress.naqelpointer.Activity.MyRoute;
+package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -24,56 +21,65 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
 import java.lang.ref.WeakReference;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class RouteListAdapterNew
-        extends RecyclerView.Adapter<RouteListAdapterNew.MyViewHolder> implements Filterable {
+public class RouteListAdapter
+        extends BaseAdapter implements Filterable {
     private Context context;
     private List<MyRouteShipments> itemList;
     private String class_;
     private List<MyRouteShipments> itemListFiltered;
     private RouteAdapterListener listener;
 
-    public RouteListAdapterNew(Context context, List<MyRouteShipments> itemList, String calss_,
-                               RouteAdapterListener listener) {
+    public RouteListAdapter(Context context, List<MyRouteShipments> itemList, String calss_) {
         this.context = context;
         this.itemList = itemList;
         itemListFiltered = itemList;
         this.class_ = calss_;
-        this.listener = listener;
     }
 
+    @Override
+    public int getCount() {
+        return itemListFiltered.size();
+    }
+
+    @Override
+    public MyRouteShipments getItem(int position) {
+        return itemListFiltered.get(position);
+    }
 
     @Override
     public long getItemId(int position) {
         return position;
     }
 
+
     @Override
-    public int getItemCount() {
-        return itemListFiltered.size();
-    }
-
-
-    @NonNull
-    @Override
-    public MyViewHolder onCreateViewHolder(@NonNull ViewGroup convertView, int position) {
-
-        View itemView = LayoutInflater.from(context)
-                .inflate(R.layout.routeitem, convertView, false);
-
-        return new MyViewHolder(itemView);
-
-
-//        return convertView;
+    public int getViewTypeCount() {
+        // menu type count
+        return 2;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+    public int getItemViewType(int position) {
+        // current menu type
+        return position % 2;
+    }
 
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = View.inflate(context, R.layout.routeitem, null);
+            new ViewHolder(convertView);
+        }
 
-        MyRouteShipments item = itemListFiltered.get(position);
+        ViewHolder holder = (ViewHolder) convertView.getTag();
+        MyRouteShipments item = getItem(position);
 
 
         holder.lbSerial.setText(String.valueOf(getItemId(position) + 1));
@@ -160,25 +166,52 @@ public class RouteListAdapterNew
 
         } else {
             holder.txtWaybill.setText("Waybill No\n" + item.ItemNo);
+            holder.txtType.setVisibility(View.VISIBLE);
             holder.imgHasComplaint.setVisibility(View.GONE);
+            holder.imgHasDeliveryRequest.setVisibility(View.VISIBLE);
+            holder.txtExpectedTime.setVisibility(View.VISIBLE);
+
+            if (item.IsDelivered) {
+                holder.imgHasDeliveryRequest.setImageResource(R.drawable.accpet_job);
+            } else
+                holder.imgHasDeliveryRequest.setImageResource(R.drawable.jobnotsync);
+
+            // holder.imgHasComplaint.setVisibility(View.GONE);
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                Date dt = formatter.parse(item.ExpectedTime.toString());
+
+                DateFormat dfmt = new SimpleDateFormat("dd-MM-yyyy");
+                String dte = dfmt.format(dt);
+
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+                String time = fmt.print(item.ExpectedTime);
+
+                holder.txtExpectedTime.setText(dte + " " + time);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (item.TypeID != 0) {
+                holder.txtType.setVisibility(View.VISIBLE);
+                holder.txtWaybill.setText("Waybillcount " + String.valueOf(item.TypeID) + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
+                holder.txtType.setText("Pieces Count " + String.valueOf(item.PiecesCount));
+            }
             holder.imgHasLocation.setVisibility(View.GONE);
-            holder.txtExpectedTime.setVisibility(View.GONE);
             holder.lbDeliveryDate.setVisibility(View.GONE);
             holder.txtAmount.setVisibility(View.GONE);
 
         }
-
+        return convertView;
     }
 
-
-    class MyViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder {
         TextView txtWaybill, txtType, lbSerial, txtExpectedTime, lbDeliveryDate, txtAmount, header;
         ImageView imgHasLocation, imgHasComplaint, imgHasDeliveryRequest;
         ConstraintLayout cl;
         //TextView panel;
 
-        public MyViewHolder(View view) {
-            super(view);
+        public ViewHolder(View view) {
             txtAmount = (TextView) view.findViewById(R.id.txtAmount);
             lbDeliveryDate = (TextView) view.findViewById(R.id.lbDeliveryDate);
             txtWaybill = (TextView) view.findViewById(R.id.txtWaybilll);
@@ -192,14 +225,6 @@ public class RouteListAdapterNew
             imgHasDeliveryRequest = (ImageView) view.findViewById(R.id.imgHasRequest);
             header = (TextView) view.findViewById(R.id.changesheader);
             cl = (ConstraintLayout) view.findViewById(R.id.changeView);
-
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // send selected contact in callback
-                    listener.onItemSelected(itemListFiltered.get(getAdapterPosition()));
-                }
-            });
 
 
             view.setTag(this);
@@ -235,7 +260,7 @@ public class RouteListAdapterNew
         @Override
         protected ConstraintLayout doInBackground(String... params) {
 
-            @SuppressLint("WrongThread") ConstraintLayout textView = new ConstraintLayout(context);
+            ConstraintLayout textView = new ConstraintLayout(context);
 
             if (params[0].equals("1"))
                 textView.setBackgroundColor(Color.parseColor("#F6F600"));

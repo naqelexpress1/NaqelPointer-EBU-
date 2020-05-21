@@ -240,5 +240,5 @@
     <!--</string-array>-->
 
     <string name="incabheader"><u>DAILY  PRE &amp; POST  TRIP TRUCK  CHECK LIST</u>.</string>
-
+    <string name="servererror">Something went wrong,kindly try again</string>
 </resources>

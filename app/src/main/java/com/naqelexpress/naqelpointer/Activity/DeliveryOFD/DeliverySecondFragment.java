@@ -108,6 +108,9 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             txtReceiverName = (EditText) rootView.findViewById(R.id.txtCheckPointType);
 
             txtPOS.addTextChangedListener(this);
+            if (DeliveryFirstFragment.IsCODtextboxEnable == 1) {
+               txtCash.setKeyListener(null);
+            }
             txtCash.addTextChangedListener(this);
 
             Button validatepayment = (Button) rootView.findViewById(R.id.validatepayament);
@@ -679,13 +682,13 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         //alertDialog.setTitle(getResources().getString(R.string.app_name));
         alertDialog.setCancelable(false);
         alertDialog.setMessage("kindly choose Payment Info");
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "StcPay", new DialogInterface.OnClickListener() {
+        /*alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "StcPay", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int id) {
                 new ValidatePayment().execute(jsonObject.toString(), "0");
                 dialog.dismiss();
             }
-        });
+        });*/
         alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "Payment Gateway", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 new ValidatePayment().execute(jsonObject.toString(), "1");

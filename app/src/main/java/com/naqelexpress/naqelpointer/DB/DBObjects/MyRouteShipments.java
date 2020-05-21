@@ -83,6 +83,9 @@ public class MyRouteShipments implements Parcelable {
     public int Position = 0;
     public int OtpNo = 0;
     public int IqamaLength = 0;
+    public int DsOrderNo = 0;
+    public int IsPaid = 0;
+    public int IsMap = 0;
 
     public MyRouteShipments() {
 
@@ -178,6 +181,7 @@ public class MyRouteShipments implements Parcelable {
                 instance.ClientID = Integer.parseInt(jsonObject.getString("ConsigneeID")); //ClientID
 
                 instance.OrderNo = jsonObject.getInt("ConsigneeAddressID");
+                instance.DsOrderNo = jsonObject.getInt("OrderNo");
                 instance.ClientName = jsonObject.getString("ClientName");
                 instance.ClientFName = jsonObject.getString("ClientFName");
 
@@ -235,6 +239,9 @@ public class MyRouteShipments implements Parcelable {
                 instance.Weight = String.valueOf(jsonObject.getString("Weight"));
                 instance.OtpNo = jsonObject.getInt("OTPNO");
                 instance.IqamaLength = jsonObject.getInt("IqamaLength");
+                instance.IsPaid = jsonObject.getInt("Ispaid");
+                instance.IsMap = jsonObject.getInt("IsMap");
+
                 if (jsonObject.getInt("Complaint") != 0) {
                     instance.HasComplaint = true;
                     complaint = complaint + 1;
@@ -388,6 +395,7 @@ public class MyRouteShipments implements Parcelable {
         HasComplaint = in.readByte() != 0;
         HasDeliveryRequest = in.readByte() != 0;
         Position = in.readInt();
+        DsOrderNo = in.readInt();
 
     }
 
@@ -569,7 +577,7 @@ public class MyRouteShipments implements Parcelable {
             if (mobileno.length() >= 9) {
                 String mno = mobileno.substring(mobileno.length() - 9, mobileno.length());
 
-                mobileno = "+"+CountryCode + mno;
+                mobileno = "+" + CountryCode + mno;
 
 
             }
@@ -628,6 +636,7 @@ public class MyRouteShipments implements Parcelable {
         parcel.writeByte((byte) (HasComplaint ? 1 : 0));
         parcel.writeByte((byte) (HasDeliveryRequest ? 1 : 0));
         parcel.writeInt(Position);
+        parcel.writeInt(DsOrderNo);
     }
 
     public enum UpdateType {

@@ -204,7 +204,11 @@ public class DeliverysheetbyPiece extends Service {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "CreateDeliversheetbyPieceLevel";
+        //final String DomainURL = "";
+        String isInternetAvailable = "";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU");
+        // String URL = GlobalVar.GV().NaqelPointerAPILink + "CreateDeliversheetbyPieceLevel";
+        String URL = DomainURL + "CreateDeliversheetbyPieceLevel";
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -224,13 +228,17 @@ public class DeliverysheetbyPiece extends Service {
 
                     } else
                         flag_thread = false;
+
+
                     db.close();
                 } catch (JSONException e) {
+
                     flag_thread = false;
                     if (db != null)
                         db.close();
                     e.printStackTrace();
                 }
+                GlobalVar.GV().triedTimes_ForDelSheetService = 0;
 
             }
         }, new Response.ErrorListener() {
@@ -238,6 +246,16 @@ public class DeliverysheetbyPiece extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForDelSheetService = GlobalVar.GV().triedTimes_ForDelSheetService + 1;
+                    if (GlobalVar.GV().triedTimes_ForDelSheetService == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "DeliverySheetCBU");
+
+                    }
+                }
+
                 flag_thread = false;
                 db.close();
             }
@@ -279,7 +297,7 @@ public class DeliverysheetbyPiece extends Service {
 
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                GlobalVar.GV().loadbalance_Contimeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

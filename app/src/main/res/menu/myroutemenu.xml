@@ -39,7 +39,7 @@
     <item
         android:id="@+id/mnuShowDeliverySheetOrder"
         android:orderInCategory="100"
-        android:title="Delivery Sheet Order"
+        android:title="Optimize my Shipments"
         app:showAsAction="never" />
 
     <!--<item-->

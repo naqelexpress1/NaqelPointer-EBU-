@@ -60,6 +60,7 @@ public class DeliverySheetSecondFragment
         //final Intent intent;
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.deliverysheetsecondfragment, container, false);
+
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);

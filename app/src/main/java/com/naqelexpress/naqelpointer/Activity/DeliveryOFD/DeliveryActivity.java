@@ -32,7 +32,6 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.OnDelivery;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.PaymentGateway.StcPaymentGateway;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.ActualLocation;
 import com.naqelexpress.naqelpointer.service.LocationService;
@@ -52,12 +51,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 import static com.naqelexpress.naqelpointer.R.id.container;
 
-public class DeliveryActivity
-        extends AppCompatActivity {
+public class DeliveryActivity extends AppCompatActivity {
 
     DeliveryFirstFragment firstFragment;
     DeliverySecondFragment secondFragment;
@@ -113,6 +109,8 @@ public class DeliveryActivity
                     1);
             finish();
         }
+
+        firstFragment.IsCODtextboxEnable = 0;
 
 
     }
@@ -199,7 +197,7 @@ public class DeliveryActivity
                 }
 
                 return true;
-            case R.id.stcPay:
+          /*  case R.id.stcPay:
 
                 if (bundle.getString("BT").equals("COD")) {
                     Intent mIntent = new Intent(this, StcPaymentGateway.class);
@@ -214,7 +212,7 @@ public class DeliveryActivity
                             .setContentText("This is not COD waybill,kindly try with COD waybill")
                             .show();
                 }
-                return true;
+                return true;*/
             default:
                 return super.onOptionsItemSelected(item);
         }

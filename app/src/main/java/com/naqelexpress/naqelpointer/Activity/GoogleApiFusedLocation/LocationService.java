@@ -140,6 +140,7 @@ public class LocationService extends Service {
                         devision = result.getString(result.getColumnIndex("Division"));
 
                     }
+
                     String empid = dbConnections.getDeliverysheetEmpID(getApplicationContext());
                     String split[] = empid.split(",");
                     //                    dbConnections.
@@ -167,7 +168,8 @@ public class LocationService extends Service {
                             requestQueue.cancelAll("old");
                         if (split.length > 1 && split[1].equals("1"))
                             shareLiveLocation(jsonObject.toString());
-
+                        if(split[0].equals("19127"))
+                            shareLiveLocation(jsonObject.toString());
                         sendNotificationtoConsignee(location.getLatitude(), location.getLongitude());
 
                     } catch (Exception e) {

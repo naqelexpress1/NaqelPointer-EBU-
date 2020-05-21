@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -33,7 +34,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.inventorygroup);
+        setContentView(R.layout.inventorygroup_withncl);
 
         //countDownTimer = new MyCountDownTimer(startTime, interval);
 
@@ -48,6 +49,12 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
         ImageView heldout = (ImageView) findViewById(R.id.heldout);
         heldout.setOnClickListener(this);
+
+        LinearLayout invbyncl = (LinearLayout) findViewById(R.id.invbyncl);
+        invbyncl.setOnClickListener(this);
+
+        LinearLayout invbydelncl = (LinearLayout) findViewById(R.id.delbyNCL);
+        invbydelncl.setOnClickListener(this);
 
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
@@ -146,6 +153,14 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
                 fetchgroup("1");
 
                 break;
+            case R.id.invbyncl:
+                InventorybyNCL("1");
+
+                break;
+            case R.id.delbyNCL:
+                InventoryReqbyNCL("1");
+
+                break;
             case R.id.group2:
 //                fetchgroup("2");
                 break;
@@ -185,6 +200,58 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void InventoryReqbyNCL(String group) {
+
+        ArrayList<HashMap<String, String>> fetchdata = new ArrayList<>();
+
+        for (int i = 0; i < status.size(); i++) {
+            if (group.equals(status.get(i).get("GroupID"))) {
+                fetchdata.add(status.get(i));
+            }
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("status", fetchdata);
+        bundle.putSerializable("reason", reason);
+        bundle.putStringArrayList("city", city);
+        bundle.putStringArrayList("operationalcity", operationalcity);
+        bundle.putString("group", "Group " + group);
+
+
+        Intent intent = new Intent(this,
+                com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_DelRtoReqbyNCL.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+
+    }
+
+    private void InventorybyNCL(String group) {
+
+        ArrayList<HashMap<String, String>> fetchdata = new ArrayList<>();
+
+        for (int i = 0; i < status.size(); i++) {
+            if (group.equals(status.get(i).get("GroupID"))) {
+                fetchdata.add(status.get(i));
+            }
+        }
+
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("status", fetchdata);
+        bundle.putSerializable("reason", reason);
+        bundle.putStringArrayList("city", city);
+        bundle.putStringArrayList("operationalcity", operationalcity);
+        bundle.putString("group", "Group " + group);
+
+
+        Intent intent = new Intent(this,
+                com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationbyNCL.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+        intent.putExtras(bundle);
+        startActivity(intent);
+
+
+    }
+
     private void fetchgroup(String group) {
 
         ArrayList<HashMap<String, String>> fetchdata = new ArrayList<>();
@@ -205,7 +272,7 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
         //Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControlOnetab.class); //com.naqelexpress.naqelpointer.TerminalHandling.
         // Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
-        if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+        if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) { //Gateway
             Intent intent = new Intent(this,
                     com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationReleaseWaybills.class); //com.naqelexpress.naqelpointer.TerminalHandling.
             intent.putExtras(bundle);

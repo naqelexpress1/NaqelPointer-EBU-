@@ -86,8 +86,11 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU : 2.6.6.0 19-04-2020";
+    public String AppVersion = "CBU : Map_Ispaid_RemoveSTC 20-05-2020";
     public static int triedTimes = 0;
+    public static int triedTimes_ForDelService = 0;
+    public static int triedTimes_ForNotDeliverService = 0;
+    public static int triedTimes_ForDelSheetService = 0;
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
@@ -98,11 +101,14 @@ public class GlobalVar {
     public int AppID = 6;
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
-    //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V1/Api/Pointer/";
-    //public String NaqelPointerAPILink = "http://192.168.1.127:49981/Api/Pointer/";
-    public String NaqelPointerAPILink = "http://35.244.2.170/NaqelPointer/api/pointer/";
-    //public String NaqelPointerAPILink = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
-    public String NaqelPointerAPILink2 = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
+    public String NaqelPointerAPILink_For5_1 = "http://34.93.221.35/NaqelPointer/api/pointer/";
+    public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/";
+    // public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/"; NaqelWay IP
+   // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
+   // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
+    public String NaqelPointerAPILink1_ForDomain ="http://34.93.221.35/NaqelPointer/api/pointer/";
+    public String NaqelPointerAPILink2_ForDomain = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
     public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
@@ -113,10 +119,12 @@ public class GlobalVar {
     public int Connandtimeout30000 = 30000;
     public int ConnandReadtimeout50000 = 50000;
 
-    public int loadbalance_Contimeout = 180000;
-    public int loadbalance_ConRedtimeout = 180000;
+    public int loadbalance_Contimeout = 30000;
+    public int loadbalance_ConRedtimeout = 30000;
 
     public boolean isneedOtp = false;
+
+    public boolean isFortesting = false;
 
     //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
     //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
@@ -240,19 +248,24 @@ public class GlobalVar {
 
     public void ShowSnackbar(View view, String Message, AlertType alertType) {
 
-        Snackbar snackbar = Snackbar.make(view, Message, Snackbar.LENGTH_LONG);
+        hideKeyboardFrom(view.getContext(), view);
+        try {
+            Snackbar snackbar = Snackbar.make(view, Message, Snackbar.LENGTH_LONG);
 
-        View sbView = snackbar.getView();
+            View sbView = snackbar.getView();
 //        TextView text = (TextView) view.findViewById(android.R.id.message);
 
-        if (alertType == AlertType.Error) {
-            sbView.setBackgroundResource(R.color.NaqelRed);
-        } else if (alertType == AlertType.Info) {
-            sbView.setBackgroundResource(R.color.NaqelBlue);
-        } else if (alertType == AlertType.Warning) {
-            sbView.setBackgroundResource(R.color.NaqelBlue);
+            if (alertType == AlertType.Error) {
+                sbView.setBackgroundResource(R.color.NaqelRed);
+            } else if (alertType == AlertType.Info) {
+                sbView.setBackgroundResource(R.color.NaqelBlue);
+            } else if (alertType == AlertType.Warning) {
+                sbView.setBackgroundResource(R.color.NaqelBlue);
+            }
+            snackbar.show();
+        } catch (Exception e) {
+            System.out.println(e);
         }
-        snackbar.show();
     }
 
     public void ShowSnackbar(View view, String Message, AlertType alertType, boolean Playsound, Context context) {
@@ -714,6 +727,7 @@ public class GlobalVar {
         dbConnections.close();
         return isvalid;
     }
+
 
     public boolean istxtBoxEnabled(Context context) {
         boolean isvalid = false;
@@ -1183,6 +1197,7 @@ public class GlobalVar {
         return pwd;
     }
 
+
     public void LoadMyRouteShipments(String orderBy,
                                      boolean CheckComplaintandDeliveryRequest, Context context, View view) {
 
@@ -1195,6 +1210,7 @@ public class GlobalVar {
                         == PackageManager.PERMISSION_GRANTED) {
 
             Location location = GlobalVar.getLastKnownLocation(context);
+            location.setSpeed(0);
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
             if (location != null)
 
@@ -1205,6 +1221,7 @@ public class GlobalVar {
         DBConnections dbConnections = new DBConnections(context, null);
 
         int position = 1;
+        int hasposition = 0;
         if (GlobalVar.GV().CourierDailyRouteID > 0) {
             Cursor result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
                     GlobalVar.GV().CourierDailyRouteID + " order by " + orderBy, context);
@@ -1237,6 +1254,7 @@ public class GlobalVar {
                             haslocation.add(position);
                             sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
                             sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
+                            sp.setSpeed(position);
                         } catch (Exception e) {
                             sp.setLatitude(0);
                             sp.setLongitude(0);
@@ -1277,6 +1295,8 @@ public class GlobalVar {
                     myRouteShipments.HasComplaint = result.getInt(result.getColumnIndex("HasComplaint")) > 0;
                     myRouteShipments.HasDeliveryRequest = result.getInt(result.getColumnIndex("HasDeliveryRequest")) > 0;
                     myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
+                    myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
+                    myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
                     myRouteShipments.Position = position - 1;
 
                     myRouteShipmentList.add(myRouteShipments);
@@ -1287,6 +1307,181 @@ public class GlobalVar {
                 while (result.moveToNext());
 
                 // ReOrderMyRouteShipments(CheckComplaintandDeliveryRequest, view, context);
+            }
+        }
+        dbConnections.close();
+    }
+
+    public void LoadMyRouteShipments_RouteOpt(String orderBy,
+                                              boolean CheckComplaintandDeliveryRequest, Context context, View view) {
+
+        String Waybillno = "";
+        String orderNo = "";
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
+                " and EmpID = " + GlobalVar.GV().EmployID, context);
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+            do {
+
+                String data = result.getString(result.getColumnIndex("StringData"));
+                String split[] = data.split("@");
+                for (int i = 1; i < split.length; i++) {
+                    String temp[] = split[i].split("_");
+
+                    if (i == 1) {
+                        Waybillno = temp[0];
+                        orderNo = temp[temp.length - 1];
+                    } else {
+                        orderNo = orderNo + "," + temp[temp.length - 1];
+                        Waybillno = Waybillno + "," + temp[0];
+                    }
+
+                }
+            }
+            while (result.moveToNext());
+        }
+        myRouteShipmentList = new ArrayList<>();
+        LoadMyRouteShipments_CBU("0", CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
+        LoadMyRouteShipments_CBU(orderBy, CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
+    }
+
+    public void LoadMyRouteShipments_CBU(String orderBy,
+                                         boolean CheckComplaintandDeliveryRequest, Context context, View view, String Waybillno, String condition) {
+
+
+        haslocation.clear();
+        MyRouteActivity.places.clear();
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+
+            Location location = GlobalVar.getLastKnownLocation(context);
+            location.setSpeed(0);
+            //ll = new LatLng(location.getLatitude(), location.getLongitude());
+            if (location != null)
+
+                MyRouteActivity.places.add(location);
+
+        }
+
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        int position = 1;
+        int hasposition = 0;
+        if (GlobalVar.GV().CourierDailyRouteID > 0) {
+            Cursor result = null;
+            if (orderBy.equals("0"))
+                result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
+                        GlobalVar.GV().CourierDailyRouteID + " and ItemNo  in(" + Waybillno + ")", context);
+            else {
+                result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
+                        GlobalVar.GV().CourierDailyRouteID + " and ItemNo not in(" + Waybillno + ") order by DsOrderNo" , context);
+            }
+            if (result.getCount() > 0) {
+
+                dbConnections.InsertOFD(result.getCount(), GlobalVar.getDate(), context);
+
+
+                result.moveToFirst();
+                do {
+                    MyRouteShipments myRouteShipments = new MyRouteShipments();
+                    myRouteShipments.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                    myRouteShipments.BillingType = result.getString(result.getColumnIndex("BillingType"));
+                    myRouteShipments.OrderNo = Integer.parseInt(result.getString(result.getColumnIndex("OrderNo")));
+                    myRouteShipments.ItemNo = result.getString(result.getColumnIndex("ItemNo"));
+                    myRouteShipments.DsOrderNo = result.getInt(result.getColumnIndex("DsOrderNo"));
+
+                    myRouteShipments.TypeID = Integer.parseInt(result.getString(result.getColumnIndex("TypeID")));
+                    myRouteShipments.CODAmount = getDoubleFromString(result.getString(result.getColumnIndex("CODAmount")));
+                    myRouteShipments.DeliverySheetID = Integer.parseInt(result.getString(result.getColumnIndex("DeliverySheetID")));
+                    myRouteShipments.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+                    myRouteShipments.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("ExpectedTime")));
+
+                    myRouteShipments.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                    myRouteShipments.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                    if ((myRouteShipments.Latitude.length() > 0 && myRouteShipments.Longitude.length() > 0) &&
+                            !myRouteShipments.Latitude.equals("null") && !myRouteShipments.Longitude.equals("null")) {
+                        Location sp = new Location("");
+                        try {
+                            haslocation.add(position);
+                            sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
+                            sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
+                            sp.setSpeed(position);
+                        } catch (Exception e) {
+                            sp.setLatitude(0);
+                            sp.setLongitude(0);
+                        }
+
+                        //Places places = new Places(position, latlong);
+                        MyRouteActivity.places.add(sp);
+                    }
+
+                    myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
+                    myRouteShipments.ClientName = result.getString(result.getColumnIndex("ClientName"));
+                    myRouteShipments.ClientFName = result.getString(result.getColumnIndex("ClientFName"));
+                    myRouteShipments.ClientAddressPhoneNumber = result.getString(result.getColumnIndex("ClientAddressPhoneNumber"));
+                    myRouteShipments.ClientAddressFirstAddress = result.getString(result.getColumnIndex("ClientAddressFirstAddress"));
+                    myRouteShipments.ClientAddressSecondAddress = result.getString(result.getColumnIndex("ClientAddressSecondAddress"));
+                    myRouteShipments.ClientContactName = result.getString(result.getColumnIndex("ClientContactName"));
+                    myRouteShipments.ClientContactFName = result.getString(result.getColumnIndex("ClientContactFName"));
+                    myRouteShipments.ClientContactPhoneNumber = result.getString(result.getColumnIndex("ClientContactPhoneNumber"));
+                    myRouteShipments.ClientContactMobileNo = result.getString(result.getColumnIndex("ClientContactMobileNo"));
+                    myRouteShipments.ConsigneeName = result.getString(result.getColumnIndex("ConsigneeName"));
+                    myRouteShipments.ConsigneeFName = result.getString(result.getColumnIndex("ConsigneeFName"));
+                    myRouteShipments.ConsigneePhoneNumber = result.getString(result.getColumnIndex("ConsigneePhoneNumber"));
+                    myRouteShipments.ConsigneeFirstAddress = result.getString(result.getColumnIndex("ConsigneeFirstAddress"));
+                    myRouteShipments.ConsigneeSecondAddress = result.getString(result.getColumnIndex("ConsigneeSecondAddress"));
+                    myRouteShipments.ConsigneeNear = result.getString(result.getColumnIndex("ConsigneeNear"));
+                    myRouteShipments.ConsigneeMobile = result.getString(result.getColumnIndex("ConsigneeMobile"));
+                    myRouteShipments.Origin = result.getString(result.getColumnIndex("Origin"));
+                    myRouteShipments.Destination = result.getString(result.getColumnIndex("Destination"));
+                    myRouteShipments.PODNeeded = Boolean.parseBoolean(result.getString(result.getColumnIndex("PODNeeded")));
+                    myRouteShipments.PODDetail = result.getString(result.getColumnIndex("PODDetail"));
+                    myRouteShipments.PODTypeCode = result.getString(result.getColumnIndex("PODTypeCode"));
+                    myRouteShipments.PODTypeName = result.getString(result.getColumnIndex("PODTypeName"));
+                    myRouteShipments.IsDelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+                    myRouteShipments.IsPartialDelivered = result.getInt(result.getColumnIndex("PartialDelivered")) > 0;
+                    myRouteShipments.NotDelivered = result.getInt(result.getColumnIndex("NotDelivered")) > 0;
+                    myRouteShipments.CourierDailyRouteID = Integer.parseInt(result.getString(result.getColumnIndex("CourierDailyRouteID")));
+                    myRouteShipments.OptimzeSerialNo = Integer.parseInt(result.getString(result.getColumnIndex("OptimzeSerialNo")));
+                    myRouteShipments.HasComplaint = result.getInt(result.getColumnIndex("HasComplaint")) > 0;
+                    myRouteShipments.HasDeliveryRequest = result.getInt(result.getColumnIndex("HasDeliveryRequest")) > 0;
+                    myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
+                    myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
+                    myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
+                    myRouteShipments.Position = position - 1;
+
+                    myRouteShipmentList.add(myRouteShipments);
+
+                    // radios += 800;
+                    position += 1;
+                }
+                while (result.moveToNext());
+
+                // ReOrderMyRouteShipments(CheckComplaintandDeliveryRequest, view, context);
+            }
+            ArrayList<MyRouteShipments> locallist = new ArrayList<>();
+
+            if (orderBy.equals("0")) {
+                String wno[] = Waybillno.split(",");
+                for (int i = 0; i < wno.length; i++) {
+
+                    for (int j = 0; j < myRouteShipmentList.size(); j++) {
+                        if (wno[i].equals(myRouteShipmentList.get(j).ItemNo)) {
+                            locallist.add(myRouteShipmentList.get(j));
+                            myRouteShipmentList.remove(j);
+                            break;
+                        }
+                    }
+                }
+
+                myRouteShipmentList.clear();
+                myRouteShipmentList.addAll(locallist);
             }
         }
         dbConnections.close();
@@ -2899,6 +3094,50 @@ public class GlobalVar {
     public String GetDomainURL(Context context) {
         DBConnections dbConnections = new DBConnections(context, null);
         return dbConnections.GetPrimaryDomain(context);
+
+    }
+
+    public String GetDomainURLforService(Context context, String ServiceName) {
+        DBConnections dbConnections = new DBConnections(context, null);
+        if (ServiceName.equals("Delivery"))
+            return dbConnections.GetPrimaryDomain_DelService(context);
+        else if (ServiceName.equals("DeliverySheetCBU"))
+            return dbConnections.GetPrimaryDomain_DelSheetService(context);
+        else if (ServiceName.equals("NotDeliver"))
+            return dbConnections.GetPrimaryDomain_NotDeliverdService(context);
+
+
+        return "";
+    }
+
+    public boolean GetDeviceVersion() {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public void SwitchoverDomain(Context context, String DomainURL) {
+        DBConnections dbConnections = new DBConnections(context, null);
+        if (GetDeviceVersion())
+            dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, context);
+        else
+            dbConnections.UpdateDomaintriedTimes_For5(GlobalVar.GV().triedTimes, DomainURL, context);
+
+    }
+
+    public void SwitchoverDomain_Service(Context context, String DomainURL, String type) {
+        DBConnections dbConnections = new DBConnections(context, null);
+        if (type.equals("Delivery"))
+            dbConnections.UpdateDomaintriedTimes_ForDelService(DomainURL);
+        else if (type.equals("DeliverySheetCBU"))
+            dbConnections.UpdateDomaintriedTimes_ForDelSheetService(DomainURL);
+        else if (type.equals("NotDeliver"))
+            dbConnections.UpdateDomaintriedTimes_NotDeliveredService(DomainURL);
+        dbConnections.close();
+
 
     }
 

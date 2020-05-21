@@ -68,6 +68,7 @@ public class DeliverySheetActivity
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        GlobalVar.GV().ResetTriedCount();
 
         TimeIn = DateTime.now();
 

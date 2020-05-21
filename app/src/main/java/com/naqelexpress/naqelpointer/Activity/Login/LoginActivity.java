@@ -1140,10 +1140,10 @@ public class LoginActivity
 
             progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
                     "Bringing User Details.", true);
-            //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            // DomainURL = dbConnections.GetPrimaryDomain(getApplicationContext());
-            //DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
-            DomainURL = GlobalVar.GV().NaqelPointerAPILink;
+
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //DomainURL =  GlobalVar.GV().NaqelPointerAPILink_For5_1;
+
         }
 
         @Override
@@ -1325,10 +1325,11 @@ public class LoginActivity
                 } else {
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
                     if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        //dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
                     }
 
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
                 }
 
             }
@@ -1367,8 +1368,8 @@ public class LoginActivity
             if (progressDialog == null)
                 progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
                         "Bringing Master Details.", true);
-            //DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
-             DomainURL = GlobalVar.GV().NaqelPointerAPILink;
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //DomainURL = GlobalVar.GV().NaqelPointerAPILink;
             super.onPreExecute();
 
         }
@@ -1412,6 +1413,7 @@ public class LoginActivity
                 }
                 return String.valueOf(buffer);
             } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
             } finally {
                 try {
                     if (ist != null)
@@ -1526,7 +1528,8 @@ public class LoginActivity
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
                     if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
                     }
                     LoadDivisionError();
                 }

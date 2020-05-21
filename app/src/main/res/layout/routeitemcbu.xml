@@ -113,19 +113,6 @@
             app:layout_constraintTop_toBottomOf="@+id/txtAmount"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
-        <TextView
-            android:id="@+id/ispaid"
-            style="@style/NaqelPointer.TextView.Red"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Expected Time"
-            app:layout_constraintRight_toLeftOf="@+id/imgHasLocation"
-            app:layout_constraintTop_toBottomOf="@+id/txtExpectedTime"
-            tools:ignore="HardcodedText,RtlHardcoded" />
-
         <Space
             android:id="@+id/space2"
             android:layout_width="344dp"

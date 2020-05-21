@@ -153,6 +153,7 @@
     <string name="validwaybill">Please enter the waybill correclty.</string>
     <string name="wentwrong">Something went wrong,kindly check your internet connection</string>
 
+
     <string name="watsappPredefinedMsg">Dear Customer,\n Please share your location in below link for deliver your Shipment(</string>
 
 
@@ -318,4 +319,5 @@
     </string-array>
 
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
+    <string name="servererror">Something went wrong,kindly try again</string>
 </resources>

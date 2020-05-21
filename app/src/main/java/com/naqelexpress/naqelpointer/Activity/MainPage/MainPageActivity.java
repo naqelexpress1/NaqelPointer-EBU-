@@ -904,8 +904,13 @@ public class MainPageActivity
                                 }
                                 if (GlobalVar.AskPermission_Contcatcs(MainPageActivity.this, 111)) {
                                     if (VersionMatct()) {
-                                        Intent mapList = new Intent(getApplicationContext(), MyRouteActivity.class);
-                                        startActivity(mapList);
+                                        if (!GetDivision()) {
+                                            Intent mapList = new Intent(getApplicationContext(), MyRouteActivity.class);
+                                            startActivity(mapList);
+                                        } else {
+                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
+                                            startActivity(mapList);
+                                        }
                                     } else
                                         GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                                 , true);

@@ -819,6 +819,8 @@ public class History extends Activity {
         String result = "";
         StringBuffer buffer;
         int moveddata = 0;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -837,6 +839,7 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 
             super.onPreExecute();
 
@@ -915,13 +918,13 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer");
+                    URL url = new URL(DomainURL + "SendPickUpDataToServer");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(GlobalVar.GV().Connandtimeout30000);
-                    httpURLConnection.setReadTimeout(GlobalVar.GV().Connandtimeout30000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();
@@ -941,6 +944,7 @@ public class History extends Activity {
                     result = String.valueOf(buffer);
 
                 } catch (Exception e) {
+                    isInternetAvailable = e.toString();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -982,52 +986,64 @@ public class History extends Activity {
 
         @Override
         protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto Where Issync = 0", getApplicationContext());
-                ts.moveToFirst();
-                int tls = 0;
+            if (finalJson != null) {
                 try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
-                } catch (Exception e) {
-                    tls = 0;
-                }
 
-                if (tls > 0) {
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
 
-                    startService(
-                            new Intent(History.this,
-                                    com.naqelexpress.naqelpointer.service.PickUp.class));
+                    DBConnections db = new DBConnections(getApplicationContext(), null);
+                    Cursor ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto Where Issync = 0", getApplicationContext());
+                    ts.moveToFirst();
+                    int tls = 0;
+                    try {
+                        tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                    } catch (Exception e) {
+                        tls = 0;
+                    }
 
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
-                    );
+                    if (tls > 0) {
+
+                        startService(
+                                new Intent(History.this,
+                                        com.naqelexpress.naqelpointer.service.PickUp.class));
+
+                        ErrorAlert("Something went wrong",
+                                "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
+                        );
 
 //                    startService(
 //                            new Intent(History.this,
 //                                    com.naqelexpress.naqelpointer.service.PickUp.class));
 
-                } else {
-                    ErrorAlert("No Data",
-                            "All Pickup Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    } else {
+                        ErrorAlert("No Data",
+                                "All Pickup Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    }
+                    ts.close();
+                    db.close();
+                    manualsyncbtn.setEnabled(true);
+                    manualsyncbtn.setClickable(true);
+
+                    super.onPostExecute(String.valueOf(finalJson));
+
+
+                } catch (Exception e) {
+                    System.out.println(e);
+                    //  insertManual();
                 }
-                ts.close();
-                db.close();
-                manualsyncbtn.setEnabled(true);
-                manualsyncbtn.setClickable(true);
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
 
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
-                //  insertManual();
+                }
             }
         }
     }
@@ -1036,6 +1052,8 @@ public class History extends Activity {
         String returnresult = "";
         StringBuffer buffer;
         int moveddata = 0;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -1054,6 +1072,7 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 
             super.onPreExecute();
 
@@ -1134,13 +1153,15 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendOnDeliveryDataToServer");
+                    URL url = new URL(DomainURL + "SendOnDeliveryDataToServer");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                     httpURLConnection.connect();
 
                     dos = httpURLConnection.getOutputStream();
@@ -1158,6 +1179,7 @@ public class History extends Activity {
                     returnresult = String.valueOf(buffer);
 
                 } catch (Exception e) {
+                    isInternetAvailable = e.toString();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -1200,43 +1222,57 @@ public class History extends Activity {
 
         @Override
         protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
-                ts.moveToFirst();
-                int tls = 0;
+            if (finalJson != null) {
                 try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+
+                    DBConnections db = new DBConnections(getApplicationContext(), null);
+                    Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
+                    ts.moveToFirst();
+                    int tls = 0;
+                    try {
+                        tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                    } catch (Exception e) {
+                        tls = 0;
+                    }
+
+                    if (tls > 0) {
+
+                        StartOnDeliveryService();
+
+                        ErrorAlert("Something went wrong",
+                                "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                    } else {
+                        ErrorAlert("No Data",
+                                "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    }
+                    ts.close();
+                    db.close();
+                    manualsyncbtn.setEnabled(true);
+                    manualsyncbtn.setClickable(true);
+                    super.onPostExecute(String.valueOf(finalJson));
+
+
                 } catch (Exception e) {
-                    tls = 0;
+                    System.out.println(e);
                 }
-
-                if (tls > 0) {
-
-                    StartOnDeliveryService();
-
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
-
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
-                    ErrorAlert("No Data",
-                            "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
+
                 }
-                ts.close();
-                db.close();
-                manualsyncbtn.setEnabled(true);
-                manualsyncbtn.setClickable(true);
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
             }
         }
     }
@@ -1245,6 +1281,8 @@ public class History extends Activity {
         String returnresult = "";
         StringBuffer buffer;
         int moveddata = 0;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -1263,7 +1301,7 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
-
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
             super.onPreExecute();
 
         }
@@ -1343,13 +1381,13 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "PartialDelivery");
+                    URL url = new URL(DomainURL + "PartialDelivery");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setReadTimeout(GlobalVar.GV().Connandtimeout30000);
-                    httpURLConnection.setConnectTimeout(GlobalVar.GV().Connandtimeout30000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();
@@ -1369,6 +1407,7 @@ public class History extends Activity {
                     returnresult = String.valueOf(buffer);
 
                 } catch (Exception e) {
+                    isInternetAvailable = e.toString();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -1427,42 +1466,56 @@ public class History extends Activity {
 
         @Override
         protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
-                ts.moveToFirst();
-                int tls = 0;
+            if (finalJson != null) {
                 try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+
+                    DBConnections db = new DBConnections(getApplicationContext(), null);
+                    Cursor ts = db.Fill("select Count(1) As totalRecord  from OnDelivery Where Issync = 0", getApplicationContext());
+                    ts.moveToFirst();
+                    int tls = 0;
+                    try {
+                        tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                    } catch (Exception e) {
+                        tls = 0;
+                    }
+
+                    if (tls > 0) {
+                        // StartOnDeliveryService();
+                        ErrorAlert("Something went wrong",
+                                "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                    } else {
+                        ErrorAlert("No Data",
+                                "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    }
+                    ts.close();
+                    db.close();
+                    manualsyncbtn.setEnabled(true);
+                    manualsyncbtn.setClickable(true);
+                    super.onPostExecute(String.valueOf(finalJson));
+
+
                 } catch (Exception e) {
-                    tls = 0;
+                    System.out.println(e);
+                    //  insertManual();
                 }
-
-                if (tls > 0) {
-                    // StartOnDeliveryService();
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
-
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
-                    ErrorAlert("No Data",
-                            "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
+
                 }
-                ts.close();
-                db.close();
-                manualsyncbtn.setEnabled(true);
-                manualsyncbtn.setClickable(true);
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
-                //  insertManual();
             }
         }
     }
@@ -1544,8 +1597,8 @@ public class History extends Activity {
             } else {
                 manualsyncbtn.setEnabled(true);
                 manualsyncbtn.setClickable(true);
-                ErrorAlert("Error",
-                        "Something went wrong,Kindly contact concern person"
+                ErrorAlert("Info",
+                        "Data is start to moving , kindly please wait"
                 );
             }
             ts.close();
@@ -1563,6 +1616,8 @@ public class History extends Activity {
         String returnresult = "";
         StringBuffer buffer;
         int moveddata = 0;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -1581,7 +1636,7 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
-
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
             super.onPreExecute();
 
         }
@@ -1663,13 +1718,13 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendNotDeliveredDataToServerBulk");
+                    URL url = new URL(DomainURL + "SendNotDeliveredDataToServerBulk");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(12000);
-                    httpURLConnection.setReadTimeout(12000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();
@@ -1689,6 +1744,7 @@ public class History extends Activity {
                     returnresult = String.valueOf(buffer);
 
                 } catch (Exception e) {
+                    isInternetAvailable = e.toString();
                     e.printStackTrace();
                 } finally {
                     try {
@@ -1753,46 +1809,60 @@ public class History extends Activity {
 
         @Override
         protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from NotDelivered Where IsSync = 0  ", getApplicationContext()); //where issync = 0
-                ts.moveToFirst();
-                int tls = 0;
+            if (finalJson != null) {
                 try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+
+                    DBConnections db = new DBConnections(getApplicationContext(), null);
+                    Cursor ts = db.Fill("select Count(1) As totalRecord  from NotDelivered Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+                    ts.moveToFirst();
+                    int tls = 0;
+                    try {
+                        tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                    } catch (Exception e) {
+                        tls = 0;
+                    }
+
+                    if (tls > 0) {
+                        // StartOnDeliveryService();
+                        startService(
+                                new Intent(History.this,
+                                        com.naqelexpress.naqelpointer.service.NotDelivery.class));
+
+                        ErrorAlert("Something went wrong",
+                                "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                    } else {
+                        ErrorAlert("No Data",
+                                "All Not Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    }
+                    ts.close();
+                    db.close();
+                    manualsyncbtn.setEnabled(true);
+                    manualsyncbtn.setClickable(true);
+                    super.onPostExecute(String.valueOf(finalJson));
+
+
                 } catch (Exception e) {
-                    tls = 0;
+                    System.out.println(e);
+                    //  insertManual();
                 }
-
-                if (tls > 0) {
-                    // StartOnDeliveryService();
-                    startService(
-                            new Intent(History.this,
-                                    com.naqelexpress.naqelpointer.service.NotDelivery.class));
-
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
-
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
-                    ErrorAlert("No Data",
-                            "All Not Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
+
                 }
-                ts.close();
-                db.close();
-                manualsyncbtn.setEnabled(true);
-                manualsyncbtn.setClickable(true);
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
-                //  insertManual();
             }
         }
 
@@ -1802,6 +1872,8 @@ public class History extends Activity {
         String returnresult = "";
         StringBuffer buffer;
         int moveddata = 0;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -1820,6 +1892,7 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 
             super.onPreExecute();
 
@@ -1905,13 +1978,13 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "CheckPointByPieceLevel");
+                    URL url = new URL(DomainURL + "CheckPointByPieceLevel");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
                     httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setConnectTimeout(12000);
-                    httpURLConnection.setReadTimeout(12000);
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
                     httpURLConnection.setDoInput(true);
                     httpURLConnection.setDoOutput(true);
                     httpURLConnection.connect();
@@ -1937,6 +2010,7 @@ public class History extends Activity {
                         if (ist != null)
                             ist.close();
                     } catch (IOException e) {
+                        isInternetAvailable = e.toString();
                         e.printStackTrace();
                     }
                     try {
@@ -1990,46 +2064,60 @@ public class History extends Activity {
 
         @Override
         protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select Count(1) As totalRecord  from CheckPoint Where IsSync = 0  ", getApplicationContext()); //where issync = 0
-                ts.moveToFirst();
-                int tls = 0;
+            if (finalJson != null) {
                 try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+
+                    if (progressDialog != null && progressDialog.isShowing()) {
+                        progressDialog.dismiss();
+                        progressDialog = null;
+                    }
+
+                    DBConnections db = new DBConnections(getApplicationContext(), null);
+                    Cursor ts = db.Fill("select Count(1) As totalRecord  from CheckPoint Where IsSync = 0  ", getApplicationContext()); //where issync = 0
+                    ts.moveToFirst();
+                    int tls = 0;
+                    try {
+                        tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                    } catch (Exception e) {
+                        tls = 0;
+                    }
+
+                    if (tls > 0) {
+                        // StartOnDeliveryService();
+                        startService(
+                                new Intent(History.this,
+                                        com.naqelexpress.naqelpointer.service.CheckPoint.class));
+
+                        ErrorAlert("Something went wrong",
+                                "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
+
+                    } else {
+                        ErrorAlert("No Data",
+                                "All Checkpoint Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    }
+                    ts.close();
+                    db.close();
+                    manualsyncbtn.setEnabled(true);
+                    manualsyncbtn.setClickable(true);
+                    super.onPostExecute(String.valueOf(finalJson));
+
+
                 } catch (Exception e) {
-                    tls = 0;
+                    System.out.println(e);
+                    //  insertManual();
                 }
-
-                if (tls > 0) {
-                    // StartOnDeliveryService();
-                    startService(
-                            new Intent(History.this,
-                                    com.naqelexpress.naqelpointer.service.CheckPoint.class));
-
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again");
-
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
-                    ErrorAlert("No Data",
-                            "All Checkpoint Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
+
                 }
-                ts.close();
-                db.close();
-                manualsyncbtn.setEnabled(true);
-                manualsyncbtn.setClickable(true);
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
-                //  insertManual();
             }
         }
 

@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.Activity.MyRoute;
+package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -87,6 +87,7 @@ public class RouteListAdapterNew
             //if (position %4 == 0)
             //holder.panel.setBackgroundColor(Color.RED);
 
+
             if (itemListFiltered.get(position).HasComplaint) {
                 holder.imgHasComplaint.setVisibility(View.VISIBLE);
                 holder.imgHasComplaint.setImageResource(R.drawable.redstar);
@@ -134,6 +135,19 @@ public class RouteListAdapterNew
             } else
                 holder.imgHasLocation.setVisibility(View.INVISIBLE);
 
+            if (item.DsOrderNo != 0)
+                holder.lbDeliveryDate.setText("DS Order No : - " + String.valueOf(item.DsOrderNo));
+            else
+                holder.lbDeliveryDate.setVisibility(View.INVISIBLE);
+            if (item.IsPaid != 0) {
+                holder.ispaid.setText("PAID");
+                holder.ispaid.setTextColor(Color.GREEN);
+            } else {
+                holder.ispaid.setText("Not PAID");
+                holder.ispaid.setTextColor(Color.RED);
+            }
+
+
             if (typeID == 1) {
 //                holder.txtType.setText("Delivery");
             } else if (typeID == 2) {
@@ -172,7 +186,7 @@ public class RouteListAdapterNew
 
 
     class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView txtWaybill, txtType, lbSerial, txtExpectedTime, lbDeliveryDate, txtAmount, header;
+        TextView txtWaybill, txtType, lbSerial, txtExpectedTime, lbDeliveryDate, txtAmount, header, ispaid;
         ImageView imgHasLocation, imgHasComplaint, imgHasDeliveryRequest;
         ConstraintLayout cl;
         //TextView panel;
@@ -185,6 +199,7 @@ public class RouteListAdapterNew
             lbSerial = (TextView) view.findViewById(R.id.lbSerial);
             txtType = (TextView) view.findViewById(R.id.txtAmount);
             txtExpectedTime = (TextView) view.findViewById(R.id.txtExpectedTime);
+            ispaid = (TextView) view.findViewById(R.id.ispaid);
             //panel = (TextView) view.findViewById(R.id.panel);
             imgHasLocation = (ImageView) view.findViewById(R.id.imgHasLocation);
 

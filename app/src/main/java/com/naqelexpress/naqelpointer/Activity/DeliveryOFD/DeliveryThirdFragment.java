@@ -94,27 +94,28 @@ public class DeliveryThirdFragment extends Fragment {
             });
 
 
-            if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
-                btnOpenCamera.setVisibility(View.GONE);
+            if (!GlobalVar.GV().isFortesting) {
+                if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
+                    btnOpenCamera.setVisibility(View.GONE);
 
-                if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
-                    txtBarCode.setKeyListener(null);
-                    txtBarCode.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
-                                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                                GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                            } else
-                                startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
-                        }
-                    });
-                } else {
+                    if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                        txtBarCode.setKeyListener(null);
+                        txtBarCode.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
+                                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                                    GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                                } else
+                                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                            }
+                        });
+                    } else {
 
-                    GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                        GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                    }
                 }
             }
-
             initViews();
             // initDialog();
         }
@@ -279,7 +280,14 @@ public class DeliveryThirdFragment extends Fragment {
                         .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-//                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+                                if (GlobalVar.GV().isFortesting) {
+                                    if (!IsDelivered(txtBarCode.getText().toString())) {
+                                        DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+                                        lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+                                        txtBarCode.setText("");
+                                        initViews();
+                                    }
+                                }
                                 txtBarCode.setText("");
                             }
                         })

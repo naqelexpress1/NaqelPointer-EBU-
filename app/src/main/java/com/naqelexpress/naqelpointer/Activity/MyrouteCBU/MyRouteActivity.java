@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.Activity.MyRoute;
+package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -31,6 +31,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
+import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivityNoMap;
 import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
@@ -1062,7 +1063,11 @@ public class MyRouteActivity
 
             int position = item.Position;
             if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
-                Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
+                Intent intent = null;
+                if (GlobalVar.GV().myRouteShipmentList.get(position).IsMap == 1)
+                    intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
+                else
+                    intent = new Intent(getApplicationContext(), WaybillPlanActivityNoMap.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
                 bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
@@ -1071,6 +1076,8 @@ public class MyRouteActivity
                 bundle.putInt("position", position);
                 intent.putExtras(bundle);
                 startActivity(intent);
+
+
             } else {
                 Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
                 startActivity(intent);

@@ -75,6 +75,7 @@ public class DeliveryFirstFragment
     Button btnOpenCamera;
     String shippername = "";
     public int PieceCount = 0;
+    public static int IsCODtextboxEnable = 0;
 
     AppCompatImageButton btnCallMobile, btnCallMobile1;
     AppCompatImageButton btnWhatsApp, btnWhatsApp1;
@@ -113,7 +114,7 @@ public class DeliveryFirstFragment
             btnWhatsApp = (AppCompatImageButton) rootView.findViewById(R.id.btnWhatsapp);
             btnCallMobile1 = (AppCompatImageButton) rootView.findViewById(R.id.btnCall1);
             btnWhatsApp1 = (AppCompatImageButton) rootView.findViewById(R.id.btnWhatsapp1);
-
+            IsCODtextboxEnable = 0;
             txtMobileNo.setTag(0);
             txtPhoneNo.setTag(0);
 
@@ -440,6 +441,7 @@ public class DeliveryFirstFragment
         if (!isdelivered) {
             JSONObject jsonObject = new JSONObject();
             try {
+                IsCODtextboxEnable = result.getInt(result.getColumnIndex("Ispaid"));
                 jsonObject.put("ID", result.getString(result.getColumnIndex("ID")));
                 jsonObject.put("WaybillNo", result.getString(result.getColumnIndex("ItemNo")));
                 jsonObject.put("PiecesCount", result.getString(result.getColumnIndex("PiecesCount")));

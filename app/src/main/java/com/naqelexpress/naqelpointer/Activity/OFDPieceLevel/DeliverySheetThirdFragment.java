@@ -126,24 +126,26 @@ public class DeliverySheetThirdFragment
             });
 
 
-            if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
-                btnOpenCamera.setVisibility(View.GONE);
+            if (!GlobalVar.GV().isFortesting) {
+                if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
+                    btnOpenCamera.setVisibility(View.GONE);
 
-                if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
-                    txtBarCode.setKeyListener(null);
-                    txtBarCode.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
-                                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                                GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                            } else
-                                startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
-                        }
-                    });
-                } else {
+                    if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                        txtBarCode.setKeyListener(null);
+                        txtBarCode.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
+                                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                                    GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                                } else
+                                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                            }
+                        });
+                    } else {
 
-                    GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                        GlobalVar.GV().disableSoftInputFromAppearing(txtBarCode);
+                    }
                 }
             }
             initViews();
@@ -318,10 +320,16 @@ public class DeliverySheetThirdFragment
         private ProgressDialog progressDialog;
         String result = "";
         StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
             progressDialog = ProgressDialog.show(getActivity(), "", "Please wait.", true);
+            //f (GlobalVar.GV().GetDeviceVersion())
+            DomainURL = GlobalVar.GV().GetDomainURL(getContext());
+//            else
+//                DomainURL = GlobalVar.GV().NaqelPointerAPILink;
         }
 
         @Override
@@ -339,15 +347,15 @@ public class DeliverySheetThirdFragment
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringWaybillInfobyPiece");
+                URL url = new URL(DomainURL + "BringWaybillInfobyPiece");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
-                httpURLConnection.setReadTimeout(30000);
-                httpURLConnection.setConnectTimeout(30000);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -365,6 +373,7 @@ public class DeliverySheetThirdFragment
 
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -388,6 +397,7 @@ public class DeliverySheetThirdFragment
 
         @Override
         protected void onPostExecute(String finalJson) {
+
             if (progressDialog != null && progressDialog.isShowing())
                 progressDialog.dismiss();
             progressDialog = null;
@@ -409,6 +419,18 @@ public class DeliverySheetThirdFragment
                     e.printStackTrace();
                 }
 
+            } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(rootView, "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getContext(), DomainURL);
+
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
             }
         }
     }

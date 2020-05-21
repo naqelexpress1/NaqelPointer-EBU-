@@ -53,27 +53,30 @@ public class FacilityLogin
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.facility);
 
+        try {
+            city = (Spinner) findViewById(R.id.citycode);
+            facility = (Spinner) findViewById(R.id.facilitycode);
+            facility.setOnItemSelectedListener(this);
+
+            Bundle bundle = getIntent().getExtras();
+            usertype = bundle.getInt("usertype"); //getIntent().getIntExtra("usertype", 0);
+
+            GlobalVar.GV().ResetTriedCount();
+
+            FacilityStatus();
+
+            cityAdapter = new CityAdapter(citymap, getApplicationContext());
+            city.setAdapter(cityAdapter);
+
+            FacilityAdapter facilityAdapter = new FacilityAdapter(facilitymap, getApplicationContext());
+            facility.setAdapter(facilityAdapter);
 
 
-
-        city = (Spinner) findViewById(R.id.citycode);
-        facility = (Spinner) findViewById(R.id.facilitycode);
-        facility.setOnItemSelectedListener(this);
-
-        Bundle bundle = getIntent().getExtras();
-        usertype = bundle.getInt("usertype"); //getIntent().getIntExtra("usertype", 0);
-
-        FacilityStatus();
-
-        cityAdapter = new CityAdapter(citymap, getApplicationContext());
-        city.setAdapter(cityAdapter);
-
-        FacilityAdapter facilityAdapter = new FacilityAdapter(facilitymap, getApplicationContext());
-        facility.setAdapter(facilityAdapter);
-
-
-        if (savedInstanceState != null)
-            setSavedInstance(savedInstanceState);
+            if (savedInstanceState != null)
+                setSavedInstance(savedInstanceState);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
 
@@ -230,6 +233,8 @@ public class FacilityLogin
 
     private class GetMasterData extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -237,6 +242,8 @@ public class FacilityLogin
             if (progressDialog == null)
                 progressDialog = ProgressDialog.show(FacilityLogin.this,
                         "Please wait.", "Update Facility Login.", true);
+
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
             super.onPreExecute();
 
         }
@@ -251,13 +258,15 @@ public class FacilityLogin
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "UpdateUsermeLogin");
+                URL url = new URL(DomainURL + "UpdateUsermeLogin");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -274,6 +283,7 @@ public class FacilityLogin
                 }
                 return String.valueOf(buffer);
             } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
             } finally {
                 try {
                     if (ist != null)
@@ -318,7 +328,17 @@ public class FacilityLogin
 
                 System.out.println(result);
             } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        //dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    }
 
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
                 LoadDivisionError();
             }
             if (progressDialog != null && progressDialog.isShowing()) {

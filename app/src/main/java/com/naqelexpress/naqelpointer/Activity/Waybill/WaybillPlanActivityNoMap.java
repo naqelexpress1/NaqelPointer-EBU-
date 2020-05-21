@@ -53,9 +53,8 @@ import java.net.URL;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class WaybillPlanActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
-    private GoogleMap mMap;
+public class WaybillPlanActivityNoMap extends AppCompatActivity {
+   //private GoogleMap mMap;
     Marker now;
     TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount, txtPODType, txtPhoneNo;
     TextView lbPODType;
@@ -64,7 +63,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     private Bundle bundle;
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
-    SupportMapFragment mapFragment;
+   // SupportMapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
 
@@ -73,16 +72,16 @@ public class WaybillPlanActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.waybillplan);
+        setContentView(R.layout.waybillplannomap);
         try {
 
             bundle = getIntent().getExtras();
 
-             mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.map);
-
-            mapFragment.getMapAsync(this);
-            mapFragment.getMapAsync(this);
+//             mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                    .findFragmentById(R.id.map);
+//
+//            mapFragment.getMapAsync(this);
+//            mapFragment.getMapAsync(this);
 
             txtWaybillNo = (TextView) findViewById(R.id.txtWaybilll);
             txtShipperName = (TextView) findViewById(R.id.txtShipperName);
@@ -106,13 +105,13 @@ public class WaybillPlanActivity extends AppCompatActivity
             btnCallMobile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivityNoMap.this);
                 }
             });
             btnCallMobile1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(txtPhoneNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    GlobalVar.GV().makeCall(txtPhoneNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivityNoMap.this);
                 }
             });
 
@@ -216,7 +215,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             }
 
 
-            spinnerDialog = new ConsingeeMobileSpinnerDialog(WaybillPlanActivity.this, txtPhoneNo.getText().toString(),
+            spinnerDialog = new ConsingeeMobileSpinnerDialog(WaybillPlanActivityNoMap.this, txtPhoneNo.getText().toString(),
                     txtMobileNo.getText().toString(), getWindow().getDecorView().getRootView());
 
             if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -228,7 +227,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
 
             } else {
-                ActivityCompat.requestPermissions(WaybillPlanActivity.this,
+                ActivityCompat.requestPermissions(WaybillPlanActivityNoMap.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         1);
                 finish();
@@ -370,35 +369,9 @@ public class WaybillPlanActivity extends AppCompatActivity
 
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        try {
-            mMap = googleMap;
-            GlobalVar.GV().ChangeMapSettings(mMap, WaybillPlanActivity.this, getWindow().getDecorView().getRootView());
 
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
-            now = mMap.addMarker(new MarkerOptions().position(GlobalVar.GV().currentLocation)
-                    .icon(icon)
-                    .title(getString(R.string.MyLocation)));
 
-            ShowShipmentMarker();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
 
-    private void ShowShipmentMarker() {
-        if (ConsigneeLongitude.length() > 3 && ConsigneeLongitude.length() > 3) {
-            LatLng latLng = new LatLng(GlobalVar.GV().getDoubleFromString(ConsigneeLatitude), GlobalVar.GV().getDoubleFromString(ConsigneeLongitude));
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.deliverymarker);
-            mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .icon(icon)
-                    .title(txtWaybillNo.getText().toString()));
-        }
-//        else
-//            mapFragment.getView().setVisibility(View.GONE);
-    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -523,7 +496,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         });
 
 
-        popup = new PopupWindow(WaybillPlanActivity.this);
+        popup = new PopupWindow(WaybillPlanActivityNoMap.this);
         popup.setContentView(layout);
         popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popup.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
@@ -561,7 +534,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
             GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
-            progressDialog = ProgressDialog.show(WaybillPlanActivity.this,
+            progressDialog = ProgressDialog.show(WaybillPlanActivityNoMap.this,
                     "Please wait.", "Your Request has been process, kindly be patient  ", true);
         }
 
@@ -632,12 +605,12 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                     if (jsonObject.getInt("ID") == 103) {
 
-                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                        new SweetAlertDialog(WaybillPlanActivityNoMap.this, SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("Name"))
                                 .show();
                     } else {
-                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                        new SweetAlertDialog(WaybillPlanActivityNoMap.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("Name"))
                                 .show();
@@ -649,7 +622,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                 }
             } else {
-                new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                new SweetAlertDialog(WaybillPlanActivityNoMap.this, SweetAlertDialog.ERROR_TYPE)
                         .setTitleText("Info")
                         .setContentText("something went wrong/check your Internet/server is busy,kindly try again later")
                         .show();

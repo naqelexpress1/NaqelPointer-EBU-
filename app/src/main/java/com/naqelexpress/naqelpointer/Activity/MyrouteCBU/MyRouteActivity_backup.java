@@ -1,40 +1,34 @@
-package com.naqelexpress.naqelpointer.Activity.MyRoute;
+package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
 import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
+import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
-import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -56,44 +50,29 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class MyRouteActivity
-        extends AppCompatActivity implements RouteListAdapterNew.RouteAdapterListener {
-    private RecyclerView mapListview;
-    private RouteListAdapterNew adapter;
+public class MyRouteActivity_backup
+        extends AppCompatActivity {
+    private SwipeMenuListView mapListview;
+    private RouteListAdapter adapter;
     Button btnStartTrip, btnCloseTrip;
     TextView txtStartTrip, txtCloseTrip;
     public static ArrayList<Location> places = new ArrayList<>();//96346
     protected boolean flag_thread = false;
     static int progressflag = 0;
 
-    private SearchView searchView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.myroutenew);
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        // toolbar fancy stuff
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Search");
-
+        setContentView(R.layout.myroute);
 
         progressflag = 0;
         GlobalVar.GV().haslocation.clear();
-        mapListview = (RecyclerView) findViewById(R.id.myRouteListView);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        mapListview.setLayoutManager(mLayoutManager);
+        mapListview = (SwipeMenuListView) findViewById(R.id.myRouteListView);
 
-
-        adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                "CourierKpi", this);
+        adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
         mapListview.setAdapter(adapter);
 
-        whiteNotificationBar(mapListview);
 
         btnStartTrip = (Button) findViewById(R.id.btnStartTrip);
         btnCloseTrip = (Button) findViewById(R.id.btnCloseTrip);
@@ -148,28 +127,26 @@ public class MyRouteActivity
             }
         });
 
-//        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                if (GlobalVar.GV().CourierDailyRouteID > 0) {
-//
-//                    position = GlobalVar.GV().kpi.get(position).Position;
-//                    if (GlobalVar.GV().kpi.get(position).TypeID == 1) {
-//                        Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-//                        Bundle bundle = new Bundle();
-//                        bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                        bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                        bundle.putInt("position", position);
-//                        intent.putExtras(bundle);
-//                        startActivity(intent);
-//                    } else {
-//                        Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-//                        startActivity(intent);
-//                    }
-//                } else
-//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
-//            }
-//        });
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (GlobalVar.GV().CourierDailyRouteID > 0) {
+                    if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
+                        Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
+                        bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+                        bundle.putInt("position", position);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
+                        startActivity(intent);
+                    }
+                } else
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
+            }
+        });
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
@@ -213,40 +190,39 @@ public class MyRouteActivity
         };
 
         // set creator
-//        mapListview.setMenuCreator(creator);
-//        mapListview.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-//                switch (index) {
-//                    case 0:
-//                        if (GlobalVar.GV().kpi.get(position).TypeID == 1) {
-//                            Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                            bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                            intent.putExtras(bundle);
-//                            startActivity(intent);
-//                        } else {
-//                            Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                            bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                            intent.putExtras(bundle);
-//                            startActivity(intent);
-//                        }
-//                        break;
-//                    case 1:
-//                        MyRouteShipments item = GlobalVar.GV().kpi.get(position);
-//                        GlobalVar.GV().kpi.remove(item);
-//                        adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().kpi, "CourierKpi");
-//                        mapListview.setAdapter(adapter);
-//                        break;
-//                }
-//                // false : close the menu; true : not close the menu
-//                return false;
-//            }
-//        });
-
+        mapListview.setMenuCreator(creator);
+        mapListview.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
+                switch (index) {
+                    case 0:
+                        if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
+                            Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
+                            bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
+                            bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
+                        break;
+                    case 1:
+                        MyRouteShipments item = GlobalVar.GV().myRouteShipmentList.get(position);
+                        GlobalVar.GV().myRouteShipmentList.remove(item);
+                        adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
+                        mapListview.setAdapter(adapter);
+                        break;
+                }
+                // false : close the menu; true : not close the menu
+                return false;
+            }
+        });
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
     }
@@ -292,7 +268,7 @@ public class MyRouteActivity
                 btnCloseTrip.setVisibility(View.GONE);
                 txtCloseTrip.setVisibility(View.GONE);
 
-                adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+                adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
                 mapListview.setAdapter(adapter);
 
 
@@ -327,35 +303,8 @@ public class MyRouteActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.myroutemenu, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                adapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                adapter.getFilter().filter(query);
-                return false;
-            }
-        });
-//        return true;
-
         return super.onCreateOptionsMenu(menu);
     }
-
 
     class Optimization {
         public String CurrentLocation;
@@ -411,34 +360,13 @@ public class MyRouteActivity
                 return true;
             case R.id.deleteall:
                 deleteConfirmRoute();
-                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.DeleteAllSuggestLocation(getApplicationContext());
-                dbConnections.DeleteAllPlannedLocation(getApplicationContext());
-                dbConnections.close();
                 return true;
             case R.id.mnuShowDeliverySheetOrder:
                 //OrderNo
-                if (GlobalVar.GV().GetDivision(getApplicationContext())) {
-                    DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections1.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
-                            " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
-                    if (result != null && result.getCount() > 0) {
-                        GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
-                                , getWindow().getDecorView().getRootView());
-                    } else {
-                        try {
-                            Intent intent = new Intent(MyRouteActivity.this, RouteMap.class);
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                } else
-                    GlobalVar.GV().LoadMyRouteShipments("ItemNo", true, getApplicationContext()
-                            , getWindow().getDecorView().getRootView());
+                GlobalVar.GV().LoadMyRouteShipments("ItemNo", true, getApplicationContext()
+                        , getWindow().getDecorView().getRootView());
 
-                adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                        "CourierKpi", this);
+                adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
                 mapListview.setAdapter(adapter);
                 return true;
 //            case R.id.DeleteAll:
@@ -460,7 +388,7 @@ public class MyRouteActivity
                 return true;
             case R.id.groupmap:
                 try {
-                    Intent intent = new Intent(MyRouteActivity.this, RouteMap.class);
+                    Intent intent = new Intent(MyRouteActivity_backup.this, RouteMap.class);
                     startActivity(intent);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -468,80 +396,16 @@ public class MyRouteActivity
                 return true;
             case R.id.movingmap:
                 try {
-                    Intent intent = new Intent(MyRouteActivity.this, MapMovingOnCurLatLng.class);
+                    Intent intent = new Intent(MyRouteActivity_backup.this, MapMovingOnCurLatLng.class);
                     startActivity(intent);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
-                }
-                return true;
-            case R.id.camera:
-
-                if (!GlobalVar.GV().checkPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera)) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera);
-                } else {
-                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
-                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                 }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
-            if (data != null) {
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    if (extras.containsKey("barcode")) {
-                        String query = extras.getString("barcode");
-                        if (query.length() > 8)
-                            query = query.substring(0, 8);
-                        searchView.setIconified(false);
-                        searchView.setQuery(query, false);
-                        //searchView.clearFocus();
-//                        getSupportActionBar().setTitle(query); //.setText(barcode);
-//                        adapter.getFilter().filter(query);
-
-//                        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//                            @Override
-//                            public boolean onQueryTextSubmit(String query) {
-//                                // filter recycler view when query submitted
-//                                adapter.getFilter().filter(query);
-//                                return false;
-//                            }
-//
-//                            @Override
-//                            public boolean onQueryTextChange(String query) {
-//                                // filter recycler view when text is changed
-//                                adapter.getFilter().filter(query);
-//                                return false;
-//                            }
-//                        });
-
-
-                    }
-                }
-
-//                final Barcode barcode = data.getParcelableExtra("barcode");
-//                txtBarCode.post(new Runnable()
-//                {
-//                    @Override
-//                    public void run()
-//                    {
-//                        txtBarCode.setText(barcode.displayValue);
-//
-//                        if (txtBarCode.getText().toString().length() > 8)
-//                            AddNewPiece();
-//                    }
-//                });
-            }
-        }
-    }
-
 
     //------------------------Bring My Route Shipments -------------------------------
     public void BringMyRouteShipments(BringMyRouteShipmentsRequest bringMyRouteShipmentsRequest, int buttonclick) {
@@ -567,14 +431,11 @@ public class MyRouteActivity
         String result = "";
         StringBuffer buffer;
         int buttonclick;
-        String DomainURL = "";
-        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
             if (progressflag == 1)
-                progressDialog = ProgressDialog.show(MyRouteActivity.this, "Please wait.", "Downloading Shipments Details.", true);
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+                progressDialog = ProgressDialog.show(MyRouteActivity_backup.this, "Please wait.", "Downloading Shipments Details.", true);
         }
 
         @Override
@@ -587,23 +448,18 @@ public class MyRouteActivity
             InputStream ist = null;
 
             try {
-                String function = "BringDeliverySheetbyOFDPiece"; //CBU division
-//                String function = "BringMyRouteShipments";
+                String function = "BringDeliverySheetbyOFDPiece";
                 if (!GetDivision())
-                    function = "BringMyRouteShipments"; //EBU Divison
-                if (GlobalVar.GV().isFortesting)
-                    function = "BringDeliverySheetFortest"; //EBU Divison
+                    function = "BringMyRouteShipments";
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence
-                URL url = new URL(DomainURL + function); //Geofence
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + function); //Geofence
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
-                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
-                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -620,7 +476,6 @@ public class MyRouteActivity
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
-                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -651,25 +506,31 @@ public class MyRouteActivity
             if (finalJson != null) {
                 if (buttonclick == 0) {
                     super.onPostExecute(String.valueOf(finalJson));
-                    setDatatoAdapter(finalJson);
 
-                } else
-                    CrossCheckandUpdateFields(finalJson);
-            } else {
-                if (isInternetAvailable.contains("No address associated with hostname")) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
-                } else {
-                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
-                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                    try {
+                        JSONObject jsonObject = new JSONObject(finalJson);
+                        //jsonObject.getJSONObject("");
 
+                        new MyRouteShipments(finalJson, String.valueOf(Latitude), String.valueOf(Longitude), getApplicationContext(),
+                                getWindow().getDecorView().getRootView());
+                        DuplicateCustomer();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
-                }
-            }
+                    adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
+                    mapListview.setAdapter(adapter);
 
-            if (MyRouteActivity.this.isDestroyed()) { // or call isFinishing() if min sdk version < 17
+                    //ValidateDatas();
+                    btnStartTrip.setVisibility(View.GONE);
+                    btnCloseTrip.setVisibility(View.GONE);
+                } else
+                    CrossCheckandUpdateFields(finalJson);
+            } else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+
+            if (MyRouteActivity_backup.this.isDestroyed()) { // or call isFinishing() if min sdk version < 17
                 return;
             }
             if (progressDialog != null && progressDialog.isShowing())
@@ -678,31 +539,6 @@ public class MyRouteActivity
             progressflag = 0;
             flag_thread = false;
         }
-    }
-
-
-    private void setDatatoAdapter(String finalJson) {
-        try {
-            JSONObject jsonObject = new JSONObject(finalJson);
-            //jsonObject.getJSONObject("");
-
-            new MyRouteShipments(finalJson, String.valueOf(Latitude), String.valueOf(Longitude), getApplicationContext(),
-                    getWindow().getDecorView().getRootView());
-            DuplicateCustomer();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                "CourierKpi", this);
-
-        mapListview.setAdapter(adapter);
-
-        //ValidateDatas();
-        btnStartTrip.setVisibility(View.GONE);
-        btnCloseTrip.setVisibility(View.GONE);
-
     }
 
     private void DuplicateCustomer() {
@@ -873,7 +709,7 @@ public class MyRouteActivity
                 GlobalVar.GV().myRouteShipmentList.addAll(temp);
                 temp.clear();
 
-                adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+                adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
                 mapListview.setAdapter(adapter);
 
             }
@@ -895,7 +731,7 @@ public class MyRouteActivity
     }
 
     private void deleteConfirmRoute() {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity.this);
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_backup.this);
         builder1.setTitle("Info");
         builder1.setMessage("Do you want to delete all? ");
         builder1.setCancelable(true);
@@ -964,7 +800,7 @@ public class MyRouteActivity
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(MyRouteActivity.this,
+            progressDialog = ProgressDialog.show(MyRouteActivity_backup.this,
                     "Info",
                     "Your Request is being process,kindly please wait");
         }
@@ -993,7 +829,7 @@ public class MyRouteActivity
             Longitude = savedInstanceState.getDouble("Longitude");
             places = (ArrayList<Location>) savedInstanceState.getSerializable("places");
 
-            adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+            adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi");
             mapListview.setAdapter(adapter);
 
             GlobalVar.GV().haslocation = (ArrayList<Integer>) savedInstanceState.getSerializable("haslocation");
@@ -1035,48 +871,4 @@ public class MyRouteActivity
         super.onSaveInstanceState(outState);
     }
 
-    private void whiteNotificationBar(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int flags = view.getSystemUiVisibility();
-            flags |= View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
-            view.setSystemUiVisibility(flags);
-            getWindow().setStatusBarColor(Color.WHITE);
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        // close search view on back button pressed
-        if (!searchView.isIconified()) {
-            searchView.setIconified(true);
-            return;
-        }
-        super.onBackPressed();
-    }
-
-    @Override
-    public void onItemSelected(MyRouteShipments item) {
-        // Toast.makeText(getApplicationContext(), "Selected: " + item.Position, Toast.LENGTH_LONG).show();
-
-        if (GlobalVar.GV().CourierDailyRouteID > 0) {
-
-            int position = item.Position;
-            if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
-                Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
-                bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
-                bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
-                bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
-                bundle.putInt("position", position);
-                intent.putExtras(bundle);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-                startActivity(intent);
-            }
-        } else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
-
-    }
 }

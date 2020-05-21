@@ -64,7 +64,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation extends AppCompatActivity implements View.OnClickListener {
+public class InventoryControl_NoPopup_Rto_DelReq extends AppCompatActivity implements View.OnClickListener {
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
@@ -157,11 +157,11 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GlobalVar.GV().checkPermission(InventoryControl_LocalValidation.this, GlobalVar.PermissionType.Camera)) {
+                if (!GlobalVar.GV().checkPermission(InventoryControl_NoPopup_Rto_DelReq.this, GlobalVar.PermissionType.Camera)) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(InventoryControl_LocalValidation.this, GlobalVar.PermissionType.Camera);
+                    GlobalVar.GV().askPermission(InventoryControl_NoPopup_Rto_DelReq.this, GlobalVar.PermissionType.Camera);
                 } else {
-                    Intent intent = new Intent(InventoryControl_LocalValidation.this, NewBarCodeScanner.class);
+                    Intent intent = new Intent(InventoryControl_NoPopup_Rto_DelReq.this, NewBarCodeScanner.class);
                     startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                 }
             }
@@ -271,7 +271,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
             }
         } else {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
+            GlobalVar.RedirectSettings(InventoryControl_NoPopup_Rto_DelReq.this);
             return;
         }
 
@@ -470,7 +470,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_LocalValidation.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_NoPopup_Rto_DelReq.this);
                     builder.setTitle("Confirm Deleting")
                             .setMessage("Are you sure you want to delete?")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -538,13 +538,13 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
+                    GlobalVar.RedirectSettings(InventoryControl_NoPopup_Rto_DelReq.this);
                 return true;
             case R.id.manual:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to upload Manual?", 3, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidation.this);
+                    GlobalVar.RedirectSettings(InventoryControl_NoPopup_Rto_DelReq.this);
                 return true;
 
             default:
@@ -694,7 +694,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
                 startService(
-                        new Intent(InventoryControl_LocalValidation.this,
+                        new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                                 com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
             }
             if (clear == 1)
@@ -728,7 +728,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
                 if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                     startService(
-                            new Intent(InventoryControl_LocalValidation.this,
+                            new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandling.class));
                 }
             }
@@ -803,7 +803,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
 
@@ -903,7 +903,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                         // handler.removeCallbacksAndMessages(null);
                         // isdeviceonlinehandler.removeCallbacksAndMessages(null);
                         //countDownTimer.cancel();
-                        InventoryControl_LocalValidation.super.onBackPressed();
+                        InventoryControl_NoPopup_Rto_DelReq.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -929,7 +929,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         protected void onPreExecute() {
 
             if (progressDialog == null)
-                progressDialog = ProgressDialog.show(InventoryControl_LocalValidation.this,
+                progressDialog = ProgressDialog.show(InventoryControl_NoPopup_Rto_DelReq.this,
                         "Please wait.", "Bringing Delivery Request data...", true);
             super.onPreExecute();
 
@@ -1132,7 +1132,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void LoadDivisionError(final int callfunction) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_NoPopup_Rto_DelReq.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Something went wrong");
         alertDialog.setMessage("Kindly Check your Internet Connection,Scan Inventory press Cancel");
@@ -1161,7 +1161,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_NoPopup_Rto_DelReq.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1199,11 +1199,11 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         somethingwrong = false;
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         ids.clear();
@@ -1301,7 +1301,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 
             }
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
 //            startService(
@@ -1314,7 +1314,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     }
 
     private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_NoPopup_Rto_DelReq.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1347,7 +1347,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         }
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidation.this,
+                    new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
     }
@@ -1399,7 +1399,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
         dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
         dbConnections.deleteUserME(GlobalVar.GV().EmployID);
 
-        ActivityCompat.finishAffinity(InventoryControl_LocalValidation.this);
+        ActivityCompat.finishAffinity(InventoryControl_NoPopup_Rto_DelReq.this);
         Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
         startActivity(intent);
 
@@ -1462,7 +1462,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
 //                progressDialog = ProgressDialog.show(InventoryControlOnetab.this,
 //                        "Please wait.", "Your data is inserting by Manual...", true);
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidation.this);
+                progressDialog = new ProgressDialog(InventoryControl_NoPopup_Rto_DelReq.this);
                 progressDialog.setMessage("your request is being process...");
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progressDialog.setMax(100);
@@ -1656,7 +1656,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
             uploaddatacount = 0;
             if (progressDialog == null) {
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidation.this);
+                progressDialog = new ProgressDialog(InventoryControl_NoPopup_Rto_DelReq.this);
                 progressDialog.setTitle("Request is being process,please wait...");
                 progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -1789,7 +1789,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
                             "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
                     );
                     startService(
-                            new Intent(InventoryControl_LocalValidation.this,
+                            new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
                 } else {
                     ErrorAlert("No Data",
@@ -1812,7 +1812,7 @@ public class InventoryControl_LocalValidation extends AppCompatActivity implemen
     private void insertManual1() {
 
         stopService(
-                new Intent(InventoryControl_LocalValidation.this,
+                new Intent(InventoryControl_NoPopup_Rto_DelReq.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         try {

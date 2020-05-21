@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 102; // Change the concept of deliver and not deliver
+    private static final int Version = 109; // Add isPaid , Ismap Option for Delivery Req
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -159,7 +159,8 @@ public class DBConnections
                 "\"HasDeliveryRequest\" BOOL ,\"DDate\" TEXT NOT NULL,\"EmpID\" INTEGER NOT NULL,\"Weight\" TEXT NOT NULL," +
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
-                "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer )");
+                "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
+                " DsOrderNo Integer , Ispaid Integer , IsMap Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -352,7 +353,8 @@ public class DBConnections
                 " \"MenuChanges\" Integer Default 0 )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"WaybillNo\"  TEXt NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL  )");
+                "\"WaybillNo\"  TEXt NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL ," +
+                "ReqType Integer Not Null , NCLNO Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
@@ -369,6 +371,23 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_NotDeliveredService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"SuggestLocations\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
     }
 
     public int getVersion() {
@@ -574,7 +593,8 @@ public class DBConnections
                     " \"MenuChanges\" Integer Default 0 )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL ," +
+                    " ReqType Integer Not Null , NCLNO Text )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
@@ -590,6 +610,24 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_NotDeliveredService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"SuggestLocations\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER ,  EmpID INTEGER)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -642,6 +680,12 @@ public class DBConnections
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN OTPNo  INTEGER ");
             if (!isColumnExist("MyRouteShipments", "IqamaLength"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IqamaLength  INTEGER ");
+
+            if (!isColumnExist("MyRouteShipments", "Ispaid"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN Ispaid  INTEGER ");
+
+            if (!isColumnExist("MyRouteShipments", "IsMap"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsMap  INTEGER ");
 
             if (!isColumnExist("WaybillMeasurement", "UserID"))
                 db.execSQL("ALTER TABLE WaybillMeasurement ADD COLUMN UserID INTEGER ");
@@ -734,6 +778,15 @@ public class DBConnections
                 db.execSQL("ALTER TABLE OnDelivery ADD COLUMN IqamaName Text ");
             if (!isColumnExist("OnDelivery", "DeliverySheetID"))
                 db.execSQL("ALTER TABLE OnDelivery ADD COLUMN DeliverySheetID Integer ");
+
+            if (!isColumnExist("MyRouteShipments", "DsOrderNo"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN DsOrderNo Integer ");
+
+            if (!isColumnExist("DeliverReq", "ReqType"))
+                db.execSQL("ALTER TABLE DeliverReq ADD COLUMN ReqType Integer ");
+
+            if (!isColumnExist("DeliverReq", "NCLNO"))
+                db.execSQL("ALTER TABLE DeliverReq ADD COLUMN NCLNO TEXT ");
         }
 
 
@@ -2376,6 +2429,9 @@ public class DBConnections
             contentValues.put("Refused", false);
             contentValues.put("OTPNo", instance.OtpNo);
             contentValues.put("IqamaLength", instance.IqamaLength);
+            contentValues.put("DsOrderNo", instance.DsOrderNo);
+            contentValues.put("Ispaid", instance.IsPaid);
+            contentValues.put("IsMap", instance.IsMap);
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
                 contentValues.put("OptimzeSerialNo", 0);
@@ -4654,6 +4710,24 @@ public class DBConnections
         return result != -1;
     }
 
+    public boolean InsertTerminalHandlingbyNCLBulk(String instance, Context context, int rowcount) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put("Json", instance);
+            contentValues.put("Count", rowcount);
+
+            result = db.insertOrThrow("InventorybyNCL", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
     public void deleteNcl(int ID, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -5261,6 +5335,20 @@ public class DBConnections
         }
     }
 
+    public void deleteInventoryByNCLID(int ID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(ID)};
+            db.delete("InventorybyNCL", "ID=?", args);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
     public void deleteLoginIDs(Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -5371,7 +5459,7 @@ public class DBConnections
 
     //Bulk Insert
     public void insertDelBulk(JSONArray deliveryReq, Context context) {
-        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
+        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO ) values (?, ?, ?, ? , ? , ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
         db.beginTransaction();
@@ -5387,6 +5475,11 @@ public class DBConnections
                 stmt.bindString(2, jsonObject1.getString("BarCode"));
                 stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
                 stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
+                stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
+                String NCLNo = "";
+                if (jsonObject1.getString("NCLNO") != null)
+                    NCLNo = jsonObject1.getString("NCLNO");
+                stmt.bindString(6, NCLNo);
 
                 long entryID = stmt.executeInsert();
                 stmt.clearBindings();
@@ -5560,14 +5653,21 @@ public class DBConnections
 
     public boolean InsertDomain(Context context) {
         long result = 0;
-        int domainCount = CountDomainURL(context);
+        int domainCount = CountDomainURL(context, 0);
         if (domainCount > 0) {
             return true;
         }
         try {
             ArrayList<String> domian = new ArrayList<>();
-            domian.add("https://mobilepointerapi2.naqelexpress.com/Api/Pointer/");
-            domian.add("https://mobilepointerapi1.naqelexpress.com/Api/Pointer/");
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                // domian.add("https://mobilepointerapi2.naqelexpress.com/Api/Pointer/");
+                //domian.add("https://mobilepointerapi1.naqelexpress.com/Api/Pointer/");
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); // NaqelWay
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Google Server
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             int i = 0;
 
@@ -5591,11 +5691,21 @@ public class DBConnections
         return result != -1;
     }
 
-    public int CountDomainURL(Context context) {
+    public int CountDomainURL(Context context, int type) {
         int Count = 0;
         try {
-            Cursor cursor = Fill("select Name  from DomainURL ", context);
-            if (cursor.getCount() > 0) {
+
+            Cursor cursor = null;
+            if (type == 0) // 0 - Normal
+                cursor = Fill("select Name  from DomainURL ", context);
+            else if (type == 1) // 1 - Partial Delivery Service - PartialDelivery
+                cursor = Fill("select Name  from DomainURL_DelService ", context);
+            else if (type == 2) // Not Delivered Service
+                cursor = Fill("select Name  from DomainURL_NotDeliveredService ", context);
+            else if (type == 3) // Deliverysheet Service
+                cursor = Fill("select Name  from DomainURL_DelSheetService ", context);
+
+            if (cursor != null && cursor.getCount() > 0) {
                 Count = cursor.getCount();
             }
             cursor.close();
@@ -5605,6 +5715,7 @@ public class DBConnections
 
         return Count;
     }
+
 
     public String GetPrimaryDomain(Context context) {
         String PrimaryDomain = "";
@@ -5633,17 +5744,50 @@ public class DBConnections
         //Put the filed which you want to update.
         if (triedtimes == 2) {
 
-            if (domainname.contains("mobilepointerapi2.naqelexpress.com")) {
-                contentValues.put("Name", "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/");
-                domainname = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+                //  domainname = GlobalVar.GV().NaqelPointerAPILink1_ForDomain;
             } else {
-                contentValues.put("Name", "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/");
-                domainname = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/";
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+                //  domainname = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/";
 
             }
             contentValues.put("Isprimary", 1);
         } else
             contentValues.put("Istried", triedtimes);
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateDomaintriedTimes_For5(int triedtimes, String domainname, Context context) {
+
+        GlobalVar.ResetTriedCount();
+        UpdateExsistingIsPrimary(domainname, context);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        if (triedtimes == 2) {
+
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+            contentValues.put("Isprimary", 1);
+        }
+//        else
+//            contentValues.put("Istried", triedtimes);
 
         try {
             String args[] = {domainname};
@@ -5675,5 +5819,410 @@ public class DBConnections
         return true;
     }
 
+
+    //For Delivery Service
+    public boolean InsertDomain_ForDelService(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 1);
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_DelService", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_DelService(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_DelService where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForDelService(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForDelService = 0;
+        UpdateExsistingIsPrimaryForDelService(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForDelService(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    //For DeliverySheet Service
+    public boolean InsertDomain_ForDelSheetService(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 3);
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_DelSheetService", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_DelSheetService(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_DelSheetService where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForDelSheetService(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForDelSheetService = 0;
+        UpdateExsistingIsPrimaryForDelSheetService(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelSheetService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForDelSheetService(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelSheetService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+
+    //For NotDelivered Service
+    public boolean InsertDomain_ForNotDeliveredService(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 2);
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_NotDeliveredService", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_NotDeliverdService(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_NotDeliveredService where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_NotDeliveredService(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForNotDeliverService = 0;
+        UpdateExsistingIsPrimaryForNotDeliveredService(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_NotDeliveredService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForNotDeliveredService(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_NotDeliveredService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public boolean InsertSuggestLocation(Context context, String location) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("StringData", location);
+            contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            result = db.insert("SuggestLocations", null, contentValues);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean DeleteSuggestLocation(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.delete("SuggestLocations", "Date!=?", args);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean DeleteAllSuggestLocation(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.execSQL("delete from SuggestLocations");
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean DeleteAllPlannedLocation(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.execSQL("delete from plannedLocation");
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean InsertPlannedLocation(Context context, String location, int pos) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("StringData", location);
+            contentValues.put("position", pos);
+            contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            result = db.insert("plannedLocation", null, contentValues);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
 
 }

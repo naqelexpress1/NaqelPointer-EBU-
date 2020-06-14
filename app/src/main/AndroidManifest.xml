@@ -212,6 +212,22 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Activity.MyrouteCBU.MyRouteActivity_Complaince"
+            android:label="My Route"
+            android:screenOrientation="portrait"
+            android:theme="@style/myroute.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+
         <!--
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
@@ -749,10 +765,16 @@
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
         <activity
-            android:name=".TerminalHandling.InventoryControl_LocalValidationReleaseWaybills"
+            android:name=".TerminalHandling.InventoryControl_LocalValidation_oneByOne"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".TerminalHandling.InventoryControl_LocalValidationReleaseWaybills"
+            android:label="Inventory Control"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
         <activity

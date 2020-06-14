@@ -2,28 +2,8 @@ package com.naqelexpress.naqelpointer.service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.naqelexpress.naqelpointer.ApplicationController;
-import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.GlobalVar;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by Hasna on 12/20/18.
@@ -50,7 +30,8 @@ public class UpdateLocation extends JobIntentService {
 
 
         try {
-            final DBConnections db = new DBConnections(getApplicationContext(), null);
+
+           /* final DBConnections db = new DBConnections(getApplicationContext(), null);
 
             Cursor result = db.Fill("select * from CurrentLocation Limit 1 ", getApplicationContext());
             // Toast.makeText(getApplicationContext(), "Count : " + String.valueOf(result.getCount()), Toast.LENGTH_LONG).show();
@@ -136,7 +117,7 @@ public class UpdateLocation extends JobIntentService {
             if (result != null)
                 result.close();
             if (db != null)
-                db.close();
+                db.close();*/
         } catch (Exception e) {
             enqueueWork(getApplicationContext(), intent);
         }

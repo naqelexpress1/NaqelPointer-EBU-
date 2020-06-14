@@ -218,6 +218,9 @@ public class History extends Activity {
         stopService(
                 new Intent(History.this,
                         com.naqelexpress.naqelpointer.service.CheckPoint.class));
+        stopService(
+                new Intent(History.this,
+                        com.naqelexpress.naqelpointer.service.NotDelivery.class));
 
     }
 
@@ -918,7 +921,7 @@ public class History extends Activity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(DomainURL + "SendPickUpDataToServer");
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer");
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
@@ -1034,7 +1037,8 @@ public class History extends Activity {
                     System.out.println(e);
                     //  insertManual();
                 }
-            } else {
+            }
+            /*else {
                 if (isInternetAvailable.contains("No address associated with hostname")) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
@@ -1044,7 +1048,7 @@ public class History extends Activity {
                     }
 
                 }
-            }
+            }*/
         }
     }
 
@@ -1072,7 +1076,8 @@ public class History extends Activity {
                 progressDialog.show();
 
             }
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            // DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            DomainURL = GlobalVar.GV().NaqelPointerAPILink;
 
             super.onPreExecute();
 
@@ -1261,19 +1266,20 @@ public class History extends Activity {
                 } catch (Exception e) {
                     System.out.println(e);
                 }
-            } else {
-                if (isInternetAvailable.contains("No address associated with hostname")) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
-                } else {
-                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
-                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
-                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
-                    }
-
-                }
             }
+//            else {
+//                if (isInternetAvailable.contains("No address associated with hostname")) {
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+//                } else {
+//                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+//                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+//                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
+//                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+//                    }
+//
+//                }
+//            }
         }
     }
 
@@ -1320,6 +1326,10 @@ public class History extends Activity {
             DBConnections db = new DBConnections(getApplicationContext(), null);
             Cursor result = db.Fill("select * from OnDelivery where IsSync = 0", getApplicationContext());
             result.moveToFirst();
+
+            if (result.getCount() == 0)
+                return "No Data";
+
             do {
                 returnresult = "";
                 buffer = new StringBuffer();
@@ -1434,6 +1444,7 @@ public class History extends Activity {
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     String updateDeliver = response.getString("ErrorMessage");
                     if (IsSync && !HasError) {
+                        isInternetAvailable = "Done";
                         moveddata = moveddata + 1;
 
                         db.updateOnDeliveryID(onDeliveryRequest.ID, getApplicationContext());
@@ -1461,12 +1472,18 @@ public class History extends Activity {
 
             result.close();
             db.close();
-            return null;
+            return isInternetAvailable;
         }
 
         @Override
         protected void onPostExecute(String finalJson) {
-            if (finalJson != null) {
+
+            if (finalJson != null && finalJson.equals("No Data")) {
+                ErrorAlert("No Data",
+                        "All Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+            }
+
+            if (finalJson != null && finalJson.equals("Done") && !finalJson.equals("No Data")) {
                 try {
 
                     if (progressDialog != null && progressDialog.isShowing()) {
@@ -1516,6 +1533,12 @@ public class History extends Activity {
                     }
 
                 }
+            }
+            manualsyncbtn.setEnabled(true);
+            manualsyncbtn.setClickable(true);
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
             }
         }
     }
@@ -1671,6 +1694,8 @@ public class History extends Activity {
                 Cursor result = db.Fill("select * from NotDelivered  Where IsSync = 0 Limit " + Limit + " oFFset " + Offset, getApplicationContext()); //where IsSync = 0
                 result.moveToFirst();
 
+                if (result.getCount() == 0)
+                    return "No Data";
                 try {
 
                     do {
@@ -1770,6 +1795,7 @@ public class History extends Activity {
                     boolean HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
                     if (IsSync && !HasError) {
                         String rIDs[] = jsonObject.getString("ErrorMessage").split("\\,");
+                        isInternetAvailable = "Done";
                         for (String id : rIDs) {
 
                             Cursor waybill_result = db.Fill("select * from NotDelivered where ID = " + id, getApplicationContext());
@@ -1804,12 +1830,16 @@ public class History extends Activity {
 
 
             db.close();
-            return null;
+            return isInternetAvailable;
         }
 
         @Override
         protected void onPostExecute(String finalJson) {
-            if (finalJson != null) {
+            if (finalJson != null && finalJson.equals("No Data")) {
+                ErrorAlert("No Data",
+                        "All Not Delivered Data Synchronized Successfully,It Will take max 10-15min to reflect InfoTrack");
+            }
+            if (finalJson.equals("Done") && !finalJson.equals("No Data")) {
                 try {
 
                     if (progressDialog != null && progressDialog.isShowing()) {
@@ -1852,7 +1882,7 @@ public class History extends Activity {
                     //  insertManual();
                 }
             } else {
-                if (isInternetAvailable.contains("No address associated with hostname")) {
+                if (isInternetAvailable.contains("No address associated with hostname") || isInternetAvailable.contains("ConnectException")) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
@@ -1863,6 +1893,12 @@ public class History extends Activity {
                     }
 
                 }
+            }
+            manualsyncbtn.setEnabled(true);
+            manualsyncbtn.setClickable(true);
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
             }
         }
 

@@ -278,8 +278,10 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
             intent.putExtras(bundle);
             startActivity(intent);
         } else {
+//            Intent intent = new Intent(this,
+//                    com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
             Intent intent = new Intent(this,
-                    com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation.class); //com.naqelexpress.naqelpointer.TerminalHandling.
+                    com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne.class);
             intent.putExtras(bundle);
             startActivity(intent);
         }

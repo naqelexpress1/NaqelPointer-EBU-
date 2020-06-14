@@ -22,6 +22,63 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
 
+    <TextView
+        android:id="@+id/citccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Citc Count: 123456"
+        android:textColor="@color/NaqelBlue"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lbNclNo"
+        tools:ignore="HardcodedText" />
+
+    <LinearLayout
+        android:id="@+id/ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/citccount"
+        tools:ignore="MissingConstraints">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/inserteddate"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:inputType="text"
+                android:text="123"
+                android:textColor="@android:color/black"
+                android:textSize="10sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
+
+            <TextView
+                android:id="@+id/validupto"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:gravity="center"
+                android:inputType="text"
+                android:text="1234"
+                android:textColor="@android:color/black"
+                android:textSize="10sp"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="HardcodedText" />
+
+
+        </TableLayout>
+    </LinearLayout>
+
     <EditText
         android:id="@+id/txtBarcode"
         android:layout_width="0dp"
@@ -37,7 +94,7 @@
         android:maxLength="13"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lbNclNo"
+        app:layout_constraintTop_toBottomOf="@+id/ll"
         tools:ignore="HardcodedText" />
 
     <Button

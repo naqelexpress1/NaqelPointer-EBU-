@@ -680,7 +680,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 jObject = new JSONObject(jsonData[0]);
 
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-                routes = parser.parse(jObject);
+                routes = parser.parse(jObject , "0" , getBaseContext() , 1);
 
 //                parseaddress(jObject);
 //                jsonroute.add(jObject.toString());

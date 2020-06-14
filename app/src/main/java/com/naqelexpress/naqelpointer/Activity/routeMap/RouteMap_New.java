@@ -245,86 +245,87 @@ public class RouteMap_New extends AppCompatActivity implements OnMapReadyCallbac
         // places.remove(0);
 
 
-        if (jsonroute.size() == 0) {
-            ArrayList<Places> temp_places = new ArrayList<>();
-            ArrayList<Location> sp = new ArrayList<>();
-            int j = 0;
-            //temp_places.add(places.get(0));
-            //places.remove(0);
-            if (places.size() > 1) {
-                while (places.size() != 0) {
+        // if (jsonroute.size() == 0) {
+        ArrayList<Places> temp_places = new ArrayList<>();
+        ArrayList<Location> sp = new ArrayList<>();
+        int j = 0;
+        //temp_places.add(places.get(0));
+        //places.remove(0);
+        if (places.size() > 1) {
+            while (places.size() != 0) {
 
-                    ArrayList<Location> temp = places;
-                    //ll = temp.get(0).latlng;
-                    List<Location> sortpath = sortLocations(temp, temp.get(0).getLatitude(), temp.get(0).getLongitude());
-                    //ArrayList<Places> sortpath = sortLocations(temp, ll.latitude, ll.longitude);
+                ArrayList<Location> temp = places;
+                //ll = temp.get(0).latlng;
+                List<Location> sortpath = sortLocations(temp, temp.get(0).getLatitude(), temp.get(0).getLongitude());
+                //ArrayList<Places> sortpath = sortLocations(temp, ll.latitude, ll.longitude);
 
-                    if (places.size() == 2) {
+                if (places.size() == 2) {
 //                        temp_places.add(sortpath.get(0));
 //                        temp_places.add(sortpath.get(1));
-                        sp.add(sortpath.get(0));
-                        sp.add(sortpath.get(1));
-                        places.clear();
-                    } else {
+                    sp.add(sortpath.get(0));
+                    sp.add(sortpath.get(1));
+                    places.clear();
+                } else {
 //                        temp_places.add(sortpath.get(0));
-                        sp.add(sortpath.get(0));
-                        places.remove(0);
-
-                    }
-                    j += 1;
+                    sp.add(sortpath.get(0));
+                    places.remove(0);
 
                 }
+                j += 1;
+
             }
-            places.addAll(sp);
-
-            ShowShipmentMarker();
-
-            if (places.size() > 1) {
-                for (int i = 0; i < places.size(); i++) {
-
-                    LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
-                    LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
-                    // Getting URL to the Google Directions API
-                    String url = getDirectionsUrl(origin, dest);
-
-                    DownloadTask downloadTask = new DownloadTask();
-                    // Start downloading json data from Google Directions API
-                    downloadTask.execute(url, String.valueOf(i));
-
-                    if ((i == places.size() - 2) && (places.size() != 2)) {
-                        origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
-                        dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
-                        url = getDirectionsUrl(origin, dest);
-                        downloadTask = new DownloadTask();
-                        downloadTask.execute(url, String.valueOf(places.size() - 1));
-                        break;
-                    }
-                    if (i == places.size() - 2)
-                        break;
-
-
-                }
-            }
-        } else {
-            ShowShipmentMarker();
-            int i = 0;
-            for (String json : jsonroute) {
-                try {
-                    List<List<HashMap<String, String>>> routes = null;
-                    JSONObject jObject = new JSONObject(json);
-
-                    DirectionsJSONParser parser = new DirectionsJSONParser();
-//                    String position = "";
-                    routes = parser.parse(jObject);
-                    drawpolyline(routes, String.valueOf(i));
-                    i++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-
         }
+        places.addAll(sp);
+
+        ShowShipmentMarker();
+
+        if (places.size() > 1) {
+            for (int i = 0; i < places.size(); i++) {
+
+                LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
+                LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
+                // Getting URL to the Google Directions API
+                String url = getDirectionsUrl(origin, dest);
+
+                DownloadTask downloadTask = new DownloadTask();
+                // Start downloading json data from Google Directions API
+                downloadTask.execute(url, String.valueOf(i));
+
+                if ((i == places.size() - 2) && (places.size() != 2)) {
+                    origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
+                    dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
+                    url = getDirectionsUrl(origin, dest);
+                    downloadTask = new DownloadTask();
+                    downloadTask.execute(url, String.valueOf(places.size() - 1));
+                    break;
+                }
+                if (i == places.size() - 2)
+                    break;
+
+
+            }
+        }
+        //   }
+//        else {
+//            ShowShipmentMarker();
+//            int i = 0;
+//            for (String json : jsonroute) {
+//                try {
+//                    List<List<HashMap<String, String>>> routes = null;
+//                    JSONObject jObject = new JSONObject(json);
+//
+//                    DirectionsJSONParser parser = new DirectionsJSONParser();
+////                    String position = "";
+//                    routes = parser.parse(jObject, "0", getApplicationContext(), 1);
+//                    drawpolyline(routes, String.valueOf(i));
+//                    i++;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//
+//        }
 
 
     }
@@ -445,7 +446,7 @@ public class RouteMap_New extends AppCompatActivity implements OnMapReadyCallbac
                 position = jsonData[1];
                 DirectionsJSONParser parser = new DirectionsJSONParser();
 
-                routes = parser.parse(jObject);
+                routes = parser.parse(jObject, "0", getApplicationContext(), 1);
                 jsonroute.add(jObject.toString());
             } catch (Exception e) {
                 e.printStackTrace();

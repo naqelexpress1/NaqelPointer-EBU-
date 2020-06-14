@@ -37,31 +37,35 @@ public class NewBarCodeScanner extends AppCompatActivity
         super.onCreate(state);
         setContentView(R.layout.newbarcodescannerlands);
 
-        if (state != null) {
-            mFlash = state.getBoolean(FLASH_STATE, false);
-            mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
-            mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
-            mCameraId = state.getInt(CAMERA_ID, -1);
-        } else {
-            mFlash = false;
-            mAutoFocus = true;
-            mSelectedIndices = null;
-            mCameraId = -1;
-        }
-
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-        mScannerView = new ZBarScannerView(this);
-        setupFormats();
-        contentFrame.addView(mScannerView);
-        Button btnFlash = (Button) findViewById(R.id.btnFlash);
-        btnFlash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFlash = !mFlash;
-                mScannerView.setFlash(mFlash);
+        try {
+            if (state != null) {
+                mFlash = state.getBoolean(FLASH_STATE, false);
+                mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
+                mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
+                mCameraId = state.getInt(CAMERA_ID, -1);
+            } else {
+                mFlash = false;
+                mAutoFocus = true;
+                mSelectedIndices = null;
+                mCameraId = -1;
             }
-        });
-        setRequestedOrientation(getResources().getConfiguration().orientation);
+
+            ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+            mScannerView = new ZBarScannerView(this);
+            setupFormats();
+            contentFrame.addView(mScannerView);
+            Button btnFlash = (Button) findViewById(R.id.btnFlash);
+            btnFlash.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFlash = !mFlash;
+                    mScannerView.setFlash(mFlash);
+                }
+            });
+            setRequestedOrientation(getResources().getConfiguration().orientation);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
     @Override

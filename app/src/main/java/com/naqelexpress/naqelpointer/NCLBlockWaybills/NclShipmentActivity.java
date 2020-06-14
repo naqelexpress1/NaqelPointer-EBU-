@@ -86,7 +86,7 @@ import Error.ErrorReporter;
 public class NclShipmentActivity extends AppCompatActivity {
 
     ScanNclNoFragment firstFragment;
-    ScanNclWaybillFragmentRemoveValidation secondFragment;
+    ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
     private Bundle bundle;
     DateTime TimeIn;
     public static String NclNo = "0";
@@ -881,7 +881,7 @@ public class NclShipmentActivity extends AppCompatActivity {
                     return firstFragment;
                 case 1:
                     if (secondFragment == null) {
-                        secondFragment = new ScanNclWaybillFragmentRemoveValidation();
+                        secondFragment = new ScanNclWaybillFragmentRemoveValidation_CITC();
                         secondFragment.setArguments(bundle);
                     }
                     return secondFragment;

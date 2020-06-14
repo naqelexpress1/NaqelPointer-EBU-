@@ -38,11 +38,9 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -66,19 +64,21 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatActivity implements View.OnClickListener {
+public class InventoryControl_LocalValidationbyNCL_OLD extends AppCompatActivity implements View.OnClickListener {
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
     HashMap<String, String> trips = new HashMap<>();
-    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount, bayancount;
+    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount;
     private EditText txtBarCode;//, txtbinlocation;
     public ArrayList<String> inventorycontrol = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
+    public ArrayList<String> iscitcshipments = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
     public ArrayList<String> isHeldout = new ArrayList<>();
-    public ArrayList<String> iscitcshipments = new ArrayList<>();
+    public ArrayList<String> isNclDelReq = new ArrayList<>();
+    public ArrayList<String> isNclCitc = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private DataAdapter adapter;
@@ -92,17 +92,12 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         setContentView(R.layout.inventory_new);
 
         lbTotal = (TextView) findViewById(R.id.lbTotal);
+        citccount = (TextView) findViewById(R.id.citccount);
         delreqcount = (TextView) findViewById(R.id.delreqcount);
         rtoreqcount = (TextView) findViewById(R.id.rtoreqcount);
-        citccount = (TextView) findViewById(R.id.citccount);
-        bayancount = (TextView) findViewById(R.id.bayancount);
-        bayancount.setVisibility(View.VISIBLE);
 
         inserteddate = (TextView) findViewById(R.id.inserteddate);
         validupto = (TextView) findViewById(R.id.validupto);
-        // rtoreqcount.setVisibility(View.GONE);
-        // inserteddate.setVisibility(View.GONE);
-        // validupto.setVisibility(View.GONE);
 
         lbTotal.setText("");
 
@@ -122,7 +117,27 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+        // isNetworkAvailable();
+        //Commented for checking force close issues
+        // isDeviceonline();
 
+
+//        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+//        txtBarCode.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (txtBarCode != null && txtBarCode.getText().length() == 13)
+//                    AddNewPiece();
+//            }
+//        });
 
         txtBarCode.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -133,7 +148,9 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                     onBackPressed();
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    AddNewPiece();
+
+                        AddNewPiece();
+
                     return true;
                 }
                 return false;
@@ -144,11 +161,11 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!GlobalVar.GV().checkPermission(InventoryControl_LocalValidationReleaseWaybills.this, GlobalVar.PermissionType.Camera)) {
+                if (!GlobalVar.GV().checkPermission(InventoryControl_LocalValidationbyNCL_OLD.this, GlobalVar.PermissionType.Camera)) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(InventoryControl_LocalValidationReleaseWaybills.this, GlobalVar.PermissionType.Camera);
+                    GlobalVar.GV().askPermission(InventoryControl_LocalValidationbyNCL_OLD.this, GlobalVar.PermissionType.Camera);
                 } else {
-                    Intent intent = new Intent(InventoryControl_LocalValidationReleaseWaybills.this, NewBarCodeScanner.class);
+                    Intent intent = new Intent(InventoryControl_LocalValidationbyNCL_OLD.this, NewBarCodeScanner.class);
                     startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                 }
             }
@@ -162,29 +179,32 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             @Override
             public void onClick(View v) {
 
-                UserME nclNoReq = new UserME();
-                nclNoReq.EmployID = GlobalVar.GV().EmployID;
-
-                OnHoldNCL(nclNoReq);
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("OriginID", 0);
+                    jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                    new BringNCLData().execute(jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
+        Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
+        if (result.getCount() > 0) {
+            ReadFromLocal(result, dbConnections);
 
-//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//        // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
-//        Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
-//        if (result.getCount() > 0) {
-//            ReadFromLocal(result, dbConnections);
-//
-//        } else {
-//            try {
-//                JSONObject jsonObject = new JSONObject();
-//                jsonObject.put("OriginID", 0);
-//                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-//                new BringNCLData().execute(jsonObject.toString());
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        } else {
+            try {
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("OriginID", 0);
+                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                new BringNCLData().execute(jsonObject.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -198,140 +218,6 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
         //initSwipe();
-    }
-
-    public void OnHoldNCL(UserME nclNoRequest) {
-        String jsonData = JsonSerializerDeserializer.serialize(nclNoRequest, true);
-        new OnHoldWaybills().execute(jsonData);
-
-    }
-
-    private class OnHoldWaybills extends AsyncTask<String, Void, String> {
-        private ProgressDialog progressDialog;
-        String result = "";
-        StringBuffer buffer;
-
-        @Override
-        protected void onPreExecute() {
-            //progressDialog = ProgressDialog.show(getContext().getApplicationContext(), "Please wait.", "Ncl No Generating.", true);
-
-            progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
-            //progressDialog.setMax(100);
-            progressDialog.setMessage("Please wait.");
-            progressDialog.setTitle("Collecting OnHold Waybills.");
-            progressDialog.show();
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            String jsonData = params[0];
-            HttpURLConnection httpURLConnection = null;
-            OutputStream dos = null;
-            InputStream ist = null;
-
-            try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "ReleaseonHoldShipments");
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                httpURLConnection.setDoInput(true);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.connect();
-
-                dos = httpURLConnection.getOutputStream();
-                httpURLConnection.getOutputStream();
-                dos.write(jsonData.getBytes());
-
-                ist = httpURLConnection.getInputStream();
-                String line;
-                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
-                buffer = new StringBuffer();
-
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                return String.valueOf(buffer);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    if (ist != null)
-                        ist.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if (dos != null)
-                        dos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (httpURLConnection != null)
-                    httpURLConnection.disconnect();
-                result = String.valueOf(buffer);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String finalJson) {
-            progressDialog.dismiss();
-            super.onPostExecute(String.valueOf(finalJson));
-            if (finalJson != null) {
-
-                JSONObject jsonObject = null;
-                try {
-                    jsonObject = new JSONObject(finalJson);
-                    fetchonhlodshipments(jsonObject.getJSONArray("ReleaseWaybills"));
-
-                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
-                    Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
-                    if (result.getCount() > 0) {
-                        ReadFromLocal(result, dbConnections);
-                    }
-
-                    if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-                        if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
-                            try {
-                                JSONObject jsonObject1 = new JSONObject();
-                                jsonObject1.put("OriginID", 0);
-                                jsonObject1.put("DestinationID", GlobalVar.GV().StationID);
-                                new BringNCLData().execute(jsonObject1.toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    public static ArrayList<String> pieceDenied = new ArrayList<>();
-
-    private void fetchonhlodshipments(JSONArray waybills) {
-
-        for (int i = 0; i < waybills.length(); i++) {
-            //generate some values
-            try {
-                JSONObject jsonObject1 = waybills.getJSONObject(i);
-                pieceDenied.add(jsonObject1.getString("BarCode"));
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        bayancount.setText("Bayan Count : " + String.valueOf(waybills.length()));
-
-
     }
 
     @Override
@@ -378,6 +264,9 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
       }
   */
     private void AddNewPiece() {
+        //isConnected();
+//        isNetworkAvailable();
+
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -386,16 +275,10 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             }
         } else {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
+            GlobalVar.RedirectSettings(InventoryControl_LocalValidationbyNCL_OLD.this);
             return;
         }
 
-        if (pieceDenied.contains(txtBarCode.getText().toString())) {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-            ErrorAlert("Info",
-                    "Bayan Created for this Piece Barcode(" + txtBarCode.getText().toString() + ")"
-            );
-        }
 
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
@@ -419,7 +302,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             return;
         }
 
-        if (txtBarCode.getText().toString().length() <= 12) {
+        if (txtBarCode.getText().toString().length() <= 9) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
@@ -438,10 +321,82 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
         boolean rtoreq = false;
         boolean ismatch = false;
+        boolean isNCLReq_Citc = false;
 
-        GetNCLDatafromDB(txtBarCode.getText().toString());
+        String Barcode = txtBarCode.getText().toString().substring(0,9);
 
-        if (iscitcshipments.contains(txtBarCode.getText().toString())) {
+        if (isNclDelReq.contains(txtBarCode.getText().toString())) {
+            if (isNclCitc.contains(txtBarCode.getText().toString())) {
+                isNCLReq_Citc = true;
+                ismatch = true;
+                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                    isHeldout.add(txtBarCode.getText().toString());
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("Status", "44");
+                    temp.put("Ref", lbTotal.getText().toString());
+                    delrtoreq.add(temp);
+                    inventorycontrol.add(txtBarCode.getText().toString());
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                    initViews();
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                }
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                ErrorAlert("Delivery/CITC Complaint", "This NCL(" + txtBarCode.getText().toString() + ") contains Request for Delivery &  CITC Complaints ", 0, txtBarCode.getText().toString());
+                // return;
+            } else {
+                ismatch = true;
+                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+
+                    isHeldout.add(txtBarCode.getText().toString());
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("Status", "44");
+                    temp.put("Ref", lbTotal.getText().toString());
+                    delrtoreq.add(temp);
+                    inventorycontrol.add(txtBarCode.getText().toString());
+                    initViews();
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                    ErrorAlert("Delivery Request", "This NCLNO Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
+                } else {
+                    ErrorAlert("Delivery Request", "This NCLNO Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                    return;
+                }
+            }
+
+
+        }
+
+        if (!isNCLReq_Citc) {
+            if (isNclCitc.contains(txtBarCode.getText().toString())) {
+                ismatch = true;
+                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+
+                    isHeldout.add(txtBarCode.getText().toString());
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("Status", "44");
+                    temp.put("Ref", lbTotal.getText().toString());
+                    delrtoreq.add(temp);
+                    inventorycontrol.add(txtBarCode.getText().toString());
+                    initViews();
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + txtBarCode.getText().toString() + ") has CITC Complaint ", 0, txtBarCode.getText().toString());
+                } else {
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + txtBarCode.getText().toString() + ") has CITC Complaint ", 0, txtBarCode.getText().toString());
+                    return;
+                }
+            }
+        }
+
+        /*if (iscitcshipments.contains(txtBarCode.getText().toString())) {
 
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
                 ismatch = true;
@@ -536,10 +491,10 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                     return;
                 }
             }
-        }
+        }*/
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            if (txtBarCode.getText().toString().length() == 10) {
 
                 // SaveData(txtBarCode.getText().toString());
 
@@ -579,72 +534,6 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
     }
 
-    private void GetNCLDatafromDB(String Barcode) {
-
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-
-        try {
-
-
-            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode='" + Barcode + "'", getApplicationContext());
-            if (cursor.getCount() > 0) {
-                isdeliveryReq.clear();
-                // isNclDelReq.clear();
-                cursor.moveToFirst();
-                do {
-
-                    isdeliveryReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
-                    // if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
-                    //     isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
-
-                } while (cursor.moveToNext());
-            }
-
-            cursor = dbConnections.Fill("select * from RtoReq  where BarCode='" + Barcode + "'", getApplicationContext());
-            if (cursor.getCount() > 0) {
-                isrtoReq.clear();
-                // isNclDelReq.clear();
-                cursor.moveToFirst();
-                do {
-
-                    isrtoReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
-                    // if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
-                    //     isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
-
-                } while (cursor.moveToNext());
-            }
-
-            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 and BarCode='" + Barcode + "'", getApplicationContext());
-            if (cursor.getCount() > 0) {
-                iscitcshipments.clear();
-                // isNclCitc.clear();
-                cursor.moveToFirst();
-                do {
-
-                    iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
-//                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
-//                        isNclCitc.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
-
-                } while (cursor.moveToNext());
-            }
-
-            cursor.close();
-
-            dbConnections.close();
-
-
-        } catch (Exception e) {
-            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Somthing went wrong, kindly scan again",
-                    GlobalVar.AlertType.Error);
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            txtBarCode.setText("");
-            txtBarCode.requestFocus();
-            e.printStackTrace();
-        }
-
-    }
-
     private void initSwipe() {
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)//| ItemTouchHelper.RIGHT)
         {
@@ -658,7 +547,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(InventoryControl_LocalValidationbyNCL_OLD.this);
                     builder.setTitle("Confirm Deleting")
                             .setMessage("Are you sure you want to delete?")
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -726,13 +615,13 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to Finish the Job?", 2, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
+                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationbyNCL_OLD.this);
                 return true;
             case R.id.manual:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
                     ErrorAlert("Info", "Are yo sure want to upload Manual?", 3, "");
                 } else
-                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
+                    GlobalVar.RedirectSettings(InventoryControl_LocalValidationbyNCL_OLD.this);
                 return true;
 
             default:
@@ -849,19 +738,16 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                 int ID = dbConnections.getMaxID("TerminalHandling", getApplicationContext());
                 try {
                     jsonObject.put("ID", ID + 1);
-                    jsonObject.put("BarCode", temp.get("WayBillNo"));
+                    jsonObject.put("NCLNO", temp.get("WayBillNo"));
                     jsonObject.put("IsSync", false);
                     jsonObject.put("EmployID", GlobalVar.GV().EmployID);
-                    jsonObject.put("Date", DateTime.now());
-                    jsonObject.put("TerminalHandlingScanStatusID", 20);
-                    jsonObject.put("TerminalHandlingScanStatusReasonID", Integer.parseInt(temp.get("Status")));
+                    jsonObject.put("CTime", DateTime.now());
                     jsonObject.put("AppVersion", GlobalVar.GV().AppVersion);
                     jsonObject.put("Latitude", String.valueOf(Latitude));
                     jsonObject.put("Longitude", String.valueOf(Longitude));
-                    jsonObject.put("StatusID", 0);
                     jsonObject.put("UserID", GlobalVar.GV().UserID);
-                    jsonObject.put("stationID", GlobalVar.GV().StationID);
-                    jsonObject.put("Reference", temp.get("Ref") + " Held by Customs Required ID ");
+                    jsonObject.put("StationID", GlobalVar.GV().StationID);
+                    jsonObject.put("BIN", temp.get("Ref"));
 
                     jsonArray.put(jsonObject);
 
@@ -872,18 +758,18 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             }
 
             try {
-                data.put("TerminalHandlingBarCodeDetails", jsonArray);
+                data.put("InvbyNCL", jsonArray);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            dbConnections.InsertTerminalHandlingBulk(data.toString(), getApplicationContext(), delrtoreq.size());
+            dbConnections.InsertTerminalHandlingbyNCLBulk(data.toString(), getApplicationContext(), delrtoreq.size());
 
 
-            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class)) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.InventorybyNCLBulk.class)) {
                 startService(
-                        new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
-                                com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
+                        new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
+                                com.naqelexpress.naqelpointer.service.InventorybyNCLBulk.class));
             }
             if (clear == 1)
                 finish();
@@ -916,7 +802,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
                 if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                     startService(
-                            new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                            new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandling.class));
                 }
             }
@@ -991,7 +877,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                    new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
 
@@ -1091,7 +977,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                         // handler.removeCallbacksAndMessages(null);
                         // isdeviceonlinehandler.removeCallbacksAndMessages(null);
                         //countDownTimer.cancel();
-                        InventoryControl_LocalValidationReleaseWaybills.super.onBackPressed();
+                        InventoryControl_LocalValidationbyNCL_OLD.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -1117,7 +1003,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         protected void onPreExecute() {
 
             if (progressDialog == null)
-                progressDialog = ProgressDialog.show(InventoryControl_LocalValidationReleaseWaybills.this,
+                progressDialog = ProgressDialog.show(InventoryControl_LocalValidationbyNCL_OLD.this,
                         "Please wait.", "Bringing Delivery Request data...", true);
             super.onPreExecute();
 
@@ -1320,7 +1206,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
     }
 
     private void LoadDivisionError(final int callfunction) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationbyNCL_OLD.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Something went wrong");
         alertDialog.setMessage("Kindly Check your Internet Connection,Scan Inventory press Cancel");
@@ -1349,7 +1235,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
     }
 
     private void ErrorAlert(final String title, String message, final int clear, final String piececode) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationbyNCL_OLD.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1387,11 +1273,11 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         somethingwrong = false;
 
         stopService(
-                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
         stopService(
-                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         ids.clear();
@@ -1489,7 +1375,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
             }
             startService(
-                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                    new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 
 //            startService(
@@ -1502,7 +1388,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
     }
 
     private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationReleaseWaybills.this).create();
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidationbyNCL_OLD.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
@@ -1535,7 +1421,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         }
         if (!isMyServiceRunning(TerminalHandling.class)) {
             startService(
-                    new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                    new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                             com.naqelexpress.naqelpointer.service.TerminalHandling.class));
         }
     }
@@ -1587,7 +1473,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
         dbConnections.deleteUserME(GlobalVar.GV().EmployID);
 
-        ActivityCompat.finishAffinity(InventoryControl_LocalValidationReleaseWaybills.this);
+        ActivityCompat.finishAffinity(InventoryControl_LocalValidationbyNCL_OLD.this);
         Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
         startActivity(intent);
 
@@ -1650,7 +1536,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 //                progressDialog = ProgressDialog.show(InventoryControlOnetab.this,
 //                        "Please wait.", "Your data is inserting by Manual...", true);
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
+                progressDialog = new ProgressDialog(InventoryControl_LocalValidationbyNCL_OLD.this);
                 progressDialog.setMessage("your request is being process...");
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
                 progressDialog.setMax(100);
@@ -1844,7 +1730,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             uploaddatacount = 0;
             if (progressDialog == null) {
 
-                progressDialog = new ProgressDialog(InventoryControl_LocalValidationReleaseWaybills.this);
+                progressDialog = new ProgressDialog(InventoryControl_LocalValidationbyNCL_OLD.this);
                 progressDialog.setTitle("Request is being process,please wait...");
                 progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
                 progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -1977,7 +1863,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                             "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
                     );
                     startService(
-                            new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                            new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                                     com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
                 } else {
                     ErrorAlert("No Data",
@@ -2000,7 +1886,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
     private void insertManual1() {
 
         stopService(
-                new Intent(InventoryControl_LocalValidationReleaseWaybills.this,
+                new Intent(InventoryControl_LocalValidationbyNCL_OLD.this,
                         com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
 
         try {
@@ -2031,10 +1917,11 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
     }
 
-    /*private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
+    private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
 
 
         isrtoReq.clear();
+
         try {
             if (result.getCount() > 0) {
                 result.moveToFirst();
@@ -2053,13 +1940,16 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             }
             result.close();
 
-            Cursor cursor = dbConnections.Fill("select * from DeliverReq ", getApplicationContext());
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1", getApplicationContext());
             if (cursor.getCount() > 0) {
                 isdeliveryReq.clear();
+                isNclDelReq.clear();
                 cursor.moveToFirst();
                 do {
 
                     isdeliveryReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
                     try {
                         validupto.setText("Upto : " + cursor.getString(cursor.getColumnIndex("ValidDate")) + " 16:30");
                         inserteddate.setText("DLD : " + cursor.getString(cursor.getColumnIndex("InsertedDate")));
@@ -2069,58 +1959,24 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                 } while (cursor.moveToNext());
             }
 
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 ", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                iscitcshipments.clear();
+                isNclCitc.clear();
+                cursor.moveToFirst();
+                do {
+
+                    iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclCitc.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
 
             delreqcount.setText("DEL Count : " + String.valueOf(isdeliveryReq.size()));
             rtoreqcount.setText("RTO Count : " + String.valueOf(isrtoReq.size()));
-
-            cursor.close();
-            result.close();
-            dbConnections.close();
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }*/
-
-    private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
-        isrtoReq.clear();
-
-        try {
-            if (result.getCount() > 0) {
-                result.moveToFirst();
-
-                //  do {
-
-                //isrtoReq.add(result.getString(result.getColumnIndex("BarCode")));
-                rtoreqcount.setText("RTO Count : " + String.valueOf(result.getCount()));
-                try {
-                    validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 16:30");
-                    inserteddate.setText("DLD : " + result.getString(result.getColumnIndex("InsertedDate")));
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-
-                //   } while (result.moveToNext());
-            }
-            result.close();
-
-            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 1", getApplicationContext());
-            if (cursor.getCount() > 0) {
-
-                cursor.moveToFirst();
-
-                delreqcount.setText("DEL Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
-            }
-
-            cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getApplicationContext());
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                citccount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
-            }
-
+            citccount.setText("CITC Count : " + String.valueOf(iscitcshipments.size()));
             cursor.close();
             result.close();
             dbConnections.close();
@@ -2132,4 +1988,5 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
 
     }
+
 }

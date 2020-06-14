@@ -141,6 +141,9 @@ public class LocationService extends Service {
 
                     }
 
+                    if (!devision.equals("Courier"))
+                        return;
+
                     String empid = dbConnections.getDeliverysheetEmpID(getApplicationContext());
                     String split[] = empid.split(",");
                     //                    dbConnections.
@@ -167,10 +170,13 @@ public class LocationService extends Service {
                         if (requestQueue != null)
                             requestQueue.cancelAll("old");
                         if (split.length > 1 && split[1].equals("1"))
-                            shareLiveLocation(jsonObject.toString());
-                        if(split[0].equals("19127"))
-                            shareLiveLocation(jsonObject.toString());
-                        sendNotificationtoConsignee(location.getLatitude(), location.getLongitude());
+                            //shareLiveLocation(jsonObject.toString()); //if you need  Live just uncomment
+                            saveLiveLocation(jsonObject.toString());
+                        if (split[0].equals("19127"))
+                            saveLiveLocation(jsonObject.toString());
+                        //shareLiveLocation(jsonObject.toString()); //if you need  Live just uncomment
+
+                        //sendNotificationtoConsignee(location.getLatitude(), location.getLongitude()); //Comment because of Data usage
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -214,6 +220,17 @@ public class LocationService extends Service {
 
     RequestQueue requestQueue;
 
+
+    public void saveLiveLocation(final String input) {
+
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.InsertLocationintoMongo(getApplicationContext(), input);
+        dbConnections.close();
+
+
+    }
+
     public void shareLiveLocation(final String input) {
 
         try {
@@ -233,9 +250,14 @@ public class LocationService extends Service {
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-//                if (error.toString().contains("NoConnectionError"))
-//                    shareLiveLocation(input);
-                System.out.println(error);
+                    if (error.toString().contains("NoConnectionError"))
+                    // shareLiveLocation(input);
+                    {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        dbConnections.InsertLocationintoMongo(getApplicationContext(), input);
+                        dbConnections.close();
+                    }
+                    System.out.println(error);
 
                 }
             }) {

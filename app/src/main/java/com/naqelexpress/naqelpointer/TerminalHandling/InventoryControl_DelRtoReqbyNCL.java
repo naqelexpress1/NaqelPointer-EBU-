@@ -226,8 +226,9 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
-                            txtBarCode.setText(barcode);
+                        //if (barcode.length() == 13)
+                        txtBarCode.setText(barcode);
+                        AddNewPiece();
 
                     }
                 }
@@ -391,6 +392,9 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                 }
             }
         }*/
+
+
+        GetPieceInfoByScanning(txtBarCode.getText().toString());
 
         if (iscitcshipments.contains(txtBarCode.getText().toString())) {
 
@@ -1921,7 +1925,107 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
     }
 
+    private void GetPieceInfoByScanning(String PieceBarcode) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        try {
+
+            isdeliveryReq.clear();
+            isNclDelReq.clear();
+            iscitcshipments.clear();
+            isNclCitc.clear();
+
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+
+                cursor.moveToFirst();
+                do {
+
+                    isdeliveryReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 and BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+
+                cursor.moveToFirst();
+                do {
+
+                    iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclCitc.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Somthing went wrong, kindly scan again",
+                    GlobalVar.AlertType.Error);
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            e.printStackTrace();
+        }
+
+    }
+
     private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
+
+
+        try {
+
+            result.moveToFirst();
+            rtoreqcount.setText("RTO Count : " + String.valueOf(result.getCount()));
+            try {
+                validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 16:30");
+                inserteddate.setText("DLD : " + result.getString(result.getColumnIndex("InsertedDate")));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
+            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 1", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                isdeliveryReq.clear();
+                isNclDelReq.clear();
+                cursor.moveToFirst();
+
+                delreqcount.setText("DEL Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
+
+            }
+
+            cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                iscitcshipments.clear();
+                isNclCitc.clear();
+                cursor.moveToFirst();
+
+                citccount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
+
+            }
+
+            cursor.close();
+            result.close();
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    /*private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
 
 
         isrtoReq.clear();
@@ -1991,6 +2095,6 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         }
 
 
-    }
+    }*/
 
 }

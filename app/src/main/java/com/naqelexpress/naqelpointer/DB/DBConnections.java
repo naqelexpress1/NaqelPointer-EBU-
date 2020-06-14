@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 109; // Add isPaid , Ismap Option for Delivery Req
+    private static final int Version = 113; // MyRoute Compla CBU
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -384,10 +384,16 @@ public class DBConnections
                 "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER )");
+                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER , PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteCompliance\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "Compliance INTEGER  NOT NULL , Date DATETIME NOT NULL , IsSync Integer Default 0 , IsDate DATETIME , EmpID Integer , UserID Integer)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"LocationintoMongo\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "\"Json\"  TEXT NOT NULL )");
     }
 
     public int getVersion() {
@@ -624,10 +630,16 @@ public class DBConnections
                     "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER ,  EmpID INTEGER)");
+                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER ,  EmpID INTEGER , PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT  )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteCompliance\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "Compliance INTEGER  NOT NULL , Date DATETIME NOT NULL ,  IsSync Integer Default 0 , IsDate DATETIME , EmpID Integer , UserID Integer)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"LocationintoMongo\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "\"Json\"  TEXT NOT NULL )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -787,6 +799,28 @@ public class DBConnections
 
             if (!isColumnExist("DeliverReq", "NCLNO"))
                 db.execSQL("ALTER TABLE DeliverReq ADD COLUMN NCLNO TEXT ");
+
+            if (!isColumnExist("plannedLocation", "PKM"))
+                db.execSQL("ALTER TABLE plannedLocation ADD COLUMN PKM TEXT ");
+
+            if (!isColumnExist("plannedLocation", "PETA"))
+                db.execSQL("ALTER TABLE plannedLocation ADD COLUMN PETA TEXT ");
+
+            if (!isColumnExist("plannedLocation", "OriginAdress"))
+                db.execSQL("ALTER TABLE plannedLocation ADD COLUMN OriginAdress TEXT ");
+
+            if (!isColumnExist("plannedLocation", "DestAdres"))
+                db.execSQL("ALTER TABLE plannedLocation ADD COLUMN DestAdres TEXT ");
+
+            if (!isColumnExist("MyRouteCompliance", "IsSync"))
+                db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN IsSync Integer Default 0 ");
+            if (!isColumnExist("MyRouteCompliance", "IsDate"))
+                db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  IsDate DATETIME ");
+            if (!isColumnExist("MyRouteCompliance", "EmpID"))
+                db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  EmpID Integer ");
+            if (!isColumnExist("MyRouteCompliance", "UserID"))
+                db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  UserID Integer ");
+
         }
 
 
@@ -1962,6 +1996,7 @@ public class DBConnections
             db.delete("BarCode", null, null);
             db.delete("Productivity", null, null);
             db.delete("Complaint", null, null);
+            db.delete("MyRouteCompliance", null, null);
 //            GlobalVar.deleteContactRawID(ContactDetails(context), context);
             db.close();
         } catch (SQLiteException e) {
@@ -6185,6 +6220,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String args[] = {GlobalVar.getDate()};
             db.execSQL("delete from SuggestLocations");
+            db.execSQL("delete from MyRouteCompliance");
             db.close();
 
         } catch (SQLiteException e) {
@@ -6223,6 +6259,134 @@ public class DBConnections
 
         }
         return result != -1;
+    }
+
+    public boolean UpdatePlannedLocation(String PKM, String PETA, String OriginAddress, String DestAddress, String position) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("PKM", PKM);
+        contentValues.put("PETA", PETA);
+        contentValues.put("OriginAdress", OriginAddress);
+        contentValues.put("DestAdres", DestAddress);
+        try {
+            String args[] = {String.valueOf(GlobalVar.GV().EmployID), GlobalVar.getDate(), position};
+            db.update("plannedLocation", contentValues, "EmpID=? AND Date=? AND position=?", args);
+        } catch (Exception e) {
+            // GlobalVar.GV().ShowSnackbar(view, e.getMessage(), GlobalVar.AlertType.Error);
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public boolean InsertMyRouteComplaince(Context context, int comp) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put("Compliance", comp);
+            contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("IsSync", 0);
+            contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            contentValues.put("UserID", GlobalVar.GV().UserID);
+            contentValues.put("IsDate", GlobalVar.getCurrentFullDateTime());
+            result = db.insertOrThrow("MyRouteCompliance", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean isMyRouteComplaince(Context context) {
+        try {
+            Cursor isMyRteCmp = Fill("select Count(*) cnt from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+
+
+            if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
+                isMyRteCmp.moveToFirst();
+                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 1 || isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 2) {
+                    isMyRteCmp.close();
+                    return true;
+                } else {
+                    isMyRteCmp.close();
+                    return false;
+                }
+
+
+            } else {
+                isMyRteCmp.close();
+                return false;
+            }
+
+        } catch (SQLiteException e) {
+
+        }
+
+        return false;
+    }
+
+    public boolean isMyRouteComplainceselect(Context context) {
+        try {
+            Cursor isMyRteCmp = Fill("select Count(*) cnt from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+
+
+            if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
+                isMyRteCmp.moveToFirst();
+                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 1) {
+                    isMyRteCmp.close();
+                    return true;
+                } else {
+                    isMyRteCmp.close();
+                    return false;
+                }
+
+
+            } else {
+                isMyRteCmp.close();
+                return false;
+            }
+
+        } catch (SQLiteException e) {
+
+        }
+
+        return false;
+    }
+
+    public void deletePlannedRoute(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from plannedLocation");
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public boolean InsertLocationintoMongo(Context context, String location) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("Json", location);
+            result = db.insert("LocationintoMongo", null, contentValues);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public void deleteLocationintoMongo(String ids, Context context) {
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        db.execSQL("DELETE FROM LocationintoMongo WHERE ID in( " + ids + ")");
+        db.close();
     }
 
 }

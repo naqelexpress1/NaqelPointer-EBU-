@@ -86,7 +86,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU : Map_Ispaid_RemoveSTC 20-05-2020";
+    public String AppVersion = "CBU : VersionNo:268(14-06-2020)";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -105,14 +105,15 @@ public class GlobalVar {
     public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
     public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/";
     // public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/"; NaqelWay IP
-   // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
-   // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
-    public String NaqelPointerAPILink1_ForDomain ="http://34.93.221.35/NaqelPointer/api/pointer/";
+    // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
+    // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
+    public String NaqelPointerAPILink1_ForDomain = "http://34.93.221.35/NaqelPointer/api/pointer/";
     public String NaqelPointerAPILink2_ForDomain = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
     public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
+    public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
@@ -122,7 +123,7 @@ public class GlobalVar {
     public int loadbalance_Contimeout = 30000;
     public int loadbalance_ConRedtimeout = 30000;
 
-    public boolean isneedOtp = false;
+    public boolean isneedOtp = true;
 
     public boolean isFortesting = false;
 
@@ -1380,7 +1381,7 @@ public class GlobalVar {
                         GlobalVar.GV().CourierDailyRouteID + " and ItemNo  in(" + Waybillno + ")", context);
             else {
                 result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
-                        GlobalVar.GV().CourierDailyRouteID + " and ItemNo not in(" + Waybillno + ") order by DsOrderNo" , context);
+                        GlobalVar.GV().CourierDailyRouteID + " and ItemNo not in(" + Waybillno + ") order by DsOrderNo", context);
             }
             if (result.getCount() > 0) {
 
@@ -2654,6 +2655,14 @@ public class GlobalVar {
             return true;
         else
             return false;
+    }
+
+    public static String getCurrentFullDateTime() {
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String datetime = dateformat.format(c.getTime());
+
+        return datetime;
     }
 
     public static String getDivision(Context context) {

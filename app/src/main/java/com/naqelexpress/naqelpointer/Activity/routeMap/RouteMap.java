@@ -68,6 +68,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import static android.graphics.Bitmap.Config.ARGB_8888;
 import static com.itextpdf.awt.geom.Point2D.distance;
 
@@ -88,6 +90,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     private Marker myMarker[];
     boolean Issuggest = false;
     public static ArrayList<HashMap<String, String>> distance_time = new ArrayList<>();
+    SweetAlertDialog pDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +98,12 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         setContentView(R.layout.routemap);
 
+        Bundle extras = getIntent().getExtras();
+        myRouteShipmentList = extras.getParcelableArrayList("myroute");
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        myRouteShipmentList = new ArrayList<>();
+        //myRouteShipmentList = new ArrayList<>();
         //Bundle bundle = getIntent().getExtras();
 
         //places = MyRouteActivity.places;
@@ -154,6 +159,12 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         //  kpi = bundle.getParcelable("routemap");
         //  System.out.println("test");
+
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Loading");
+        pDialog.setCancelable(false);
+        pDialog.show();
 
 
     }
@@ -218,7 +229,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 
                     if (position != 0)
-                        custom_alert((Integer) marker.getTag());
+                        custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
                     else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
 //                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
@@ -250,91 +261,95 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         // places.remove(0);
 
 
-        if (jsonroute.size() == 0) {
-            if (!Issuggest) {
-                ArrayList<Places> temp_places = new ArrayList<>();
-                ArrayList<Location> sp = new ArrayList<>();
-                int j = 0;
-                //temp_places.add(places.get(0));
-                //places.remove(0);
-                if (places.size() > 1) {
-                    while (places.size() != 0) {
+        //if (jsonroute.size() == 0) {
+        if (!Issuggest) {
+            ArrayList<Places> temp_places = new ArrayList<>();
+            ArrayList<Location> sp = new ArrayList<>();
+            int j = 0;
+            //temp_places.add(places.get(0));
+            //places.remove(0);
+            if (places.size() > 1) {
+                while (places.size() != 0) {
 
-                        ArrayList<Location> temp = places;
-                        //ll = temp.get(0).latlng;
-                        List<Location> sortpath = sortLocations(temp, temp.get(0).getLatitude(), temp.get(0).getLongitude());
-                        //ArrayList<Places> sortpath = sortLocations(temp, ll.latitude, ll.longitude);
+                    ArrayList<Location> temp = places;
+                    //ll = temp.get(0).latlng;
+                    List<Location> sortpath = sortLocations(temp, temp.get(0).getLatitude(), temp.get(0).getLongitude());
+                    //ArrayList<Places> sortpath = sortLocations(temp, ll.latitude, ll.longitude);
 
-                        if (places.size() == 2) {
+                    if (places.size() == 2) {
 //                        temp_places.add(sortpath.get(0));
 //                        temp_places.add(sortpath.get(1));
-                            sp.add(sortpath.get(0));
-                            sp.add(sortpath.get(1));
-                            places.clear();
-                        } else {
+                        sp.add(sortpath.get(0));
+                        sp.add(sortpath.get(1));
+                        places.clear();
+                    } else {
 //                        temp_places.add(sortpath.get(0));
-                            sp.add(sortpath.get(0));
-                            places.remove(0);
-
-                        }
-                        j += 1;
+                        sp.add(sortpath.get(0));
+                        places.remove(0);
 
                     }
-                }
-                places.addAll(sp);
-            }
+                    j += 1;
 
-            ShowShipmentMarker();
-            GetPlannedLocation();
-            if (!IsPlanned) {
-                if (places.size() > 1) {
-                    for (int i = 0; i < places.size(); i++) {
-
-                        LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
-                        LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
-                        // Getting URL to the Google Directions API
-                        String url = getDirectionsUrl(origin, dest);
-
-                        DownloadTask downloadTask = new DownloadTask();
-                        // Start downloading json data from Google Directions API
-                        downloadTask.execute(url, String.valueOf(i));
-
-                        if ((i == places.size() - 2) && (places.size() != 2)) {
-                            origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
-                            dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
-                            url = getDirectionsUrl(origin, dest);
-                            downloadTask = new DownloadTask();
-                            downloadTask.execute(url, String.valueOf(places.size() - 1));
-                            break;
-                        }
-                        if (i == places.size() - 2)
-                            break;
-
-
-                    }
                 }
             }
-        } else {
-            ShowShipmentMarker();
-            int i = 0;
-            for (String json : jsonroute) {
-                try {
-                    List<List<HashMap<String, String>>> routes = null;
-                    JSONObject jObject = new JSONObject(json);
-
-                    DirectionsJSONParser parser = new DirectionsJSONParser();
-//                    String position = "";
-                    routes = parser.parse(jObject);
-                    drawpolyline(routes, String.valueOf(i));
-                    i++;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-
+            places.addAll(sp);
         }
 
+        ShowShipmentMarker();
+        GetPlannedLocation();
+        if (!IsPlanned) {
+            if (places.size() > 1) {
+                for (int i = 0; i < places.size(); i++) {
+
+                    LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
+                    LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
+                    // Getting URL to the Google Directions API
+                    String url = getDirectionsUrl(origin, dest);
+
+                    DownloadTask downloadTask = new DownloadTask();
+                    // Start downloading json data from Google Directions API
+                    downloadTask.execute(url, String.valueOf(i));
+
+                    if ((i == places.size() - 2) && (places.size() != 2)) {
+                        origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
+                        dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
+                        url = getDirectionsUrl(origin, dest);
+                        downloadTask = new DownloadTask();
+                        downloadTask.execute(url, String.valueOf(places.size() - 1));
+                        break;
+                    }
+                    if (i == places.size() - 2)
+                        break;
+
+
+                }
+            }
+        }
+        // }
+
+//        else {
+//            ShowShipmentMarker();
+//            int i = 0;
+//            for (String json : jsonroute) {
+//                try {
+//                    List<List<HashMap<String, String>>> routes = null;
+//                    JSONObject jObject = new JSONObject(json);
+//
+//                    DirectionsJSONParser parser = new DirectionsJSONParser();
+////                    String position = "";
+//                    routes = parser.parse(jObject);
+//                    drawpolyline(routes, String.valueOf(i));
+//                    i++;
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//
+//        }
+
+        if (pDialog != null && pDialog.isShowing())
+            pDialog.dismissWithAnimation();
 
     }
 
@@ -460,7 +475,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 position = jsonData[1];
                 DirectionsJSONParser parser = new DirectionsJSONParser();
 
-                routes = parser.parse(jObject);
+                routes = parser.parse(jObject, position, getBaseContext(), 0);
                 jsonroute.add(jObject.toString());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -607,13 +622,16 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     .icon(BitmapDescriptorFactory.fromBitmap(bmp)));
             //.title("Mohamed Ismail"));
             myMarker[i].setTag((int) places.get(i).getSpeed());
+            myMarker[i].setSnippet(String.valueOf(i));
 
             //double distanceToPlace1 = distance(prvLat, preLng, latLng.latitude , latLng.longitude);
             if (i == 0)
-                data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0");
+                data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0_0");
             else
-                data = data + "@" + GlobalVar.GV().myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
-                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i));
+                data = data + "@" + myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
+                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i) + "_" + String.valueOf((int) places.get(i).getSpeed()));
+//                data = data + "@" + String.valueOf((int) places.get(i).getAltitude() - 1) + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
+//                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i));
 
             prvLat = latLng.latitude;
             preLng = latLng.longitude;
@@ -710,10 +728,11 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     }
 
 
-    private void custom_alert(final int position) {
+    private void custom_alert(final int position, final int markerposition) {
 
         try {
 
+            // final int position = findWaybillNoPosition(wno);
             LayoutInflater inflater = getLayoutInflater();
             View alertLayout = inflater.inflate(R.layout.map_customalert, null);
             ImageView bm = (ImageView) alertLayout.findViewById(R.id.imageview_account_profile);
@@ -727,19 +746,21 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 
             // final int position = GlobalVar.GV().haslocation.get(pos - 1);
-            consignname.setText(GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneeName);
+            consignname.setText(myRouteShipmentList.get(position - 1).ConsigneeName);
 
-            waybillno.setText(String.valueOf(position) + "." + GlobalVar.GV().myRouteShipmentList.get(position - 1).ItemNo);
-            if (GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneeMobile.length() > 0 && !GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneeMobile.equals("null"))
-                mobileno.setText(GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneeMobile);
+            waybillno.setText(String.valueOf(position) + "." + myRouteShipmentList.get(position - 1).ItemNo);
+            if (myRouteShipmentList.get(position - 1).ConsigneeMobile.length() > 0 && !myRouteShipmentList.get(position - 1).ConsigneeMobile.equals("null"))
+                mobileno.setText(myRouteShipmentList.get(position - 1).ConsigneeMobile);
             else
                 mobileno.setVisibility(View.GONE);
-            if (GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.length() > 0 && !GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.equals("null"))
-                mobileno1.setText(GlobalVar.GV().myRouteShipmentList.get(position - 1).ConsigneePhoneNumber);
+            if (myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.length() > 0 && !myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.equals("null"))
+                mobileno1.setText(myRouteShipmentList.get(position - 1).ConsigneePhoneNumber);
             else
                 mobileno1.setVisibility(View.GONE);
 
-            BitmapDrawable ob = new BitmapDrawable(getResources(), makeBitmap(getApplicationContext(), String.valueOf(position), colors_marker_route.get(position)));
+
+            BitmapDrawable
+                    ob = new BitmapDrawable(getResources(), makeBitmap(getApplicationContext(), String.valueOf(position), colors_marker_route.get(markerposition)));
             bm.setBackgroundDrawable(ob);
 
             mobileno.setOnClickListener(new View.OnClickListener() {
@@ -774,7 +795,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             deliver.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Delivered(GlobalVar.GV().myRouteShipmentList.get(position - 1));
+                    Delivered(myRouteShipmentList.get(position - 1));
                 }
             });
 
@@ -782,7 +803,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 @Override
                 public void onClick(View v) {
 
-                    NotDelivered(GlobalVar.GV().myRouteShipmentList.get(position - 1));
+                    NotDelivered(myRouteShipmentList.get(position - 1));
                 }
             });
 
@@ -947,7 +968,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         outState.putSerializable("places", places);
         outState.putIntegerArrayList("colors_marker_route", colors_marker_route);
         outState.putSerializable("distance_time", distance_time);
-        outState.putStringArrayList("jsonroute", jsonroute);
+        //outState.putStringArrayList("jsonroute", jsonroute);
         outState.putSerializable("haslocation", GlobalVar.GV().haslocation);
     }
 
@@ -971,7 +992,12 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     Location sp = new Location("");
                     sp.setLatitude(Double.parseDouble(temp[1]));
                     sp.setLongitude(Double.parseDouble(temp[2]));
+                    sp.setAltitude(Double.parseDouble(temp[4]));
                     sp.setSpeed(Float.parseFloat(temp[temp.length - 1]));
+                    if (i == 0)
+                        sp.setAltitude(0);
+                    else
+                        sp.setAltitude(Double.parseDouble(temp[0]));
                     places.add(sp);
                 }
 
@@ -993,22 +1019,39 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
                 " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
-        if (result != null && result.getCount() > 0) {
-            IsPlanned = true;
-            result.moveToFirst();
-            do {
 
-                String data = result.getString(result.getColumnIndex("StringData"));
-                int position = result.getInt(result.getColumnIndex("position"));
+        if (result.getCount() == places.size()) {
 
-                ParserTask parserTask = new ParserTask();
-                parserTask.execute(data, String.valueOf(position));
 
+            if (result != null && result.getCount() > 0) {
+                IsPlanned = true;
+                result.moveToFirst();
+                do {
+
+                    String data = result.getString(result.getColumnIndex("StringData"));
+                    int position = result.getInt(result.getColumnIndex("position"));
+
+                    ParserTask parserTask = new ParserTask();
+                    parserTask.execute(data, String.valueOf(position));
+
+                }
+                while (result.moveToNext());
             }
-            while (result.moveToNext());
-        }
+        } else
+            dbConnections.deletePlannedRoute(getApplicationContext());
         result.close();
         dbConnections.close();
 
+    }
+
+    private int findWaybillNoPosition(int Waybillno) {
+        int pos = 0;
+        for (int i = 0; i < myRouteShipmentList.size(); i++) {
+            if (Waybillno == Integer.parseInt(myRouteShipmentList.get(i).ItemNo)) {
+                pos = i;
+                break;
+            }
+        }
+        return pos;
     }
 }

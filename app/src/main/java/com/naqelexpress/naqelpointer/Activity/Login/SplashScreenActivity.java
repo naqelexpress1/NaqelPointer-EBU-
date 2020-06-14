@@ -16,8 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -32,9 +30,9 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
-
-import cn.pedant.SweetAlert.Constants;
 
 public class SplashScreenActivity
         extends AppCompatActivity {
@@ -51,10 +49,8 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
-
-
-       // sendNotification("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff");
-       // sendNotification("et7zm9gyRaWEszgjT_zwGp:APA91bFgieA2s2HPcqbBt5By_2TmvVx34tB80adMkXtbXytL19Cjsp3jLYAbeIrxgZHRqGyjlG_GMBwQN0sEGGRrcCZd5S4mSrvH7aPN5Vm7nNNHcs-KIAMI3XOf_hwWGXJ68O213siQ");
+        // sendNotification("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff");
+        // sendNotification("et7zm9gyRaWEszgjT_zwGp:APA91bFgieA2s2HPcqbBt5By_2TmvVx34tB80adMkXtbXytL19Cjsp3jLYAbeIrxgZHRqGyjlG_GMBwQN0sEGGRrcCZd5S4mSrvH7aPN5Vm7nNNHcs-KIAMI3XOf_hwWGXJ68O213siQ");
 //        FirebaseMessaging fm = FirebaseMessaging.getInstance();
 //        fm.send(new RemoteMessage.Builder("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff" + "@fcm.googleapis.com")
 //
@@ -72,6 +68,9 @@ public class SplashScreenActivity
 //        dbConnections1.DeleteAllPlannedLocation(getApplicationContext());
 //        dbConnections1.close();
 //
+
+
+
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -688,30 +687,31 @@ public class SplashScreenActivity
 
     public static final MediaType JSON
             = MediaType.parse("application/json; charset=utf-8");
+
     private void sendNotification(final String regToken) {
-        new AsyncTask<Void,Void,Void>(){
+        new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
                 try {
                     OkHttpClient client = new OkHttpClient();
-                    JSONObject json=new JSONObject();
-                    JSONObject dataJson=new JSONObject();
-                    dataJson.put("title" ,"Our Courier will be ready to Deliver(40000464),kindly be ready ");
-                    dataJson.put("waybillno","41790089");
-                    dataJson.put("EmpID","93283");
-                    dataJson.put("Lat","24.214574");
-                    dataJson.put("Lng","47.23162");
-                    json.put("notification",dataJson);
-                    json.put("to",regToken);
+                    JSONObject json = new JSONObject();
+                    JSONObject dataJson = new JSONObject();
+                    dataJson.put("title", "Our Courier will be ready to Deliver(40000464),kindly be ready ");
+                    dataJson.put("waybillno", "41790089");
+                    dataJson.put("EmpID", "93283");
+                    dataJson.put("Lat", "24.214574");
+                    dataJson.put("Lng", "47.23162");
+                    json.put("notification", dataJson);
+                    json.put("to", regToken);
                     RequestBody body = RequestBody.create(JSON, json.toString());
                     Request request = new Request.Builder()
-                            .header("Authorization","key="+ "AAAAiNWIXO8:APA91bHXz33puOphUeOiAviFjDmkbehmBEL-ycu-1Adan90aYX8DQiQ03U_njrX-9ySnA-GWF0imJWBCXErfo-9r0rV8XW4lnG4G1-OtqbnlBfqvfsGv8o6REq95bQlqWAPrjVF72oVY")
+                            .header("Authorization", "key=" + "AAAAiNWIXO8:APA91bHXz33puOphUeOiAviFjDmkbehmBEL-ycu-1Adan90aYX8DQiQ03U_njrX-9ySnA-GWF0imJWBCXErfo-9r0rV8XW4lnG4G1-OtqbnlBfqvfsGv8o6REq95bQlqWAPrjVF72oVY")
                             .url("https://fcm.googleapis.com/fcm/send")
                             .post(body)
                             .build();
                     Response response = client.newCall(request).execute();
                     String finalResponse = response.body().string();
-                }catch (Exception e){
+                } catch (Exception e) {
                     //Log.d(TAG,e+"");
                 }
                 return null;

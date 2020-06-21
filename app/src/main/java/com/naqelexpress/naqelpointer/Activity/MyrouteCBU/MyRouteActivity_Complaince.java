@@ -252,6 +252,7 @@ public class MyRouteActivity_Complaince
 
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
+
     }
 
     private void ValidateDatas() {
@@ -337,69 +338,112 @@ public class MyRouteActivity_Complaince
 
             Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
                     " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
-
+            GetSeqWaybillNo();
             if (result.getCount() != places.size()) {
 
-                new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                        .setTitleText("Kindly Load Planned Location")
-                        .setContentText("Be patient until Load Fully")
-                        .setConfirmText("OK")
+                SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+                eDialog.setTitleText("Kindly Load Planned Location");
+                eDialog.setContentText("Be patient until Load Fully");
+                eDialog.setConfirmText("OK");
+                eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.dismissWithAnimation();
+                        try {
+                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
 
-                        .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                            @Override
-                            public void onClick(SweetAlertDialog sDialog) {
-                                try {
-                                    Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                                    startActivity(intent);
-                                } catch (Exception e) {
-                                    System.out.println(e.getMessage());
-                                }
 
-
-                            }
-                        })
-
-                        .show();
+                    }
+                });
+                eDialog.setCancelable(false);
+                eDialog.show();
 
             }
         }
     }
 
+    public void GetSeqWaybillNo() {
+
+
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        Cursor result = dbConnections.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
+                " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+        if (result != null && result.getCount() > 0) {
+            places.clear();
+            result.moveToFirst();
+            do {
+
+                String data = result.getString(result.getColumnIndex("StringData"));
+                String split[] = data.split("@");
+                for (int i = 0; i < split.length; i++) {
+                    String temp[] = split[i].split("_");
+                    Location sp = new Location("");
+                    sp.setLatitude(Double.parseDouble(temp[1]));
+                    sp.setLongitude(Double.parseDouble(temp[2]));
+                    sp.setAltitude(Double.parseDouble(temp[4]));
+                    sp.setSpeed(Float.parseFloat(temp[temp.length - 1]));
+                    if (i == 0)
+                        sp.setAltitude(0);
+                    else
+                        sp.setAltitude(Double.parseDouble(temp[0]));
+                    places.add(sp);
+                }
+
+
+            }
+            while (result.moveToNext());
+        }
+
+        result.close();
+        dbConnections.close();
+
+    }
+
     private void MyRouteCompliance() {
+        IsplannedLocationLoaded();
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (!dbConnections.isMyRouteComplaince(getApplicationContext())) {
-            new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
-                    .setTitleText("Are you sure?")
-                    .setContentText("Are you follow to Deliver by Google Map")
-                    .setConfirmText("Yes")
-                    .setCancelText("No")
-                    .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sDialog) {
-                            dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
-                            sDialog.dismissWithAnimation();
+            SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
 
-                            try {
-                                Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                                intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                                startActivity(intent);
-                            } catch (Exception e) {
-                                System.out.println(e.getMessage());
-                            }
+            eDialog.setCancelable(false);
+            eDialog.setTitleText("Are you sure?");
+            eDialog.setContentText("Are you follow to Deliver by Google Map");
+            eDialog.setConfirmText("Yes");
+            eDialog.setCancelText("No");
+
+            eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sDialog) {
+                    dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
+                    sDialog.dismissWithAnimation();
+
+                    try {
+                        Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
 
 
-                        }
-                    })
-                    .setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                        @Override
-                        public void onClick(SweetAlertDialog sDialog) {
-                            dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
-                            sDialog.dismissWithAnimation();
-                            //sDialog.dismissWithAnimation();
-                        }
-                    })
-                    .show();
+                }
+            });
+            eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sDialog) {
+                    dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
+                    sDialog.dismissWithAnimation();
+                    //sDialog.dismissWithAnimation();
+                }
+            });
+            eDialog.show();
         }
         dbConnections.close();
     }

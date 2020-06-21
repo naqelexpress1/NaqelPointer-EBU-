@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 113; // MyRoute Compla CBU
+    private static final int Version = 115; // No of attempt
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -357,7 +357,7 @@ public class DBConnections
                 "ReqType Integer Not Null , NCLNO Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+                "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL , NCLNO Text  )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeniedWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
@@ -394,6 +394,9 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"LocationintoMongo\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"Json\"  TEXT NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillAttempt\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "WayBillNo Integer   , Attempt Integer , BarCode TEXT , InsertedDate TEXT)");
     }
 
     public int getVersion() {
@@ -603,7 +606,7 @@ public class DBConnections
                     " ReqType Integer Not Null , NCLNO Text )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL )");
+                    "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL , NCLNO Text )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DeniedWaybills\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL )");
@@ -640,6 +643,9 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"LocationintoMongo\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"Json\"  TEXT NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillAttempt\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "WayBillNo Integer   , Attempt Integer , BarCode TEXT , InsertedDate TEXT)");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -820,6 +826,8 @@ public class DBConnections
                 db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  EmpID Integer ");
             if (!isColumnExist("MyRouteCompliance", "UserID"))
                 db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  UserID Integer ");
+            if (!isColumnExist("RtoReq", "NCLNO"))
+                db.execSQL("ALTER TABLE RtoReq ADD COLUMN  NCLNO Text ");
 
         }
 
@@ -884,16 +892,28 @@ public class DBConnections
     }
 
     public Cursor Fill(String Query, Context context) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
         try {
 
-            SQLiteDatabase db = getReadableDatabase();
+
             synchronized ("dblock") {
-                return db.rawQuery(Query, null);
+                cursor = db.rawQuery(Query, null);
+                //  db.close();
+
+                return cursor;
             }
+
         } catch (SQLiteException e) {
             System.out.println(e);
 
+        } finally {
+
+
+//            if (db != null && db.isOpen())
+//                db.close();
         }
+
         return null;
     }
 
@@ -5511,8 +5531,8 @@ public class DBConnections
                 stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
                 stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
                 stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
-                String NCLNo = "";
-                if (jsonObject1.getString("NCLNO") != null)
+                String NCLNo = "0";
+                if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
                     NCLNo = jsonObject1.getString("NCLNO");
                 stmt.bindString(6, NCLNo);
 
@@ -5532,7 +5552,7 @@ public class DBConnections
 
     //Bulk Insert
     public void insertReqBulk(JSONArray rtoReq, Context context) {
-        String sql = "insert into RtoReq (WaybillNo, BarCode, InsertedDate, ValidDate) values (?, ?, ?, ?);";
+        String sql = "insert into RtoReq (WaybillNo, BarCode, InsertedDate, ValidDate , NCLNO) values (?, ?, ?, ?,?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
         db.beginTransaction();
@@ -5546,6 +5566,10 @@ public class DBConnections
                 stmt.bindString(2, jsonObject1.getString("BarCode"));
                 stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
                 stmt.bindString(4, GlobalVar.GV().getDateAdd1Day());
+                String NCLNo = "0";
+                if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
+                    NCLNo = jsonObject1.getString("NCLNO");
+                stmt.bindString(5, NCLNo);
 
                 long entryID = stmt.executeInsert();
                 stmt.clearBindings();
@@ -6303,12 +6327,12 @@ public class DBConnections
 
     public boolean isMyRouteComplaince(Context context) {
         try {
-            Cursor isMyRteCmp = Fill("select Count(*) cnt from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+            Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
 
 
             if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
                 isMyRteCmp.moveToFirst();
-                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 1 || isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 2) {
+                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("Compliance")) == 1 || isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("Compliance")) == 2) {
                     isMyRteCmp.close();
                     return true;
                 } else {
@@ -6331,12 +6355,12 @@ public class DBConnections
 
     public boolean isMyRouteComplainceselect(Context context) {
         try {
-            Cursor isMyRteCmp = Fill("select Count(*) cnt from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+            Cursor isMyRteCmp = Fill("select * from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
 
 
             if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
                 isMyRteCmp.moveToFirst();
-                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("cnt")) == 1) {
+                if (isMyRteCmp.getInt(isMyRteCmp.getColumnIndex("Compliance")) == 1) {
                     isMyRteCmp.close();
                     return true;
                 } else {
@@ -6389,4 +6413,48 @@ public class DBConnections
         db.close();
     }
 
+    //Bulk Insert
+    public void insertwaybillattemptBulk(JSONArray deliveryReq, Context context) {
+        String sql = "insert into WaybillAttempt (WayBillNo, Attempt, BarCode , InsertedDate) values (?, ?, ?,?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (int i = 0; i < deliveryReq.length(); i++) {
+            //generate some values
+            try {
+
+                JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
+
+                stmt.bindString(1, String.valueOf(jsonObject1.getInt("WayBillNo")));
+                stmt.bindString(2, String.valueOf(jsonObject1.getInt("Attempt")));
+                stmt.bindString(3, jsonObject1.getString("BarCode"));
+                stmt.bindString(4, GlobalVar.GV().getCurrentDateTimeSS());
+
+                long entryID = stmt.executeInsert();
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
+    }
+
+    public void deleteWaybillAttempt(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from WaybillAttempt");
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
 }

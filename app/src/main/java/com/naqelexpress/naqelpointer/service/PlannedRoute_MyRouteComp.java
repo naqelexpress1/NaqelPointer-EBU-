@@ -27,13 +27,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryDetailRequest;
-//import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
@@ -44,6 +39,8 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
+
+//import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 
 public class PlannedRoute_MyRouteComp extends Service {
 
@@ -162,7 +159,28 @@ public class PlannedRoute_MyRouteComp extends Service {
                     header.put("Compliance", myroutecomp);
 
 
-                    result = db.Fill("select * from MyRouteCompliance where IsSync = 0 Limit 1 ", getApplicationContext());
+                    result = db.Fill("select * from SuggestLocations where IsSync = 0 Limit 1 ", getApplicationContext());
+                    JSONArray sl_array = new JSONArray();
+                    if (result != null && result.getCount() > 0) {
+                        result.moveToFirst();
+                        do {
+
+                            String data = result.getString(result.getColumnIndex("StringData"));
+                            String split[] = data.split("@");
+                            for (int i = 0; i < split.length; i++) {
+                                JSONObject sl_obj = new JSONObject();
+                                String temp[] = split[i].split("_");
+                                sl_obj.put("Lat", Double.parseDouble(temp[1]));
+                                sl_obj.put("Lng", Double.parseDouble(temp[2]));
+                                sl_obj.put("WaybillNo", Double.parseDouble(temp[0]));
+                                sl_obj.put("SeqNo", Float.parseFloat(temp[temp.length - 1]));
+
+                            }
+
+
+                        }
+                        while (result.moveToNext());
+                    }
 
                    /* OnDeliveryRequest onDeliveryRequest = new OnDeliveryRequest();
                     onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
@@ -247,7 +265,7 @@ public class PlannedRoute_MyRouteComp extends Service {
 
 
                     }*/
-                   // String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
+                    // String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
                     //jsonData = jsonData.replace("Date(-", "Date(");
                     //SaveOnDelivery(db, jsonData, onDeliveryRequest.ID, onDeliveryRequest.WaybillNo);
                 }

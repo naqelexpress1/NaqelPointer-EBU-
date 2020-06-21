@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.pusher:pusher-platform-android:1.0.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/17b8718a716cb4a69926a824c55fe8f8/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/17b8718a716cb4a69926a824c55fe8f8/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/pusher-platform-android/1.0.0/ee9eb4cc28ca439e378c4feadce4276ca4e716d2/pusher-platform-android-1.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

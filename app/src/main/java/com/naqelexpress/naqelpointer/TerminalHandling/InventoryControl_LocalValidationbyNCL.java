@@ -76,6 +76,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
     public ArrayList<String> iscitcshipments = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
+    public ArrayList<String> isNCLrtoReq = new ArrayList<>();
     public ArrayList<String> isHeldout = new ArrayList<>();
     public ArrayList<String> isNclDelReq = new ArrayList<>();
     public ArrayList<String> isNclCitc = new ArrayList<>();
@@ -322,16 +323,61 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         }
 
 
-        boolean rtoreq = false;
+        //boolean rtoreq = false;
         boolean ismatch = false;
-        boolean isNCLReq_Citc = false;
+        //boolean isNCLReq_Citc = false;
 
         GetNCLDatafromDB(Barcode);
 
+        //Toast.makeText(getApplicationContext(), String.valueOf(isNclDelReq.size()) + "-" + String.valueOf(isNclCitc.size()), Toast.LENGTH_LONG).show();
 
         if (isNclDelReq.contains(Barcode)) {
             if (isNclCitc.contains(Barcode)) {
-                isNCLReq_Citc = true;
+                if (isNCLrtoReq.contains(Barcode)) {
+                    // rtoreq = true;
+                    // isNCLReq_Citc = true;
+                    ismatch = true;
+                    if (!isHeldout.contains(Barcode)) {
+                        isHeldout.add(Barcode);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", Barcode);
+                        temp.put("Status", "44");
+                        temp.put("Ref", lbTotal.getText().toString());
+                        delrtoreq.add(temp);
+                        inventorycontrol.add(Barcode);
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                        initViews();
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    }
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains Request for Delivery &  CITC Complaints & RTO Request \n" +
+                            "CITC Count : " + String.valueOf(isNclCitc.size()) + "\n" + "Del Count : " + String.valueOf(isNclDelReq.size()) + "\n" +
+                            "RTO Count : " + String.valueOf(isNCLrtoReq.size()), 0, txtBarCode.getText().toString());
+                } else {
+                    //isNCLReq_Citc = true;
+                    ismatch = true;
+                    if (!isHeldout.contains(Barcode)) {
+                        isHeldout.add(Barcode);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", Barcode);
+                        temp.put("Status", "44");
+                        temp.put("Ref", lbTotal.getText().toString());
+                        delrtoreq.add(temp);
+                        inventorycontrol.add(Barcode);
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                        initViews();
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    }
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains Request for Delivery &  CITC Complaints \n" +
+                            "CITC Count : " + String.valueOf(isNclCitc.size()) + "\n" + "Del Count : " + String.valueOf(isNclDelReq.size()), 0, txtBarCode.getText().toString());
+                }
+            }
+            if (isNCLrtoReq.contains(Barcode) && !ismatch) {
+                // rtoreq = true;
+                //isNCLReq_Citc = true;
                 ismatch = true;
                 if (!isHeldout.contains(Barcode)) {
                     isHeldout.add(Barcode);
@@ -347,35 +393,90 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                 }
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains Request for Delivery &  CITC Complaints ", 0, txtBarCode.getText().toString());
-                // return;
+                ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains Request for Delivery & RTO Request \n" +
+                        "Del Count : " + String.valueOf(isNclDelReq.size()) + "\n" +
+                        "RTO Count : " + String.valueOf(isNCLrtoReq.size()), 0, txtBarCode.getText().toString());
             } else {
-                ismatch = true;
-                if (!isHeldout.contains(Barcode)) {
+                if (!ismatch) {
 
-                    isHeldout.add(Barcode);
-                    HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", Barcode);
-                    temp.put("Status", "44");
-                    temp.put("Ref", lbTotal.getText().toString());
-                    delrtoreq.add(temp);
-                    inventorycontrol.add(Barcode);
-                    initViews();
+                    ismatch = true;
+                    if (!isHeldout.contains(Barcode)) {
+
+                        isHeldout.add(Barcode);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", Barcode);
+                        temp.put("Status", "44");
+                        temp.put("Ref", lbTotal.getText().toString());
+                        delrtoreq.add(temp);
+                        inventorycontrol.add(Barcode);
+                        initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                    ErrorAlert("Delivery Request", "This NCLNO Number(" + Barcode + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
-                } else {
-                    ErrorAlert("Delivery Request", "This NCLNO Number(" + Barcode + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                    return;
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                        ErrorAlert("Delivery Request", "This NCLNO Number(" + Barcode + ") is Request For Delivery \n " +
+                                "Del Count :" + String.valueOf(isNclDelReq.size()), 0, txtBarCode.getText().toString());
+                    } else {
+                        ErrorAlert("Delivery Request", "This NCLNO Number(" + Barcode + ") is Request For Delivery \n Del Count :"
+                                + String.valueOf(isNclDelReq.size()), 0, txtBarCode.getText().toString());
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
+
+                    }
                 }
             }
 
 
         }
 
-        if (!isNCLReq_Citc) {
+        if (!ismatch) {
+
+            if (isNCLrtoReq.contains(Barcode)) {
+                if (isNclCitc.contains(Barcode)) {
+
+                    ismatch = true;
+                    if (!isHeldout.contains(Barcode)) {
+                        isHeldout.add(Barcode);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", Barcode);
+                        temp.put("Status", "44");
+                        temp.put("Ref", lbTotal.getText().toString());
+                        delrtoreq.add(temp);
+                        inventorycontrol.add(Barcode);
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                        initViews();
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    }
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains CITC Complaints & RTO Request \n" +
+                            "CITC Count : " + String.valueOf(isNclCitc.size()) + "\n" +
+                            "RTO Count : " + String.valueOf(isNCLrtoReq.size()), 0, txtBarCode.getText().toString());
+                } else {
+
+                    ismatch = true;
+                    if (!isHeldout.contains(Barcode)) {
+                        isHeldout.add(Barcode);
+                        HashMap<String, String> temp = new HashMap<>();
+                        temp.put("WayBillNo", Barcode);
+                        temp.put("Status", "44");
+                        temp.put("Ref", lbTotal.getText().toString());
+                        delrtoreq.add(temp);
+                        inventorycontrol.add(Barcode);
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                        initViews();
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    }
+                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                    ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains RTO Request \n" +
+                            "RTO Count : " + String.valueOf(isNclCitc.size()), 0, txtBarCode.getText().toString());
+                }
+
+
+            }
+
+        }
+
+        if (!ismatch) {
             if (isNclCitc.contains(Barcode)) {
                 ismatch = true;
                 if (!isHeldout.contains(Barcode)) {
@@ -391,11 +492,13 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + Barcode + ") has CITC Complaint ", 0, txtBarCode.getText().toString());
+                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + Barcode + ") has CITC Complaint \n " +
+                            "CITC Count :" + String.valueOf(isNclCitc.size()), 0, txtBarCode.getText().toString());
                 } else {
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + Barcode + ") has CITC Complaint ", 0, txtBarCode.getText().toString());
-                    return;
+                    ErrorAlert("CITC Complaint", "This NCLNO Number(" + Barcode + ") has CITC Complaint \n " +
+                            "CITC Count :" + String.valueOf(isNclCitc.size()), 0, txtBarCode.getText().toString());
+
                 }
             }
         }
@@ -532,7 +635,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
             }
         }
 
-        if (delrtoreq.size() == 20) {
+        if (delrtoreq.size() >= 20) {
             SaveData(2);
         }
 
@@ -667,6 +770,22 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 
                 } while (cursor.moveToNext());
             }
+
+            cursor = dbConnections.Fill("select * from RtoReq  where NCLNO='" + NCLBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                isrtoReq.clear();
+                isNCLrtoReq.clear();
+                // isNclDelReq.clear();
+                cursor.moveToFirst();
+                do {
+
+                    isrtoReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNCLrtoReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
 
             cursor.close();
 
@@ -1060,7 +1179,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 
             if (progressDialog == null)
                 progressDialog = ProgressDialog.show(InventoryControl_LocalValidationbyNCL.this,
-                        "Please wait.", "Bringing Delivery Request data...", true);
+                        "Please wait.", "Bringing Delivery Request data..." + GlobalVar.GV().getCurrentDateTimeSS(), true);
             super.onPreExecute();
 
         }
@@ -1936,6 +2055,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
                 //  insertManual();
             }
         }
+
     }
 
 
@@ -2074,6 +2194,17 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 
                 delreqcount.setText("DEL Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
             }
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 Limit 1", getApplicationContext());
+
+            try {
+                cursor.moveToFirst();
+                validupto.setText("Upto : " + cursor.getString(cursor.getColumnIndex("ValidDate")) + " 16:30");
+                inserteddate.setText("DLD : " + cursor.getString(cursor.getColumnIndex("InsertedDate")));
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+
 
             cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getApplicationContext());
             if (cursor.getCount() > 0) {

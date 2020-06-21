@@ -83,6 +83,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
     private RecyclerView recyclerView;
     private DataAdapter adapter;
     private Paint p = new Paint();
+    Button bringdatawaybillattempt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,6 +188,23 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                 }
             }
         });
+        bringdatawaybillattempt = (Button) findViewById(R.id.bringdatawaybillattempt);
+        bringdatawaybillattempt.setVisibility(View.VISIBLE);
+        bringdatawaybillattempt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    JSONObject jsonObject = new JSONObject();
+                    jsonObject.put("OriginID", 0);
+                    jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+                    new BringWaybillattempt().execute(jsonObject.toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        ReadFromLocalWaybillAttempt();
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
         Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
@@ -396,9 +414,15 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
         GetPieceInfoByScanning(txtBarCode.getText().toString());
 
+
+        if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0")  )
+            WaybillAttempt = "No Data";
+
+        boolean popup = false;
         if (iscitcshipments.contains(txtBarCode.getText().toString())) {
 
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                popup = true;
                 ismatch = true;
                 isHeldout.add(txtBarCode.getText().toString());
                 HashMap<String, String> temp = new HashMap<>();
@@ -411,7 +435,8 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarCode.getText().toString() + ") has CITC Complaint ", 0, txtBarCode.getText().toString());
+                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarCode.getText().toString() + ") has CITC Complaint \n" +
+                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                 //  return;
             } else {
 
@@ -424,6 +449,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         if (!ismatch) {
             if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
                 if (isrtoReq.contains(txtBarCode.getText().toString())) {
+                    popup = true;
                     ismatch = true;
                     rtoreq = true;
 
@@ -440,12 +466,14 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                         initViews();
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                     }
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0, txtBarCode.getText().toString());
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     // return;
                 } else {
 
                     if (!isHeldout.contains(txtBarCode.getText().toString())) {
                         ismatch = true;
+                        popup = true;
                         isHeldout.add(txtBarCode.getText().toString());
                         HashMap<String, String> temp = new HashMap<>();
                         temp.put("WayBillNo", txtBarCode.getText().toString());
@@ -457,11 +485,14 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
+                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
+                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     } else {
+                        popup = true;
                         //GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
+                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
+                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                         // return;
                     }
                 }
@@ -473,6 +504,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             if (isrtoReq.contains(txtBarCode.getText().toString())) {
 
                 if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                    popup = true;
                     ismatch = true;
                     isHeldout.add(txtBarCode.getText().toString());
                     HashMap<String, String> temp = new HashMap<>();
@@ -485,10 +517,13 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0, txtBarCode.getText().toString());
+                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                 } else {
+                    popup = true;
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0, txtBarCode.getText().toString());
+                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     // return;
                 }
             }
@@ -529,6 +564,11 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             }
         }*/
 
+        if (!popup && !WaybillAttempt.equals("No Data")) {
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+            ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
+                    "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+        }
         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
         txtBarCode.setText("");
         txtBarCode.requestFocus();
@@ -1012,7 +1052,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
             if (progressDialog == null)
                 progressDialog = ProgressDialog.show(InventoryControl_DelRtoReqbyNCL.this,
-                        "Please wait.", "Bringing Delivery Request data...", true);
+                        "Please wait.", "Bringing Delivery Request data..." + GlobalVar.GV().getCurrentDateTime(), true);
             super.onPreExecute();
 
         }
@@ -1925,8 +1965,10 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
     }
 
-    private void GetPieceInfoByScanning(String PieceBarcode) {
+    String WaybillAttempt = "19127";
 
+    private void GetPieceInfoByScanning(String PieceBarcode) {
+        WaybillAttempt = "19127";
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         try {
@@ -1935,6 +1977,8 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             isNclDelReq.clear();
             iscitcshipments.clear();
             isNclCitc.clear();
+            isrtoReq.clear();
+
 
             Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode='" + PieceBarcode + "'", getApplicationContext());
             if (cursor.getCount() > 0) {
@@ -1962,7 +2006,29 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                 } while (cursor.moveToNext());
             }
 
+            cursor = dbConnections.Fill("select * from RtoReq  where BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                isrtoReq.clear();
+                // isNclDelReq.clear();
+                cursor.moveToFirst();
+                do {
+
+                    isrtoReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    // if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                    //     isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
             cursor.close();
+
+            Cursor result1 = dbConnections.Fill("select Sum(Attempt) Attempt  from WaybillAttempt where BarCode='" + PieceBarcode + "'", getApplicationContext());
+
+
+            if (result1.getCount() > 0) {
+                result1.moveToFirst();
+                WaybillAttempt = String.valueOf(result1.getInt(result1.getColumnIndex("Attempt")));
+            }
 
             dbConnections.close();
 
@@ -2001,6 +2067,15 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
                 delreqcount.setText("DEL Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
 
+            }
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 Limit 1", getApplicationContext());
+            try {
+                cursor.moveToFirst();
+                validupto.setText("Upto : " + cursor.getString(cursor.getColumnIndex("ValidDate")) + " 16:30");
+                inserteddate.setText("DLD : " + cursor.getString(cursor.getColumnIndex("InsertedDate")));
+            } catch (Exception e) {
+                System.out.println(e);
             }
 
             cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getApplicationContext());
@@ -2097,4 +2172,159 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
     }*/
 
+    private class BringWaybillattempt extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+
+        @Override
+        protected void onPreExecute() {
+
+            if (progressDialog == null)
+                progressDialog = ProgressDialog.show(InventoryControl_DelRtoReqbyNCL.this,
+                        "Please wait.", "Bringing Waybill attempt data..." + GlobalVar.GV().getCurrentDateTimeSS(), true);
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... params) {
+
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringWaybillattempt");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setConnectTimeout(120000);
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+//
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+
+                    // JsonObject convertedObject = new Gson().fromJson(result, JsonObject.class);
+                    //JsonObject jsonObject = (JsonObject) new JsonParser().parse("YourJsonString");
+
+
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.getBoolean("HasError")) {
+                        //fetchData(jsonObject);
+                        try {
+
+
+                            JSONArray WaybillAttempt = jsonObject.getJSONArray("WaybillAttempt");
+
+                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                            dbConnections.deleteWaybillAttempt(getApplicationContext());
+
+                            if (WaybillAttempt.length() > 0) {
+
+                                dbConnections.insertwaybillattemptBulk(WaybillAttempt, getApplicationContext());
+                                dbConnections.close();
+
+                            }
+
+                            ReadFromLocalWaybillAttempt();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(result);
+            } else {
+
+                LoadDivisionError(0);
+            }
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+        }
+
+    }
+
+    private void ReadFromLocalWaybillAttempt() {
+        // isWaybillAttempt.clear();
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        Cursor result = dbConnections.Fill("select count(*) total from WaybillAttempt", getApplicationContext());
+        Cursor result1 = dbConnections.Fill("select *  from WaybillAttempt Limit 1", getApplicationContext());
+
+        try {
+            String downloaddate = "";
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+
+                if (result1.getCount() > 0) {
+                    result1.moveToFirst();
+                    downloaddate = result1.getString(result1.getColumnIndex("InsertedDate"));
+                }
+
+                bringdatawaybillattempt.setText("Waybill Attempt Count : " + String.valueOf(result.getInt(result.getColumnIndex("total"))) + " " + downloaddate);
+
+            }
+            result.close();
+            result1.close();
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
 }

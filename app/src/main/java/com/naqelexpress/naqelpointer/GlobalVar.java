@@ -94,8 +94,8 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH only
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH only
+    public int AppIDForTH = 0; //for TH only 1
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;

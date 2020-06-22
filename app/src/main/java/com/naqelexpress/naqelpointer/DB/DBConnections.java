@@ -6457,4 +6457,25 @@ public class DBConnections
 
         }
     }
+
+    public void updateMyRouteShipmentsIsPaid(Context context, String waybillno) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+
+
+            contentValues.put("Ispaid", 1);
+
+            try {
+                String args[] = {String.valueOf(waybillno)};
+                db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
 }

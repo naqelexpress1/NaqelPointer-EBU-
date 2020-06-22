@@ -19,7 +19,6 @@ import android.util.Log;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -43,7 +42,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         try {
 
 
-            Intent notificationIntent = new Intent(this, MyRouteActivity.class);
+            Intent notificationIntent = new Intent(this, com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
 
             //        if(StartActivity.isAppRunning){
 //            //Some action
@@ -90,6 +89,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 } else if (type.equals("Reschedule")) {
                     image = R.drawable.request;
                     updateBooking(remoteMessage.getData().get("message"));
+                } else if (type.equals("IsPaid")) {
+                    image = R.drawable.pendingcod;
+                    updatePaid(remoteMessage.getData().get("message"));
                 } else
                     image = R.mipmap.ic_launcher;
 
@@ -186,6 +188,19 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (result.getCount() > 0) {
             updateComplaint();
             dbConnections.updateMyRouteShipments(getApplicationContext(), Waybillno, "Complaint", "", "");
+        }
+        result.close();
+        dbConnections.close();
+    }
+
+    private void updatePaid(String Waybillno) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = " + Waybillno,
+                getApplicationContext());
+        if (result.getCount() > 0) {
+            updateComplaint();
+            dbConnections.updateMyRouteShipmentsIsPaid(getApplicationContext(), Waybillno);
         }
         result.close();
         dbConnections.close();

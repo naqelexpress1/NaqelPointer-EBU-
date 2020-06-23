@@ -139,11 +139,18 @@ public class RouteListAdapterNew
                 holder.lbDeliveryDate.setText("DS Order No : - " + String.valueOf(item.DsOrderNo));
             else
                 holder.lbDeliveryDate.setVisibility(View.INVISIBLE);
-            if (item.IsPaid != 0) {
+
+            if (item.IsPaid == 1) {
                 holder.ispaid.setText("PAID");
                 holder.ispaid.setTextColor(Color.GREEN);
+            } else if (item.IsPaid == 2) {
+                holder.ispaid.setText("A");
+                holder.ispaid.setTextColor(Color.BLUE);
+            } else if (item.IsPaid == 0) {
+                holder.ispaid.setText("NOT PAID");
+                holder.ispaid.setTextColor(Color.RED);
             } else {
-                holder.ispaid.setText("Not PAID");
+                holder.ispaid.setText("");
                 holder.ispaid.setTextColor(Color.RED);
             }
 

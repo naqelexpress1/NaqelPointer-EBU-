@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 115; // No of attempt
+    private static final int Version = 116; // No of attempt
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -431,6 +431,7 @@ public class DBConnections
             //db.execSQL("delete from OnDelivery");
             //db.execSQL("delete from OnDeliveryDetail");
             db.execSQL("delete from DeliveryStatus");
+            db.execSQL("delete from LocationintoMongo");
 
 
             //Added by ismail

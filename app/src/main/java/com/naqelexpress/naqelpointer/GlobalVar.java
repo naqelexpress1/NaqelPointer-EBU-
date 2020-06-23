@@ -86,7 +86,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "TH : Testing 20-06-2020 Rto Popup";
+    public String AppVersion = "CBU : 24-06-2020(269)";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

@@ -25,7 +25,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -33,7 +32,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -133,18 +131,17 @@ public class LocationIntoMongo extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from LocationintoMongo Limit 20 ", getApplicationContext());
+            Cursor result = db.Fill("select * from LocationintoMongo Limit 10 ", getApplicationContext());
 
             JSONArray jsonArray = new JSONArray();
             //JSONObject header = new JSONObject();
             if (result.getCount() > 0) {
                 result.moveToFirst();
-                result.moveToFirst();
                 do {
                     String JsonData = result.getString(result.getColumnIndex("Json"));
                     JSONObject jsonObject = new JSONObject(JsonData);
                     jsonObject.put("id", result.getInt(result.getColumnIndex("ID")));
-                    jsonArray.put(JsonData);
+                    jsonArray.put(jsonObject);
 
                 }
                 while (result.moveToNext());

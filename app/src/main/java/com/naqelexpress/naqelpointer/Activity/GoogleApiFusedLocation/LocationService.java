@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -160,6 +161,7 @@ public class LocationService extends Service {
                             jsonObject.put("WaybillNo", dbConnections.GetLastDeliveredWaybill(getApplicationContext()));
                             jsonObject.put("EmpID", empid);
                             jsonObject.put("Division", devision);
+                            jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
 
                             dbConnections.close();
                             result.close();
@@ -229,7 +231,24 @@ public class LocationService extends Service {
         dbConnections.close();
 
 
+        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.LocationIntoMongo.class)) {
+            startService(new Intent(getBaseContext(),
+                    com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+        }
+
     }
+
+    public boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplicationContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void shareLiveLocation(final String input) {
 

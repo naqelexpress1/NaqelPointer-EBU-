@@ -1213,6 +1213,9 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.InventorybyNCLBulk"
             android:process=":naqelInventorybyNCLBulk" />
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.LocationIntoMongo"
+            android:process=":naqelLocationIntoMongo" />
 
     </application>
 

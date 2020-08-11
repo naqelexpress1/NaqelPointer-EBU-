@@ -78,7 +78,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
             bundle = getIntent().getExtras();
 
-             mapFragment = (SupportMapFragment) getSupportFragmentManager()
+            mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
             mapFragment.getMapAsync(this);
@@ -456,12 +456,15 @@ public class WaybillPlanActivity extends AppCompatActivity
         customerlocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (ConsigneeLatitude != null && ConsigneeLatitude.length() == 0)
+                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
+                            + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
+                            + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
+                            + txtWaybillNo.getText().toString(), getApplicationContext());
+                else
+                    alertforcommon();
 
-                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
-                        + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
-                        + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
-                        + txtWaybillNo.getText().toString(), getApplicationContext());
-                popup.dismiss();
+                    popup.dismiss();
             }
         });
         frontofthedoor.setOnClickListener(new View.OnClickListener() {
@@ -535,6 +538,16 @@ public class WaybillPlanActivity extends AppCompatActivity
         // Clear the default translucent background
         popup.setBackgroundDrawable(new BitmapDrawable());
         popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
+    }
+
+    private void alertforcommon() {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(true);
+        eDialog.setTitleText("Has Location");
+        eDialog.setContentText("This Shipment already has Location , kindly please start to deliver");
+        eDialog.show();
+
     }
 
     Point p;

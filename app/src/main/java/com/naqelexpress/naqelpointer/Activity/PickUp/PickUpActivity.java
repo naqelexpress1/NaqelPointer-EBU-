@@ -418,6 +418,12 @@ public class PickUpActivity extends AppCompatActivity {
                 isValid = false;
                 return false;
             }
+            if (firstFragment.txtRefNo.getText().toString().equals("")) //|| GlobalVar.GV().getDoubleFromString(firstFragment.txtWeight.getText().toString()) <= 0
+            {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the RefNo", GlobalVar.AlertType.Error);
+                isValid = false;
+                return false;
+            }
         }
 
         if (secondFragment != null) {
@@ -434,8 +440,7 @@ public class PickUpActivity extends AppCompatActivity {
                 return false;
             }
 
-            if(firstFragment.txtClientID.getText().toString() == null || firstFragment.txtClientID.getText().toString().length() ==0)
-            {
+            if (firstFragment.txtClientID.getText().toString() == null || firstFragment.txtClientID.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
                         "Kindly enter ClientID ", GlobalVar.AlertType.Error);
                 isValid = false;

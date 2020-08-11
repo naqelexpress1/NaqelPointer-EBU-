@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.service;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -7,14 +8,18 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,7 +36,6 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
-import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -134,7 +138,7 @@ public class PlannedRoute_MyRouteComp extends Service {
 
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
-
+            //db.DeleteAllSuggestLocation(getApplicationContext());
             Cursor result = db.Fill("select * from MyRouteCompliance where IsSync = 0 Limit 1 ", getApplicationContext());
 
             JSONObject header = new JSONObject();
@@ -142,153 +146,159 @@ public class PlannedRoute_MyRouteComp extends Service {
             JSONArray comp = new JSONArray();
             String MRCDate = "";
             int EmpID;
-
+            String MRCID = "0", SLID = "0", PLID = "0";
             if (result.getCount() > 0) {
 
-                if (result.moveToFirst()) {
+                result.moveToFirst();
+                do {
+                    MRCID = String.valueOf(result.getInt(result.getColumnIndex("ID")));
+                    EmpID = result.getInt(result.getColumnIndex("EmpID"));
+                    MRCDate = result.getString(result.getColumnIndex("Date"));
+                    myroutecomp.put("Compliance", result.getInt(result.getColumnIndex("Compliance")));
+                    myroutecomp.put("Date", result.getString(result.getColumnIndex("IsDate")));
+                    myroutecomp.put("EmpID", EmpID);
+                    myroutecomp.put("UserID", result.getInt(result.getColumnIndex("UserID")));
+                    myroutecomp.put("DeliverysheetID", db.GetDeliverysheet(getApplicationContext()));
+                    try {
+                        myroutecomp.put("DeviceModel", GlobalVar.GV().getDeviceName());
+
+                    } catch (Exception e) {
+                        myroutecomp.put("DeviceModel", "No Model");
+                    }
+                    try {
+                        myroutecomp.put("Softwareversion", android.os.Build.VERSION.RELEASE);
+
+                    } catch (Exception e) {
+                        myroutecomp.put("Softwareversion", "");
+                    }
+                    try {
+                        myroutecomp.put("Sdkversion", android.os.Build.VERSION.SDK_INT);
+
+                    } catch (Exception e) {
+                        myroutecomp.put("Sdkversion", 0);
+                    }
+                    try {
+
+                        TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED) {
+                            myroutecomp.put("DeviceID", telephonyManager.getDeviceId().toString());
+                        }
+                    } catch (Exception e) {
+                        try {
+                            myroutecomp.put("DeviceID", Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID).toString());
+                        } catch (Exception ee) {
+
+                        }
+                    }
+                    comp.put(myroutecomp);
+                } while (result.moveToNext());
+
+                header.put("Compliance", myroutecomp);
+
+
+                result = db.Fill("select * from SuggestLocations where Date = '" + MRCDate + "' " +
+                        "and EmpID = " + EmpID + " and  IsSync = 0  Limit 1 ", getApplicationContext());
+
+                JSONArray sl_array = new JSONArray();
+                if (result != null && result.getCount() > 0) {
+                    result.moveToFirst();
                     do {
-                        EmpID = result.getInt(result.getColumnIndex("EmpID"));
-                        MRCDate = result.getString(result.getColumnIndex("Date"));
-                        myroutecomp.put("Compliance", result.getInt(result.getColumnIndex("Compliance")));
-                        myroutecomp.put("Date", DateTime.parse(result.getString(result.getColumnIndex("IsDate"))));
-                        myroutecomp.put("EmpID", EmpID);
-                        myroutecomp.put("UserID", result.getInt(result.getColumnIndex("UserID")));
-                        comp.put(myroutecomp);
-                    } while (result.moveToNext());
-
-                    header.put("Compliance", myroutecomp);
-
-
-                    result = db.Fill("select * from SuggestLocations where IsSync = 0 Limit 1 ", getApplicationContext());
-                    JSONArray sl_array = new JSONArray();
-                    if (result != null && result.getCount() > 0) {
-                        result.moveToFirst();
-                        do {
-
-                            String data = result.getString(result.getColumnIndex("StringData"));
-                            String split[] = data.split("@");
-                            for (int i = 0; i < split.length; i++) {
-                                JSONObject sl_obj = new JSONObject();
-                                String temp[] = split[i].split("_");
-                                sl_obj.put("Lat", Double.parseDouble(temp[1]));
-                                sl_obj.put("Lng", Double.parseDouble(temp[2]));
-                                sl_obj.put("WaybillNo", Double.parseDouble(temp[0]));
-                                sl_obj.put("SeqNo", Float.parseFloat(temp[temp.length - 1]));
-
-                            }
+                        SLID = SLID + "," + String.valueOf(result.getInt(result.getColumnIndex("ID")));
+                        String data = result.getString(result.getColumnIndex("StringData"));
+                        byte[] b = data.getBytes();
+                        JSONObject sl_obj = new JSONObject();
+                        sl_obj.put("ID", result.getInt(result.getColumnIndex("ID")));
+                        //sl_obj.put("SLByte", b.toString());
+                        String encodedString = java.util.Base64.getEncoder().encodeToString(b);
+                        sl_obj.put("SLByte", encodedString);
+                        sl_array.put(sl_obj);
+//                            String split[] = data.split("@");
+//                            for (int i = 0; i < split.length; i++) {
+//                                JSONObject sl_obj = new JSONObject();
+//                                String temp[] = split[i].split("_");
+//                                sl_obj.put("Lat", Double.parseDouble(temp[1]));
+//                                sl_obj.put("Lng", Double.parseDouble(temp[2]));
+//                                if (temp[0].equals("Stratingplace"))
+//                                    sl_obj.put("WaybillNo", 0);
+//                                else
+//                                    sl_obj.put("WaybillNo", Integer.parseInt(temp[0]));
+//                                sl_obj.put("SeqNo", Float.parseFloat(temp[temp.length - 2]));
+//                                sl_obj.put("DLSeqNo", Float.parseFloat(temp[temp.length - 1]));
+//                                sl_array.put(sl_obj);
+//
+//                            }
 
 
-                        }
-                        while (result.moveToNext());
                     }
+                    while (result.moveToNext());
 
-                   /* OnDeliveryRequest onDeliveryRequest = new OnDeliveryRequest();
-                    onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-                    onDeliveryRequest.WaybillNo = result.getString(result.getColumnIndex("WaybillNo"));
-                    onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
-
-                    onDeliveryRequest.PiecesCount = Integer.parseInt(result.getString(result.getColumnIndex("PiecesCount")));
-                    onDeliveryRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
-                    onDeliveryRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
-                    onDeliveryRequest.EmployID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
-                    onDeliveryRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
-                    onDeliveryRequest.IsPartial = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsPartial")));
-                    onDeliveryRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
-                    onDeliveryRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
-                    onDeliveryRequest.ReceivedAmt = Double.parseDouble(result.getString(result.getColumnIndex("TotalReceivedAmount")));
-                    //onDeliveryRequest.ReceiptNo = result.getString(result.getColumnIndex("ReceiptNo"));
-                    //onDeliveryRequest.StopPointsID = Integer.parseInt(result.getString(result.getColumnIndex("StopPointsID")));
-                    onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
-                    onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
-                    onDeliveryRequest.al = result.getInt(result.getColumnIndex("AL"));
-                    onDeliveryRequest.Barcode = result.getString(result.getColumnIndex("Barcode"));
-
-                    onDeliveryRequest.IqamaID = result.getString(result.getColumnIndex("IqamaID"));
-                    onDeliveryRequest.PhoneNo = result.getString(result.getColumnIndex("PhoneNo"));
-                    onDeliveryRequest.IqamaName = result.getString(result.getColumnIndex("IqamaName"));
-                    onDeliveryRequest.DeliverySheetID = result.getInt(result.getColumnIndex("DeliverySheetID"));
-
-                    try {
-                        FirebaseApp.initializeApp(this);
-                        String token = FirebaseInstanceId.getInstance().getToken();
-                        onDeliveryRequest.DeviceToken = token;
-                    } catch (Exception e) {
-                        onDeliveryRequest.DeviceToken = "";
-                    }
-
-                    try {
-                        int index = 0;
-                        String barcode[] = onDeliveryRequest.Barcode.split("\\,");
-                        for (String piececode : barcode) {
-
-                            Cursor wid = db.Fill("select * from BarCode where BarCode = '" + piececode + "'"
-                                    , getApplicationContext());
-
-                            int WayBillID = 0;
-                            if (wid.getCount() > 0) {
-                                wid.moveToFirst();
-                                WayBillID = wid.getInt(wid.getColumnIndex("WayBillID"));
-                            }
-                            wid.close();
-
-                            onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
-                                    new OnDeliveryDetailRequest(piececode, WayBillID));
-
-                            index++;
-                        }
-
-                    } catch (Exception e) {
-                        System.out.println(e);
-                    }*/
-
-                    /*Cursor resultDetail = db.Fill("select * from OnDeliveryDetail where DeliveryID = " + onDeliveryRequest.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
-                        int index = 0;
-                        do {
-                            Cursor wid = db.Fill("select * from BarCode where BarCode = '" + resultDetail.getString(resultDetail.getColumnIndex("BarCode")) + "'"
-                                    , getApplicationContext());
-                            int WayBillID = 0;
-                            if (wid.getCount() > 0) {
-                                wid.moveToFirst();
-                                WayBillID = wid.getInt(wid.getColumnIndex("WayBillID"));
-                            }
-                            wid.close();
-
-
-                            onDeliveryRequest.OnDeliveryDetailRequestList.add(index,
-                                    new OnDeliveryDetailRequest(resultDetail.getString(resultDetail.getColumnIndex("BarCode")), WayBillID));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-
-
-                    }*/
-                    // String jsonData = JsonSerializerDeserializer.serialize(onDeliveryRequest, true);
-                    //jsonData = jsonData.replace("Date(-", "Date(");
-                    //SaveOnDelivery(db, jsonData, onDeliveryRequest.ID, onDeliveryRequest.WaybillNo);
+                    header.put("SuggestLocation", sl_array);
                 }
 
+                result = db.Fill("select * from plannedLocation where Date = '" + MRCDate + "' " +
+                        "and EmpID = " + EmpID + " and  IsSync = 0 ", getApplicationContext());
 
+                JSONArray pl_array = new JSONArray();
+                if (result != null && result.getCount() > 0) {
+                    result.moveToFirst();
+                    do {
+                        PLID = PLID + "," + String.valueOf(result.getInt(result.getColumnIndex("ID")));
+                        String data = result.getString(result.getColumnIndex("StringData"));
+                        byte[] b = data.getBytes();
+                        JSONObject sl_obj = new JSONObject();
+                        sl_obj.put("ID", result.getInt(result.getColumnIndex("ID")));
+                        sl_obj.put("position", result.getInt(result.getColumnIndex("position")));
+                        String encodedString = java.util.Base64.getEncoder().encodeToString(b);
+                        sl_obj.put("PLByte", encodedString);
+                       // sl_obj.put("Date", encodedString);
+                       // sl_obj.put("PLByte", encodedString);
+                        pl_array.put(sl_obj);
+//                            for (int i = 0; i < split.length; i++) {
+//                                JSONObject sl_obj = new JSONObject();
+//                                String temp[] = split[i].split("_");
+//                                sl_obj.put("Lat", Double.parseDouble(temp[1]));
+//                                sl_obj.put("Lng", Double.parseDouble(temp[2]));
+//                                if (temp[0].equals("Stratingplace"))
+//                                    sl_obj.put("WaybillNo", 0);
+//                                else
+//                                    sl_obj.put("WaybillNo", Integer.parseInt(temp[0]));
+//                                sl_obj.put("SeqNo", Float.parseFloat(temp[temp.length - 2]));
+//                                sl_obj.put("DLSeqNo", Float.parseFloat(temp[temp.length - 1]));
+//                                pl_array.put(sl_obj);
+//
+//                            }
+
+
+                    }
+                    while (result.moveToNext());
+
+                    header.put("PlannedLocation", pl_array);
+                    System.out.println(header.toString());
+
+
+                }
+
+                SaveMyRouteCompliance(db, header.toString(), MRCID, SLID, PLID);
             } else {
                 flag_thread = false;
                 this.stopSelf();
                 android.os.Process.killProcess(android.os.Process.myPid());
             }
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             flag_thread = false;
         }
+
     }
 
 
-    public void SaveOnDelivery(final DBConnections db, final String input, final int id, final String waybillno) {
+    public void SaveMyRouteCompliance(final DBConnections db, final String input, final String MRCID, final String SLID, final String PLID) {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Delivery");
         //String URL = GlobalVar.GV().NaqelPointerAPILink + "PartialDelivery";
-        String URL = DomainURL + "PartialDelivery";
+        String URL = DomainURL + "MyRouteComplaince";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 URL, null, new Response.Listener<JSONObject>() {
@@ -300,24 +310,11 @@ public class PlannedRoute_MyRouteComp extends Service {
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     String updateDeliver = response.getString("ErrorMessage");
                     if (IsSync && !HasError) {
-
-                        //db.deleteonDeliveryID(id, getApplicationContext());
-                        //db.deleteDeliveyDetails(id, getApplicationContext());
-
-                        db.updateOnDeliveryID(id, getApplicationContext());
-
-                        if (updateDeliver.equals("Complete")) {
-                            db.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), waybillno, id);
-                        } else {
-                            db.UpdateMyRouteShipmentsIsPartialDelivered(getApplicationContext(), waybillno, id);
-                        }
-
+                        db.updateMyRouteCompliance(MRCID, SLID, PLID, getApplicationContext());
                         flag_thread = false;
-
-
                     } else
                         flag_thread = false;
-                    GlobalVar.GV().triedTimes_ForDelService = 0;
+
                     db.close();
                 } catch (JSONException e) {
                     flag_thread = false;
@@ -332,15 +329,7 @@ public class PlannedRoute_MyRouteComp extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
-                if (error.toString().contains("No address associated with hostname")) {
 
-                } else {
-                    GlobalVar.GV().triedTimes_ForDelService = GlobalVar.GV().triedTimes_ForDelService + 1;
-                    if (GlobalVar.GV().triedTimes_ForDelService == GlobalVar.GV().triedTimesCondition) {
-                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "Delivery");
-
-                    }
-                }
                 flag_thread = false;
                 db.close();
             }

@@ -86,16 +86,18 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU : 24-06-2020(269)";
+    public String AppVersion = "CBU - Nootp & Has Location 04-08-2020" ; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
     public static int triedTimes_ForDelSheetService = 0;
+    public static int triedTimes_ForDelSheetServicebyNCL = 0;
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH only
     public int AppIDForTH = 0; //for TH only 1
+    //
     //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -2613,7 +2615,7 @@ public class GlobalVar {
 
     public static String getCurrentDateTimeSS() {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" , Locale.ENGLISH);
         String datetime = dateformat.format(c.getTime());
 
         return datetime;
@@ -3122,6 +3124,8 @@ public class GlobalVar {
             return dbConnections.GetPrimaryDomain_DelSheetService(context);
         else if (ServiceName.equals("NotDeliver"))
             return dbConnections.GetPrimaryDomain_NotDeliverdService(context);
+        else if (ServiceName.equals("DeliverySheetbyNCL"))
+            return dbConnections.GetPrimaryDomain_DelSheetServicebyNCL(context);
 
 
         return "";
@@ -3153,6 +3157,8 @@ public class GlobalVar {
             dbConnections.UpdateDomaintriedTimes_ForDelSheetService(DomainURL);
         else if (type.equals("NotDeliver"))
             dbConnections.UpdateDomaintriedTimes_NotDeliveredService(DomainURL);
+        else if (type.equals("DeliverySheetbyNCL"))
+            dbConnections.UpdateDomaintriedTimes_ForDelSheetServicebyNCL(DomainURL);
         dbConnections.close();
 
 

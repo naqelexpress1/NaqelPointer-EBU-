@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.routeMap;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -162,7 +163,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        pDialog.setTitleText("Loading");
+        pDialog.setTitleText("Optimizing routes kindly please wait");
         pDialog.setCancelable(false);
         pDialog.show();
 
@@ -296,7 +297,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         }
 
         ShowShipmentMarker();
+
         GetPlannedLocation();
+
         if (!IsPlanned) {
             if (places.size() > 1) {
                 for (int i = 0; i < places.size(); i++) {
@@ -305,6 +308,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
                     // Getting URL to the Google Directions API
                     String url = getDirectionsUrl(origin, dest);
+
 
                     DownloadTask downloadTask = new DownloadTask();
                     // Start downloading json data from Google Directions API
@@ -316,10 +320,14 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                         url = getDirectionsUrl(origin, dest);
                         downloadTask = new DownloadTask();
                         downloadTask.execute(url, String.valueOf(places.size() - 1));
+
                         break;
                     }
-                    if (i == places.size() - 2)
+                    if (i == places.size() - 2) {
+                        if (pDialog != null && pDialog.isShowing())
+                            pDialog.dismissWithAnimation();
                         break;
+                    }
 
 
                 }
@@ -348,8 +356,8 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 //
 //        }
 
-        if (pDialog != null && pDialog.isShowing())
-            pDialog.dismissWithAnimation();
+//        if (pDialog != null && pDialog.isShowing())
+//            pDialog.dismissWithAnimation();
 
     }
 
@@ -441,10 +449,18 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             if (!result.equals("")) {
+                String wno;
+                if (places.size() - 1 == Integer.parseInt(position)) {
+
+                    wno = "0";
+
+                } else
+                    wno = myRouteShipmentList.get((int) places.get(i).getSpeed() + 1).ItemNo;
 
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 dbConnections.InsertPlannedLocation(getApplicationContext(), result, Integer.parseInt(position));
                 dbConnections.close();
+
                 ParserTask parserTask = new ParserTask();
                 parserTask.execute(result, position);
 
@@ -531,6 +547,17 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             //  ShowShipmentMarker_byone(color,position);
         } catch (Exception e) {
             System.out.println(e);
+        }
+
+        if (Integer.parseInt(pos) == places.size() - 2 || Integer.parseInt(pos) == places.size() - 1 || Integer.parseInt(pos) == places.size()) {
+            if (pDialog != null && pDialog.isShowing())
+                pDialog.dismissWithAnimation();
+
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class)) {
+                startService(
+                        new Intent(this,
+                                com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
+            }
         }
     }
 
@@ -1031,6 +1058,10 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     String data = result.getString(result.getColumnIndex("StringData"));
                     int position = result.getInt(result.getColumnIndex("position"));
 
+                    if(data.contains("ZERO_RESULTS"))
+                    {
+                        System.out.println("true");
+                    }
                     ParserTask parserTask = new ParserTask();
                     parserTask.execute(data, String.valueOf(position));
 
@@ -1054,4 +1085,18 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         }
         return pos;
     }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplication()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

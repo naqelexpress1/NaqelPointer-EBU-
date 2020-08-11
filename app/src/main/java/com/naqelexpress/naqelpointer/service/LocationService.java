@@ -41,8 +41,8 @@ public class LocationService extends Service {
         int ACCESS_COARSE_LOCATION = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
         int ACCESS_FINE_LOCATION = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
         if (ACCESS_COARSE_LOCATION == PackageManager.PERMISSION_GRANTED && ACCESS_FINE_LOCATION == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
+//            locationManager.requestLocationUpdates(
+//                    LocationManager.NETWORK_PROVIDER, 4000, 0, listener);
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
                     4000, 0, listener);
         }
@@ -85,7 +85,7 @@ public class LocationService extends Service {
                 .getAccuracy());
         boolean isLessAccurate = accuracyDelta > 0;
         boolean isMoreAccurate = accuracyDelta < 0;
-        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 100; //200
 
         // Check if the old and new location are from the same provider
         boolean isFromSameProvider = isSameProvider(location.getProvider(),

@@ -65,7 +65,7 @@ import java.util.HashSet;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 116; // No of attempt
+    private static final int Version = 120; // No of attempt
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -381,10 +381,11 @@ public class DBConnections
                 "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"SuggestLocations\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER )");
+                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER , IsSync Integer)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER , PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT )");
+                "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER , " +
+                "PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT , IsSync Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
@@ -397,6 +398,17 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillAttempt\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "WayBillNo Integer   , Attempt Integer , BarCode TEXT , InsertedDate TEXT)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCloadingForDbyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"CourierID\" INTEGER NOT NULL " +
+                ", \"UserID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL , \"CTime\" DATETIME NOT NULL , \"PieceCount\" INTEGER NOT NULL , \"TruckID\" TEXT, " +
+                "\"StationID\" INTEGER NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCLoadingForDDetailbyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"OnCLoadingForDIDbyNCL\" INTEGER NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetbyNCLService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
     }
 
     public int getVersion() {
@@ -426,12 +438,16 @@ public class DBConnections
 
             db.execSQL("delete from UserMELogin");
             db.execSQL("delete from UserME");
+            db.execSQL("delete from LocationintoMongo");
             //db.execSQL("delete from NotDelivered");
             //db.execSQL("delete from NotDeliveredDetail");
             //db.execSQL("delete from OnDelivery");
             //db.execSQL("delete from OnDeliveryDetail");
             db.execSQL("delete from DeliveryStatus");
             db.execSQL("delete from LocationintoMongo");
+            db.execSQL("delete from MyRouteCompliance");
+            db.execSQL("delete from SuggestLocations");
+            db.execSQL("delete from plannedLocation");
 
 
             //Added by ismail
@@ -631,10 +647,11 @@ public class DBConnections
                     "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"SuggestLocations\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER)");
+                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL ,  EmpID INTEGER , IsSync Integer)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"plannedLocation\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
-                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER ,  EmpID INTEGER , PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT  )");
+                    "\"StringData\" Text NOT NULL ,  \"Date\" DATETIME NOT NULL , position INTEGER , EmpID INTEGER , " +
+                    "PKM TEXT , PETA TEXT , OriginAdress TEXT , DestAdres TEXT , IsSync Integer )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"InventorybyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Json\" TEXT  NOT NULL , \"Count\" Integer DEFAULT 0)");
@@ -647,6 +664,16 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillAttempt\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "WayBillNo Integer   , Attempt Integer , BarCode TEXT , InsertedDate TEXT)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCloadingForDbyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"CourierID\" INTEGER NOT NULL " +
+                    ", \"UserID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL , \"CTime\" DATETIME NOT NULL , \"PieceCount\" INTEGER NOT NULL , \"TruckID\" TEXT, " +
+                    "\"StationID\" INTEGER NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCLoadingForDDetailbyNCL\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                    "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"OnCLoadingForDIDbyNCL\" INTEGER NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetbyNCLService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -829,6 +856,13 @@ public class DBConnections
                 db.execSQL("ALTER TABLE MyRouteCompliance ADD COLUMN  UserID Integer ");
             if (!isColumnExist("RtoReq", "NCLNO"))
                 db.execSQL("ALTER TABLE RtoReq ADD COLUMN  NCLNO Text ");
+
+            if (!isColumnExist("SuggestLocations", "IsSync"))
+                db.execSQL("ALTER TABLE SuggestLocations ADD COLUMN  IsSync INTEGER ");
+
+            if (!isColumnExist("plannedLocation", "IsSync"))
+                db.execSQL("ALTER TABLE plannedLocation ADD COLUMN  IsSync INTEGER ");
+
 
         }
 
@@ -2018,6 +2052,10 @@ public class DBConnections
             db.delete("Productivity", null, null);
             db.delete("Complaint", null, null);
             db.delete("MyRouteCompliance", null, null);
+            db.delete("SuggestLocations" ,null,null);
+            db.delete("plannedLocation" ,null,null);
+
+
 //            GlobalVar.deleteContactRawID(ContactDetails(context), context);
             db.close();
         } catch (SQLiteException e) {
@@ -2835,6 +2873,7 @@ public class DBConnections
             ContentValues contentValues = new ContentValues();
 
             contentValues.put("NotDelivered", true);
+            contentValues.put("OnDeliveryDate", DateTime.now().toString());
             try {
                 String args[] = {String.valueOf(Waybill)};
                 db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
@@ -4462,6 +4501,27 @@ public class DBConnections
         return Waybillno;
     }
 
+    public String GetLastActionWaybill(Context context) {
+        String Waybillno = "0";
+        try {
+            Cursor mnocursor = Fill("select * from MyRouteShipments where  IsDelivered = 1 or NotDelivered = 1  order by OnDeliveryDate desc Limit 1", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    Waybillno = mnocursor.getString(mnocursor.getColumnIndex("ItemNo")) + "_" + String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("DeliverySheetID")));
+
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return Waybillno;
+    }
+
 //    public String GetLastRefusedWaybill(Context context) {
 //        String Waybillno = "0";
 //        try {
@@ -5764,6 +5824,8 @@ public class DBConnections
                 cursor = Fill("select Name  from DomainURL_NotDeliveredService ", context);
             else if (type == 3) // Deliverysheet Service
                 cursor = Fill("select Name  from DomainURL_DelSheetService ", context);
+            else if (type == 4) // Deliverysheet Service
+                cursor = Fill("select Name  from DomainURL_DelSheetbyNCLService ", context);
 
             if (cursor != null && cursor.getCount() > 0) {
                 Count = cursor.getCount();
@@ -6216,6 +6278,7 @@ public class DBConnections
             contentValues.put("StringData", location);
             contentValues.put("Date", GlobalVar.getDate());
             contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            contentValues.put("IsSync", 0);
             result = db.insert("SuggestLocations", null, contentValues);
 
             db.close();
@@ -6245,6 +6308,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String args[] = {GlobalVar.getDate()};
             db.execSQL("delete from SuggestLocations");
+            db.execSQL("delete from plannedLocation");
             db.execSQL("delete from MyRouteCompliance");
             db.close();
 
@@ -6277,6 +6341,7 @@ public class DBConnections
             contentValues.put("position", pos);
             contentValues.put("Date", GlobalVar.getDate());
             contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            contentValues.put("IsSync", 0);
             result = db.insert("plannedLocation", null, contentValues);
 
             db.close();
@@ -6476,6 +6541,254 @@ public class DBConnections
             } catch (Exception e) {
             }
 
+        } catch (SQLiteException e) {
+        }
+    }
+
+    public boolean InsertOnCLoadingDetailbyNCLLevel(OFDPieceLevel instance, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("BarCode", instance.BarCode);
+            contentValues.put("OnCLoadingForDIDbyNCL", instance.OnCLoadingForDID);
+            contentValues.put("IsSync", instance.IsSync);
+
+            result = db.insert("OnCLoadingForDDetailbyNCL", null, contentValues);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean InsertOnCloadingForDbyNCL(OnCloadingForD instance, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("CourierID", instance.CourierID);
+            contentValues.put("UserID", instance.UserID);
+            contentValues.put("IsSync", instance.IsSync);
+            contentValues.put("CTime", instance.CTime.toString());
+            contentValues.put("PieceCount", instance.PieceCount);
+            contentValues.put("TruckID", instance.TruckID);
+            contentValues.put("StationID", instance.StationID);
+
+            result = db.insert("OnCloadingForDbyNCL", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    //For DeliverySheet Service
+    public boolean InsertDomain_ForDelSheetServicebyNCL(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 4);
+
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_DelSheetbyNCLService", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_DelSheetServicebyNCL(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_DelSheetbyNCLService where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForDelSheetServicebyNCL(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForDelSheetServicebyNCL = 0;
+        UpdateExsistingIsPrimaryForDelSheetServicebyNCL(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelSheetbyNCLService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForDelSheetServicebyNCL(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_DelSheetbyNCLService", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public void deleteOnLoadingIDbyNCL(int ID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS
+                    | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(ID)};
+            db.delete("OnCloadingForDbyNCL", "ID=?", args);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public void deleteOnLoadingBarcodebyNCL(int onLoadingID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(onLoadingID)};
+            db.delete("OnCLoadingForDDetailbyNCL", "OnCLoadingForDIDbyNCL=?", args);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public void deleteAllLocation(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from LocationintoMongo");
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public String GetDeliverysheet(Context context) {
+        String DeliverySheetID = "0";
+        try {
+            Cursor mnocursor = Fill("select Distinct DeliverySheetID from MyRouteShipments", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    DeliverySheetID = DeliverySheetID + "," + String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("DeliverySheetID")));
+
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return DeliverySheetID.replace("0,", "");
+    }
+
+    public void updateMyRouteCompliance(String MRCID, String SLID, String PLID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues_MRC = new ContentValues();
+            try {
+                contentValues_MRC.put("IsSync", 1);
+
+                String args[] = {MRCID};
+                db.update("MyRouteCompliance", contentValues_MRC, "ID=?", args);
+                // db.close();
+            } catch (Exception e) {
+            }
+
+            ContentValues contentValues_SL = new ContentValues();
+            try {
+                contentValues_SL.put("IsSync", 1);
+
+                String args[] = {SLID};
+                db.update("SuggestLocations", contentValues_SL, "ID=?", args);
+                // db.close();
+            } catch (Exception e) {
+            }
+
+            ContentValues contentValues_PL = new ContentValues();
+            try {
+                contentValues_PL.put("IsSync", 1);
+
+                String args[] = {PLID};
+                db.update("plannedLocation", contentValues_PL, "ID=?", args);
+
+            } catch (Exception e) {
+            }
+            db.close();
         } catch (SQLiteException e) {
         }
     }

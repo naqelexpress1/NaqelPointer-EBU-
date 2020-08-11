@@ -329,9 +329,29 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 
         GetNCLDatafromDB(Barcode);
 
+        if (isNCLrtoReq.contains(Barcode)) {
+            ismatch = true;
+            if (!isHeldout.contains(Barcode)) {
+                isHeldout.add(Barcode);
+                HashMap<String, String> temp = new HashMap<>();
+                temp.put("WayBillNo", Barcode);
+                temp.put("Status", "44");
+                temp.put("Ref", lbTotal.getText().toString());
+                delrtoreq.add(temp);
+                inventorycontrol.add(Barcode);
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                initViews();
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+            }
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+            ErrorAlert("RTO Request", "This NCL(" + Barcode + ") contains RTO Request \n" +
+                    "RTO Count : " + String.valueOf(isNclCitc.size()), 0, txtBarCode.getText().toString());
+        }
+
         //Toast.makeText(getApplicationContext(), String.valueOf(isNclDelReq.size()) + "-" + String.valueOf(isNclCitc.size()), Toast.LENGTH_LONG).show();
 
-        if (isNclDelReq.contains(Barcode)) {
+        if (isNclDelReq.contains(Barcode) && !ismatch) {
             if (isNclCitc.contains(Barcode)) {
                 if (isNCLrtoReq.contains(Barcode)) {
                     // rtoreq = true;
@@ -467,7 +487,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                     }
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                    ErrorAlert("Delivery/CITC Complaint", "This NCL(" + Barcode + ") contains RTO Request \n" +
+                    ErrorAlert("RTO Shipments", "This NCL(" + Barcode + ") contains RTO Request \n" +
                             "RTO Count : " + String.valueOf(isNclCitc.size()), 0, txtBarCode.getText().toString());
                 }
 
@@ -2177,7 +2197,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
                 //isrtoReq.add(result.getString(result.getColumnIndex("BarCode")));
                 rtoreqcount.setText("RTO Count : " + String.valueOf(result.getCount()));
                 try {
-                    validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 16:30");
+                    validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 15:00");//16:30
                     inserteddate.setText("DLD : " + result.getString(result.getColumnIndex("InsertedDate")));
                 } catch (Exception e) {
                     System.out.println(e);

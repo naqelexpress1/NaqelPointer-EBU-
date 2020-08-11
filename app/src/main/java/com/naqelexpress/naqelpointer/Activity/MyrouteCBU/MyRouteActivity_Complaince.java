@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
@@ -41,6 +42,8 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
+import com.naqelexpress.naqelpointer.service.LocationService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -367,8 +370,23 @@ public class MyRouteActivity_Complaince
         }
     }
 
-    public void GetSeqWaybillNo() {
+    private boolean IsHasLocation() {
 
+        boolean ishasLocation = false;
+        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor ds = dbConnections.Fill("select count(ID) totalcount from MyRouteShipments where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and CourierDailyRouteID = " +
+                GlobalVar.GV().CourierDailyRouteID, getApplicationContext());
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            int count = ds.getInt(ds.getColumnIndex("totalcount"));
+            if (count >= 2)
+                ishasLocation = true;
+        }
+        return ishasLocation;
+    }
+
+
+    public void GetSeqWaybillNo() {
 
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -407,44 +425,76 @@ public class MyRouteActivity_Complaince
     }
 
     private void MyRouteCompliance() {
-        IsplannedLocationLoaded();
+
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        if (!dbConnections.isMyRouteComplaince(getApplicationContext())) {
-            SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+        if (GlobalVar.GV().CourierDailyRouteID == 0)
+            return;
 
-            eDialog.setCancelable(false);
-            eDialog.setTitleText("Are you sure?");
-            eDialog.setContentText("Are you follow to Deliver by Google Map");
-            eDialog.setConfirmText("Yes");
-            eDialog.setCancelText("No");
+        if (IsHasLocation()) {
+            IsplannedLocationLoaded();
 
-            eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                @Override
-                public void onClick(SweetAlertDialog sDialog) {
-                    dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
-                    sDialog.dismissWithAnimation();
+            if (!dbConnections.isMyRouteComplaince(getApplicationContext())) {
+                SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
 
-                    try {
-                        Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
+                eDialog.setCancelable(false);
+                eDialog.setTitleText("Are you sure?");
+                eDialog.setContentText("Are you follow to Deliver by Google Map");
+                eDialog.setConfirmText("Yes");
+                eDialog.setCancelText("No");
+
+                eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
+                        sDialog.dismissWithAnimation();
+
+                        try {
+                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                            startActivity(intent);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+
+
                     }
+                });
+//                eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                    @Override
+//                    public void onClick(SweetAlertDialog sDialog) {
+////                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
+//                        sDialog.dismissWithAnimation();
+////
+////                        try {
+////                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+////                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+////                            startActivity(intent);
+////                        } catch (Exception e) {
+////                            System.out.println(e.getMessage());
+////                        }
+//
+//
+//                    }
+//                });
 
-
-                }
-            });
-            eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                @Override
-                public void onClick(SweetAlertDialog sDialog) {
-                    dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
-                    sDialog.dismissWithAnimation();
-                    //sDialog.dismissWithAnimation();
-                }
-            });
-            eDialog.show();
+                eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
+                        sDialog.dismissWithAnimation();
+                        //sDialog.dismissWithAnimation();
+                    }
+                });
+                eDialog.show();
+            }
+        } else {
+            dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
         }
+
+        startActualRoute();
+        RestartServiceLocationMorethan30();
+
+
         dbConnections.close();
     }
 
@@ -536,10 +586,7 @@ public class MyRouteActivity_Complaince
                 return true;
             case R.id.deleteall:
                 deleteConfirmRoute();
-                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.DeleteAllSuggestLocation(getApplicationContext());
-                dbConnections.DeleteAllPlannedLocation(getApplicationContext());
-                dbConnections.close();
+
                 return true;
             case R.id.mnuShowDeliverySheetOrder:
                 //OrderNo
@@ -778,7 +825,7 @@ public class MyRouteActivity_Complaince
             if (finalJson != null) {
                 if (buttonclick == 0) {
                     super.onPostExecute(String.valueOf(finalJson));
-                    MyRouteCompliance();
+
                     setDatatoAdapter(finalJson);
 
                 } else
@@ -817,6 +864,7 @@ public class MyRouteActivity_Complaince
             new MyRouteShipments(finalJson, String.valueOf(Latitude), String.valueOf(Longitude), getApplicationContext(),
                     getWindow().getDecorView().getRootView());
             DuplicateCustomer();
+            MyRouteCompliance();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1036,8 +1084,10 @@ public class MyRouteActivity_Complaince
 
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                         dbConnections.clearAllCourierDailyRoute(getApplicationContext());
-
+                        //  dbConnections.DeleteAllSuggestLocation(getApplicationContext());
                         new DeleteContact().execute("");
+
+                        // dbConnections.DeleteAllPlannedLocation(getApplicationContext());
                         dbConnections.close();
 
                     }
@@ -1189,6 +1239,9 @@ public class MyRouteActivity_Complaince
 
         if (GlobalVar.GV().CourierDailyRouteID > 0) {
 
+            ValidatePlannedSuggestRouteSync();
+            RestartServiceLocationMorethan30();
+
             int position = item.Position;
             if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
                 Intent intent = null;
@@ -1213,5 +1266,100 @@ public class MyRouteActivity_Complaince
         } else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
 
+    }
+
+    private void ValidatePlannedSuggestRouteSync() {
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+        //db.DeleteAllSuggestLocation(getApplicationContext());
+        Cursor result = db.Fill("select * from MyRouteCompliance where IsSync = 0 Limit 1 ", getApplicationContext());
+        if (result.getCount() > 0) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class)) {
+                startService(
+                        new Intent(this,
+                                com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
+            }
+        }
+        result.close();
+        db.close();
+
+
+    }
+
+    private void RestartService() {
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+        //db.DeleteAllSuggestLocation(getApplicationContext());
+        Cursor result = db.Fill("select * from LocationintoMongo  Limit 1", getApplicationContext());
+
+        if (result.getCount() > 0) {
+
+            stopService(
+                    new Intent(this,
+                            com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+            startService(
+                    new Intent(this,
+                            com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+
+        }
+        result.close();
+        db.close();
+
+
+    }
+
+    private void RestartServiceLocationMorethan30() {
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+        //db.DeleteAllSuggestLocation(getApplicationContext());
+        Cursor result = db.Fill("select count(*) totalcount from LocationintoMongo", getApplicationContext());
+        if (result.getCount() > 0) {
+
+            result.moveToFirst();
+            int count = result.getInt(result.getColumnIndex("totalcount"));
+            if (count > 30) {
+                stopService(
+                        new Intent(this,
+                                com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+                startService(
+                        new Intent(this,
+                                com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+            }
+
+        }
+        result.close();
+        db.close();
+
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getApplication()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void startActualRoute() {
+
+        if (GlobalVar.locationEnabled(getApplicationContext())) {
+            if (!GlobalVar.isMyServiceRunning(LocationService.class, getApplicationContext())) {
+                startService(new Intent(getBaseContext(),
+                        LocationService.class));
+            }
+
+
+            LocationupdateInterval.cancelAlarm(getApplicationContext());
+            LocationupdateInterval.setAlarm(true, getApplicationContext());
+        }
+
+        if (GlobalVar.locationEnabled(getApplicationContext())) {
+            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService.class)) {
+                startService(new Intent(getBaseContext(),
+                        com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService.class));
+            }
+        }
     }
 }

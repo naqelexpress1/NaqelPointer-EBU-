@@ -444,11 +444,13 @@ public class MainPageActivity
     HashMap<Integer, Integer> itemposition = new HashMap<>();
 
     private void LoadMenu() {
+        //total 28 cases for Menus
+
         user.setText("Welcome to Mr." + String.valueOf(GlobalVar.GV().EmployID));
 
         if (devision.equals("Courier")) {
-            cellTitle = new String[12];
-            cellIcon = new int[12];
+            cellTitle = new String[13];
+            cellIcon = new int[13];
 
 //            cellTitle = new String[11];
 //            cellIcon = new int[11];
@@ -484,6 +486,7 @@ public class MainPageActivity
             cellTitle[9] = "Terminal Handling";//13
             cellTitle[10] = "Booking List";//13
             cellTitle[11] = "Change Password";//13
+            cellTitle[12] = "DeliverySheet by NCL";//13
 
 
             itemposition.put(0, 0);
@@ -500,6 +503,7 @@ public class MainPageActivity
             itemposition.put(9, 23);
             itemposition.put(10, 11);
             itemposition.put(11, 24);
+            itemposition.put(12, 28);
 
         }
 
@@ -587,7 +591,7 @@ public class MainPageActivity
                 itemposition.put(4, 2);
                 itemposition.put(5, 3);
                 itemposition.put(6, 4);
-                itemposition.put(7, 11);
+                itemposition.put(7, 6);
                 itemposition.put(8, 20);
                 itemposition.put(9, 8);
                 itemposition.put(10, 9);
@@ -598,6 +602,7 @@ public class MainPageActivity
                 itemposition.put(15, 25);
                 itemposition.put(16, 26);
                 itemposition.put(17, 27);
+               // itemposition.put(18, 11);
             }
 
         }
@@ -632,6 +637,7 @@ public class MainPageActivity
             cellIcon[9] = R.drawable.terminalhandeling; //CBU
             cellIcon[10] = R.drawable.contacts; //CBU
             cellIcon[11] = R.drawable.money; //CBU
+            cellIcon[12] = R.drawable.deliverysheet; //CBU
         }
         if (devision.equals("Express")) {
 
@@ -682,6 +688,7 @@ public class MainPageActivity
                 cellIcon[15] = R.drawable.contacts; //CBU
                 cellIcon[16] = R.drawable.customclearence; //CBU
                 cellIcon[17] = R.drawable.car; //CBU
+               // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
         if (devision.equals("IRS")) {
@@ -908,8 +915,8 @@ public class MainPageActivity
                                             Intent mapList = new Intent(getApplicationContext(), MyRouteActivity.class);
                                             startActivity(mapList);
                                         } else {
-                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
-                                            //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince.class);
+                                            //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
+                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince.class);
                                             startActivity(mapList);
                                         }
                                     } else
@@ -1255,6 +1262,27 @@ public class MainPageActivity
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                     , true);
                         }
+                        break;
+                    case 28:
+
+                        if (GlobalVar.locationEnabled(getApplicationContext())) {
+                            if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 6)) {
+
+                                if (VersionMatct()) {
+                                    Intent deliverySheet = new Intent(getApplicationContext(),
+                                            com.naqelexpress.naqelpointer.Activity.OFDPiecebyNCL.DeliverySheetActivity.class);
+//                                    Intent deliverySheet = new Intent(getApplicationContext(), DeliverySheetActivity.class);
+                                    startActivity(deliverySheet);
+                                } else {
+                                    GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                            "Kindly Update our Latest Version.(Logout and Login again)"
+                                            , true);
+                                }
+
+                            }
+                        } else
+                            GlobalVar.enableLocationSettings(MainPageActivity.this);
+
                         break;
                 }
             }

@@ -62,7 +62,7 @@ public class DeliveryFirstFragment
     public static ArrayList<String> ShipmentBarCodeList = new ArrayList<>();
     public static EditText txtWaybillNo;
     public static TextView txtConsigneeName;
-    public TextView txtBillingType;
+    public static TextView txtBillingType;
     private TextView txtCODAmount;
     private TextView txtWeight;
     private TextView txtPiecesCount;
@@ -434,6 +434,8 @@ public class DeliveryFirstFragment
 
     }
 
+    static String Billingtype = "";
+
     private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
 
         result.moveToFirst();
@@ -447,6 +449,7 @@ public class DeliveryFirstFragment
                 jsonObject.put("PiecesCount", result.getString(result.getColumnIndex("PiecesCount")));
                 jsonObject.put("Weight", result.getString(result.getColumnIndex("Weight")));
                 jsonObject.put("BillingType", result.getString(result.getColumnIndex("BillingType")));
+                Billingtype = result.getString(result.getColumnIndex("BillingType"));
                 jsonObject.put("CODAmount", result.getString(result.getColumnIndex("CODAmount")));
                 jsonObject.put("ConsigneeName", result.getString(result.getColumnIndex("ConsigneeName")));
                 jsonObject.put("ConsigneeFName", result.getString(result.getColumnIndex("ConsigneeFName")));

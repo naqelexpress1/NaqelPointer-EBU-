@@ -109,7 +109,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
             txtPOS.addTextChangedListener(this);
             if (DeliveryFirstFragment.IsCODtextboxEnable == 1) {
-               txtCash.setKeyListener(null);
+                txtCash.setKeyListener(null);
             }
             txtCash.addTextChangedListener(this);
 
@@ -178,7 +178,10 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
                 }
             });
+            if (DeliveryFirstFragment.Billingtype.equals("A"))
+                otpcheckbox.setVisibility(View.GONE);
 
+            String asd = DeliveryFirstFragment.txtBillingType.getText().toString();
             boolean pos = GlobalVar.getPOS(getContext());
             TextView tv = (TextView) rootView.findViewById(R.id.nopos);
             if (!pos) {

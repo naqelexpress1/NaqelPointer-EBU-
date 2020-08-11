@@ -25,20 +25,24 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.OnCLoadingForDeliverySheetPiece;
+import com.naqelexpress.naqelpointer.JSON.Request.OnCLoadingForDeliverySheetRequest;
 import com.naqelexpress.naqelpointer.R;
 
-import org.json.JSONArray;
+import org.joda.time.DateTime;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LocationIntoMongo extends Service {
+public class DeliverysheetbyNCL extends Service {
 
     protected boolean flag_thread = false;
 
@@ -51,7 +55,6 @@ public class LocationIntoMongo extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
@@ -61,7 +64,7 @@ public class LocationIntoMongo extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startMyOwnForeground() {
-        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.intoMongo";
+        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.DeliverysheetbyNCL";
         String channelName = "My Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
@@ -79,7 +82,6 @@ public class LocationIntoMongo extends Service {
                 .build();
         startForeground(2, notification);
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -131,25 +133,45 @@ public class LocationIntoMongo extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from LocationintoMongo Limit 30 ", getApplicationContext());
+            Cursor result = db.Fill("select * from OnCloadingForDbyNCL where IsSync = 0 Limit 1 ", getApplicationContext());
 
-            JSONArray jsonArray = new JSONArray();
-            //JSONObject header = new JSONObject();
             if (result.getCount() > 0) {
-                result.moveToFirst();
-                do {
-                    String JsonData = result.getString(result.getColumnIndex("Json"));
-                    JSONObject jsonObject = new JSONObject(JsonData);
-                    jsonObject.put("id", result.getInt(result.getColumnIndex("ID")));
-                    jsonArray.put(jsonObject);
 
+                if (result.moveToFirst()) {
+
+                    OnCLoadingForDeliverySheetRequest onCLoadingForDeliverySheetRequest = new OnCLoadingForDeliverySheetRequest();
+                    onCLoadingForDeliverySheetRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                    onCLoadingForDeliverySheetRequest.CourierID = Integer.parseInt(result.getString(result.getColumnIndex("CourierID")));
+                    onCLoadingForDeliverySheetRequest.UserID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
+                    onCLoadingForDeliverySheetRequest.CTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
+                    onCLoadingForDeliverySheetRequest.PieceCount = Integer.parseInt(result.getString(result.getColumnIndex("PieceCount")));
+                    onCLoadingForDeliverySheetRequest.TruckID = result.getString(result.getColumnIndex("TruckID"));
+                    onCLoadingForDeliverySheetRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
+
+                    Cursor resultDetail = db.Fill("select * from OnCLoadingForDDetailbyNCL where OnCLoadingForDIDbyNCL = " +
+                            onCLoadingForDeliverySheetRequest.ID, getApplicationContext());
+
+                    if (resultDetail.getCount() > 0) {
+                        resultDetail.moveToFirst();
+                        int index = 0;
+                        resultDetail.moveToFirst();
+                        do {
+                            onCLoadingForDeliverySheetRequest.OnCLoadingForDeliverySheetPieceList.add(index,
+                                    new OnCLoadingForDeliverySheetPiece(resultDetail.getString(resultDetail.getColumnIndex("BarCode")),
+                                            "0"));
+                            index++;
+                        }
+                        while (resultDetail.moveToNext());
+                    }
+
+                    String jsonData = JsonSerializerDeserializer.serialize(onCLoadingForDeliverySheetRequest, true);
+                    jsonData = jsonData.replace("Date(-", "Date(");
+                    SaveOnLoading(db, jsonData, onCLoadingForDeliverySheetRequest.ID);
                 }
-                while (result.moveToNext());
 
 
-                // header.put(jsonArray);
-                SaveLocation(db, jsonArray.toString());
             } else {
+
                 flag_thread = false;
                 this.stopSelf();
                 android.os.Process.killProcess(android.os.Process.myPid());
@@ -160,93 +182,16 @@ public class LocationIntoMongo extends Service {
     }
 
 
-    public void SaveLocation(final DBConnections db, final String input) {
+    public void SaveOnLoading(final DBConnections db, final String input, final int id) {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerLivetrackingLocation + "InsertLocation";
 
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-
-                try {
-                    if (response.contains("Created")) {
-                        db.deleteLocationintoMongo(response.replace("Created-", ""), getApplicationContext());
-
-                        flag_thread = false;
-
-
-                    } else
-                        flag_thread = false;
-                    db.close();
-                } catch (Exception e) {
-                    flag_thread = false;
-                    if (db != null)
-                        db.close();
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-                //ArrayList<String> value = GlobalVar.VolleyError(error);
-                flag_thread = false;
-                db.close();
-            }
-        }) {
-            @Override
-            public String getBodyContentType() {
-                return "application/json; charset=utf-8";
-            }
-
-            @Override
-            public byte[] getBody() {
-                try {
-                    return input == null ? null : input.getBytes("utf-8");
-                } catch (UnsupportedEncodingException uee) {
-                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", input, "utf-8");
-                    return null;
-                }
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Content-Type", "application/json; charset=utf-8");
-                return params;
-            }
-
-//            @Override
-//            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-//                String responseString = "";
-//                if (response != null) {
-//
-//                    responseString = String.valueOf(response.statusCode);
-//
-//                }
-//                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-//            }
-        };
-
-        stringRequest.setShouldCache(false);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                GlobalVar.GV().ConnandReadtimeout50000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(stringRequest);
-        requestQueue.getCache().remove(URL);
-
-    }
-
-   /* public void SaveOnDelivery(final DBConnections db, final String input, final int id, final String waybillno) {
-
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerLivetrackingLocation + "InsertLocation";
+        //final String DomainURL = "";
+        String isInternetAvailable = "";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetbyNCL");
+        // String URL = GlobalVar.GV().NaqelPointerAPILink + "CreateDeliversheetbyPieceLevel";
+        String URL = DomainURL + "CreateDeliversheetbyNCLLevel";
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -258,22 +203,22 @@ public class LocationIntoMongo extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteLocationintoMongo(id, getApplicationContext());
-                        //db.deleteonDeliveryID(id, getApplicationContext());
-                        //db.deleteDeliveyDetails(id, getApplicationContext());
-                        db.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), waybillno, id);
+                        db.deleteOnLoadingIDbyNCL(id, getApplicationContext());
+                        db.deleteOnLoadingBarcodebyNCL(id, getApplicationContext());
                         flag_thread = false;
-
-
                     } else
                         flag_thread = false;
+
+
                     db.close();
                 } catch (JSONException e) {
+
                     flag_thread = false;
                     if (db != null)
                         db.close();
                     e.printStackTrace();
                 }
+                GlobalVar.GV().triedTimes_ForDelSheetServicebyNCL = 0;
 
             }
         }, new Response.ErrorListener() {
@@ -281,6 +226,16 @@ public class LocationIntoMongo extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForDelSheetServicebyNCL = GlobalVar.GV().triedTimes_ForDelSheetServicebyNCL + 1;
+                    if (GlobalVar.GV().triedTimes_ForDelSheetServicebyNCL == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "DeliverySheetbyNCL");
+
+                    }
+                }
+
                 flag_thread = false;
                 db.close();
             }
@@ -318,15 +273,18 @@ public class LocationIntoMongo extends Service {
 //                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
 //            }
         };
+
+
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                60000,
+                GlobalVar.GV().loadbalance_Contimeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);
         requestQueue.getCache().remove(URL);
 
-    }*/
+
+    }
 
 
 }

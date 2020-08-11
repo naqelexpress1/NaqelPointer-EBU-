@@ -9,10 +9,14 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.CallLog;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.telephony.TelephonyManager;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -30,25 +34,38 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.joda.time.DateTime;
 import org.json.JSONObject;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class SplashScreenActivity
         extends AppCompatActivity {
+
+
 
     double Latitude = 0.0;
     double Longitude = 0.0;
 
     int redirctcalss = 0;
-
+    static final Uri CallLog_URI = CallLog.Calls.CONTENT_URI;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
+        //getCallLog();
 
+//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+//        dbConnections1.DeleteAllSuggestLocation(getApplicationContext());
+//        dbConnections1.close();
+
+//        startService(
+//                new Intent(this,
+//                        com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
         // sendNotification("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff");
         // sendNotification("et7zm9gyRaWEszgjT_zwGp:APA91bFgieA2s2HPcqbBt5By_2TmvVx34tB80adMkXtbXytL19Cjsp3jLYAbeIrxgZHRqGyjlG_GMBwQN0sEGGRrcCZd5S4mSrvH7aPN5Vm7nNNHcs-KIAMI3XOf_hwWGXJ68O213siQ");
 //        FirebaseMessaging fm = FirebaseMessaging.getInstance();
@@ -69,9 +86,12 @@ public class SplashScreenActivity
 //        dbConnections1.close();
 //
 
+//        DBConnections db = new DBConnections(getApplicationContext(), null);
+//        db.deleteAllLocation(getApplicationContext());
+//        db.close();
 
-
-        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+        
+        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             dbConnections.InsertDomain_ForDelService(getApplicationContext());
@@ -81,7 +101,8 @@ public class SplashScreenActivity
             dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
             dbConnections.DeleteExsistingLogin(getApplicationContext());
             dbConnections.DeleteAllSyncData(getApplicationContext());
-            dbConnections.DeleteSuggestLocation(getApplicationContext());
+            //dbConnections.DeleteSuggestLocation(getApplicationContext());
+            dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
 
 //        String DeviceName = GlobalVar.GV().getDeviceName();
 
@@ -129,7 +150,8 @@ public class SplashScreenActivity
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (dbConnections.isColumnExist("UserMeLogin", "LogedOut", getApplicationContext())) {
-            Cursor result = dbConnections.Fill("select * from UserMeLogin where LogedOut is NULL or LogedOut = 0", getApplicationContext());
+            Cursor result = dbConnections.Fill("select * from UserMeLogin where LogedOut is NULL or LogedOut = 0",
+                    getApplicationContext());
 
             if (result == null) {
 
@@ -608,15 +630,48 @@ public class SplashScreenActivity
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    ActivityCompat.requestPermissions(
+                            SplashScreenActivity.this,
+                            new String[]{Manifest.permission.READ_PHONE_STATE},
+                            11
+                    );
+
+                } else {
+                    if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
+                        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
+                            try {
+                                Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                                startActivity(i);
+                            } catch (Exception e) {
+                                GlobalVar.ShowDialog(SplashScreenActivity.this, "Permission necessary", "Kindly please contact our Admin", true);
+                            }
+                            // finish();
+                        } else {
+                            ActivityCompat.requestPermissions(
+                                    SplashScreenActivity.this,
+                                    new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS},
+                                    10
+                            );
+                        }
+                    }
+                }
+                break;
+            case 11:
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
                     if (redirctcalss == 0) {
 
                         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         intent.putExtra("getMaster", 0);
                         startActivity(intent);
                     } else if (redirctcalss == 1) {
+
                         Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
                         intent.putExtra("getMaster", 0);
                         startActivity(intent);
+
                     } else {
                         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         intent.putExtra("getMaster", 0);
@@ -637,8 +692,8 @@ public class SplashScreenActivity
                         } else {
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
-                                    new String[]{Manifest.permission.WRITE_CONTACTS, Manifest.permission.READ_CONTACTS},
-                                    10
+                                    new String[]{Manifest.permission.READ_PHONE_STATE},
+                                    11
                             );
                         }
                     }
@@ -719,4 +774,6 @@ public class SplashScreenActivity
         }.execute();
 
     }
+
+   
 }

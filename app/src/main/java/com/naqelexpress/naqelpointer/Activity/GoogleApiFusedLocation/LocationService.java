@@ -14,6 +14,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -73,13 +74,33 @@ public class LocationService extends Service {
         else
             startForeground(10, new Notification());
 
-
         updateLocation(getApplicationContext());
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                // new DownloadJSON().execute();
+                try {
+                    // if (!flag_thread) {
+                    //      flag_thread = true;
+
+                    //updateLocation(getApplicationContext());
+                    System.out.println("test");
+
+                    //     }
+                    handler.postDelayed(this, 60000);
+                } catch (Exception e) {
+                    flag_thread = false;
+                    handler.postDelayed(this, 60000);
+                    Log.e("Dashboard thread", e.toString());
+                }
+
+            }
+        }, 60000);
         return Service.START_STICKY;
     }
 
@@ -100,6 +121,8 @@ public class LocationService extends Service {
                 .setContentTitle("App is running in background")
                 .setPriority(NotificationManager.IMPORTANCE_MIN)
                 .setCategory(Notification.CATEGORY_SERVICE)
+                .setOngoing(true)
+                .setAutoCancel(false)
                 .build();
         startForeground(11, notification);
     }
@@ -107,6 +130,7 @@ public class LocationService extends Service {
 
     //get current location os user
     private void updateLocation(Context context) {
+
 
         googleLocationService = new GoogleLocationService(context, new LocationUpdateListener() {
             @Override
@@ -158,7 +182,15 @@ public class LocationService extends Service {
                             jsonObject.put("latitude", location.getLatitude());
                             jsonObject.put("longitude", location.getLongitude());
                             jsonObject.put("Channel", "CBU-" + String.valueOf(lastlogin));
-                            jsonObject.put("WaybillNo", dbConnections.GetLastDeliveredWaybill(getApplicationContext()));
+                            //jsonObject.put("WaybillNo", dbConnections.GetLastDeliveredWaybill(getApplicationContext()));GetLastActionWaybill
+
+                            String wd = dbConnections.GetLastActionWaybill(getApplicationContext());
+                            if (!wd.equals("0")) {
+                                jsonObject.put("WaybillNo", wd.split("_")[0]);
+                                jsonObject.put("DsID", wd.split("_")[1]);
+                            } else
+                                jsonObject.put("WaybillNo", wd);
+
                             jsonObject.put("EmpID", empid);
                             jsonObject.put("Division", devision);
                             jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
@@ -180,6 +212,7 @@ public class LocationService extends Service {
 
                         //sendNotificationtoConsignee(location.getLatitude(), location.getLongitude()); //Comment because of Data usage
 
+                        flag_thread = false;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -189,8 +222,9 @@ public class LocationService extends Service {
 
             @Override
             public void updateLocationName(String localityName, Location location) {
-
-                googleLocationService.stopLocationUpdates();
+                //if (flag_thread)
+                //    flag_thread = false;
+                // googleLocationService.stopLocationUpdates();
             }
         });
         googleLocationService.startUpdates();
@@ -215,9 +249,12 @@ public class LocationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (googleLocationService != null) {
-            googleLocationService.stopLocationUpdates();
-        }
+//        if (googleLocationService != null) {
+//            googleLocationService.stopLocationUpdates();
+//        }
+//
+//
+//        flag_thread = false;
     }
 
     RequestQueue requestQueue;

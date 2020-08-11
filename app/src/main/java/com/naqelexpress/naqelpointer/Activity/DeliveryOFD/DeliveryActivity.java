@@ -111,7 +111,7 @@ public class DeliveryActivity extends AppCompatActivity {
         }
 
         firstFragment.IsCODtextboxEnable = 0;
-
+        firstFragment.Billingtype = "";
 
     }
 

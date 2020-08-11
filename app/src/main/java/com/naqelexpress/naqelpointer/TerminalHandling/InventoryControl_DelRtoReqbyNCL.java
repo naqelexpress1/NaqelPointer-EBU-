@@ -415,11 +415,35 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         GetPieceInfoByScanning(txtBarCode.getText().toString());
 
 
-        if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0")  )
+        if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
             WaybillAttempt = "No Data";
 
         boolean popup = false;
-        if (iscitcshipments.contains(txtBarCode.getText().toString())) {
+
+        if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            popup = true;
+            ismatch = true;
+            rtoreq = true;
+
+            if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                isHeldout.add(txtBarCode.getText().toString());
+                HashMap<String, String> temp = new HashMap<>();
+                temp.put("WayBillNo", txtBarCode.getText().toString());
+                temp.put("Status", "44");
+                temp.put("Ref", "Request For RTO");
+                delrtoreq.add(temp);
+                inventorycontrol.add(txtBarCode.getText().toString());
+//                    txtBarCode.setText("");
+//                    txtBarCode.requestFocus();
+                initViews();
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+            }
+            ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ")" +
+                    " is Request for RTO ", 0, txtBarCode.getText().toString());
+            // return;
+        }
+
+        if (iscitcshipments.contains(txtBarCode.getText().toString()) && !ismatch) {
 
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
                 popup = true;
@@ -569,6 +593,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
                     "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
         }
+
         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
         txtBarCode.setText("");
         txtBarCode.requestFocus();
@@ -2053,7 +2078,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             result.moveToFirst();
             rtoreqcount.setText("RTO Count : " + String.valueOf(result.getCount()));
             try {
-                validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 16:30");
+                validupto.setText("Upto : " + result.getString(result.getColumnIndex("ValidDate")) + " 15:00");//16:30
                 inserteddate.setText("DLD : " + result.getString(result.getColumnIndex("InsertedDate")));
             } catch (Exception e) {
                 System.out.println(e);

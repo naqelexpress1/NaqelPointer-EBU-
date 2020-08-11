@@ -12,7 +12,7 @@ public class WaybillDetailsResult
     public int WaybillNo = 0;
     public int PiecesCount = 0;
     public double Weight = 0;
-    public String BillingType = "";
+    public  String BillingType = "";
     public double CODAmount = 0;
     public String ConsigneeName = "";
     private String ConsigneeFName = "";

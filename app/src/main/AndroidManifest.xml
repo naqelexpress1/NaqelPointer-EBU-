@@ -13,6 +13,8 @@
         android:permissionGroupFlags="personalInfo"
         android:priority="450" />
 
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
     <permission
         android:name="android.permission.READ_CALL_LOG"
         android:description="@string/permgrouprequest_calllog"
@@ -980,12 +982,20 @@
             android:name=".TerminalHandling.InventoryControl_DelRtoReqbyNCL"
             android:label="ByNCL" />
 
+        <activity
+            android:name=".Activity.OFDPiecebyNCL.DeliverySheetActivity"
+            android:label="Delivery Sheet"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
             android:process=":naqelsignature" />
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.LocationService"
+            android:exported="true"
             android:process=":location"></service>
         <service
             android:name="com.naqelexpress.naqelpointer.service.AtOrigin"
@@ -1106,7 +1116,7 @@
 
         <service
             android:name="com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService"
-            android:enabled="true"></service>
+            android:process=":GoogleApiFusedLocationlocation"></service>
 
         <service
             android:name=".service.SendNotificationtoConsignee"
@@ -1132,6 +1142,10 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.CustomerRating"
             android:process=":naqelCustomerRating" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp"
+            android:process=":myroutecomp"></service>
 
         <receiver
             android:name="com.naqelexpress.naqelpointer.Receiver.MyReceiver"
@@ -1216,6 +1230,10 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.LocationIntoMongo"
             android:process=":naqelLocationIntoMongo" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.DeliverysheetbyNCL"
+            android:process=":naqelDeliverysheetbyNCL" />
 
     </application>
 

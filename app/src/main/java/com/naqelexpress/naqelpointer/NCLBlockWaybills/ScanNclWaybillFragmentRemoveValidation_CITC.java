@@ -30,8 +30,6 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
-import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.NCLBulk.ScanNclNoFragment;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 
@@ -75,9 +73,9 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             txtBarcode = (EditText) rootView.findViewById(R.id.txtBarcode);
             txtCitcCount = (TextView) rootView.findViewById(R.id.citccount);
-            txtCitcCount.setVisibility(View.VISIBLE);
+            txtCitcCount.setVisibility(View.GONE);
             LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.ll);
-            ll.setVisibility(View.VISIBLE);
+            ll.setVisibility(View.GONE);
             inserteddate = (TextView) rootView.findViewById(R.id.inserteddate);
             validupto = (TextView) rootView.findViewById(R.id.validupto);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
@@ -158,18 +156,20 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     private void AddNewPiece(String PieceCode, String WaybillNo, double Weight) {
 
         if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
-            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
-                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", PieceCode, WaybillNo, Weight);
-                return;
-            }
+//            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+//                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+//                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", PieceCode, WaybillNo, Weight);
+//                return;
+//            }
+
         } else {
             GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
             GlobalVar.RedirectSettings(getActivity());
             return;
         }
 
-        GetNCLDatafromDB(txtBarcode.getText().toString());
+        //Commented by ismail  09-09-2020 by ashik no need this function any more
+        //  GetNCLDatafromDB(txtBarcode.getText().toString());
 
         boolean rtoreq = false;
         boolean ismatch = false;
@@ -257,8 +257,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
         if (PieceCodeList.size() == 20) {
             SaveData(PieceCodeList, WaybillList);
-            PieceCodeList.clear();
-            WaybillList.clear();
+            //PieceCodeList.clear();
+            //WaybillList.clear();
         }
     }
 

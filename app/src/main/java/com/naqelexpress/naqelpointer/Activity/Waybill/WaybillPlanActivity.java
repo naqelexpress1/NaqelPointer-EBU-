@@ -1,8 +1,11 @@
 package com.naqelexpress.naqelpointer.Activity.Waybill;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -464,7 +467,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 else
                     alertforcommon();
 
-                    popup.dismiss();
+                popup.dismiss();
             }
         });
         frontofthedoor.setOnClickListener(new View.OnClickListener() {
@@ -671,4 +674,23 @@ public class WaybillPlanActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Exit")
+                .setMessage("Are you sure you want to exit?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        //countDownTimer.cancel();
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("result", "refreshdata");
+                        setResult(Activity.RESULT_OK, returnIntent);
+                        finish();
+                        WaybillPlanActivity.super.onBackPressed();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

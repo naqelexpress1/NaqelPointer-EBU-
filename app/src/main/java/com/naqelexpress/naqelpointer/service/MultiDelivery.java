@@ -183,8 +183,9 @@ public class MultiDelivery extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "MultiDelivery";
-
+        //String URL = GlobalVar.GV().NaqelPointerAPILink + "MultiDelivery";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Delivery");
+        String URL = DomainURL + "MultiDelivery";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
@@ -202,6 +203,7 @@ public class MultiDelivery extends Service {
                     } else
                         flag_thread = false;
                     db.close();
+                    GlobalVar.GV().triedTimes_ForDelService = 0;
                 } catch (Exception e) {
                     flag_thread = false;
                     if (db != null)
@@ -215,6 +217,16 @@ public class MultiDelivery extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForDelService = GlobalVar.GV().triedTimes_ForDelService + 1;
+                    if (GlobalVar.GV().triedTimes_ForDelService == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "Delivery");
+
+                    }
+                }
+
                 flag_thread = false;
                 db.close();
             }

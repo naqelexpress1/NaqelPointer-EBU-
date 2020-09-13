@@ -47,6 +47,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 /**
@@ -559,7 +560,11 @@ public class History extends Activity {
     }
 
     private void GetDeliverySheet() {
-        mydeliverylist.addAll(GlobalVar.getDeliverySheet(getApplicationContext()));
+        try {
+            mydeliverylist.addAll(GlobalVar.getDeliverySheet(getApplicationContext()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         if (mydeliverylist.size() > 0) {
             myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);

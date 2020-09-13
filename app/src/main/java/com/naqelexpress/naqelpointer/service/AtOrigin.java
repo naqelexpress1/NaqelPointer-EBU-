@@ -154,7 +154,8 @@ public class AtOrigin extends Service {
         String result = "";
         StringBuffer buffer;
         int id = 0;
-
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected String doInBackground(String... params) {
@@ -166,7 +167,9 @@ public class AtOrigin extends Service {
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "AtOrigin"); //LoadtoDestination
+                DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+                //URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "AtOrigin"); //LoadtoDestination
+                URL url = new URL(DomainURL + "AtOrigin"); //LoadtoDestination
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -189,6 +192,7 @@ public class AtOrigin extends Service {
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -222,7 +226,19 @@ public class AtOrigin extends Service {
                 super.onPostExecute(String.valueOf(finalJson));
 
             }
+            else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
 
+                } else {
+                    GlobalVar.GV().triedTimes_ForAtOrigin = GlobalVar.GV().triedTimes_ForAtOrigin + 1;
+                    if (GlobalVar.GV().triedTimes_ForAtOrigin == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL , "AtOrigin");
+
+                    }
+
+
+                }
+            }
             flag_thread = false;
 
         }

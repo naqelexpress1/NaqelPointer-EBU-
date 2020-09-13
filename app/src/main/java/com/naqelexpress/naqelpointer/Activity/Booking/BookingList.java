@@ -112,7 +112,7 @@ public class BookingList extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + myBookingList.get(position).RefNo,getApplicationContext());
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and RefNo=" + myBookingList.get(position).RefNo, getApplicationContext());
                     if (result.getCount() == 0) {
                         Intent intent = new Intent(getApplicationContext(), BookingDetailActivity.class);
                         Bundle bundle = new Bundle();
@@ -128,7 +128,7 @@ public class BookingList extends AppCompatActivity {
                 }
             });
         } catch
-                (Exception ex) {
+        (Exception ex) {
             System.out.println(ex.getMessage());
         }
 
@@ -205,6 +205,8 @@ public class BookingList extends AppCompatActivity {
         String result = "";
         StringBuffer buffer;
         ProgressDialog pd;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -213,6 +215,8 @@ public class BookingList extends AppCompatActivity {
             pd.setMessage("Downloading your Booking Request ");
             pd.show();
             super.onPreExecute();
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+
         }
 
         @Override
@@ -223,11 +227,14 @@ public class BookingList extends AppCompatActivity {
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringBookingList");
+                DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+                URL url = new URL(DomainURL + "BringBookingList");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();
@@ -246,6 +253,7 @@ public class BookingList extends AppCompatActivity {
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -276,7 +284,18 @@ public class BookingList extends AppCompatActivity {
 
             } else {
                 //
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+                // GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
             }
             if (pd != null)
                 pd.dismiss();

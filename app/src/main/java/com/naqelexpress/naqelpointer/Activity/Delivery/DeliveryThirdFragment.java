@@ -212,36 +212,43 @@ public class DeliveryThirdFragment extends Fragment {
 
     private void AddNewPiece() {
         if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
-                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
-                txtBarCode.setText("");
-                initViews();
-            } else {
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
-                AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                builder.setMessage("This piece is not belong to this waybill, Are you sure you want to add it?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int which) {
-                                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
-                                initViews();
-                                txtBarCode.setText("");
-                            }
-                        })
-                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int which) {
-                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
-                                txtBarCode.setText("");
-                            }
-                        })
-                        .setCancelable(false);
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
-            }
+            DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+            lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+            txtBarCode.setText("");
+            initViews();
+
+
+//            if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
+//                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+//                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+//                txtBarCode.setText("");
+//                initViews();
+//            } else {
+//                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+//                AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+//                builder.setMessage("This piece is not belong to this waybill, Are you sure you want to add it?")
+//                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int which) {
+//                                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+//                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                                initViews();
+//                                txtBarCode.setText("");
+//                            }
+//                        })
+//                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int which) {
+//                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                                txtBarCode.setText("");
+//                            }
+//                        })
+//                        .setCancelable(false);
+//                AlertDialog alertDialog = builder.create();
+//                alertDialog.show();
+//            }
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);

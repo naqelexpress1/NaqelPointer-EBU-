@@ -86,16 +86,19 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU - Nootp & Has Location 04-08-2020" ; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "GTW - Access - LD-Con TH (09-09-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
     public static int triedTimes_ForDelSheetService = 0;
     public static int triedTimes_ForDelSheetServicebyNCL = 0;
+    public static int triedTimes_ForArrivedatDest = 0;
+    public static int triedTimes_ForAtOrigin = 0;
+    public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH only
+    public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
     //
     //
@@ -1320,6 +1323,7 @@ public class GlobalVar {
 
         String Waybillno = "";
         String orderNo = "";
+        int NWno = 0, NSeqNo = 0, tCount = 0;
         DBConnections dbConnections = new DBConnections(context, null);
 
         Cursor result = dbConnections.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
@@ -1327,25 +1331,34 @@ public class GlobalVar {
         if (result != null && result.getCount() > 0) {
 
             result.moveToFirst();
+            String SeqNo = "";
             do {
 
                 String data = result.getString(result.getColumnIndex("StringData"));
                 String split[] = data.split("@");
+                tCount = split.length - 1;
                 for (int i = 1; i < split.length; i++) {
                     String temp[] = split[i].split("_");
 
                     if (i == 1) {
                         Waybillno = temp[0];
                         orderNo = temp[temp.length - 1];
+                        SeqNo = temp[temp.length - 1] + "_" + temp[0];
+                        NWno = Integer.parseInt(temp[0]);
+                        NSeqNo = Integer.parseInt(temp[temp.length - 1]);
                     } else {
                         orderNo = orderNo + "," + temp[temp.length - 1];
                         Waybillno = Waybillno + "," + temp[0];
+                        SeqNo = SeqNo + "@" + temp[temp.length - 1] + "_" + temp[0];
                     }
 
                 }
             }
             while (result.moveToNext());
+
+            dbConnections.InsertMyRouteActionActivity(context, 0, NSeqNo, NWno, 0, tCount, SeqNo);
         }
+        myRouteShipmentList.clear();
         myRouteShipmentList = new ArrayList<>();
         LoadMyRouteShipments_CBU("0", CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
         LoadMyRouteShipments_CBU(orderBy, CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
@@ -1947,11 +1960,12 @@ public class GlobalVar {
     }
 
 
-    public static ArrayList<MyRouteShipments> getDeliverySheet(Context context) {
+    public static ArrayList<MyRouteShipments> getDeliverySheet(Context context) throws ParseException {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from OnCLoadingForDWaybill where IsSync = 0", context);
+        Cursor result = dbConnections.Fill("select ocw.WaybillNo , oc.CTime from OnCLoadingForDWaybill ocw inner join OnCloadingForD oc " +
+                "on oc.ID = ocw.OnCLoadingID where ocw.IsSync = 0", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
@@ -1959,7 +1973,9 @@ public class GlobalVar {
                 MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                 // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
                 onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
-
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                //Date dt = formatter.parse();
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
                 DeliverySheetFromLocal.add(onDeliveryRequest);
 
             }
@@ -2615,7 +2631,7 @@ public class GlobalVar {
 
     public static String getCurrentDateTimeSS() {
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" , Locale.ENGLISH);
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
         String datetime = dateformat.format(c.getTime());
 
         return datetime;
@@ -3126,6 +3142,10 @@ public class GlobalVar {
             return dbConnections.GetPrimaryDomain_NotDeliverdService(context);
         else if (ServiceName.equals("DeliverySheetbyNCL"))
             return dbConnections.GetPrimaryDomain_DelSheetServicebyNCL(context);
+        else if (ServiceName.equals("ArrivedatDest"))
+            return dbConnections.GetPrimaryDomain_ArrivedatDest(context);
+        else if (ServiceName.equals("Pickup"))
+            return dbConnections.GetPrimaryDomain_ForPickup(context);
 
 
         return "";
@@ -3159,6 +3179,12 @@ public class GlobalVar {
             dbConnections.UpdateDomaintriedTimes_NotDeliveredService(DomainURL);
         else if (type.equals("DeliverySheetbyNCL"))
             dbConnections.UpdateDomaintriedTimes_ForDelSheetServicebyNCL(DomainURL);
+        else if (type.equals("ArrivedatDest"))
+            dbConnections.UpdateDomaintriedTimes_ForArrivedatDest(DomainURL);
+        else if (type.equals("AtOrigin"))
+            dbConnections.UpdateDomaintriedTimes_ForAtorigin(DomainURL);
+        else if (type.equals("Pickup"))
+            dbConnections.UpdateDomaintriedTimes_ForPickup(DomainURL);
         dbConnections.close();
 
 

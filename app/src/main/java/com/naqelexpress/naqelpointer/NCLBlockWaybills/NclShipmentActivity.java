@@ -682,9 +682,9 @@ public class NclShipmentActivity extends AppCompatActivity {
         DBConnections db = new DBConnections(getApplicationContext(), null);
         Cursor result = db.Fill("select * from Ncl where IsSync = 0 Limit 1 ", getApplicationContext());
         if (result.getCount() > 0) {
-            if (!isMyServiceRunning(NclService.class)) {
+            if (!isMyServiceRunning(NclServiceBulk.class)) {
                 startService(
-                        new Intent(this, NclService.class));
+                        new Intent(this, NclServiceBulk.class));
 
             }
         }
@@ -740,7 +740,7 @@ public class NclShipmentActivity extends AppCompatActivity {
             ncl.NclNo = NclShipmentActivity.NclNo;
             ncl.Date = TimeIn;
             ncl.UserID = GlobalVar.GV().UserID;
-            ncl.PieceCount = ScanNclWaybillFragmentRemoveValidation.PieceCodeList.size();
+            ncl.PieceCount = ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.size();
 
             ncl.EmployID = GlobalVar.GV().EmployID;
             ncl.StationID = GlobalVar.GV().StationID;
@@ -754,7 +754,7 @@ public class NclShipmentActivity extends AppCompatActivity {
 
             ncl.IsSync = false;
 
-            for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation.PieceCodeList.size(); i++) {
+            for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.size(); i++) {
 //                if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
 //
 //                    waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
@@ -763,7 +763,7 @@ public class NclShipmentActivity extends AppCompatActivity {
 //
 //                }
                 ncl.ncldetails.add(i,
-                        new NclDetail(ScanNclWaybillFragmentRemoveValidation.PieceCodeList.get(i).Barcode, 0));
+                        new NclDetail(ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i).Barcode, 0));
             }
             ncl.WaybillCount = waybill.size();
 

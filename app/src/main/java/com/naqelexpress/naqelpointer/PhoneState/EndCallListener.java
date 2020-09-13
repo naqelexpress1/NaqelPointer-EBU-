@@ -1,8 +1,10 @@
 package com.naqelexpress.naqelpointer.PhoneState;
 
+import android.content.Context;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Created by Hasna on 3/10/19.
@@ -13,6 +15,7 @@ class EndCallListener extends PhoneStateListener {
 
     @Override
     public void onCallStateChanged(int state, String incomingNumber) {
+
         if (TelephonyManager.CALL_STATE_RINGING == state) {
             Log.i("", "RINGING, number: " + incomingNumber);
         }
@@ -28,4 +31,6 @@ class EndCallListener extends PhoneStateListener {
 
         }
     }
+
+
 }

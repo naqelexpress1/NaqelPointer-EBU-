@@ -219,7 +219,7 @@ public class RouteListAdapterNew
                 @Override
                 public void onClick(View view) {
                     // send selected contact in callback
-                    listener.onItemSelected(itemListFiltered.get(getAdapterPosition()));
+                    listener.onItemSelected(itemListFiltered.get(getAdapterPosition()) , getAdapterPosition());
                 }
             });
 
@@ -366,6 +366,6 @@ public class RouteListAdapterNew
     }
 
     public interface RouteAdapterListener {
-        void onItemSelected(MyRouteShipments contact);
+        void onItemSelected(MyRouteShipments contact , int position);
     }
 }

@@ -232,8 +232,9 @@ public class PickUp extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer";
-
+        //String URL = GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Pickup");
+        String URL = DomainURL + "SendPickUpDataToServer";
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 URL, null, new Response.Listener<JSONObject>() {
@@ -253,6 +254,7 @@ public class PickUp extends Service {
                     } else
                         flag_thread = false;
                     db.close();
+                    GlobalVar.GV().triedTimes_ForPickup = 0;
                 } catch (JSONException e) {
                     flag_thread = false;
                     if (db != null)
@@ -266,6 +268,15 @@ public class PickUp extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForPickup = GlobalVar.GV().triedTimes_ForPickup + 1;
+                    if (GlobalVar.GV().triedTimes_ForPickup == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "Pickup");
+
+                    }
+                }
                 flag_thread = false;
                 db.close();
             }

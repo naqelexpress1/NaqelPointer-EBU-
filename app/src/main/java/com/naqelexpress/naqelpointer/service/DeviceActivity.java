@@ -25,8 +25,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -38,7 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TripPlanDetails extends Service {
+public class DeviceActivity extends Service {
 
     protected boolean flag_thread = false;
 
@@ -51,7 +52,6 @@ public class TripPlanDetails extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
         else
@@ -61,7 +61,7 @@ public class TripPlanDetails extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startMyOwnForeground() {
-        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.TripPlanDetails";
+        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.DeviceActivity";
         String channelName = "My Background Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
@@ -79,7 +79,6 @@ public class TripPlanDetails extends Service {
                 .build();
         startForeground(2, notification);
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -131,18 +130,24 @@ public class TripPlanDetails extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from TripPlanDetails Limit 1 ", getApplicationContext());
-
+            Cursor result = db.Fill("select * from DeviceActivity where IsSync = 0 Limit 1 ", getApplicationContext());
 
             if (result.getCount() > 0) {
 
                 if (result.moveToFirst()) {
-                    int id = result.getInt(result
-                            .getColumnIndex("ID"));
-                    String json = result.getString(result.getColumnIndex("Json"));
-                    //String jsonData = JsonSerializerDeserializer.serialize(json, true);
-                    json = json.replace("Date(-", "Date(");
-                    SaveOnTripPlan(db, json, id);
+                    final com.naqelexpress.naqelpointer.DB.DBObjects.DeviceActivity DeviceActivity = new com.naqelexpress.naqelpointer.DB.DBObjects.DeviceActivity();
+                    DeviceActivity.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                    DeviceActivity.DeviceName = result.getString(result.getColumnIndex("DeviceName"));
+                    DeviceActivity.DeviceAction = result.getInt(result.getColumnIndex("DeviceAction"));
+                    DeviceActivity.ActionDate = result.getString(result.getColumnIndex("ActionDate"));
+                    DeviceActivity.EmpID = result.getInt(result.getColumnIndex("EmpID"));
+                    DeviceActivity.ActionLatLng = result.getString(result.getColumnIndex("ActionLatLng"));
+                    DeviceActivity.DeviceModel = result.getString(result.getColumnIndex("DeviceModel"));
+
+
+                    String jsonData = JsonSerializerDeserializer.serialize(DeviceActivity, true);
+                    //jsonData = jsonData.replace("Date(-", "Date(");
+                    SaveDeviceActivity(db, jsonData, DeviceActivity.ID);
                 }
 
 
@@ -158,33 +163,37 @@ public class TripPlanDetails extends Service {
     }
 
 
-    public void SaveOnTripPlan(final DBConnections db, final String input, final int id) {
+    public void SaveDeviceActivity(final DBConnections db, final String input, final int id) {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU");
-       // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendtoTripPlanDetails";
-        String URL = DomainURL + "SendtoTripPlanDetails";
+        String URL = GlobalVar.GV().NaqelPointerAPILink + "InsertDeviceActivity"; //CheckPoint
 
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                URL, null, new Response.Listener<JSONObject>() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
-            public void onResponse(JSONObject response) {
+            public void onResponse(String response) {
 
+                JSONObject obj = null;
                 try {
-                    boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
-                    boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
-                    if (IsSync && !HasError) {
-                        db.deleteTripPlanDetails(id, getApplicationContext());
-                        flag_thread = false;
-
-
-                    } else
-                        flag_thread = false;
-                    db.close();
-                    GlobalVar.GV().triedTimes_ForDelSheetService = 0;
+                    obj = new JSONObject(response);
                 } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (obj != null) {
+                        if (!obj.getBoolean("HasError")) {
+                            db.deleteDeviceActivity(id, getApplicationContext());
+
+                            flag_thread = false;
+
+
+                        } else
+                            flag_thread = false;
+                    }
+                    flag_thread = false;
+                    db.close();
+                } catch (Exception e) {
                     flag_thread = false;
                     if (db != null)
                         db.close();
@@ -197,15 +206,6 @@ public class TripPlanDetails extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
-                if (error.toString().contains("No address associated with hostname")) {
-
-                } else {
-                    GlobalVar.GV().triedTimes_ForDelSheetService = GlobalVar.GV().triedTimes_ForDelSheetService + 1;
-                    if (GlobalVar.GV().triedTimes_ForDelSheetService == GlobalVar.GV().triedTimesCondition) {
-                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "DeliverySheetCBU");
-
-                    }
-                }
                 flag_thread = false;
                 db.close();
             }
@@ -243,12 +243,13 @@ public class TripPlanDetails extends Service {
 //                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
 //            }
         };
-        jsonObjectRequest.setShouldCache(false);
-        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+
+        stringRequest.setShouldCache(false);
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
                 120000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        requestQueue.add(jsonObjectRequest);
+        requestQueue.add(stringRequest);
         requestQueue.getCache().remove(URL);
 
     }

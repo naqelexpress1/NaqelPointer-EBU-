@@ -301,7 +301,7 @@ public class DeliveryActivity
                 dbConnections.UpdateComplaint_Delivered(GlobalVar.getDate(), getApplicationContext());
 
             updateLocation();
-            if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al, "0", "", "")) {
+            if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al, "0", "", "",0)) {
 
 //                int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
 //                for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {

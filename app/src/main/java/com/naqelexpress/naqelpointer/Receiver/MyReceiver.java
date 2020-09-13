@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
@@ -21,10 +22,10 @@ import android.provider.CallLog;
 import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.History.CallRecordTrigger;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
-import com.naqelexpress.naqelpointer.service.PhoneState;
 
 import org.joda.time.DateTime;
 
@@ -32,18 +33,29 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class MyReceiver extends BroadcastReceiver {
 
+    boolean isbooton = false;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         // assumes WordService is a registered service
-        if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction()) || intent.getAction().equalsIgnoreCase("android.intent.action.LOCKED_BOOT_COMPLETED")) {
+        if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction()) ||
+                intent.getAction().equalsIgnoreCase("android.intent.action.LOCKED_BOOT_COMPLETED")) {
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(new Intent(context, PhoneState.class));
-            } else {
-                context.startService(new Intent(context, PhoneState.class));
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                context.startForegroundService(new Intent(context, PhoneState.class));
+//            } else {
+//                context.startService(new Intent(context, PhoneState.class));
+//            }
 
             //startAllService(context);
+
+            DBConnections dbConnections = new DBConnections(context, null);
+            dbConnections.InsertDeviceActivity(context, 2);
+            dbConnections.close();
+
+            context.startService(
+                    new Intent(context,
+                            com.naqelexpress.naqelpointer.service.DeviceActivity.class));
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 if (!CallRecordTrigger.isScheduled(context)) {
@@ -78,9 +90,27 @@ public class MyReceiver extends BroadcastReceiver {
 
             onCallStateChanged(context, state, number);
 
+            //Toast.makeText(context.getApplicationContext(), "test by is " + number, Toast.LENGTH_LONG).show();
+
         } else if (intent.getAction().equalsIgnoreCase("android.intent.action.NEW_OUTGOING_CALL")) {
             savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
 
+        } else if (Intent.ACTION_SHUTDOWN.equalsIgnoreCase(intent.getAction()) || Intent.ACTION_AIRPLANE_MODE_CHANGED.equalsIgnoreCase(intent.getAction()) ||
+                Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED.equalsIgnoreCase(intent.getAction())) {
+            DBConnections dbConnections = new DBConnections(context, null);
+            if (Intent.ACTION_SHUTDOWN.equals(intent.getAction()))
+                dbConnections.InsertDeviceActivity(context, 1);
+            else if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(intent.getAction().intern()))
+                dbConnections.InsertDeviceActivity(context, 3);
+            else if (Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED.equals(intent.getAction()))
+                dbConnections.InsertDeviceActivity(context, 5);
+            else if (ConnectivityManager.CONNECTIVITY_ACTION
+                    .equalsIgnoreCase(intent.getAction())) {
+                // some operation
+            }
+            Toast.makeText(context.getApplicationContext(), "test by is " + intent.getAction(), Toast.LENGTH_LONG).show();
+
+            dbConnections.close();
         }
         //else if()
     }

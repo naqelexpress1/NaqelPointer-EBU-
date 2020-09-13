@@ -474,7 +474,8 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
                         "You have to press start Button", GlobalVar.AlertType.Error);
                 return;
             }
-        }
+        }else
+            SaveData();
 
 
     }
@@ -488,7 +489,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             weight = Double.parseDouble(txtWeight.getText().toString());
 
         WaybillMeasurement waybillMeasurement = new WaybillMeasurement(GlobalVar.GV().getIntegerFromString(txtWaybillNo.getText().toString()),
-                GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString()), "Samsung Mobile",
+                GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString()), GlobalVar.GV().getDeviceName(),
                 weight, chNoVolume.isChecked(), ReasonID);
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

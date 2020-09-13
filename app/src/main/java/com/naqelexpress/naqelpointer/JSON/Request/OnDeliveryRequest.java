@@ -29,7 +29,7 @@ public class OnDeliveryRequest {
     public String PhoneNo = "";
     public String IqamaName = "";
     public int DeliverySheetID = 0;
-
+    public int OTPNo = 0;
     //    public String ReceiptNo ;
 //    public int StopPointsID ;
     public List<OnDeliveryDetailRequest> OnDeliveryDetailRequestList;

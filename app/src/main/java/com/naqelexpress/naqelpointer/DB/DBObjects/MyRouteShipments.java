@@ -86,6 +86,7 @@ public class MyRouteShipments implements Parcelable {
     public int DsOrderNo = 0;
     public int IsPaid = 0;
     public int IsMap = 0;
+    public int IsPlan = 0;
 
     public MyRouteShipments() {
 
@@ -106,7 +107,7 @@ public class MyRouteShipments implements Parcelable {
         int CountryID = 0;
         String CountryCode = "";
 
-
+        boolean Division = GlobalVar.GV().GetDivision(context);
         DBConnections dbConnections = new DBConnections(context, null);
 
         try {
@@ -189,13 +190,19 @@ public class MyRouteShipments implements Parcelable {
 
                 instance.ConsigneeName = jsonObject.getString("ConsigneeName");
                 instance.ConsigneeFName = jsonObject.getString("ConsigneeFName");
-                if (CountryID == 1) {
-                    instance.ConsigneePhoneNumber = ValidateMobileNo(jsonObject.getString("ConsigneePhoneNumber"));
-                    instance.ConsigneeMobile = ValidateMobileNo(jsonObject.getString("ConsigneeMobile"));
-                } else {
-                    instance.ConsigneePhoneNumber = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneePhoneNumber"), CountryCode);
-                    instance.ConsigneeMobile = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneeMobile"), CountryCode);
+                if (!Division) {
+                    if (CountryID == 1) {
+                        instance.ConsigneePhoneNumber = ValidateMobileNo(jsonObject.getString("ConsigneePhoneNumber"));
+                        instance.ConsigneeMobile = ValidateMobileNo(jsonObject.getString("ConsigneeMobile"));
+                    } else {
+                        instance.ConsigneePhoneNumber = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneePhoneNumber"), CountryCode);
+                        instance.ConsigneeMobile = ValidateMobileNoOtherCountry(jsonObject.getString("ConsigneeMobile"), CountryCode);
+                    }
                 }
+
+                instance.ConsigneePhoneNumber = "+" + jsonObject.getString("ConsigneePhoneNumber");
+                instance.ConsigneeMobile = "+" + jsonObject.getString("ConsigneeMobile");
+
                 instance.ConsigneeFirstAddress = jsonObject.getString("ConsigneeFirstAddress");
                 instance.ConsigneeSecondAddress = jsonObject.getString("ConsigneeSecondAddress");
                 instance.ConsigneeNear = jsonObject.getString("ConsigneeNear");
@@ -241,7 +248,7 @@ public class MyRouteShipments implements Parcelable {
                 instance.IqamaLength = jsonObject.getInt("IqamaLength");
                 instance.IsPaid = jsonObject.getInt("Ispaid");
                 instance.IsMap = jsonObject.getInt("IsMap");
-
+                instance.IsPlan = jsonObject.getInt("IsPlan");
                 if (jsonObject.getInt("Complaint") != 0) {
                     instance.HasComplaint = true;
                     complaint = complaint + 1;

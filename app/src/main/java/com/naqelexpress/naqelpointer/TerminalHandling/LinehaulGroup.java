@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.NCLBlockWaybills.NclShipmentActivity;
@@ -169,16 +170,25 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
 
                 break;
             case R.id.shipmentarrrivedatdest:
-                fetchgroup("8");
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    fetchgroup("8");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
 //            case R.id.group3:
 //                fetchgroup("4");
 //                break;
             case R.id.llgroup4:
-                fetchgroup("4");
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    fetchgroup("4");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.llgroup5:
-                fetchgroup("5");
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    fetchgroup("5");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ncl:
                 if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
@@ -190,24 +200,35 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                 }
                 break;
             case R.id.loadtrotrip:
+                //if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
                 Intent tripdetails = new Intent(LinehaulGroup.this, BringTripDetails.class);
                 tripdetails.putExtra("Function", 0);
                 startActivity(tripdetails);
+                //  } else
+                //      Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.heldin:
-
-                Intent heldin = new Intent(LinehaulGroup.this, InventoryHeldIn.class);
-                startActivity(heldin);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent heldin = new Intent(LinehaulGroup.this, InventoryHeldIn.class);
+                    startActivity(heldin);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.arrivedatdest:
-                Intent arrivedat = new Intent(LinehaulGroup.this, BringTripDetails.class);
-                arrivedat.putExtra("Function", 1);
-                startActivity(arrivedat);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent arrivedat = new Intent(LinehaulGroup.this, BringTripDetails.class);
+                    arrivedat.putExtra("Function", 1);
+                    startActivity(arrivedat);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.undoncl:
-                Intent undo = new Intent(LinehaulGroup.this, BringTripDetails.class);
-                undo.putExtra("Function", 2);
-                startActivity(undo);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent undo = new Intent(LinehaulGroup.this, BringTripDetails.class);
+                    undo.putExtra("Function", 2);
+                    startActivity(undo);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
 
         }

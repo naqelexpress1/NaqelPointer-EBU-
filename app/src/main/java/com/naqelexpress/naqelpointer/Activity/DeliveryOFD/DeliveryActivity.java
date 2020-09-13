@@ -279,7 +279,9 @@ public class DeliveryActivity extends AppCompatActivity {
 
         String WaybillNo = firstFragment.txtWaybillNo.getText().toString();
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-
+        if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext()))
+            GlobalVar.ShowDialog(DeliveryActivity.this, "Warning",
+                    "Something went wrong , kindly save again", true);
 
         Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + WaybillNo + "'",
                 getApplicationContext());
@@ -349,8 +351,12 @@ public class DeliveryActivity extends AppCompatActivity {
             phoneno = secondFragment.phoneno.getText().toString();
             rname = secondFragment.receivername.getText().toString();
         }
+        int otpno = 0;
+        if (secondFragment.txtotpno.getText().toString() != null && secondFragment.txtotpno.getText().toString().length() > 0)
+            otpno = Integer.parseInt(secondFragment.txtotpno.getText().toString());
+
         if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al,
-                iqamaid, phoneno, rname)) {
+                iqamaid, phoneno, rname, otpno)) {
 
 //            int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
 //            for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {

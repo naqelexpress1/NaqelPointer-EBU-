@@ -225,7 +225,9 @@ public class OnDelivery extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnDeliveryDataToServer";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Delivery");
+        String URL = DomainURL + "SendOnDeliveryDataToServer";
+        //String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnDeliveryDataToServer";
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -247,6 +249,7 @@ public class OnDelivery extends Service {
                     } else
                         flag_thread = false;
                     db.close();
+                    GlobalVar.GV().triedTimes_ForDelService = 0;
                 } catch (JSONException e) {
                     flag_thread = false;
                     if (db != null)
@@ -260,6 +263,15 @@ public class OnDelivery extends Service {
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForDelService = GlobalVar.GV().triedTimes_ForDelService + 1;
+                    if (GlobalVar.GV().triedTimes_ForDelService == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "Delivery");
+
+                    }
+                }
                 flag_thread = false;
                 db.close();
             }
@@ -299,7 +311,7 @@ public class OnDelivery extends Service {
         };
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                60000,
+                GlobalVar.GV().loadbalance_Contimeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

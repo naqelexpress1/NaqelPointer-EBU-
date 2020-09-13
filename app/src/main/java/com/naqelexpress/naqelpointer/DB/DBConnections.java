@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.DB;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.location.Location;
+import android.telephony.TelephonyManager;
 import android.view.View;
 
 import com.naqelexpress.naqelpointer.DB.DBObjects.Booking;
@@ -63,9 +65,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import static android.content.Context.TELEPHONY_SERVICE;
+
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 120; // No of attempt
+    private static final int Version = 127; // MyRouteActivity
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -105,7 +109,7 @@ public class DBConnections
                 "\"StationID\" INTEGER NOT NULL , \"IsPartial\" BOOL NOT NULL  DEFAULT 0, \"Latitude\" TEXT, \"Longitude\" TEXT ," +
                 " \"TotalReceivedAmount\" DOUBLE NOT NULL , \"CashAmount\" DOUBLE NOT NULL DEFAULT 0, \"POSAmount\" DOUBLE NOT NULL DEFAULT 0 ," +
                 " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0 , Barcode Text , IqamaID Text , PhoneNo Text , IqamaName Text," +
-                "DeliverySheetID Integer)");
+                "DeliverySheetID Integer , OTPNo Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
@@ -135,7 +139,8 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserSettings\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE  , \"EmployID\" INTEGER NOT NULL , \"ShowScaningCamera\" BOOL NOT NULL , \"IPAddress\" TEXT NOT NULL , \"LastBringMasterData\" DATETIME)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierDailyRoute\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"EmployID\" INTEGER NOT NULL , \"StartingTime\" DATETIME NOT NULL , \"StartLatitude\" TEXT, \"StartLongitude\" TEXT, " +
                 "\"EndTime\" DATETIME  , \"EndLatitude\" TEXT, \"EndLongitude\" TEXT, \"DeliverySheetID\" INTEGER)");
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCloadingForD\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"CourierID\" INTEGER NOT NULL , \"UserID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL , \"CTime\" DATETIME NOT NULL , \"PieceCount\" INTEGER NOT NULL , \"TruckID\" TEXT, \"WaybillCount\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCloadingForD\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , \"CourierID\" INTEGER NOT NULL , " +
+                "\"UserID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL , \"CTime\" DATETIME NOT NULL , \"PieceCount\" INTEGER NOT NULL , \"TruckID\" TEXT, \"WaybillCount\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnCLoadingForDDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"OnCLoadingForDID\" INTEGER NOT NULL ,\"WaybillNo\" TEXT NOT NULL )");
@@ -160,7 +165,7 @@ public class DBConnections
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
-                " DsOrderNo Integer , Ispaid Integer , IsMap Integer )");
+                " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -409,6 +414,26 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetbyNCLService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"CallCapturefortodayDate\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Date\" String Not Null , \"CallID\"  INTEGER )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_ArrivedtDest\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_AtOrigin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_Pickup\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
+                ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0 )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
+                ", ActionLatLng Text NOT NULL , DeviceModel Text , Issync Integer Default 0 )");
+
     }
 
     public int getVersion() {
@@ -438,16 +463,16 @@ public class DBConnections
 
             db.execSQL("delete from UserMELogin");
             db.execSQL("delete from UserME");
-            db.execSQL("delete from LocationintoMongo");
+            // db.execSQL("delete from LocationintoMongo");
             //db.execSQL("delete from NotDelivered");
             //db.execSQL("delete from NotDeliveredDetail");
             //db.execSQL("delete from OnDelivery");
             //db.execSQL("delete from OnDeliveryDetail");
             db.execSQL("delete from DeliveryStatus");
-            db.execSQL("delete from LocationintoMongo");
-            db.execSQL("delete from MyRouteCompliance");
-            db.execSQL("delete from SuggestLocations");
-            db.execSQL("delete from plannedLocation");
+            // db.execSQL("delete from LocationintoMongo");
+//            db.execSQL("delete from MyRouteCompliance");
+//            db.execSQL("delete from SuggestLocations");
+//            db.execSQL("delete from plannedLocation");
 
 
             //Added by ismail
@@ -675,6 +700,26 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_DelSheetbyNCLService\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"CallCapturefortodayDate\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Date\" String Not Null , \"CallID\"  INTEGER )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_ArrivedtDest\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_AtOrigin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DomainURL_Pickup\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"Istried\"  INTEGER , \"Isprimary\"  INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
+                    ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
+                    ", ActionLatLng Text NOT NULL , DeviceModel Text , Issync Integer Default 0 )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -863,6 +908,14 @@ public class DBConnections
             if (!isColumnExist("plannedLocation", "IsSync"))
                 db.execSQL("ALTER TABLE plannedLocation ADD COLUMN  IsSync INTEGER ");
 
+            if (!isColumnExist("OnDelivery", "OTPNo"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN  OTPNo INTEGER ");
+
+            if (!isColumnExist("MyRouteActionActivity", "isComplete"))
+                db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN  isComplete INTEGER Default 0");
+
+            if (!isColumnExist("MyRouteShipments", "IsPlan"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsPlan  INTEGER ");
 
         }
 
@@ -1332,7 +1385,7 @@ public class DBConnections
 //    }
 
     //---------------------------------On Delivery Table-------------------------------
-    public boolean InsertOnDelivery(OnDelivery instance, Context context, int al, String iqamaid, String PhoneNo, String IqamaName) {
+    public boolean InsertOnDelivery(OnDelivery instance, Context context, int al, String iqamaid, String PhoneNo, String IqamaName, int Otpno) {
 
         long result = 0;
         int DsID = 0;
@@ -1367,6 +1420,7 @@ public class DBConnections
             contentValues.put("PhoneNo", PhoneNo);
             contentValues.put("IqamaName", IqamaName);
             contentValues.put("DeliverySheetID", DsID);
+            contentValues.put("OTPNo", Otpno);
 
 
             result = db.insert("OnDelivery", null, contentValues);
@@ -2052,9 +2106,9 @@ public class DBConnections
             db.delete("Productivity", null, null);
             db.delete("Complaint", null, null);
             db.delete("MyRouteCompliance", null, null);
-            db.delete("SuggestLocations" ,null,null);
-            db.delete("plannedLocation" ,null,null);
-
+            db.delete("SuggestLocations", null, null);
+            db.delete("plannedLocation", null, null);
+            db.delete("MyRouteActionActivity", null, null);
 
 //            GlobalVar.deleteContactRawID(ContactDetails(context), context);
             db.close();
@@ -2526,6 +2580,7 @@ public class DBConnections
             contentValues.put("DsOrderNo", instance.DsOrderNo);
             contentValues.put("Ispaid", instance.IsPaid);
             contentValues.put("IsMap", instance.IsMap);
+            contentValues.put("IsPlan", instance.IsPlan);
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
                 contentValues.put("OptimzeSerialNo", 0);
@@ -5826,6 +5881,12 @@ public class DBConnections
                 cursor = Fill("select Name  from DomainURL_DelSheetService ", context);
             else if (type == 4) // Deliverysheet Service
                 cursor = Fill("select Name  from DomainURL_DelSheetbyNCLService ", context);
+            else if (type == 5) // ArrivedatDest
+                cursor = Fill("select Name  from DomainURL_ArrivedtDest ", context);
+            else if (type == 6) // AtOrigin
+                cursor = Fill("select Name  from DomainURL_AtOrigin ", context);
+            else if (type == 7) // AtOrigin
+                cursor = Fill("select Name  from DomainURL_Pickup ", context);
 
             if (cursor != null && cursor.getCount() > 0) {
                 Count = cursor.getCount();
@@ -6625,6 +6686,7 @@ public class DBConnections
         return result != -1;
     }
 
+
     public String GetPrimaryDomain_DelSheetServicebyNCL(Context context) {
         String PrimaryDomain = "";
         try {
@@ -6790,6 +6852,506 @@ public class DBConnections
             }
             db.close();
         } catch (SQLiteException e) {
+        }
+    }
+
+
+    //*************************
+    public boolean InsertDomain_ForArrivedatDest(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 5);
+
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_ArrivedtDest", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_ArrivedatDest(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_ArrivedtDest where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForArrivedatDest(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForArrivedatDest = 0;
+        UpdateExsistingIsPrimaryForarrivedatDest(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_ArrivedtDest", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForarrivedatDest(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_ArrivedtDest", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    //*************************
+    public boolean InsertDomain_ForAtorigin(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 6);
+
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_AtOrigin", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_ForAtorigin(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_AtOrigin where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForAtorigin(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForAtOrigin = 0;
+        UpdateExsistingIsPrimaryForAtorigin(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_AtOrigin", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForAtorigin(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_AtOrigin", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    //*************************
+    public boolean InsertDomain_ForPickup(Context context) {
+        long result = 0;
+        int domainCount = CountDomainURL(context, 7);
+
+        if (domainCount > 0) {
+            return true;
+        }
+        try {
+            ArrayList<String> domian = new ArrayList<>();
+            if (GlobalVar.GV().GetDeviceVersion()) {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink1_ForDomain); //Naqel Way
+                domian.add(GlobalVar.GV().NaqelPointerAPILink2_ForDomain); // Route optmization
+            } else {
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_1);
+                domian.add(GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            }
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            int i = 0;
+
+            for (String url : domian) {
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("Name", url);
+                contentValues.put("Istried", 0);
+                if (i == 0)
+                    contentValues.put("Isprimary", 1);
+                else
+                    contentValues.put("Isprimary", 0);
+
+                result = db.insert("DomainURL_Pickup", null, contentValues);
+                i++;
+            }
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetPrimaryDomain_ForPickup(Context context) {
+        String PrimaryDomain = "";
+        try {
+
+            Cursor cursor = Fill("select Name  from DomainURL_Pickup where Isprimary = 1", context);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                PrimaryDomain = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return PrimaryDomain;
+    }
+
+    public boolean UpdateDomaintriedTimes_ForPickup(String domainname) {
+
+        GlobalVar.GV().triedTimes_ForPickup = 0;
+        UpdateExsistingIsPrimaryForPickup(domainname);
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        if (GlobalVar.GV().GetDeviceVersion()) {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink1_ForDomain))
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink2_ForDomain);
+            else
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink1_ForDomain);
+        } else {
+            if (domainname.contains(GlobalVar.GV().NaqelPointerAPILink_For5_1)) {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_2);
+            } else {
+                contentValues.put("Name", GlobalVar.GV().NaqelPointerAPILink_For5_1);
+            }
+        }
+        contentValues.put("Isprimary", 1);
+
+
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_Pickup", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+
+        db.close();
+        return true;
+    }
+
+    public boolean UpdateExsistingIsPrimaryForPickup(String domainname) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("Istried", 0);
+        contentValues.put("Isprimary", 0);
+        try {
+            String args[] = {domainname};
+            db.update("DomainURL_Pickup", contentValues, "Name=?", args);
+
+        } catch (Exception e) {
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public boolean InsertMyRouteActionActivity(Context context, int LastActionSeqNo, int NextActivitySeqNo, int NextActivityWaybillno, int LastActivityWaybillNo,
+                                               int TotalLocationCount, String SeqNo) {
+        long result = 0;
+        try {
+            Cursor cursor = Fill("select ID   from MyRouteActionActivity ", context);
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.close();
+                return true;
+            }
+
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("LastActivitySeqno", LastActionSeqNo);
+            contentValues.put("LastActivityWaybillNo", LastActivityWaybillNo);
+            contentValues.put("NextActivitySeqNo", NextActivitySeqNo);
+            contentValues.put("NextActivityWaybillNo", NextActivityWaybillno);
+            contentValues.put("TotalLocationCount", TotalLocationCount);
+            contentValues.put("SeqNo", SeqNo);
+
+            result = db.insert("MyRouteActionActivity", null, contentValues);
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean UpdateMyRouteActionActivitySeqNo(Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+        int prevActivitySeqNo, prevActivityWaybillNo, NextActivitySeqNo, NextActivityWaybillNo;
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            prevActivitySeqNo = result.getInt(result.getColumnIndex("NextActivitySeqNo"));
+            prevActivityWaybillNo = result.getInt(result.getColumnIndex("NextActivityWaybillNo"));
+            int TotalLocationCount = result.getInt(result.getColumnIndex("TotalLocationCount"));
+            String SeqNo = result.getString(result.getColumnIndex("SeqNo"));
+            String split[] = SeqNo.split("@");
+            //if (TotalLocationCount > prevActivitySeqNo - 1) {
+            for (int i = 0; i < split.length; i++) {
+                String temp[] = split[i].split("_");
+                if (prevActivitySeqNo == Integer.parseInt(temp[0])) {
+                    try {
+                        String t[] = split[i + 1].split("_");
+                        ContentValues contentValues = new ContentValues();
+                        //Put the filed which you want to update.
+                        contentValues.put("LastActivitySeqno", prevActivitySeqNo);
+                        contentValues.put("LastActivityWaybillNo", prevActivityWaybillNo);
+                        contentValues.put("NextActivitySeqNo", Integer.parseInt(t[0]));
+                        contentValues.put("NextActivityWaybillNo", Integer.parseInt(t[1]));
+
+                        try {
+                            String args[] = {String.valueOf(prevActivityWaybillNo)};
+                            db.update("MyRouteActionActivity", contentValues, "NextActivityWaybillNo=?", args);
+
+                        } catch (Exception e) {
+                            return false;
+                        }
+                    } catch (Exception e) {
+                        ContentValues contentValues = new ContentValues();
+                        contentValues.put("isComplete", 1);
+                        String args[] = {String.valueOf(prevActivityWaybillNo)};
+                        db.update("MyRouteActionActivity", contentValues, "NextActivityWaybillNo=?", args);
+                    }
+                    break;
+                }
+            }
+            //}
+            //int LastActivitySeqno = result.getInt(result.getColumnIndex("LastActivitySeqno"));
+            //
+        }
+
+
+        db.close();
+        return true;
+    }
+
+    @SuppressLint("MissingPermission")
+    public boolean InsertDeviceActivity(Context context, int deviceaction) {
+        long result = 0;
+        try {
+
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Location location = GlobalVar.getLastKnownLocation(context);
+            double Latitude = 0.0, Longitude = 0.0;
+            if (location != null) {
+                Latitude = location.getLatitude();
+                Longitude = location.getLongitude();
+            }
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("DeviceName", GlobalVar.GV().getDeviceName());
+            contentValues.put("DeviceAction", deviceaction);
+            contentValues.put("ActionDate", GlobalVar.getCurrentDateTimeSS());
+            contentValues.put("EmpID", GlobalVar.getlastlogin(context));
+            contentValues.put("ActionLatLng", String.valueOf(Latitude) + "," + String.valueOf(Longitude));
+            //  AccountManager am = AccountManager.get(context);
+//            @SuppressLint("MissingPermission") Account[] accounts = am.getAccounts();
+//            String phoneNumber = "";
+//            try {
+//                for (Account ac : accounts) {
+//                    String acname = ac.name;
+//                    String actype = ac.type;
+//                    if (actype.equals("com.whatsapp")) {
+//                        phoneNumber = ac.name;
+//                    }
+//                    // Take your time to look at all available accounts
+//                    System.out.println("Accounts : " + acname + ", " + actype);
+//                }
+//            } catch (Exception e) {
+//                phoneNumber = e.toString();
+//            }
+
+            String couriernumber = "";
+            try {
+                TelephonyManager tm = (TelephonyManager) context.getSystemService(TELEPHONY_SERVICE);
+                couriernumber = tm.getLine1Number();
+                if (couriernumber == null || couriernumber.length() == 0) {
+                    couriernumber = tm.getSimSerialNumber();
+                    if (couriernumber == null || couriernumber.length() == 0) {
+                        couriernumber = tm.getDeviceId();
+                    }
+                }
+            } catch (Exception e) {
+                couriernumber = e.toString();
+            }
+
+            contentValues.put("DeviceModel", couriernumber);
+            contentValues.put("Issync", 0);
+
+            result = db.insert("DeviceActivity", null, contentValues);
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public void deleteDeviceActivity(int ID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(ID)};
+            db.delete("DeviceActivity", "ID=?", args);
+
+            db.close();
+        } catch (SQLiteException e) {
+
         }
     }
 }

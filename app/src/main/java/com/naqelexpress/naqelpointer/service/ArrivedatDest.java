@@ -162,7 +162,9 @@ public class ArrivedatDest extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "SendArrivedatDestToServer";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "ArrivedatDest"); //For EBU
+        String URL = DomainURL + "SendArrivedatDestToServer";
+        //String URL = GlobalVar.GV().NaqelPointerAPILink + "SendArrivedatDestToServer";
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -181,6 +183,7 @@ public class ArrivedatDest extends Service {
                     } else
                         flag_thread = false;
                     db.close();
+                    GlobalVar.GV().triedTimes_ForArrivedatDest = 0;
                 } catch (JSONException e) {
                     flag_thread = false;
                     if (db != null)
@@ -196,6 +199,15 @@ public class ArrivedatDest extends Service {
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
                 flag_thread = false;
                 db.close();
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForArrivedatDest = GlobalVar.GV().triedTimes_ForArrivedatDest + 1;
+                    if (GlobalVar.GV().triedTimes_ForArrivedatDest == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "ArrivedatDest");
+
+                    }
+                }
             }
         }) {
             @Override

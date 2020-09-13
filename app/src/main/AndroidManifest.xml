@@ -22,6 +22,9 @@
         android:permissionGroup="android.permission-group.PHONE"
         android:protectionLevel="dangerous" />
 
+    <uses-permission
+        android:name="android.permission.GET_ACCOUNTS"
+        android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -481,6 +484,7 @@
         <!-- comment by ismail and added <activity android:name=".MainActivity"></activity> -->
 
         <activity android:name=".Activity.routeMap.RouteMap"></activity>
+        <activity android:name=".Activity.routeMap.RouteMap_SingleWaybill"></activity>
         <activity android:name=".Activity.routeMap.TagsDemoActivity"></activity>
         <activity android:name=".Activity.routeMap.MapsActivity"></activity>
         <activity android:name=".Activity.routeMap.MapMovingOnCurLatLng"></activity>
@@ -1147,6 +1151,11 @@
             android:name="com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp"
             android:process=":myroutecomp"></service>
 
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.DeviceActivity"
+            android:process=":naqelDeviceActivity" />
+
+
         <receiver
             android:name="com.naqelexpress.naqelpointer.Receiver.MyReceiver"
             android:directBootAware="true"
@@ -1162,6 +1171,9 @@
             <intent-filter>
                 <!-- above N -->
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.BATTERY_CHANGED" />
+                <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
@@ -1183,6 +1195,14 @@
             </intent-filter>
         </receiver>
 
+        <!--<receiver
+            android:name=".Receiver.NetworkChangeReceiver"
+            android:label="NetworkChangeReceiver">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>-->
 
         <service
             android:name=".Watsapp.WhatsappAccessibilityService"
@@ -1197,14 +1217,14 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".Activity.PhoneState.ServiceReceiver"
-            android:permission="android.permission.READ_PHONE_STATE">
-            <intent-filter>
-                <action android:name="android.intent.action.PHONE_STATE" />
-                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
-            </intent-filter>
-        </receiver>
+        <!--        <receiver-->
+        <!--            android:name=".Activity.PhoneState.ServiceReceiver"-->
+        <!--            android:permission="android.permission.READ_PHONE_STATE">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.intent.action.PHONE_STATE" />-->
+        <!--                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />-->
+        <!--            </intent-filter>-->
+        <!--        </receiver>-->
 
         <service
             android:name=".service.CallStateReceiver"

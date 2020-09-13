@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -35,6 +36,7 @@ import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivityNoMap;
 import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
+import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_SingleWaybill;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -290,6 +292,7 @@ public class MyRouteActivity_Complaince
             GlobalVar.GV().CourierDailyRouteID = dbConnections.getMaxID("CourierDailyRoute Where EmployID = " + GlobalVar.GV().EmployID + " and EndTime is NULL ", getApplicationContext());
             GlobalVar.GV().LoadMyRouteShipments("OrderNo", true, getApplicationContext(),
                     getWindow().getDecorView().getRootView());
+
             DuplicateCustomer();
 
 
@@ -302,9 +305,20 @@ public class MyRouteActivity_Complaince
 
                 MyRouteCompliance();
 
-                adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
-                mapListview.setAdapter(adapter);
+                if (IsHasLocation()) {
+                    GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+                            , getWindow().getDecorView().getRootView());
 
+                    adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+                            "CourierKpi", this);
+                    mapListview.setAdapter(adapter);
+
+                    hideenableListview();
+
+                } else {
+                    adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+                    mapListview.setAdapter(adapter);
+                }
 
                 //ValidateDatas();
 
@@ -355,7 +369,7 @@ public class MyRouteActivity_Complaince
                         try {
                             Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
                             intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                            startActivity(intent);
+                            startActivityForResult(intent, 1);
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                         }
@@ -451,7 +465,7 @@ public class MyRouteActivity_Complaince
                         try {
                             Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
                             intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                            startActivity(intent);
+                            startActivityForResult(intent, 1);
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                         }
@@ -590,29 +604,33 @@ public class MyRouteActivity_Complaince
                 return true;
             case R.id.mnuShowDeliverySheetOrder:
                 //OrderNo
-                if (GlobalVar.GV().GetDivision(getApplicationContext())) {
-                    DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections1.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
-                            " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
-                    if (result != null && result.getCount() > 0) {
-                        GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
-                                , getWindow().getDecorView().getRootView());
-                    } else {
-                        try {
-                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                            startActivity(intent);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-                    }
-                } else
-                    GlobalVar.GV().LoadMyRouteShipments("ItemNo", true, getApplicationContext()
-                            , getWindow().getDecorView().getRootView());
+//                if (GlobalVar.GV().GetDivision(getApplicationContext())) {
+//                    DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+//                    Cursor result = dbConnections1.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
+//                            " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+//                    if (result != null && result.getCount() > 0) {
+//                        GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+//                                , getWindow().getDecorView().getRootView());
+//                    } else {
+//                        try {
+//                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+//                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+//                            startActivity(intent);
+//                        } catch (Exception e) {
+//                            System.out.println(e.getMessage());
+//                        }
+//                    }
+//                } else
+
+                GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+                        , getWindow().getDecorView().getRootView());
 
                 adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
                         "CourierKpi", this);
                 mapListview.setAdapter(adapter);
+
+                hideenableListview();
+
                 return true;
 //            case R.id.DeleteAll:
 ////                //TODO remove delete all from the menu itself.
@@ -632,13 +650,25 @@ public class MyRouteActivity_Complaince
                 //   GlobalVar.GV().SyncData(getApplicationContext(), getWindow().getDecorView().getRootView());
                 return true;
             case R.id.groupmap:
-                try {
-                    Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                    startActivity(intent);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
+                if (IsHasLocation() && GlobalVar.GV().myRouteShipmentList.size() == 1) {
+                    try {
+                        Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap_SingleWaybill.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+
+                } else if (IsHasLocation()) {
+                    try {
+                        Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        startActivity(intent);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                } else
+                    Toast.makeText(getApplicationContext(), "No Location ", Toast.LENGTH_LONG).show();
                 return true;
             case R.id.movingmap:
                 try {
@@ -713,6 +743,24 @@ public class MyRouteActivity_Complaince
 //                    }
 //                });
             }
+        } else if (requestCode == 1 && resultCode == RESULT_OK) { //Refresh Data
+            Bundle extras = data.getExtras();
+            if (extras != null) {
+                if (extras.containsKey("result")) {
+                    String result = extras.getString("result");
+                    if (result.equals("refreshdata")) {
+                        GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+                                , getWindow().getDecorView().getRootView());
+
+                        adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+                                "CourierKpi", this);
+                        mapListview.setAdapter(adapter);
+
+                        hideenableListview();
+                    }
+
+                }
+            }
         }
     }
 
@@ -761,7 +809,7 @@ public class MyRouteActivity_Complaince
             InputStream ist = null;
 
             try {
-                String function = "BringDeliverySheetbyOFDPiece"; //CBU division
+                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
                     function = "BringMyRouteShipments"; //EBU Divison
@@ -822,6 +870,8 @@ public class MyRouteActivity_Complaince
 //            if (CourierKpi.this.isDestroyed()) {
 //                return;
 //            }
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.clearAllCourierDailyRoute(getApplicationContext());
             if (finalJson != null) {
                 if (buttonclick == 0) {
                     super.onPostExecute(String.valueOf(finalJson));
@@ -1234,15 +1284,18 @@ public class MyRouteActivity_Complaince
     }
 
     @Override
-    public void onItemSelected(MyRouteShipments item) {
+    public void onItemSelected(MyRouteShipments item, int pos) {
         // Toast.makeText(getApplicationContext(), "Selected: " + item.Position, Toast.LENGTH_LONG).show();
 
         if (GlobalVar.GV().CourierDailyRouteID > 0) {
 
             ValidatePlannedSuggestRouteSync();
             RestartServiceLocationMorethan30();
+            RestartDeviceActivity();
+            // OLD Method commented date - 04-09-2020
+            // int position = item.Position;
 
-            int position = item.Position;
+            int position = getItemPosition(item.ItemNo);
             if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
                 Intent intent = null;
                 if (GlobalVar.GV().myRouteShipmentList.get(position).IsMap == 1)
@@ -1256,16 +1309,25 @@ public class MyRouteActivity_Complaince
                 bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
                 bundle.putInt("position", position);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
 
 
             } else {
                 Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
                 startActivity(intent);
             }
+
+
         } else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
 
+    }
+
+    private int getItemPosition(String ItemNo) {
+        for (int position = 0; position < GlobalVar.GV().myRouteShipmentList.size(); position++)
+            if (GlobalVar.GV().myRouteShipmentList.get(position).ItemNo.equals(ItemNo))
+                return position;
+        return 0;
     }
 
     private void ValidatePlannedSuggestRouteSync() {
@@ -1321,12 +1383,26 @@ public class MyRouteActivity_Complaince
                 startService(
                         new Intent(this,
                                 com.naqelexpress.naqelpointer.service.LocationIntoMongo.class));
+
+
             }
 
         }
         result.close();
         db.close();
 
+
+    }
+
+    public void RestartDeviceActivity() {
+
+        stopService(
+                new Intent(getApplicationContext(),
+                        com.naqelexpress.naqelpointer.service.DeviceActivity.class));
+
+        startService(
+                new Intent(getApplicationContext(),
+                        com.naqelexpress.naqelpointer.service.DeviceActivity.class));
 
     }
 
@@ -1360,6 +1436,44 @@ public class MyRouteActivity_Complaince
                 startService(new Intent(getBaseContext(),
                         com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService.class));
             }
+        }
+    }
+
+    private void hideenableListview() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        boolean isLoadFull = true;
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", getApplicationContext());
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+            //do {
+            int NextActivitySeqNo = result.getInt(result.getColumnIndex("NextActivitySeqNo"));
+            int NextActivityWaybillNo = result.getInt(result.getColumnIndex("NextActivityWaybillNo"));
+            int LastActivitySeqno = result.getInt(result.getColumnIndex("LastActivitySeqno"));
+            int TotalLocationCount = result.getInt(result.getColumnIndex("TotalLocationCount"));
+            int isComplete = result.getInt(result.getColumnIndex("isComplete"));
+            if (isComplete == 0) {
+                for (int i = 0; i < GlobalVar.GV().myRouteShipmentList.size(); i++) {
+                    MyRouteShipments t = GlobalVar.GV().myRouteShipmentList.get(i);
+
+                    if (Integer.parseInt(t.ItemNo) == NextActivityWaybillNo) {
+                        GlobalVar.GV().myRouteShipmentList.clear();
+                        GlobalVar.GV().myRouteShipmentList.add(t);
+                        break;
+                    }
+
+                }
+            }
+            if (isComplete == 1) {
+                GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+                        , getWindow().getDecorView().getRootView());
+
+                adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+                        "CourierKpi", this);
+                mapListview.setAdapter(adapter);
+            }
+            adapter.notifyDataSetChanged();
+            // } while (result.moveToFirst());
         }
     }
 }

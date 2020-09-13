@@ -1056,7 +1056,7 @@ public class MyRouteActivity
     }
 
     @Override
-    public void onItemSelected(MyRouteShipments item) {
+    public void onItemSelected(MyRouteShipments item , int pos) {
         // Toast.makeText(getApplicationContext(), "Selected: " + item.Position, Toast.LENGTH_LONG).show();
 
         if (GlobalVar.GV().CourierDailyRouteID > 0) {

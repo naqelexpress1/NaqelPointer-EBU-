@@ -194,6 +194,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
         String result = "";
         StringBuffer buffer;
         ProgressDialog progressDialog;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -203,6 +205,7 @@ public class CourierDetails extends Fragment // implements ResultInterface
             progressDialog.setTitle("Downloading PickUp Data");
             progressDialog.show();
             progressDialog.setCancelable(false);
+            DomainURL = GlobalVar.GV().GetDomainURL(getContext());
         }
 
         @Override
@@ -213,7 +216,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetArrivedAtOriginData");
+                URL url = new URL(DomainURL + "GetArrivedAtOriginData");  //GlobalVar.GV().NaqelPointerAPILink
+
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -236,6 +240,7 @@ public class CourierDetails extends Fragment // implements ResultInterface
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -310,8 +315,20 @@ public class CourierDetails extends Fragment // implements ResultInterface
                     e.printStackTrace();
                 }
 
-            } else
-                GlobalVar.GV().ShowSnackbar(rootView, "No data with Current Employee ID", GlobalVar.AlertType.Error);
+            } else{
+                //GlobalVar.GV().ShowSnackbar(rootView, "No data with Current Employee ID", GlobalVar.AlertType.Error);
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(rootView, "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getContext(), DomainURL);
+
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
+            }
 
             waybillcount.setText(String.valueOf(waybilldetails.size()));
             piececount.setText(String.valueOf(waybillBardetails.size()));

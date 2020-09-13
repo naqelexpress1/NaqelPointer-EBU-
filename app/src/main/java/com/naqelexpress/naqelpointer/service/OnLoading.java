@@ -204,11 +204,11 @@ public class OnLoading extends Service {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnCLoadingForDeliverySheet";
-
-
+       // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnCLoadingForDeliverySheet";
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU"); //For EBU
+        String URL = DomainURL + "SendOnCLoadingForDeliverySheet";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                URL, null, new Response.Listener<JSONObject>() {
+                DomainURL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
@@ -231,13 +231,22 @@ public class OnLoading extends Service {
                         db.close();
                     e.printStackTrace();
                 }
-
+                GlobalVar.GV().triedTimes_ForDelSheetService = 0;
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForDelSheetService = GlobalVar.GV().triedTimes_ForDelSheetService + 1;
+                    if (GlobalVar.GV().triedTimes_ForDelSheetService == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "DeliverySheetCBU");
+
+                    }
+                }
                 flag_thread = false;
                 db.close();
             }
@@ -279,7 +288,7 @@ public class OnLoading extends Service {
 
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                GlobalVar.GV().loadbalance_Contimeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

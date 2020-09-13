@@ -231,6 +231,8 @@ public class Summery extends AppCompatActivity implements View.OnClickListener {
         StringBuffer buffer;
         ProgressDialog progressDialog;
         JSONObject jsonObject;
+        String DomainURL = "";
+        String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
@@ -241,6 +243,8 @@ public class Summery extends AppCompatActivity implements View.OnClickListener {
             progressDialog.setTitle("Please wait");
             progressDialog.show();
             progressDialog.setCancelable(false);
+
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 
             jsonObject = new JSONObject();
             try {
@@ -285,11 +289,15 @@ public class Summery extends AppCompatActivity implements View.OnClickListener {
             String error = "";
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetLoadtoDestSummery");
+
+                //URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetLoadtoDestSummery");
+                URL url = new URL(DomainURL + "GetLoadtoDestSummery");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
                 httpURLConnection.connect();
@@ -308,6 +316,7 @@ public class Summery extends AppCompatActivity implements View.OnClickListener {
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 error = e.toString();
                 e.printStackTrace();
             } finally {
@@ -483,8 +492,18 @@ public class Summery extends AppCompatActivity implements View.OnClickListener {
                 }
 
             } else {
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
 
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "No data with these Data's", GlobalVar.AlertType.Error);
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
+               // GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "No data with these Data's", GlobalVar.AlertType.Error);
             }
 
 

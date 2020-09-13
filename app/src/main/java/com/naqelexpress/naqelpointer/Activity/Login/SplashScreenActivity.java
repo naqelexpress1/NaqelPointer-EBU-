@@ -9,14 +9,10 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.provider.CallLog;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
-import android.telephony.TelephonyManager;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -34,23 +30,18 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.joda.time.DateTime;
 import org.json.JSONObject;
-
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.regex.Pattern;
 
 public class SplashScreenActivity
         extends AppCompatActivity {
-
 
 
     double Latitude = 0.0;
     double Longitude = 0.0;
 
     int redirctcalss = 0;
-    static final Uri CallLog_URI = CallLog.Calls.CONTENT_URI;
+
+    // static final Uri CallLog_URI = CallLog.Calls.CONTENT_URI;
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +50,8 @@ public class SplashScreenActivity
 
         //getCallLog();
 
-//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+        //DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+        // dbConnections1.deleteDeliveryDeliveyDetails(getApplicationContext());
 //        dbConnections1.DeleteAllSuggestLocation(getApplicationContext());
 //        dbConnections1.close();
 
@@ -90,7 +82,11 @@ public class SplashScreenActivity
 //        db.deleteAllLocation(getApplicationContext());
 //        db.close();
 
-        
+
+//        startService(
+//                new Intent(SplashScreenActivity.this,
+//                        com.naqelexpress.naqelpointer.service.DeviceActivity.class));
+
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -103,7 +99,9 @@ public class SplashScreenActivity
             dbConnections.DeleteAllSyncData(getApplicationContext());
             //dbConnections.DeleteSuggestLocation(getApplicationContext());
             dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
-
+            dbConnections.InsertDomain_ForArrivedatDest(getApplicationContext());
+            dbConnections.InsertDomain_ForAtorigin(getApplicationContext());
+            dbConnections.InsertDomain_ForPickup(getApplicationContext());
 //        String DeviceName = GlobalVar.GV().getDeviceName();
 
             //dbConnections.DeleteTrucks(getApplicationContext());
@@ -775,5 +773,5 @@ public class SplashScreenActivity
 
     }
 
-   
+
 }

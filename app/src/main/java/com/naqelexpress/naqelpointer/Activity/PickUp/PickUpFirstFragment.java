@@ -1,14 +1,12 @@
 package com.naqelexpress.naqelpointer.Activity.PickUp;
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -376,13 +374,17 @@ public class PickUpFirstFragment
             clientdetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("clientdetails");
         }
     }
-
+    String DomainURL = "";
     public void GetClientID(final String input) {
         final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "Please wait.", "Downloading Client Details.", true);
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "BringLoadTypeValidateClient"; //BringLoadType
 
+        String isInternetAvailable = "";
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+        // String URL = GlobalVar.GV().NaqelPointerAPILink + "BringLoadTypeValidateClient"; //BringLoadType
+        DomainURL = GlobalVar.GV().GetDomainURL(getContext());
+        String URL = DomainURL + "BringLoadTypeValidateClient"; //BringLoadType
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 URL, null, new Response.Listener<JSONObject>() {
@@ -399,20 +401,20 @@ public class PickUpFirstFragment
                             HashMap<String, String> temp = new HashMap<>();
                             temp.put("LoadTypeID", String.valueOf(jsonObject.get("LoadTypeID")));
                             temp.put("Name", String.valueOf(jsonObject.get("Name")));
-                            if(jsonObject.getInt("BlockClient") == 1)
-                            {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                builder.setTitle("Info")
-                                        .setMessage("Mentioned Client is Block,kindly contact Operational team.")
-                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int which) {
-                                                getActivity().finish();
-                                            }
-                                        }).setNegativeButton("Cancel", null).setCancelable(false);
-                                AlertDialog alertDialog = builder.create();
-                                alertDialog.show();
-                            }
+//                            if(jsonObject.getInt("BlockClient") == 1)
+//                            {
+//                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                                builder.setTitle("Info")
+//                                        .setMessage("Mentioned Client is Block,kindly contact Operational team.")
+//                                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                                            @Override
+//                                            public void onClick(DialogInterface dialogInterface, int which) {
+//                                                getActivity().finish();
+//                                            }
+//                                        }).setNegativeButton("Cancel", null).setCancelable(false);
+//                                AlertDialog alertDialog = builder.create();
+//                                alertDialog.show();
+//                            }
                             clientdetails.add(temp);
                         }
 
@@ -437,8 +439,19 @@ public class PickUpFirstFragment
             @Override
             public void onErrorResponse(VolleyError error) {
                 flag_thread = false;
-                GlobalVar.GV().ShowSnackbar(rootView, error.toString(), GlobalVar.AlertType.Error);
+                //GlobalVar.GV().ShowSnackbar(rootView, error.toString(), GlobalVar.AlertType.Error);
                 progressDialog.dismiss();
+                if (error.toString().contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(rootView, "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getContext(), DomainURL);
+
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
 
             }
         }) {
@@ -466,7 +479,7 @@ public class PickUpFirstFragment
         };
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
-                120000,
+                GlobalVar.GV().loadbalance_Contimeout,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);

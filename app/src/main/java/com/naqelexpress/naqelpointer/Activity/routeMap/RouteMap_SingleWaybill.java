@@ -1,7 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.routeMap;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -48,7 +47,6 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
@@ -73,13 +71,12 @@ import java.util.Random;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.graphics.Bitmap.Config.ARGB_8888;
-import static com.itextpdf.awt.geom.Point2D.distance;
 
 /**
  * Created by Hasna on 7/21/18.
  */
 
-public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+public class RouteMap_SingleWaybill extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
@@ -114,13 +111,13 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 
         //ArrayList<String> test = getIntent().getStringArrayListExtra("test");
-        RouteMap.distance_time.clear();
+        RouteMap_SingleWaybill.distance_time.clear();
 
         ImageButton distance = (ImageButton) findViewById(R.id.viewmore);
         distance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intetn = new Intent(RouteMap.this, RouteMap_Distance.class);
+                Intent intetn = new Intent(RouteMap_SingleWaybill.this, RouteMap_Distance.class);
                 startActivity(intetn);
             }
         });
@@ -174,44 +171,16 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        GlobalVar.GV().ChangeMapSettings(mMap, RouteMap.this, getWindow().getDecorView().getRootView());
+        GlobalVar.GV().ChangeMapSettings(mMap, RouteMap_SingleWaybill.this, getWindow().getDecorView().getRootView());
 
 
         LatLng ll = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 8));
-        mMap.setOnInfoWindowClickListener(RouteMap.this);
+        mMap.setOnInfoWindowClickListener(RouteMap_SingleWaybill.this);
 
         myMarker = new Marker[places.size()];
 
-//        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-//
-//            // Use default InfoWindow frame
-//            @Override
-//            public View getInfoWindow(Marker arg0) {
-//                return null;
-//            }
-//
-//            // Defines the contents of the InfoWindow
-//            @Override
-//            public View getInfoContents(Marker arg0) {
-//                View v = null;
-//                try {
-//
-//                    // Getting view from the layout file info_window_layout
-//                    v = getLayoutInflater().inflate(R.layout.custom_infowindow, null);
-//
-//                    // Getting reference to the TextView to set latitude
-//                    TextView addressTxt = (TextView) v.findViewById(R.id.address);
-//                    addressTxt.setText(arg0.getTitle());
-//
-//                } catch (Exception ev) {
-//                    System.out.print(ev.getMessage());
-//                }
-//
-//                return v;
-//            }
-//        });
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -220,9 +189,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 // if (distance_time.size() > 0) {
 
                 // LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ActivityCompat.checkSelfPermission(RouteMap_SingleWaybill.this, Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        ActivityCompat.checkSelfPermission(RouteMap_SingleWaybill.this, Manifest.permission.ACCESS_COARSE_LOCATION)
                                 == PackageManager.PERMISSION_GRANTED) {
                     //  Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -234,36 +203,15 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                         custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
                     else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
-//                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
 
-                    //LatLng ll = places.get(position).ge;
-//                    String uri = "http://maps.google.com/maps?saddr=" + location.getLatitude() + "," + location.getLongitude()
-//                            + "&daddr=" + places.get(position).getLatitude() + "," + places.get(position).getLongitude();
-//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-//                    intent.setPackage("com.google.android.apps.maps");
-//                    startActivity(intent);
                 }
 
 
-                //myMarker[position].setTitle(distance_time.get(position).get("address"));
-                //myMarker[position].setSnippet(distance_time.get(position).get("address"));
-                //  myMarker[position].showInfoWindow();
-                //   } else
-                //        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "please wait the route is loading", GlobalVar.AlertType.Error);
                 return false;
             }
         });
 
-//        double lat = places.get(0).latlng.latitude;
-//        double lng = places.get(0).latlng.longitude;
-//        LatLng latLng = new LatLng(lat, lng);
 
-
-        //ArrayList<Places> bow =  sortLocations(places, lat, lng);
-        // places.remove(0);
-
-
-        //if (jsonroute.size() == 0) {
         if (!Issuggest) {
             ArrayList<Places> temp_places = new ArrayList<>();
             ArrayList<Location> sp = new ArrayList<>();
@@ -367,11 +315,11 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             @Override
             public int compare(Location o, Location o2) {
                 float[] result1 = new float[3];
-                android.location.Location.distanceBetween(myLatitude, myLongitude, o.getLatitude(), o.getLongitude(), result1);
+                Location.distanceBetween(myLatitude, myLongitude, o.getLatitude(), o.getLongitude(), result1);
                 Float distance1 = result1[0];
 
                 float[] result2 = new float[3];
-                android.location.Location.distanceBetween(myLatitude, myLongitude, o2.getLatitude(), o2.getLongitude(), result2);
+                Location.distanceBetween(myLatitude, myLongitude, o2.getLatitude(), o2.getLongitude(), result2);
                 Float distance2 = result2[0];
 
                 return distance1.compareTo(distance2);
@@ -554,21 +502,11 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             if (pDialog != null && pDialog.isShowing())
                 pDialog.dismissWithAnimation();
 
-            stopService(
-                    new Intent(this,
-                            com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
             if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class)) {
                 startService(
                         new Intent(this,
                                 com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
             }
-            if (!IsPlanned)
-                {
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("result", "refreshdata");
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
-                }
         }
     }
 
@@ -664,22 +602,22 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 
             //double distanceToPlace1 = distance(prvLat, preLng, latLng.latitude , latLng.longitude);
-            if (i == 0)
-                data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0_0");
-            else
-                data = data + "@" + myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
-                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i) + "_" + String.valueOf((int) places.get(i).getSpeed()));
-//                data = data + "@" + String.valueOf((int) places.get(i).getAltitude() - 1) + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
-//                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i));
+//            if (i == 0)
+//                data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0_0");
+//            else
+//                data = data + "@" + myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
+//                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i) + "_" + String.valueOf((int) places.get(i).getSpeed()));
+////                data = data + "@" + String.valueOf((int) places.get(i).getAltitude() - 1) + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
+////                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i));
 
             prvLat = latLng.latitude;
             preLng = latLng.longitude;
 
-            if (i == places.size() - 1 && !Issuggest) {
-                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.InsertSuggestLocation(getApplicationContext(), data);
-                dbConnections.close();
-            }
+//            if (i == places.size() - 1 && !Issuggest) {
+//                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//                dbConnections.InsertSuggestLocation(getApplicationContext(), data);
+//                dbConnections.close();
+//            }
 
         }
 
@@ -767,7 +705,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     }
 
 
-    private void custom_alert(final int position, final int markerposition) {
+    private void custom_alert(int position, final int markerposition) {
 
         try {
 
@@ -785,15 +723,15 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 
             // final int position = GlobalVar.GV().haslocation.get(pos - 1);
-            consignname.setText(myRouteShipmentList.get(position - 1).ConsigneeName);
+            consignname.setText(myRouteShipmentList.get(0).ConsigneeName);
 
-            waybillno.setText(String.valueOf(position) + "." + myRouteShipmentList.get(position - 1).ItemNo);
-            if (myRouteShipmentList.get(position - 1).ConsigneeMobile.length() > 0 && !myRouteShipmentList.get(position - 1).ConsigneeMobile.equals("null"))
-                mobileno.setText(myRouteShipmentList.get(position - 1).ConsigneeMobile);
+            waybillno.setText(String.valueOf(position) + "." + myRouteShipmentList.get(0).ItemNo);
+            if (myRouteShipmentList.get(0).ConsigneeMobile.length() > 0 && !myRouteShipmentList.get(0).ConsigneeMobile.equals("null"))
+                mobileno.setText(myRouteShipmentList.get(0).ConsigneeMobile);
             else
                 mobileno.setVisibility(View.GONE);
-            if (myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.length() > 0 && !myRouteShipmentList.get(position - 1).ConsigneePhoneNumber.equals("null"))
-                mobileno1.setText(myRouteShipmentList.get(position - 1).ConsigneePhoneNumber);
+            if (myRouteShipmentList.get(0).ConsigneePhoneNumber.length() > 0 && !myRouteShipmentList.get(0).ConsigneePhoneNumber.equals("null"))
+                mobileno1.setText(myRouteShipmentList.get(0).ConsigneePhoneNumber);
             else
                 mobileno1.setVisibility(View.GONE);
 
@@ -805,13 +743,13 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             mobileno.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap_SingleWaybill.this);
                 }
             });
             mobileno1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap_SingleWaybill.this);
                 }
             });
 
@@ -834,7 +772,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             deliver.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Delivered(myRouteShipmentList.get(position - 1));
+                    Delivered(myRouteShipmentList.get(0));
                 }
             });
 
@@ -842,7 +780,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 @Override
                 public void onClick(View v) {
 
-                    NotDelivered(myRouteShipmentList.get(position - 1));
+                    NotDelivered(myRouteShipmentList.get(0));
                 }
             });
 
@@ -1011,13 +949,15 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         outState.putSerializable("haslocation", GlobalVar.GV().haslocation);
     }
 
+    int prePlannedSeq, nextPlannedSeq;
+
     public void GetSeqWaybillNo() {
 
         places.clear();
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
-        Cursor result = dbConnections.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
+        Cursor result = dbConnections.Fill("select * from SuggestLocations where  Date = '" + GlobalVar.getDate() + "'" +
                 " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
         if (result != null && result.getCount() > 0) {
             Issuggest = true;
@@ -1030,28 +970,56 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     Bundle extras = new Bundle();
 
                     String temp[] = split[i].split("_");
-                    Location sp = new Location("");
-                    extras.putString("WaybillNo", temp[0]);
-                    extras.putString("dsID", temp[temp.length - 1]);
-                    extras.putInt("PsID", Integer.parseInt(temp[temp.length - 2]));
-                    sp.setLatitude(Double.parseDouble(temp[1]));
-                    sp.setLongitude(Double.parseDouble(temp[2]));
-                    sp.setAltitude(Double.parseDouble(temp[4]));
-                    sp.setSpeed(Float.parseFloat(temp[temp.length - 1]));
+                    if (temp[0].equals(myRouteShipmentList.get(0).ItemNo)) {
 
-                    sp.setExtras(extras);
-                    if (i == 0)
-                        sp.setAltitude(0);
-                    else
-                        sp.setAltitude(Double.parseDouble(temp[0]));
-                    places.add(sp);
+                        //previous one
+                        String temp0[] = split[i - 1].split("_");
+                        Location sp0 = new Location("");
+                        extras.putString("WaybillNo", temp0[0]);
+                        extras.putString("dsID", temp0[temp0.length - 1]);
+                        extras.putInt("PsID", Integer.parseInt(temp0[temp0.length - 2]));
+                        sp0.setLatitude(Double.parseDouble(temp0[1]));
+                        sp0.setLongitude(Double.parseDouble(temp0[2]));
+                        sp0.setAltitude(Double.parseDouble(temp0[4]));
+                        sp0.setSpeed(Float.parseFloat(temp0[temp0.length - 1]));
+
+                        sp0.setExtras(extras);
+                        if (i - 1 == 0)
+                            sp0.setAltitude(0);
+                        else
+                            sp0.setAltitude(Double.parseDouble(temp0[0]));
+                        places.add(sp0);
+                        prePlannedSeq = Integer.parseInt(temp0[temp0.length - 2]);
+
+                        //Current One
+                        Location sp = new Location("");
+                        extras.putString("WaybillNo", temp[0]);
+                        extras.putString("dsID", temp[temp.length - 1]);
+                        extras.putInt("PsID", Integer.parseInt(temp[temp.length - 2]));
+                        sp.setLatitude(Double.parseDouble(temp[1]));
+                        sp.setLongitude(Double.parseDouble(temp[2]));
+                        sp.setAltitude(Double.parseDouble(temp[4]));
+                        sp.setSpeed(Float.parseFloat(temp[temp.length - 1]));
+
+                        sp.setExtras(extras);
+                        if (i == 0)
+                            sp.setAltitude(0);
+                        else
+                            sp.setAltitude(Double.parseDouble(temp[0]));
+                        places.add(sp);
+
+                        nextPlannedSeq = Integer.parseInt(temp[temp.length - 2]);
+                        break;
+                    }
+
                 }
 
 
             }
             while (result.moveToNext());
-        } else
-            places = MyRouteActivity.places;
+        }
+//        else
+//            places = MyRouteActivity.places;
         result.close();
         dbConnections.close();
 
@@ -1063,31 +1031,30 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
-        Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
+        Cursor result = dbConnections.Fill("select * from plannedLocation where position " +
+                "in(" + prePlannedSeq + "," + nextPlannedSeq + ") and  Date = '" + GlobalVar.getDate() + "'" +
                 " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
 
-        if (result.getCount() == places.size()) {
+        if (result != null && result.getCount() > 0) {
+            IsPlanned = true;
+            result.moveToFirst();
+            int pos = 0;
+            do {
 
+                String data = result.getString(result.getColumnIndex("StringData"));
+                int position = result.getInt(result.getColumnIndex("position"));
 
-            if (result != null && result.getCount() > 0) {
-                IsPlanned = true;
-                result.moveToFirst();
-                do {
-
-                    String data = result.getString(result.getColumnIndex("StringData"));
-                    int position = result.getInt(result.getColumnIndex("position"));
-
-                    if (data.contains("ZERO_RESULTS")) {
-                        System.out.println("true");
-                    }
-                    ParserTask parserTask = new ParserTask();
-                    parserTask.execute(data, String.valueOf(position));
-
-                }
-                while (result.moveToNext());
+//                if (data.contains("ZERO_RESULTS")) {
+//                    System.out.println("true");
+//                }
+                ParserTask parserTask = new ParserTask();
+                parserTask.execute(data, String.valueOf(pos)); //position
+                pos = pos + 1;
+                break;
             }
-        } else
-            dbConnections.deletePlannedRoute(getApplicationContext());
+            while (result.moveToNext());
+        }
+
         result.close();
         dbConnections.close();
 

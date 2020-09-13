@@ -335,6 +335,8 @@ public class FirstFragment
         String result = "";
         StringBuffer buffer;
         ProgressDialog progressDialog;
+        String isInternetAvailable = "";
+        String DomainURL = "";
 
         @Override
         protected void onPreExecute() {
@@ -345,6 +347,7 @@ public class FirstFragment
             progressDialog.setTitle("Downloading PickUp Data");
             progressDialog.show();
             ;
+            DomainURL = GlobalVar.GV().GetDomainURL(getContext());
             //progressDialog = ProgressDialog.show(getActivity().getApplicationContext(), "Please wait.", "Downloading PickUp Data.", true);
         }
 
@@ -356,13 +359,16 @@ public class FirstFragment
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetArrivedAtOriginData");
+                DomainURL = GlobalVar.GV().GetDomainURL(getContext());
+                URL url = new URL(DomainURL + "GetArrivedAtOriginData");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -379,6 +385,7 @@ public class FirstFragment
                 }
                 return String.valueOf(buffer);
             } catch (Exception e) {
+                isInternetAvailable = e.toString();
                 e.printStackTrace();
             } finally {
                 try {
@@ -439,8 +446,20 @@ public class FirstFragment
                     e.printStackTrace();
                 }
 
-            } else
-                GlobalVar.GV().ShowSnackbar(rootView, "No data with Current Employee ID", GlobalVar.AlertType.Error);
+            } else {
+                // GlobalVar.GV().ShowSnackbar(rootView, "No data with Current Employee ID", GlobalVar.AlertType.Error);
+                if (isInternetAvailable.contains("No address associated with hostname")) {
+                    GlobalVar.GV().ShowSnackbar(rootView, "Kindly check your internet", GlobalVar.AlertType.Error);
+                } else {
+                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain(getContext(), DomainURL);
+
+                    }
+
+                    GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.servererror), GlobalVar.AlertType.Error);
+                }
+            }
             progressDialog.dismiss();
             super.onPostExecute(String.valueOf(finalJson));
         }

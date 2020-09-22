@@ -100,7 +100,7 @@ public class BookingListAdapter extends BaseAdapter {
 
     class ViewHolder {
         TextView waybillno, date, consname, orgstation,
-                deststation, billtype;
+                deststation, billtype ;
         //TextView panel;
 
         public ViewHolder(View view) {
@@ -109,7 +109,7 @@ public class BookingListAdapter extends BaseAdapter {
             consname = (TextView) view.findViewById(R.id.consname);
             orgstation = (TextView) view.findViewById(R.id.orgstation);
             deststation = (TextView) view.findViewById(R.id.deststation);
-
+           // contactnumber  = (TextView) view.findViewById(R.id.lblContactNo);
             billtype = (TextView) view.findViewById(R.id.billtype);
             view.setTag(this);
         }

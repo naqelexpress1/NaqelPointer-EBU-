@@ -770,20 +770,21 @@ public class NclShipmentActivity extends AppCompatActivity {
             String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
             jsonData = jsonData.replace("Date(-", "Date(");
 
-            dbConnections.InsertNclBulk(jsonData, getApplicationContext(), ncl.PieceCount);
+            boolean issave = dbConnections.InsertNclBulk(jsonData, getApplicationContext(), ncl.PieceCount);
+            if (issave) {
+                if (!isMyServiceRunning(NclServiceBulk.class) && close != 2) {
+                    startService(
+                            new Intent(this, NclServiceBulk.class));
 
-            if (!isMyServiceRunning(NclServiceBulk.class)) {
-                startService(
-                        new Intent(this, NclServiceBulk.class));
+                }
+                if (close == 1)
+                    finish();
+                else if (close == 2)
+                    NCLbyManual();
 
+                ScanNclWaybillFragment.PieceCodeList.clear();
+                ScanNclWaybillFragment.WaybillList.clear();
             }
-            if (close == 1)
-                finish();
-            else if (close == 2)
-                NCLbyManual();
-
-            ScanNclWaybillFragment.PieceCodeList.clear();
-            ScanNclWaybillFragment.WaybillList.clear();
 
         }
         dbConnections.close();
@@ -1160,7 +1161,7 @@ public class NclShipmentActivity extends AppCompatActivity {
         protected String doInBackground(String... params) {
             totalsize = Integer.parseInt(params[0]);
             DBConnections db = new DBConnections(getApplicationContext(), null);
-            Cursor result = db.Fill("select * from Ncl where IsSync = 0 order by ID", getApplicationContext());
+            Cursor result = db.Fill("select * from Ncl where IsSync = 0 order by ID Limit 20", getApplicationContext());
             if (result.getCount() == 0) {
                 result.close();
                 return null;
@@ -1174,11 +1175,11 @@ public class NclShipmentActivity extends AppCompatActivity {
                 buffer.setLength(0);
 
                 String jsonData = "";
-                if (result.moveToFirst()) {
-                    id = result.getInt(result.getColumnIndex("ID"));
-                    piececount = result.getInt(result.getColumnIndex("PieceCount"));
-                    jsonData = result.getString(result.getColumnIndex("JsonData"));
-                }
+                // if (result.moveToFirst()) {
+                id = result.getInt(result.getColumnIndex("ID"));
+                piececount = result.getInt(result.getColumnIndex("PieceCount"));
+                jsonData = result.getString(result.getColumnIndex("JsonData"));
+                // }
 
                 jsonData = jsonData.replace("Date(-", "Date(");
 
@@ -1231,8 +1232,10 @@ public class NclShipmentActivity extends AppCompatActivity {
 
 
                 if (returnresult.contains("Created")) {
-                    moveddata = moveddata + piececount;
-                    db.updateNCL(id, getApplicationContext());
+
+                    boolean isupdate = db.updateNCL(id, getApplicationContext());
+                    if (isupdate)
+                        moveddata = moveddata + piececount;
                     //db.deleteNcl(id, getApplicationContext());
                     //db.deleteNclWayBill(ncl.ID, getApplicationContext());
                     //db.deleteNclBarcode(id, getApplicationContext());

@@ -69,7 +69,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 127; // MyRouteActivity
+    private static final int Version = 129; // MyRouteActivity
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -428,11 +428,12 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
-                ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0 )");
+                ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
                 ", ActionLatLng Text NOT NULL , DeviceModel Text , Issync Integer Default 0 )");
+
 
     }
 
@@ -714,11 +715,12 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
-                    ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  )");
+                    ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
                     ", ActionLatLng Text NOT NULL , DeviceModel Text , Issync Integer Default 0 )");
+
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -917,6 +919,9 @@ public class DBConnections
             if (!isColumnExist("MyRouteShipments", "IsPlan"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsPlan  INTEGER ");
 
+
+            if (!isColumnExist("MyRouteActionActivity", "IsNotification"))
+                db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN IsNotification INTEGER DEFAULT 0");
         }
 
 
@@ -2598,7 +2603,8 @@ public class DBConnections
         String employid = String.valueOf(GlobalVar.getlastlogin(context));
         String tru = "0";
         try {
-            Cursor empid = Fill("select Distinct EmpID from MyRouteShipments Where DDate = '" + GlobalVar.getDate() + "'", context);
+            //Cursor empid = Fill("select Distinct EmpID from MyRouteShipments Where DDate = '" + GlobalVar.getDate() + "'", context);
+            Cursor empid = Fill("select Distinct EmpID from MyRouteShipments ", context);
 
 
             if (empid != null && empid.getCount() > 0) {
@@ -2824,6 +2830,7 @@ public class DBConnections
             ContentValues contentValues = new ContentValues();
 
             contentValues.put("IsDelivered", true);
+            contentValues.put("OnDeliveryDate", DateTime.now().toString());
             try {
                 String args[] = {String.valueOf(ID)};
                 db.update("MyRouteShipments", contentValues, "ID=?", args);
@@ -2877,7 +2884,7 @@ public class DBConnections
                 ContentValues contentValues = new ContentValues();
 
                 contentValues.put("PartialDelivered", true);
-//                contentValues.put("OnDeliveryDate", DateTime.now().toString());
+                contentValues.put("OnDeliveryDate", DateTime.now().toString());
                 try {
                     String args[] = {String.valueOf(Waybill)};
                     db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
@@ -4566,6 +4573,15 @@ public class DBConnections
                 do {
                     Waybillno = mnocursor.getString(mnocursor.getColumnIndex("ItemNo")) + "_" + String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("DeliverySheetID")));
 
+                    if (mnocursor.getInt(mnocursor.getColumnIndex("NotDelivered")) == 1) {
+                        Cursor nc = Fill("select ds.Name from NotDelivered n inner join DeliveryStatus ds on n.DeliveryStatusID = ds.ID " +
+                                " where  n.WaybillNo = '" + mnocursor.getString(mnocursor.getColumnIndex("ItemNo")) + "'" +
+                                "  order by n.TimeIn desc Limit 1", context);
+                        nc.moveToFirst();
+
+                        Waybillno = Waybillno + "_" + nc.getString(nc.getColumnIndex("Name"));
+                    } else
+                        Waybillno = Waybillno + "_" + "Delivered";
 
                 } while (mnocursor.moveToNext());
             } else
@@ -7209,6 +7225,7 @@ public class DBConnections
             contentValues.put("NextActivitySeqNo", NextActivitySeqNo);
             contentValues.put("NextActivityWaybillNo", NextActivityWaybillno);
             contentValues.put("TotalLocationCount", TotalLocationCount);
+            contentValues.put("IsNotification", 0);
             contentValues.put("SeqNo", SeqNo);
 
             result = db.insert("MyRouteActionActivity", null, contentValues);
@@ -7220,6 +7237,7 @@ public class DBConnections
         }
         return result != -1;
     }
+
 
     public boolean UpdateMyRouteActionActivitySeqNo(Context context) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -7248,6 +7266,7 @@ public class DBConnections
                         contentValues.put("LastActivityWaybillNo", prevActivityWaybillNo);
                         contentValues.put("NextActivitySeqNo", Integer.parseInt(t[0]));
                         contentValues.put("NextActivityWaybillNo", Integer.parseInt(t[1]));
+                        contentValues.put("IsNotification", 0);
 
                         try {
                             String args[] = {String.valueOf(prevActivityWaybillNo)};
@@ -7273,6 +7292,94 @@ public class DBConnections
 
         db.close();
         return true;
+    }
+
+
+    public String FindMyRouteActionActivityNextSeqNo(Context context) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+        String NextActivityWaybillNo = "0";
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            NextActivityWaybillNo = String.valueOf(result.getInt(result.getColumnIndex("NextActivityWaybillNo")));
+
+            Cursor conLoc = Fill("select * from MyRouteShipments where ItemNo = '" + NextActivityWaybillNo + "' Limit 1", context);
+            if (conLoc.getCount() > 0) {
+                conLoc.moveToFirst();
+                String lat = conLoc.getString(conLoc.getColumnIndex("Latitude"));
+                String longi = conLoc.getString(conLoc.getColumnIndex("Longitude"));
+                NextActivityWaybillNo = NextActivityWaybillNo + "_" + lat + "," + longi;
+            }
+            conLoc.close();
+        }
+
+
+        db.close();
+        result.close();
+        return NextActivityWaybillNo;
+    }
+
+    public boolean UpdateMyRouteActionActivityNotification(Context context, int Waybillno) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+        int NextActivityWaybillNo;
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            NextActivityWaybillNo = result.getInt(result.getColumnIndex("NextActivityWaybillNo"));
+
+            ContentValues contentValues = new ContentValues();
+            //Put the filed which you want to update.
+
+            contentValues.put("IsNotification", 1);
+
+
+            try {
+                String args[] = {String.valueOf(Waybillno)};
+                db.update("MyRouteActionActivity", contentValues, "NextActivityWaybillNo=?", args);
+
+            } catch (Exception e) {
+                return false;
+
+
+            }
+            result.close();
+            db.close();
+        }
+
+
+        db.close();
+        return true;
+    }
+
+    public boolean IsNotificationSend(Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+        int prevActivitySeqNo, prevActivityWaybillNo, NextActivitySeqNo, NextActivityWaybillNo;
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            int IsNotification = result.getInt(result.getColumnIndex("IsNotification"));
+            int isComplete = result.getInt(result.getColumnIndex("isComplete"));
+
+            if (isComplete == 1)
+                return true;
+            else if (IsNotification == 1)
+                return true;
+        }
+
+        db.close();
+        return false;
     }
 
     @SuppressLint("MissingPermission")

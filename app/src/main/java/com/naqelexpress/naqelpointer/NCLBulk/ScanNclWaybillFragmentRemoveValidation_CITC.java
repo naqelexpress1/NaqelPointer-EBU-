@@ -253,7 +253,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             txtBarcode.setText("");
         }
 
-        if (PieceCodeList.size() == 20) {
+        if (PieceCodeList.size() >= 20) {
             SaveData(PieceCodeList, WaybillList);
             PieceCodeList.clear();
             WaybillList.clear();
@@ -616,17 +616,19 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
             jsonData = jsonData.replace("Date(-", "Date(");
 
-            dbConnections.InsertNclBulk(jsonData, getContext(), PieceCodeList.size());
+            boolean isinsert = dbConnections.InsertNclBulk(jsonData, getContext(), PieceCodeList.size());
 
-            if (!isMyServiceRunning(NclServiceBulk.class)) {
-                getActivity().startService(
-                        new Intent(getActivity(), NclServiceBulk.class));
+            if (isinsert) {
+                if (!isMyServiceRunning(NclServiceBulk.class)) {
+                    getActivity().startService(
+                            new Intent(getActivity(), NclServiceBulk.class));
 
+                }
+
+                PieceCodeList.clear();
+                WaybillList.clear();
+                initViews();
             }
-
-            PieceCodeList.clear();
-            WaybillList.clear();
-            initViews();
         }
         dbConnections.close();
 

@@ -39,7 +39,7 @@ public class Booking implements Parcelable {
     }
 
     public Booking(int psid, int psdid, String refno, String pickUpReqDT, String contactPerson,
-                   String orgin, String destination, String billType
+                   String orgin, String destination, String billType ,String contactNumber
     ) {
         PSID = psid;
         PSDID = psdid;
@@ -49,6 +49,7 @@ public class Booking implements Parcelable {
         Orgin = orgin;
         Destination = destination;
         BillType = billType;
+        ContactNumber = contactNumber;
 
     }
 

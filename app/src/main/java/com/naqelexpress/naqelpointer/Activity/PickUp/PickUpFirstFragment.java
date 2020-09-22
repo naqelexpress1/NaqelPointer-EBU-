@@ -26,7 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.naqelexpress.naqelpointer.Activity.Booking.Booking;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.Booking;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
@@ -69,7 +69,8 @@ public class PickUpFirstFragment
 
 
         if (rootView == null) {
-            rootView = inflater.inflate(R.layout.pickupfirstfragmentnew, container, false);
+            LayoutInflater lf = getActivity().getLayoutInflater();
+            rootView = lf.inflate(R.layout.pickupfirstfragmentnew, container, false);
 
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             txtOrigin = (EditText) rootView.findViewById(R.id.txtOrigin);
@@ -259,15 +260,22 @@ public class PickUpFirstFragment
 
     private void SetText() {
 
-        txtOrigin.setText(bookinglist.get(position).Orgin);
-        OriginID = bookinglist.get(position).OriginId;
-        txtDestination.setText(bookinglist.get(position).Destination);
-        txtDestination.setInputType(InputType.TYPE_NULL);
-        txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
-        txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
-        txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
-        txtRefNo.setText(bookinglist.get(position).RefNo);
-        DestinationID = bookinglist.get(position).DestinationId;
+        try {
+
+            txtWaybillNo.setText(bookinglist.get(position).RefNo);
+            txtWaybillNo.setInputType(InputType.TYPE_NULL);
+            txtOrigin.setText(bookinglist.get(position).Orgin); //
+            OriginID = bookinglist.get(position).OriginId;
+            txtDestination.setText(bookinglist.get(position).Destination);
+            txtDestination.setInputType(InputType.TYPE_NULL);
+            txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+            txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
+            txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
+            txtRefNo.setText(bookinglist.get(position).RefNo);
+            DestinationID = bookinglist.get(position).DestinationId;
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
     }
 
 //    @Override
@@ -374,7 +382,9 @@ public class PickUpFirstFragment
             clientdetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("clientdetails");
         }
     }
+
     String DomainURL = "";
+
     public void GetClientID(final String input) {
         final ProgressDialog progressDialog = ProgressDialog.show(getActivity(), "Please wait.", "Downloading Client Details.", true);
 

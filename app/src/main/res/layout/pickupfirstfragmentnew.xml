@@ -46,7 +46,8 @@
                         android:ems="10"
                         android:hint=""
                         android:inputType="number"
-                        android:maxLength="8" />
+                        android:maxLength="8"
+                        />
 
                     <Button
                         android:id="@+id/btnOpenCamera"
@@ -79,6 +80,7 @@
                         android:layout_weight=".5"
                         android:ems="10"
                         android:hint=""
+                        android:text="test"
                         android:inputType="number"
                         android:maxLength="7" />
 
@@ -211,7 +213,7 @@
                         android:textStyle="bold" />
 
 
-                    <EditText
+                    <android.support.v7.widget.AppCompatEditText
                         android:id="@+id/txtOrigin"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"

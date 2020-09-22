@@ -325,7 +325,7 @@ public class BookingList extends AppCompatActivity {
                         //instance.OfficeUpTo = DateTime.parse(jsonObject.getString("OfficeUpTo"));
                         //instance.PickUpReqDT = DateTime.parse(jsonObject.getString("PickUpReqDT"));
                         instance.ContactPerson = jsonObject.getString("ConsigneeName");
-                        // instance.ContactNumber = jsonObject.getString("ContactNumber");
+                        instance.ContactNumber = jsonObject.getString("PhoneNo");
                         //instance.Address = jsonObject.getString("FirstAddress");
                         //instance.Latitude = jsonObject.getString("Latitude");
                         //instance.Longitude = jsonObject.getString("Longitude");
@@ -346,7 +346,8 @@ public class BookingList extends AppCompatActivity {
 
 
                         myBookingList.add(new Booking(instance.PSID, instance.PSDID, instance.RefNo,
-                                instance.PickUpReqDT, instance.ContactPerson, instance.Orgin, instance.Destination, instance.BillType
+                                instance.PickUpReqDT, instance.ContactPerson, instance.Orgin, instance.Destination, instance.BillType,
+                                instance.ContactNumber
                         ));
 
                         // myBookingList.add(instance);

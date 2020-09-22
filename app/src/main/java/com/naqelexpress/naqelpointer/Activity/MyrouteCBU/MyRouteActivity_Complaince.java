@@ -897,9 +897,10 @@ public class MyRouteActivity_Complaince
             if (MyRouteActivity_Complaince.this.isDestroyed()) { // or call isFinishing() if min sdk version < 17
                 return;
             }
-            if (progressDialog != null && progressDialog.isShowing())
+            if (progressDialog != null && progressDialog.isShowing()) {
                 progressDialog.dismiss();
-
+                progressDialog = null;
+            }
             progressflag = 0;
             flag_thread = false;
         }
@@ -1283,44 +1284,109 @@ public class MyRouteActivity_Complaince
         super.onBackPressed();
     }
 
+    private boolean isnotificationsend(int Waybillno , String consLocation) {
+        // SweetAlertLoading();
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        boolean issend = false;//dbConnections.IsNotificationSend(getApplicationContext());
+        double Latitude = 0.0, Longitude = 0.0;
+        if (!issend) {
+            Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
+            if (location != null) {
+                Latitude = location.getLatitude();
+                Longitude = location.getLongitude();
+            }
+
+
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("WayBillNo", Waybillno);
+
+                jsonObject.put("EmployID", GlobalVar.GV().EmployID);
+                jsonObject.put("Type", "LiveTracking");
+                jsonObject.put("Lat", Latitude);
+                jsonObject.put("Long", Longitude);
+                jsonObject.put("ConsLocation", consLocation);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new SendNotificationtoConsignee().execute(jsonObject.toString(), String.valueOf(Waybillno));
+
+            //String result = new SendNotificationtoConsignee().execute(jsonObject.toString()).get();
+
+//                if (result != null) {
+//                    JSONObject jsonResult = null;
+//                    try {
+//                        jsonResult = new JSONObject(result);
+//                        if (!jsonResult.getBoolean("HasError")) {
+//                            AlertCommon("Info", "Notification sent Sucessfully to the Consignee, kindly start deliver process ", 2,
+//                                    2, Waybillno);
+//                            return true;
+//                        } else {
+//                            AlertCommon("Error", "Kindly try again to Notify the Consignee", 1,
+//                                    1, Waybillno);
+//                        }
+//
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+
+
+        }
+
+        dbConnections.close();
+        return issend;
+    }
+
     @Override
     public void onItemSelected(MyRouteShipments item, int pos) {
         // Toast.makeText(getApplicationContext(), "Selected: " + item.Position, Toast.LENGTH_LONG).show();
 
         if (GlobalVar.GV().CourierDailyRouteID > 0) {
 
-            ValidatePlannedSuggestRouteSync();
-            RestartServiceLocationMorethan30();
-            RestartDeviceActivity();
-            // OLD Method commented date - 04-09-2020
-            // int position = item.Position;
-
-            int position = getItemPosition(item.ItemNo);
-            if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
-                Intent intent = null;
-                if (GlobalVar.GV().myRouteShipmentList.get(position).IsMap == 1)
-                    intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-                else
-                    intent = new Intent(getApplicationContext(), WaybillPlanActivityNoMap.class);
-                Bundle bundle = new Bundle();
-                bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
-                bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
-                bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
-                bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
-                bundle.putInt("position", position);
-                intent.putExtras(bundle);
-                startActivityForResult(intent, 1);
-
-
-            } else {
-                Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-                startActivity(intent);
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            if (!dbConnections.IsNotificationSend(getApplicationContext())) {
+                isnotificationsend(Integer.parseInt(item.ItemNo) , (item.Latitude+","+ item.Longitude));
+                return;
             }
-
+            RedirectwaybillDetailActivity(item.ItemNo);
 
         } else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
 
+    }
+
+    private void RedirectwaybillDetailActivity(String WaybillNo) {
+        ValidatePlannedSuggestRouteSync();
+        RestartServiceLocationMorethan30();
+        RestartDeviceActivity();
+        // OLD Method commented date - 04-09-2020
+        // int position = item.Position;
+
+        int position = getItemPosition(WaybillNo);
+
+
+        if (GlobalVar.GV().myRouteShipmentList.get(position).TypeID == 1) {
+            Intent intent = null;
+            if (GlobalVar.GV().myRouteShipmentList.get(position).IsMap == 1)
+                intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
+            else
+                intent = new Intent(getApplicationContext(), WaybillPlanActivityNoMap.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
+            bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+            bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
+            bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
+            bundle.putInt("position", position);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 1);
+
+
+        } else {
+            Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
+            startActivity(intent);
+        }
     }
 
     private int getItemPosition(String ItemNo) {
@@ -1475,5 +1541,150 @@ public class MyRouteActivity_Complaince
             adapter.notifyDataSetChanged();
             // } while (result.moveToFirst());
         }
+    }
+
+    private class SendNotificationtoConsignee extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
+        int Waybillno = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            if (progressDialog == null)
+                progressDialog = ProgressDialog.show(MyRouteActivity_Complaince.this,
+                        "Please wait.", "Notify the Consignee for Delivery", true);
+
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... params) {
+
+            //GetFacilityStatusRequest getDeliveryStatusRequest = new GetFacilityStatusRequest();
+            String jsonData = params[0];
+            Waybillno = Integer.parseInt(params[1]);
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(DomainURL + "SendNotificationtoConsigneeForCustApp");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+
+
+            return null;
+//
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+                JSONObject jsonResult = null;
+                try {
+                    jsonResult = new JSONObject(result);
+                    if (!jsonResult.getBoolean("HasError")) {
+//                        AlertCommon("Info", "Notification sent Sucessfully to the Consignee, kindly start deliver process ", 2,
+//                                2, Waybillno);
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        dbConnections.UpdateMyRouteActionActivityNotification(getApplicationContext(), Waybillno);
+                        dbConnections.close();
+                        //  return true;
+                        RedirectwaybillDetailActivity(String.valueOf(Waybillno));
+                    } else {
+                        AlertCommon("Error", "Kindly try again to Notify the Consignee", 1,
+                                1, Waybillno);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else {
+                Toast.makeText(getApplicationContext(), "Something goes wrong , kindly try again", Toast.LENGTH_LONG).show();
+            }
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+
+        }
+    }
+
+    private void AlertCommon(String title, String message, final int type, final int updateDB, final int refNo) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, type);
+        eDialog.setTitleText(title);
+        eDialog.setContentText(message);
+        eDialog.setConfirmText("OK");
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+                sDialog.dismissWithAnimation();
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                if (type == 2 && updateDB == 2) // updateDB = 2 - Notification in myrouteActivity
+                {
+                    dbConnections.UpdateMyRouteActionActivityNotification(getApplicationContext(), refNo);
+                }
+
+            }
+        });
+        eDialog.setCancelable(false);
+        eDialog.show();
+    }
+
+    SweetAlertDialog pDialog;
+
+    private void SweetAlertLoading() {
+        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+        pDialog.setTitleText("Loading");
+        pDialog.setContentText("Notify to the Consignee, Kindly wait..");
+        pDialog.setCancelable(false);
+        pDialog.show();
     }
 }

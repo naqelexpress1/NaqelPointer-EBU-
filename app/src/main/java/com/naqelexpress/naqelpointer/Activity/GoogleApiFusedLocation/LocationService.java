@@ -185,13 +185,18 @@ public class LocationService extends Service {
                             //jsonObject.put("WaybillNo", dbConnections.GetLastDeliveredWaybill(getApplicationContext()));GetLastActionWaybill
 
                             String wd = dbConnections.GetLastActionWaybill(getApplicationContext());
+                            String NextWNo = dbConnections.FindMyRouteActionActivityNextSeqNo(getApplicationContext());
                             if (!wd.equals("0")) {
                                 jsonObject.put("WaybillNo", wd.split("_")[0]);
                                 jsonObject.put("DsID", wd.split("_")[1]);
+                                // if (!wd.split("_")[2].equals("NoData"))
+                                jsonObject.put("NDReason", wd.split("_")[2]);
                             } else
                                 jsonObject.put("WaybillNo", wd);
 
                             jsonObject.put("EmpID", empid);
+                            jsonObject.put("NextWNo", NextWNo.split("_")[0]);
+                            jsonObject.put("ConLocation", NextWNo.split("_")[1]);
                             jsonObject.put("Division", devision);
                             jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
 

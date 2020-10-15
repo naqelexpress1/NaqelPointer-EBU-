@@ -175,7 +175,8 @@ public class NotDeliveredActivity
 
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        if (IsValid() &&   dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext())) {
+        if (IsValid() && dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), firstFragment.txtReason.getText().toString(),
+                firstFragment.txtWaybillNo.getText().toString())) {
             dbConnections.UpdateProductivity_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
             String Barcode = "";

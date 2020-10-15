@@ -69,7 +69,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 129; // MyRouteActivity
+    private static final int Version = 132; // MyRouteActivity
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -165,7 +165,7 @@ public class DBConnections
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
-                " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger )");
+                " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -428,7 +428,8 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
-                ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0)");
+                ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0 , StartDateTime Text ," +
+                " ScanAction Text , LastScanWaybillNo Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
@@ -715,7 +716,8 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"MyRouteActionActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "LastActivitySeqno INTEGER NOT NULL , LastActivityWaybillNo INTEGER NOT NULL , NextActivitySeqNo  INTEGER NOT NULL, NextActivityWaybillNo INTEGER NOT NULL " +
-                    ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0)");
+                    ", TotalLocationCount INTEGER NOT NULL , SeqNo Text , isComplete Integer Default 0  , IsNotification Integer Default 0 , StartDateTime Text," +
+                    "  ScanAction Text , LastScanWaybillNo Text )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DeviceActivity\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
@@ -922,6 +924,17 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteActionActivity", "IsNotification"))
                 db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN IsNotification INTEGER DEFAULT 0");
+            if (!isColumnExist("MyRouteActionActivity", "StartDateTime"))
+                db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN StartDateTime INTEGER DEFAULT 0");
+
+            if (!isColumnExist("MyRouteShipments", "IsRestarted"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsRestarted  INTEGER ");
+
+            if (!isColumnExist("MyRouteActionActivity", "ScanAction"))
+                db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN ScanAction  Text ");
+
+            if (!isColumnExist("MyRouteActionActivity", "LastScanWaybillNo"))
+                db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN LastScanWaybillNo  Text ");
         }
 
 
@@ -4593,6 +4606,27 @@ public class DBConnections
         return Waybillno;
     }
 
+    public String GetLastActionWaybill_MyRouteActionActivity(Context context) {
+        String Waybillno = "0";
+        try {
+            Cursor mnocursor = Fill("select * from MyRouteActionActivity Limit 1", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    Waybillno = mnocursor.getString(mnocursor.getColumnIndex("LastScanWaybillNo")) + "_"
+                            + String.valueOf("0") + "_" + mnocursor.getString(mnocursor.getColumnIndex("ScanAction"));
+
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return Waybillno;
+    }
 //    public String GetLastRefusedWaybill(Context context) {
 //        String Waybillno = "0";
 //        try {
@@ -7225,6 +7259,9 @@ public class DBConnections
             contentValues.put("NextActivitySeqNo", NextActivitySeqNo);
             contentValues.put("NextActivityWaybillNo", NextActivityWaybillno);
             contentValues.put("TotalLocationCount", TotalLocationCount);
+            contentValues.put("StartDateTime", DateTime.now().toString());
+            contentValues.put("ScanAction", "");
+            contentValues.put("LastScanWaybillNo", "0");
             contentValues.put("IsNotification", 0);
             contentValues.put("SeqNo", SeqNo);
 
@@ -7239,7 +7276,7 @@ public class DBConnections
     }
 
 
-    public boolean UpdateMyRouteActionActivitySeqNo(Context context) {
+    public boolean UpdateMyRouteActionActivitySeqNo(Context context, String action, String WaybillNo) {
         SQLiteDatabase db = this.getWritableDatabase();
         DBConnections dbConnections = new DBConnections(context, null);
 
@@ -7266,6 +7303,9 @@ public class DBConnections
                         contentValues.put("LastActivityWaybillNo", prevActivityWaybillNo);
                         contentValues.put("NextActivitySeqNo", Integer.parseInt(t[0]));
                         contentValues.put("NextActivityWaybillNo", Integer.parseInt(t[1]));
+                        contentValues.put("StartDateTime", DateTime.now().toString());
+                        contentValues.put("ScanAction", action);
+                        contentValues.put("LastScanWaybillNo", WaybillNo);
                         contentValues.put("IsNotification", 0);
 
                         try {
@@ -7306,8 +7346,9 @@ public class DBConnections
             result.moveToFirst();
 
             NextActivityWaybillNo = String.valueOf(result.getInt(result.getColumnIndex("NextActivityWaybillNo")));
+            NextActivityWaybillNo = NextActivityWaybillNo + "," + String.valueOf(result.getString(result.getColumnIndex("StartDateTime")));
 
-            Cursor conLoc = Fill("select * from MyRouteShipments where ItemNo = '" + NextActivityWaybillNo + "' Limit 1", context);
+            Cursor conLoc = Fill("select * from MyRouteShipments where ItemNo = '" + NextActivityWaybillNo.split(",")[0] + "' Limit 1", context);
             if (conLoc.getCount() > 0) {
                 conLoc.moveToFirst();
                 String lat = conLoc.getString(conLoc.getColumnIndex("Latitude"));
@@ -7376,7 +7417,8 @@ public class DBConnections
                 return true;
             else if (IsNotification == 1)
                 return true;
-        }
+        } else
+            return true;
 
         db.close();
         return false;
@@ -7460,5 +7502,71 @@ public class DBConnections
         } catch (SQLiteException e) {
 
         }
+    }
+
+    public void updateMyRouteShipmentsIsRestarted(Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("IsRestarted", 1);
+
+            try {
+                db.execSQL("update MyRouteShipments set IsRestarted = 1 ");
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
+    public boolean GetMyRouteShipmentsIsRestarted(Context context) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteShipments Limit 1", context);
+
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            int IsRestarted = result.getInt(result.getColumnIndex("IsRestarted"));
+
+            db.close();
+            result.close();
+            if (IsRestarted == 1)
+                return true;
+
+        } else
+            return true;
+
+
+        return true;
+    }
+
+    public String GetLocation(Context context, String Waybillno) {
+        String locations = "NoData";
+
+        try {
+            Cursor mnocursor = Fill("select Latitude , Longitude  from MyRouteShipments where Latitude !='' and Longitude !=''  and ItemNo = '" + Waybillno + "' Limit 1", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    Location temp = new Location("");
+                    temp.setLongitude(Double.parseDouble(mnocursor.getString(mnocursor.getColumnIndex("Longitude"))));
+                    temp.setLatitude(Double.parseDouble(mnocursor.getString(mnocursor.getColumnIndex("Latitude"))));
+                    //locations.add(temp);
+                    locations = mnocursor.getString(mnocursor.getColumnIndex("Latitude")) + "" + mnocursor.getString(mnocursor.getColumnIndex("Longitude"));
+
+                } while (mnocursor.moveToNext());
+            }
+
+        } catch (SQLiteException e) {
+
+        }
+        return locations;
     }
 }

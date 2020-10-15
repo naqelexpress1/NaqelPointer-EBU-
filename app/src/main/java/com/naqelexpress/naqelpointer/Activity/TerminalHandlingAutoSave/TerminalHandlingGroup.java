@@ -57,7 +57,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         ImageView group3 = (ImageView) findViewById(R.id.group3);
         group3.setOnClickListener(this);
         ImageView group4 = (ImageView) findViewById(R.id.group4);
-        group4.setOnClickListener(this);
+        group4.setOnClickListener(this); //Linehaul
         ImageView group5 = (ImageView) findViewById(R.id.group5);
         group5.setOnClickListener(this);
         ImageView ncl = (ImageView) findViewById(R.id.ncl);

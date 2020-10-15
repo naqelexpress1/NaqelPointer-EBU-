@@ -50,8 +50,12 @@ public class MyReceiver extends BroadcastReceiver {
             //startAllService(context);
 
             DBConnections dbConnections = new DBConnections(context, null);
+
             dbConnections.InsertDeviceActivity(context, 2);
             dbConnections.close();
+
+
+            dbConnections.updateMyRouteShipmentsIsRestarted(context);
 
             context.startService(
                     new Intent(context,
@@ -98,6 +102,7 @@ public class MyReceiver extends BroadcastReceiver {
         } else if (Intent.ACTION_SHUTDOWN.equalsIgnoreCase(intent.getAction()) || Intent.ACTION_AIRPLANE_MODE_CHANGED.equalsIgnoreCase(intent.getAction()) ||
                 Intent.ACTION_APPLICATION_RESTRICTIONS_CHANGED.equalsIgnoreCase(intent.getAction())) {
             DBConnections dbConnections = new DBConnections(context, null);
+            dbConnections.updateMyRouteShipmentsIsRestarted(context);
             if (Intent.ACTION_SHUTDOWN.equals(intent.getAction()))
                 dbConnections.InsertDeviceActivity(context, 1);
             else if (Intent.ACTION_AIRPLANE_MODE_CHANGED.equals(intent.getAction().intern()))

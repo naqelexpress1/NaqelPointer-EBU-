@@ -1215,13 +1215,14 @@ public class LoginActivity
 
                 GlobalVar.ResetTriedCount();
                 GetUserMEDataResult getUserMEDataResult = new GetUserMEDataResult(finalJson);
+
                 if (!getUserMEDataResult.HasError) {
                     // if (GlobalVar.GV().dbConnections != null) {
 
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;
-                    instance.Password = getUserMEDataResult.Password;
+                    instance.Password =  txtPassword.getText().toString();//getUserMEDataResult.Password;
                     instance.RoleMEID = getUserMEDataResult.RoleMEID;
                     instance.StationID = getUserMEDataResult.StationID;
                     instance.StatusID = getUserMEDataResult.StatusID;

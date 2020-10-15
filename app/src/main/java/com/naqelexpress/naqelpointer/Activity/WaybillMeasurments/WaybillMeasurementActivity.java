@@ -458,7 +458,10 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
             if (constraintLayout.getVisibility() == View.VISIBLE) {
 
-                if (initialCalculation())
+                if (!txtRemaining.getText().toString().equals("0")) {
+                    if (initialCalculation())
+                        SaveData();
+                } else
                     SaveData();
 
 //                int remaining = GlobalVar.GV().getIntegerFromString(txtTotalPieces.getText().toString());
@@ -474,7 +477,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
                         "You have to press start Button", GlobalVar.AlertType.Error);
                 return;
             }
-        }else
+        } else
             SaveData();
 
 

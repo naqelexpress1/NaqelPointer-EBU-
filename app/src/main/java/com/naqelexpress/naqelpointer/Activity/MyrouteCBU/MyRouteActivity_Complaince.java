@@ -47,6 +47,7 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.service.LocationService;
 
+import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -303,6 +304,9 @@ public class MyRouteActivity_Complaince
                 btnCloseTrip.setVisibility(View.GONE);
                 txtCloseTrip.setVisibility(View.GONE);
 
+                if (!isRestarted())
+                    return;
+
                 MyRouteCompliance();
 
                 if (IsHasLocation()) {
@@ -356,32 +360,48 @@ public class MyRouteActivity_Complaince
             Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
                     " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
             GetSeqWaybillNo();
+
+            if (result.getCount() == 1) {
+                if (places.size() == 0) {
+                    alertPlannedLocation();
+                }
+                return;
+            }
+
             if (result.getCount() != places.size()) {
+                alertPlannedLocation();
 
-                SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
-                eDialog.setTitleText("Kindly Load Planned Location");
-                eDialog.setContentText("Be patient until Load Fully");
-                eDialog.setConfirmText("OK");
-                eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        sDialog.dismissWithAnimation();
-                        try {
-                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                            startActivityForResult(intent, 1);
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-
-
-                    }
-                });
-                eDialog.setCancelable(false);
-                eDialog.show();
 
             }
         }
+    }
+
+    private void alertPlannedLocation() {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE);
+        eDialog.setTitleText("Kindly Load Planned Location");
+        eDialog.setContentText("Be patient until Load Fully");
+        eDialog.setConfirmText("OK");
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+                sDialog.dismissWithAnimation();
+                try {
+                    GlobalVar.GV().myRouteShipmentList.clear();
+                    GlobalVar.GV().LoadMyRouteShipments("OrderNo", true, getApplicationContext(),
+                            getWindow().getDecorView().getRootView());
+
+                    Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
+                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                    startActivityForResult(intent, 1);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+
+            }
+        });
+        eDialog.setCancelable(false);
+        eDialog.show();
     }
 
     private boolean IsHasLocation() {
@@ -393,7 +413,7 @@ public class MyRouteActivity_Complaince
         if (ds.getCount() > 0) {
             ds.moveToFirst();
             int count = ds.getInt(ds.getColumnIndex("totalcount"));
-            if (count >= 2)
+            if (count >= 1)
                 ishasLocation = true;
         }
         return ishasLocation;
@@ -438,6 +458,33 @@ public class MyRouteActivity_Complaince
 
     }
 
+    private boolean isRestarted() {
+
+        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        if (!dbConnections.GetMyRouteShipmentsIsRestarted(getApplicationContext())) {
+
+            SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+            eDialog.setCancelable(false);
+            eDialog.setTitleText("Info");
+            eDialog.setContentText("Kindly Restart the Device for better performance before start Route");
+            eDialog.setConfirmText("Ok");
+
+            eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                @Override
+                public void onClick(SweetAlertDialog sDialog) {
+
+                    sDialog.dismissWithAnimation();
+                    finish();
+                }
+            });
+            eDialog.show();
+            dbConnections.close();
+            return false;
+        }
+        return true;
+    }
+
     private void MyRouteCompliance() {
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -473,6 +520,7 @@ public class MyRouteActivity_Complaince
 
                     }
                 });
+                eDialog.show();
 //                eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
 //                    @Override
 //                    public void onClick(SweetAlertDialog sDialog) {
@@ -814,7 +862,7 @@ public class MyRouteActivity_Complaince
                 if (!GetDivision())
                     function = "BringMyRouteShipments"; //EBU Divison
                 if (GlobalVar.GV().isFortesting)
-                    function = "BringDeliverySheetFortest"; //EBU Divison
+                    function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence
                 URL url = new URL(DomainURL + function); //Geofence
@@ -916,6 +964,9 @@ public class MyRouteActivity_Complaince
                     getWindow().getDecorView().getRootView());
             DuplicateCustomer();
             MyRouteCompliance();
+
+            if (!isRestarted())
+                return;
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -1284,7 +1335,7 @@ public class MyRouteActivity_Complaince
         super.onBackPressed();
     }
 
-    private boolean isnotificationsend(int Waybillno , String consLocation) {
+    private boolean isnotificationsend(int Waybillno, String consLocation) {
         // SweetAlertLoading();
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         boolean issend = false;//dbConnections.IsNotificationSend(getApplicationContext());
@@ -1306,6 +1357,7 @@ public class MyRouteActivity_Complaince
                 jsonObject.put("Lat", Latitude);
                 jsonObject.put("Long", Longitude);
                 jsonObject.put("ConsLocation", consLocation);
+                jsonObject.put("StartTime", DateTime.now().toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -1347,7 +1399,7 @@ public class MyRouteActivity_Complaince
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             if (!dbConnections.IsNotificationSend(getApplicationContext())) {
-                isnotificationsend(Integer.parseInt(item.ItemNo) , (item.Latitude+","+ item.Longitude));
+                isnotificationsend(Integer.parseInt(item.ItemNo), (item.Latitude + "," + item.Longitude));
                 return;
             }
             RedirectwaybillDetailActivity(item.ItemNo);

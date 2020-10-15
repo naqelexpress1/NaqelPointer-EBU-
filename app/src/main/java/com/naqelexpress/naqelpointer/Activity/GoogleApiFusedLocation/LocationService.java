@@ -184,9 +184,10 @@ public class LocationService extends Service {
                             jsonObject.put("Channel", "CBU-" + String.valueOf(lastlogin));
                             //jsonObject.put("WaybillNo", dbConnections.GetLastDeliveredWaybill(getApplicationContext()));GetLastActionWaybill
 
-                            String wd = dbConnections.GetLastActionWaybill(getApplicationContext());
+                            //String wd = dbConnections.GetLastActionWaybill(getApplicationContext());
+                            String wd = dbConnections.GetLastActionWaybill_MyRouteActionActivity(getApplicationContext());
                             String NextWNo = dbConnections.FindMyRouteActionActivityNextSeqNo(getApplicationContext());
-                            if (!wd.equals("0")) {
+                            if (!wd.equals("0_0_")) {
                                 jsonObject.put("WaybillNo", wd.split("_")[0]);
                                 jsonObject.put("DsID", wd.split("_")[1]);
                                 // if (!wd.split("_")[2].equals("NoData"))
@@ -195,8 +196,11 @@ public class LocationService extends Service {
                                 jsonObject.put("WaybillNo", wd);
 
                             jsonObject.put("EmpID", empid);
-                            jsonObject.put("NextWNo", NextWNo.split("_")[0]);
-                            jsonObject.put("ConLocation", NextWNo.split("_")[1]);
+                            if (!NextWNo.equals("0")) {
+                                jsonObject.put("NextWNo", NextWNo.split("_")[0].split(",")[0]);
+                                jsonObject.put("StartTime", NextWNo.split("_")[0].split(",")[1]);
+                                jsonObject.put("ConLocation", NextWNo.split("_")[1]);
+                            }
                             jsonObject.put("Division", devision);
                             jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
 

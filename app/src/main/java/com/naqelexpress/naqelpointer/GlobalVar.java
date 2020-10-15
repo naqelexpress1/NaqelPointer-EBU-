@@ -86,7 +86,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "CBU- PickupTest(21-09-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "271 - (06-10-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -109,6 +109,7 @@ public class GlobalVar {
     public String NaqelPointerAPILink_For5_1 = "http://34.93.221.35/NaqelPointer/api/pointer/";
     public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
     public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/";
+    public String NaqelPointerAPILink_UploadImage = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
     // public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/"; NaqelWay IP
     // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
     // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
@@ -2907,6 +2908,55 @@ public class GlobalVar {
 
         double foundLongitude = new_x + lon;
         double foundLatitude = y + lat;
+
+        float[] results = new float[1];
+        Location.distanceBetween(lat, lon, foundLatitude, foundLongitude, results);
+        float distanceInMeters = results[0];
+        boolean isWithinradius = distanceInMeters < radius;
+
+        if (isWithinradius)
+            isradius = true;
+        else
+            isradius = false;
+
+        //return new LatLng(foundLatitude, foundLongitude);
+        return isradius;
+
+
+    }
+
+    public static boolean isCourierReachedConsigneeLocation(Context context, double lat, double lon) {
+        boolean isradius = false;
+        if (lat == 0.0) {
+            return true;
+        }
+        Location location = GlobalVar.getLastKnownLocation(context);
+        int radius = 200;
+        double foundLongitude = 0.0, foundLatitude = 0.0;
+
+        if (location != null) {
+            foundLatitude = location.getLatitude();
+            foundLongitude = location.getLongitude();
+        }
+
+
+        //     Random random = new Random();
+
+        // Convert radius from meters to degrees
+//        double radiusInDegrees = radius / 111000f;
+//
+//        double u = random.nextDouble();
+//        double v = random.nextDouble();
+//        double w = radiusInDegrees * Math.sqrt(u);
+//        double t = 2 * Math.PI * v;
+//        double x = w * Math.cos(t);
+//        double y = w * Math.sin(t);
+//
+//        // Adjust the x-coordinate for the shrinking of the east-west distances
+//        double new_x = x / Math.cos(lat);
+
+        // double foundLongitude = new_x + lon;
+        // double foundLatitude = y + lat;
 
         float[] results = new float[1];
         Location.distanceBetween(lat, lon, foundLatitude, foundLongitude, results);

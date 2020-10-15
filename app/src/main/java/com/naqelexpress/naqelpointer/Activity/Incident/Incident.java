@@ -628,6 +628,10 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
             if (!result.equals("")) {
                 ParserTask parserTask = new ParserTask();
                 parserTask.execute(result);
+            } else {
+                ErrorAlert();
+                if (progressDialog != null && progressDialog.isShowing())
+                    progressDialog.dismiss();
             }
 
         }
@@ -680,7 +684,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 jObject = new JSONObject(jsonData[0]);
 
                 DirectionsJSONParser parser = new DirectionsJSONParser();
-                routes = parser.parse(jObject , "0" , getBaseContext() , 1);
+                routes = parser.parse(jObject, "0", getBaseContext(), 1);
 
 //                parseaddress(jObject);
 //                jsonroute.add(jObject.toString());
@@ -1303,7 +1307,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringIncidentReasons");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "BringIncidentReasons");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1380,13 +1384,14 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
     private class InsertIncident extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
+        ProgressDialog pDialog;
 
         @Override
         protected void onPreExecute() {
 
-            if (progressDialog == null)
-                progressDialog = ProgressDialog.show(Incident.this,
-                        "Please wait.", "your Incident Request is being process.", true);
+            // if (progressDialog == null)
+            pDialog = ProgressDialog.show(Incident.this,
+                    "Please wait.", "your Incident Request is being process.", true);
             super.onPreExecute();
 
         }
@@ -1400,7 +1405,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertIncident");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "InsertIncident");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1471,9 +1476,9 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
                 GlobalVar.ShowDialog(Incident.this, "Error", "Your Request Not Insert, please try again later", true);
             }
-            if (progressDialog != null && progressDialog.isShowing()) {
-                progressDialog.dismiss();
-                progressDialog = null;
+            if (pDialog != null && pDialog.isShowing()) {
+                pDialog.dismiss();
+                pDialog = null;
             }
 
         }
@@ -1501,7 +1506,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "Emergency");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "Emergency");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1602,7 +1607,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "CloseIncident");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "CloseIncident");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1782,6 +1787,26 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
         alertDialog.show();
     }
 
+    private void ErrorAlert() {
+        AlertDialog alertDialog = new AlertDialog.Builder(Incident.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Info.");
+        alertDialog.setMessage("Kindly Check your Internet Connection/Something went wrong,please try again");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Close",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        alertDialog.show();
+    }
+
     private void SucessfullyInsert() {
         AlertDialog alertDialog = new AlertDialog.Builder(Incident.this).create();
         alertDialog.setCancelable(false);
@@ -1835,8 +1860,10 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
     private void checkuploadimages() {
 
         if (isFlag_image1 && isFlag_image2 && isFlag_image3 && isFlag_image4) {
-            progressDialog.dismiss();
-            progressDialog = null;
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
             insertDatatoServer();
             return;
         }
@@ -1983,7 +2010,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -2062,7 +2089,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 System.out.println(result);
             } else {
 
-                LoadDivisionError();
+                ErrorAlert();
             }
 
         }
@@ -2149,7 +2176,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -2228,7 +2255,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 System.out.println(result);
             } else {
 
-                LoadDivisionError();
+                ErrorAlert();
             }
 
 
@@ -2313,7 +2340,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -2392,7 +2419,7 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 System.out.println(result);
             } else {
 
-                LoadDivisionError();
+                ErrorAlert();
             }
         }
     }
@@ -2534,13 +2561,15 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_Contimeout);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -2611,8 +2640,13 @@ public class Incident extends AppCompatActivity implements View.OnClickListener 
                 }
 
                 System.out.println(result);
-            }
+            } else
+                ErrorAlert();
 
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
 
         }
     }

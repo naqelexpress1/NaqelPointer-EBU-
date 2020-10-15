@@ -34,7 +34,7 @@ public class GetUserMEDataResult
             jsonObject = new JSONObject(finalJson);
             ID = Integer.parseInt(jsonObject.getString("ID"));
             EmployID = Integer.parseInt(jsonObject.getString("EmployID"));
-            Password = jsonObject.getString("Password");
+            Password = "" ; // jsonObject.getString("Password");
             StationID = Integer.parseInt(jsonObject.getString("StationID"));
             RoleMEID = Integer.parseInt(jsonObject.getString("RoleMEID"));
             StatusID = Integer.parseInt(jsonObject.getString("StatusID"));

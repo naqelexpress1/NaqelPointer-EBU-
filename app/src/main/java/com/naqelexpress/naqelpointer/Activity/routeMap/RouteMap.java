@@ -562,13 +562,12 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                         new Intent(this,
                                 com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
             }
-            if (!IsPlanned)
-                {
-                    Intent returnIntent = new Intent();
-                    returnIntent.putExtra("result", "refreshdata");
-                    setResult(Activity.RESULT_OK, returnIntent);
-                    finish();
-                }
+            if (!IsPlanned) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("result", "refreshdata");
+                setResult(Activity.RESULT_OK, returnIntent);
+                finish();
+            }
         }
     }
 
@@ -638,51 +637,54 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
     private void ShowShipmentMarker() {
 
-        //Location location = new Location();
-        double prvLat = 0.0;
-        double preLng = 0.0;
-        String data = "";
-        for (int i = 0; i < places.size(); i++) {
+        try {
+            //Location location = new Location();
+            double prvLat = 0.0;
+            double preLng = 0.0;
+            String data = "";
+            for (int i = 0; i < places.size(); i++) {
 
-            Random random = new Random();
+                Random random = new Random();
 
-            int color = Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
-            Bitmap bmp = makeBitmap(getApplicationContext(), String.valueOf(i), color);
-            // Canvas canvas = new Canvas(bmp);
+                int color = Color.argb(255, random.nextInt(256), random.nextInt(256), random.nextInt(256));
+                Bitmap bmp = makeBitmap(getApplicationContext(), String.valueOf(i), color);
+                // Canvas canvas = new Canvas(bmp);
 
-            // canvas.drawText(String.valueOf(i+1), 0, 50, paint);
-            colors_marker_route.add(color);
-            LatLng latLng = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
-            ;
-            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.dest_marker);
-            myMarker[i] = mMap.addMarker(new MarkerOptions()
-                    .position(latLng)
-                    .icon(BitmapDescriptorFactory.fromBitmap(bmp)));
-            //.title("Mohamed Ismail"));
-            myMarker[i].setTag((int) places.get(i).getSpeed());
-            myMarker[i].setSnippet(String.valueOf(i));
+                // canvas.drawText(String.valueOf(i+1), 0, 50, paint);
+                colors_marker_route.add(color);
+                LatLng latLng = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
+                ;
+                BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.dest_marker);
+                myMarker[i] = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmp)));
+                //.title("Mohamed Ismail"));
+                myMarker[i].setTag((int) places.get(i).getSpeed());
+                myMarker[i].setSnippet(String.valueOf(i));
 
 
-            //double distanceToPlace1 = distance(prvLat, preLng, latLng.latitude , latLng.longitude);
-            if (i == 0)
-                data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0_0");
-            else
-                data = data + "@" + myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
-                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i) + "_" + String.valueOf((int) places.get(i).getSpeed()));
+                //double distanceToPlace1 = distance(prvLat, preLng, latLng.latitude , latLng.longitude);
+                if (i == 0)
+                    data = "Stratingplace_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_0_0_0");
+                else
+                    data = data + "@" + myRouteShipmentList.get((int) places.get(i).getSpeed() - 1).ItemNo + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
+                            + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i) + "_" + String.valueOf((int) places.get(i).getSpeed()));
 //                data = data + "@" + String.valueOf((int) places.get(i).getAltitude() - 1) + "_" + String.valueOf(places.get(i).getLatitude()) + "_" + String.valueOf(places.get(i).getLongitude() + "_"
 //                        + String.valueOf(distance(prvLat, preLng, latLng.latitude, latLng.longitude)) + "_" + String.valueOf(i));
 
-            prvLat = latLng.latitude;
-            preLng = latLng.longitude;
+                prvLat = latLng.latitude;
+                preLng = latLng.longitude;
 
-            if (i == places.size() - 1 && !Issuggest) {
-                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.InsertSuggestLocation(getApplicationContext(), data);
-                dbConnections.close();
+                if (i == places.size() - 1 && !Issuggest) {
+                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    dbConnections.InsertSuggestLocation(getApplicationContext(), data);
+                    dbConnections.close();
+                }
+
             }
-
+        } catch (Exception e) {
+            System.out.println(e.toString());
         }
-
     }
 
     private void ShowShipmentMarker_byone(int color, String position) {

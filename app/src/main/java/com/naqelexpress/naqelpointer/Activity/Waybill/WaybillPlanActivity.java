@@ -316,10 +316,18 @@ public class WaybillPlanActivity extends AppCompatActivity
 
     public void Delivered() {
 
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (GetDivision()) {
-            Intent intent = new Intent(this, com.naqelexpress.naqelpointer.Activity.DeliveryOFD.DeliveryActivity.class);
-            intent.putExtras(bundle);
-            startActivity(intent);
+            if (ConsigneeLatitude.length() == 0) {
+                ConsigneeLatitude = "0.0";
+                ConsigneeLongitude = "0.0";
+            }
+            if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude))) {
+                Intent intent = new Intent(this, com.naqelexpress.naqelpointer.Activity.DeliveryOFD.DeliveryActivity.class);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            } else
+                ErrorAlert("Info", "Kindly Reach Consignee Location before start Delivery Scan");
         } else {
             Intent intent = new Intent(this, com.naqelexpress.naqelpointer.Activity.Delivery.DeliveryActivity.class);
             intent.putExtras(bundle);
@@ -330,28 +338,36 @@ public class WaybillPlanActivity extends AppCompatActivity
     public void NotDelivered() {
 
         if (GetDivision()) {
-            String waybillno = txtWaybillNo.getText().toString().substring(0, 8);
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            Cursor result = dbConnections.Fill("select PiecesCount from MyRouteShipments Where ItemNo = '"
-                            + waybillno + "'",
-                    getApplicationContext());
-
-            if (result.getCount() > 0) {
-                result.moveToFirst();
-                if (result.getInt(result.getColumnIndex("PiecesCount")) > 1) {
-                    Intent notDelivered = new Intent(getApplicationContext(),
-                            com.naqelexpress.naqelpointer.Activity.NotDeliveredCBU.NotDeliveredActivity.class);
-                    notDelivered.putExtras(bundle);
-                    startActivity(notDelivered);
-                } else {
-                    Intent notDelivered = new Intent(getApplicationContext(),
-                            com.naqelexpress.naqelpointer.Activity.NotDeliveredSinglePiece.NotDeliveredActivity.class);
-                    notDelivered.putExtras(bundle);
-                    startActivity(notDelivered);
-                }
-
-
+            if (ConsigneeLatitude.length() == 0) {
+                ConsigneeLatitude = "0.0";
+                ConsigneeLongitude = "0.0";
             }
+            if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude))) {
+
+
+                String waybillno = txtWaybillNo.getText().toString().substring(0, 8);
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                Cursor result = dbConnections.Fill("select PiecesCount from MyRouteShipments Where ItemNo = '"
+                                + waybillno + "'",
+                        getApplicationContext());
+
+                if (result.getCount() > 0) {
+                    result.moveToFirst();
+                    if (result.getInt(result.getColumnIndex("PiecesCount")) > 1) {
+                        Intent notDelivered = new Intent(getApplicationContext(),
+                                com.naqelexpress.naqelpointer.Activity.NotDeliveredCBU.NotDeliveredActivity.class);
+                        notDelivered.putExtras(bundle);
+                        startActivity(notDelivered);
+                    } else {
+                        Intent notDelivered = new Intent(getApplicationContext(),
+                                com.naqelexpress.naqelpointer.Activity.NotDeliveredSinglePiece.NotDeliveredActivity.class);
+                        notDelivered.putExtras(bundle);
+                        startActivity(notDelivered);
+                    }
+
+                }
+            } else
+                ErrorAlert("Info", "Kindly Reach Consignee Location before start Not Deliver Scan");
         } else {
             Intent notDelivered = new Intent(getApplicationContext(), NotDeliveredActivity.class);
             startActivity(notDelivered);
@@ -552,6 +568,17 @@ public class WaybillPlanActivity extends AppCompatActivity
         eDialog.show();
 
     }
+
+    private void ErrorAlert(String title, String msg) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(true);
+        eDialog.setTitleText(title);
+        eDialog.setContentText(msg);
+        eDialog.show();
+
+    }
+
 
     Point p;
 

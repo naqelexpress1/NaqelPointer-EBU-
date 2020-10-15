@@ -699,7 +699,7 @@ public class ArrivedatDestination extends AppCompatActivity {
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");

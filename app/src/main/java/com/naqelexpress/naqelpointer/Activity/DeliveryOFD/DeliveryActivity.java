@@ -279,9 +279,17 @@ public class DeliveryActivity extends AppCompatActivity {
 
         String WaybillNo = firstFragment.txtWaybillNo.getText().toString();
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext()))
+//        if (!dbConnections.UpdateMyRouteShipmentsIsDeliverd(getApplicationContext(), WaybillNo, 0)) {
+//            GlobalVar.ShowDialog(DeliveryActivity.this, "Warning",
+//                    "Something went wrong , kindly save again", true);
+//            return;
+//        }
+
+        if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), "Delivered", WaybillNo)) {
             GlobalVar.ShowDialog(DeliveryActivity.this, "Warning",
                     "Something went wrong , kindly save again", true);
+            return;
+        }
 
         Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + WaybillNo + "'",
                 getApplicationContext());

@@ -114,7 +114,9 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL , \"IsNCLDest\" INTEGER NOT NULL  )");
+       //todo riyam
+       // db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
                 "\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT , SeqOrder INTEGER )");
 
@@ -435,6 +437,26 @@ public class DBConnections
                 "DeviceName TEXT , DeviceAction INTEGER NOT NULL , ActionDate Text , EmpID INTEGER NOT NULL " +
                 ", ActionLatLng Text NOT NULL , DeviceModel Text , Issync Integer Default 0 )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnlineValidation\" " +
+                "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                " \"Barcode\" INTEGER NOT NULL ," +
+                " \"DestID\" INTEGER NOT NULL," +
+                " \"IsMultiPieces\" INTEGER NOT NULL , " +
+                "\"IsRTORequest\" INTEGER NOT NULL , " +
+                "\"IsStopped\" INTEGER NOT NULL, " +
+                "\"IsDeliveryRequest\" INTEGER NOT NULL," +
+                "\"NoOfAttempts\" INTEGER NOT NULL," +
+                "\"IsRelabel\" INTEGER NOT NULL )");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnLineValidationFileDetails\" " +
+                "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                " \"UplodatDate\"  DATETIME NOT NULL )");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"NCLDestinations\" " +
+                "(\"NCLDestID\" INTEGER NOT NULL ," +
+                " \"StationID\" INTEGER NOT NULL )");
 
     }
 

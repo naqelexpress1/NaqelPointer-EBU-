@@ -72,6 +72,9 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     HashMap<String, String> trips = new HashMap<>();
     TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount;
     private EditText txtBarCode;//, txtbinlocation;
+    Button bringdatawaybillattempt;
+
+
     public ArrayList<String> inventorycontrol = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
     public ArrayList<String> iscitcshipments = new ArrayList<>();
@@ -82,7 +85,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     private DataAdapter adapter;
     private Paint p = new Paint();
     public ArrayList<String> isWaybillAttempt = new ArrayList<>();
-    Button bringdatawaybillattempt;
+    private int binMasterCount;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,38 +110,12 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         txtBarCode.setKeyListener(null);
         txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
         txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25)});
-        // txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
-        // txtbinlocation.setKeyListener(null);
 
-        //txtbinlocation.setVisibility(View.GONE);
-
-        //checkinternetAvailability();
-        //isConnected();
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        // isNetworkAvailable();
-        //Commented for checking force close issues
-        // isDeviceonline();
 
-
-//        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
-//        txtBarCode.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (txtBarCode != null && txtBarCode.getText().length() == 13)
-//                    AddNewPiece();
-//            }
-//        });
 
         txtBarCode.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -207,7 +185,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
         });
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        // dbConnections.deleteDeliverRtoReqData(getApplicationContext());
         Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
         if (result.getCount() > 0) {
             ReadFromLocal(result, dbConnections);
@@ -223,6 +200,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
         }
 
+        binMasterCount = GlobalVar.getBinMasterCount(getApplicationContext());
     }
 
 
@@ -257,34 +235,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
     }
 
-    /*  public boolean isNetworkAvailable() {
-
-          try {
-              HttpURLConnection urlc = (HttpURLConnection)
-                      (new URL("http://clients3.google.com/generate_204")
-                              .openConnection());
-              urlc.setRequestProperty("User-Agent", "Android");
-              urlc.setRequestProperty("Connection", "close");
-              urlc.setConnectTimeout(1500);
-              urlc.connect();
-  //                return (urlc.getResponseCode() == 204 &&
-  //                        urlc.getContentLength() == 0);
-              if (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0) {
-                  txtbinlocation.setText("Device is Online!");
-                  return true;
-              }
-          } catch (IOException e) {
-              Log.e("", "Error checking internet connection", e);
-              txtbinlocation.setText("Error checking internet connection!");
-          }
-
-          txtbinlocation.setText("No Internet!");
-          return false;
-      }
-  */
     private void AddNewPiece() {
-        //isConnected();
-//        isNetworkAvailable();
 
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
@@ -299,9 +250,13 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
 
-        // Toast.makeText(getApplicationContext(), txtBarCode.getText().toString(), Toast.LENGTH_LONG).show();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
+            //Validate Bin location
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
+                return;
+            }
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
             txtBarCode.setText("");

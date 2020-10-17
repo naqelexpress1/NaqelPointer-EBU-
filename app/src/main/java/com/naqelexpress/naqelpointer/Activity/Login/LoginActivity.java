@@ -21,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -73,10 +74,9 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 
-public class LoginActivity
-        extends AppCompatActivity {
-    // DBConnections dbConnections;
-    //Context context;
+public class LoginActivity extends AppCompatActivity {
+
+
     TextView lbVersion;
     Button btnLogin, btnForgotPassword, btnScan;
     EditText txtEmployID, txtPassword;
@@ -97,11 +97,8 @@ public class LoginActivity
 
         boolean asd = GlobalVar.GV().IsAllowtoScan("Upto : 2019-12-11 16.30".replace("Upto : ", ""));
 
-        //GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-//        int empid = GlobalVar.getlastlogin(getApplicationContext());
         btnLogin = (Button) findViewById(R.id.btnLogin);
 
         btnForgotPassword = (Button) findViewById(R.id.btnForgotPassword);
@@ -113,52 +110,16 @@ public class LoginActivity
             }
         });
 
-        //context = this;
         lbVersion = (TextView) findViewById(R.id.lbVersion);
         String Version = getString(R.string.lbVersion) + GlobalVar.GV().AppVersion;
         lbVersion.setText(Version);
 
-        // this.dbConnections = new DBConnections(this, mainRootView);
 
         txtEmployID = (EditText) findViewById(R.id.txtEmployID);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
 
         GlobalVar.ResetTriedCount();
 
-//        if (savedInstanceState != null)
-//            setSavedInstance(savedInstanceState);
-
-
-        //TODO remove user name and password
-        //txtEmployID.setText("17693");
-        //txtPassword.setText("1989");
-
-//        txtEmployID.setText("15304");
-//        txtPassword.setText("123456");
-
-        //Commented by Ismail
-//        JSONObject jsonObject = new JSONObject();
-//        try
-//        {
-//            if (GlobalVar.GV().HasInternetAccess)
-//            {
-//                CheckNewVersionRequest checkNewVersionRequest = new CheckNewVersionRequest();
-//                jsonObject.put("AppSystemSettingID",checkNewVersionRequest.AppSystemSettingID);
-//                jsonObject.put("CurrentVersion",checkNewVersionRequest.CurrentVersion);
-//                jsonObject.put("AppTypeID",checkNewVersionRequest.AppTypeID);
-//                jsonObject.put("AppVersion",checkNewVersionRequest.AppVersion);
-//                jsonObject.put("LanguageID",checkNewVersionRequest.LanguageID);
-//                String jsonData = jsonObject.toString();
-//
-//                new CheckNewVersion().execute(jsonData);
-//            }
-//            else
-//                GlobalVar.GV().ShowSnackbar(mainRootView,getString(R.string.NoInternetConnection), GlobalVar.AlertType.Warning);
-//        }
-//        catch (JSONException e)
-//        {
-//            e.printStackTrace();
-//        }
 
         txtEmployID.addTextChangedListener(new TextWatcher() {
             @Override
@@ -171,59 +132,10 @@ public class LoginActivity
 
             @Override
             public void afterTextChanged(Editable s) {
-//                //#4#-1#Admin#RUH#Yemen#Correct#
-//                int UserID = 0, EmployID = -5;
-//                if (txtEmployID.getText().toString().startsWith("#") &&
-//                        txtEmployID.getText().toString().endsWith("#Correct#"))
-//                {
-//                    String[] txt = txtEmployID.getText().toString().split("#");
-//                    UserID = Integer.parseInt(txt[1]);
-//                    EmployID = Integer.parseInt(txt[2]);
-//
-//                    if (EmployID >= -1 && UserID > 0)
-//                    {
-//                        Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " + String.valueOf(EmployID) );//+ " and ID =" + String.valueOf(UserID));
-//                        if (result.getCount() > 0)
-//                        {
-//                            result.moveToFirst();
-//                            GlobalVar.GV().UserID = Integer.valueOf(result.getString(result.getColumnIndex("ID")));
-//                            GlobalVar.GV().EmployID = Integer.valueOf(result.getString(result.getColumnIndex("EmployID")));
-//                            GlobalVar.GV().StationID = Integer.valueOf(result.getString(result.getColumnIndex("StationID")));
-//
-//                            UserMeLogin userMeLogin = new UserMeLogin(GlobalVar.GV().EmployID,1);
-//                            dbConnections.InsertUserMeLogin(userMeLogin);
-//                            dataSync.SendUserMeLoginsData();
-//
-//                           OpenMainPage();
-//                        }
-//                        else
-//                            {
-//                                dataSync.GetUserMEData(EmployID,"NoPass");
-//                                GlobalVar.GV().ShowSnackbar(mainRootView,"Please check your barcode", GlobalVar.AlertType.Error);
-//                            }
-//                    }
-//                    else
-//                    {
-//                        dataSync.GetUserMEData(EmployID,"NoPass");
-//                        GlobalVar.GV().ShowSnackbar(mainRootView,"Please check your barcode", GlobalVar.AlertType.Error);
-//                    }
-//                }
-//                else
-//                {
-//                    dataSync.GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()),txtPassword.getText().toString());
-//                    GlobalVar.GV().ShowSnackbar(mainRootView, "Please Check Your Employ ID and Password", GlobalVar.AlertType.Error);
-//                }
+
             }
         });
 
-//        ActivityCompat.requestPermissions(
-//                LoginActivity.this,
-//                new String[]{Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG, Manifest.permission.WRITE_CONTACTS
-//                        , Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE
-//                        , Manifest.permission.CAMERA, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE},
-//                1
-//        );
 
         if (GlobalVar.GV().LoginVariation) {
             vehicles = new ArrayList<FindVehilceObject>();
@@ -248,8 +160,6 @@ public class LoginActivity
             if (result.getCount() == 0) {
                 try {
                     JSONObject jsonObject = new JSONObject();
-                    //jsonObject.put("StationID", GlobalVar.GV().StationID);
-                    //jsonObject.put("Function", function);
                     new BringTruckData().execute(jsonObject.toString());
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -295,7 +205,6 @@ public class LoginActivity
     public void HideKeyBoard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        //SyncData();
     }
 
 
@@ -331,23 +240,8 @@ public class LoginActivity
                     "You have to enter Odometer", GlobalVar.AlertType.Warning);
             return;
         }
-//        if (txtPassword.getText().toString().equals("123456")) {
-//            Intent intent = new Intent(this, UpdatePassword.class);
-//            txtPassword.setText("");
-//            intent.putExtra("EmployID", txtEmployID.getText().toString());
-//            startActivity(intent);
-//            return;
-//        }
-
-        //Add Comment for EBU
-//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//        Cursor result = dbConnections.Fill("select * from Facility ", getApplicationContext());
-//        if (result.getCount() == 0)
-//            GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
-//        else
 
         LoginIntoOpenMainPage();
-//        GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
     }
 
     private void LoginIntoOpenMainPage() {
@@ -360,27 +254,15 @@ public class LoginActivity
         if (result != null && result.getCount() > 0) {
 
             result.moveToFirst();
-//            int x1 = Integer.valueOf(result.getString(result.getColumnIndex("ID")));
             GlobalVar.GV().UserID = Integer.valueOf(result.getString(result.getColumnIndex("ID")));
             GlobalVar.GV().EmployID = Integer.valueOf(result.getString(result.getColumnIndex("EmployID")));
             GlobalVar.GV().StationID = Integer.valueOf(result.getString(result.getColumnIndex("StationID")));
             int uid = result.getInt(result.getColumnIndex("UserTypeID"));
             usertype = uid;
 
-//            GlobalVar.lastlogin(getApplicationContext(), GlobalVar.GV().EmployID);
-
-//            DBConnections dbConnections = new DBConnections(context, null);
             dbConnections.UpdateLastLogin(GlobalVar.GV().EmployID, getApplicationContext(), uid);
             dbConnections.UpdateTruckID(GlobalVar.GV().EmployID, getApplicationContext(), truckID);
 
-//            try
-//            {
-//                String x = result.getString(result.getColumnIndex("MobileNo"));
-//            }
-//            catch (Exception e)
-//            {
-//                e.printStackTrace();
-//            }
 
             try {
                 GlobalVar.GV().EmployMobileNo = result.getString(result.getColumnIndex("MobileNo"));
@@ -402,17 +284,8 @@ public class LoginActivity
                 e.printStackTrace();
             }
             LoginToMainPage(1);
-//            OpenMainPage(0);
         } else {
-            // if ( GlobalVar.GV().HasInternetAccess )
-            //  {
-            //DataSync dataSync = new DataSync();
             GetUserMEData(Integer.parseInt(txtEmployID.getText().toString()), txtPassword.getText().toString());
-
-            //     GlobalVar.GV().ShowSnackbar(mainRootView, "Please Check Your Employ ID and Password", GlobalVar.AlertType.Error);
-            // }
-            // else
-            //      GlobalVar.GV().ShowSnackbar(mainRootView,"Please check the internet connection", GlobalVar.AlertType.Warning);
         }
     }
 
@@ -434,37 +307,12 @@ public class LoginActivity
         if (GlobalVar.GV().ThereIsMandtoryVersion)
             GlobalVar.GV().ShowDialog(LoginActivity.this, "New Version", "There is a new version, Please update the system, or cordiante with IT department for updating your system.", true);
         else {
-            //  SetDeviceId();
 
-//            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//            intent.putExtra("getMaster", getMaster);
-//            startActivity(intent);
-//            finish();
-//            if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CALL_PHONE)
-//                    != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                     LoginActivity.this,
                     new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG}, //Manifest.permission.CALL_PHONE,
                     2
             );
-
-//            }
-
-//            else{
-//                Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//                intent.putExtra("getMaster", getMaster);
-//                startActivity(intent);
-//                finish();
-//            }
-
-//            ActivityCompat.requestPermissions(
-//                    LoginActivity.this,
-//                    new String[]{Manifest.permission.READ_CALL_LOG, Manifest.permission.WRITE_CALL_LOG, Manifest.permission.WRITE_CONTACTS
-//                            , Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.CALL_PHONE, Manifest.permission.READ_PHONE_STATE
-//                            , Manifest.permission.CAMERA, Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS,
-//                            Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_PHONE_NUMBERS},
-//                    1
-//            );
         }
     }
 
@@ -486,72 +334,7 @@ public class LoginActivity
         String jsonData = JsonSerializerDeserializer.serialize(optimization, true);
         ProjectAsyncTask task = new ProjectAsyncTask("Optimize", "Post", jsonData, "http://35.188.10.142/NaqelRouteApi/api/");
         task.execute();
-
-
     }
-
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
-//            if (data != null) {
-//                final Barcode barcode = data.getParcelableExtra("barcode");
-//                txtEmployID.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        String resultBarcode = barcode.displayValue;
-//                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
-//
-//                        //#4#-1#Admin#RUH#Yemen#Correct#
-//                        int UserID, EmployID;
-//                        if (resultBarcode.startsWith("#") &&
-//                                resultBarcode.endsWith("#Correct#")) {
-//                            String[] txt = resultBarcode.split("#");
-//                            UserID = Integer.parseInt(txt[1]);
-//                            EmployID = Integer.parseInt(txt[2]);
-//                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//                            if (EmployID >= -1 && UserID > 0) {
-//                                if (GlobalVar.GV().ThereIsMandtoryVersion) {
-//                                    GlobalVar.GV().ShowDialog(LoginActivity.this, "New Version", "There is a new version, Please update the system, or cordiante with IT department for updating your system.", false);
-//                                    return;
-//                                }
-//
-//                                Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " + String.valueOf(EmployID), getApplicationContext());//+ " and ID =" + String.valueOf(UserID));
-//                                if (result.getCount() > 0) {
-//                                    result.moveToFirst();
-//                                    GlobalVar.GV().UserID = Integer.valueOf(result.getString(result.getColumnIndex("ID")));
-//                                    GlobalVar.GV().EmployID = Integer.valueOf(result.getString(result.getColumnIndex("EmployID")));
-//                                    GlobalVar.GV().StationID = Integer.valueOf(result.getString(result.getColumnIndex("StationID")));
-//                                    GlobalVar.GV().EmployMobileNo = result.getString(result.getColumnIndex("MobileNo"));
-//                                    if (GlobalVar.GV().IsEnglish()) {
-//                                        GlobalVar.GV().EmployName = result.getString(result.getColumnIndex("EmployName"));
-//                                        GlobalVar.GV().EmployStation = result.getString(result.getColumnIndex("StationName"));
-//                                    } else {
-//                                        GlobalVar.GV().EmployName = result.getString(result.getColumnIndex("EmployFName"));
-//                                        GlobalVar.GV().EmployStation = result.getString(result.getColumnIndex("StationFName"));
-//                                    }
-//
-//                                    LoginToMainPage();
-//                                } else {
-//                                    //DataSync dataSync = new DataSync();
-//                                    GetUserMEData(EmployID, "NoPass");
-//                                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Please check your barcode", GlobalVar.AlertType.Error);
-//                                }
-//                            } else {
-//                                //DataSync dataSync = new DataSync();
-//                                GetUserMEData(EmployID, "NoPass");
-//                                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Please check your barcode", GlobalVar.AlertType.Error);
-//                            }
-//                            dbConnections.close();
-//                        }
-//
-//                    }
-//                });
-//            }
-//        }
-//
-//
-//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
@@ -597,7 +380,6 @@ public class LoginActivity
                     }
 
                 } else {
-                    //  GlobalVar.AskPermission_Location(MainPageActivity.this);
                     for (int i = 0; i < permissions.length; i++) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
                             Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -619,11 +401,6 @@ public class LoginActivity
                             4
                     );
 
-
-//                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//                    intent.putExtra("getMaster", getMaster);
-//                    startActivity(intent);
-//                    finish();
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -633,7 +410,6 @@ public class LoginActivity
                             } catch (Exception e) {
                                 GlobalVar.ShowDialog(LoginActivity.this, "Permission necessary", "Kindly please contact our Admin", true);
                             }
-                            // finish();
                         } else {
                             ActivityCompat.requestPermissions(
                                     LoginActivity.this,
@@ -642,12 +418,6 @@ public class LoginActivity
                             );
                         }
                     }
-//                    else {
-//                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//                        intent.putExtra("getMaster", getMaster);
-//                        startActivity(intent);
-//                        finish();
-//                    }
                 }
 
                 break;
@@ -678,12 +448,6 @@ public class LoginActivity
                                 5
                         );
 
-//                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//                        intent.putExtra("getMaster", getMaster);
-//                        startActivity(intent);
-//
-//                        finish();
-
                     } else {
                         GlobalVar.enableLocationSettings(LoginActivity.this);
                     }
@@ -696,7 +460,6 @@ public class LoginActivity
                             } catch (Exception e) {
                                 GlobalVar.ShowDialog(LoginActivity.this, "Permission necessary", "Kindly please contact our Admin", true);
                             }
-                            // finish();
                         } else {
                             ActivityCompat.requestPermissions(
                                     LoginActivity.this,
@@ -729,12 +492,6 @@ public class LoginActivity
                         startActivity(intent);
                         finish();
                     }
-
-
-//                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-//                    intent.putExtra("getMaster", getMaster);
-//                    startActivity(intent);
-                    //finsih();
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -903,12 +660,6 @@ public class LoginActivity
                         File file = new File(DIRECTORY);
                         if (file.exists()) {
 
-//                            Intent intent1 = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-//                            intent1.setData(Uri.parse("package:" + app_pkg_name));
-//                            intent1.putExtra(Intent.EXTRA_RETURN_RESULT, true);
-//                            startActivityForResult(intent1, UNINSTALL_REQUEST_CODE);
-
-
                             String DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
                             File toInstall = new File(DIRECTORY1, installaionfile);
 
@@ -924,10 +675,6 @@ public class LoginActivity
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             startActivity(intent);
 
-//                            Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-//                                    .setDataAndType(Uri.parse(DIRECTORY1),
-//                                            "application/vnd.android.package-archive");
-//                            startActivity(promptInstall);
                         }
                     } else {
                         try {
@@ -1084,24 +831,17 @@ public class LoginActivity
         super.onSaveInstanceState(outState);
     }
 
-//    private void setSavedInstance(Bundle savedInstanceState) {
-//
-//        if (savedInstanceState != null) {
-//            txtEmployID.setText(savedInstanceState.getString("txtEmployID"));
-//            txtPassword.setText(savedInstanceState.getString("txtPassword"));
-//            truck.setText(savedInstanceState.getString("truck"));
-//            truckID = savedInstanceState.getInt("truckID");
-//        }
-//    }
 
     public void GetUserMEData(int EmployID, String Password) {
-        //  if (!GlobalVar.GV().HasInternetAccess)
-        //      return;
+        DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
+
         GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
         GetUserMEDataRequest getUserMEDataRequest = new GetUserMEDataRequest();
         getUserMEDataRequest.EmployID = EmployID;
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
+        getUserMEDataRequest.IsLastLoggingOutError = dbConnections.UpdateLoginStatusErrorCount(EmployID , getApplicationContext()) > 0 ? true : false;
+
 
         if (GlobalVar.GV().LoginVariation)
             getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
@@ -1142,7 +882,6 @@ public class LoginActivity
                     "Bringing User Details.", true);
 
             DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
-            //DomainURL =  GlobalVar.GV().NaqelPointerAPILink_For5_1;
 
         }
 
@@ -1156,7 +895,7 @@ public class LoginActivity
 
             try {
 
-                URL url = new URL(DomainURL + "GetUserMEData");
+                URL url = new URL(DomainURL + "GetUserMEData_v2");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 try {
@@ -1216,13 +955,17 @@ public class LoginActivity
                 GlobalVar.ResetTriedCount();
                 GetUserMEDataResult getUserMEDataResult = new GetUserMEDataResult(finalJson);
 
-                if (!getUserMEDataResult.HasError) {
-                    // if (GlobalVar.GV().dbConnections != null) {
-
+                if (getUserMEDataResult.HasError) {
+                    if (getUserMEDataResult.PwdNeedUpdate) {
+                        updatePasswordDialog(getUserMEDataResult.ErrorMessage);
+                    } else {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Data Not Sync Because :" + getUserMEDataResult.ErrorMessage, GlobalVar.AlertType.Error);
+                    }
+                } else {
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;
-                    instance.Password =  txtPassword.getText().toString();//getUserMEDataResult.Password;
+                    instance.Password = txtPassword.getText().toString();//getUserMEDataResult.Password;
                     instance.RoleMEID = getUserMEDataResult.RoleMEID;
                     instance.StationID = getUserMEDataResult.StationID;
                     instance.StatusID = getUserMEDataResult.StatusID;
@@ -1244,26 +987,12 @@ public class LoginActivity
                     instance.TruckID = truckID;
 
 
-//                    dbConnections.close();
-//                    GlobalVar.lastlogin(getApplicationContext(), instance.EmployID);
-
                     GlobalVar.GV().UserID = instance.ID;
                     GlobalVar.GV().EmployID = instance.EmployID;
                     GlobalVar.GV().StationID = instance.StationID;
                     GlobalVar.GV().EmployMobileNo = instance.MobileNo;
                     GlobalVar.GV().EmployName = instance.EmployName;
                     GlobalVar.GV().EmployStation = instance.StationFName;
-
-//                    dbConnections.UpdateLastLogin(instance.EmployID, getApplicationContext(), instance.UsertypeID);
-//                    dbConnections.deleteUserME(instance, getApplicationContext(), getWindow().getDecorView().getRootView());
-//                    dbConnections.InsertUserME(instance, getApplicationContext());
-
-//                    LoginToMainPage(1);
-
-//                    OpenMainPage(1);
-
-                    //   }
-
 
                     dbConnections.InsertAppVersion(getUserMEDataResult.Appversion, getApplicationContext());
 
@@ -1317,16 +1046,14 @@ public class LoginActivity
                             ShowAlertMessage("This Application will support only for " + getUserMEDataResult.AppName + " Employees" +
                                     " kindly contact concern person", 1);
                     }
-
-                } else
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Data Not Sync Because :" + getUserMEDataResult.ErrorMessage, GlobalVar.AlertType.Error);
-            } else {
+                }
+            }
+             else {
                 if (isInternetAvailable.contains("No address associated with hostname")) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
                 } else {
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
                     if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        //dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
                         GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
                     }
 
@@ -1378,10 +1105,6 @@ public class LoginActivity
         @SuppressWarnings("deprecation")
         protected String doInBackground(String... params) {
 
-
-            //uploadfilescount = uploadfilescount + 1;
-
-            // GlobalVar.GV().GetMasterData(MainPageActivity.this, getWindow().getDecorView().getRootView(), progressDialog);
             GetDeliveryStatusRequest getDeliveryStatusRequest = new GetDeliveryStatusRequest();
             String jsonData = JsonSerializerDeserializer.serialize(getDeliveryStatusRequest, true);
 
@@ -1507,14 +1230,22 @@ public class LoginActivity
                         if (CityLists.length() > 0)
                             dbConnections.insertCityBulk(CityLists, getApplicationContext());
 
+                        try {
+
+                            JSONArray binMasterList = jsonObject.getJSONArray("BinMastersList");
+
+                            if (binMasterList.length() > 0)
+                                dbConnections.insertBinMasterBulk(binMasterList, getApplicationContext());
+                        } catch (Exception ex) {
+                            Log.d("test" , "Insert Master Bin ex " + ex.toString());
+                        }
+
+
+
                         updateUserDetails();
                         LoginIntoOpenMainPage();
 
-//                            OpenMainPage(1);
-
-                        // }
                     } else {
-//                        GlobalVar.updateApp(LoginActivity.this);
                         deleteApk();
                         updateApp();
                     }
@@ -1822,5 +1553,24 @@ public class LoginActivity
         alertDialog.show();
     }
 
+    private void updatePasswordDialog(String message) {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+            builder.setTitle("Info")
+                    .setMessage(message)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+                            Intent i = new Intent(LoginActivity.this , UpdatePasswordActivity.class);
+                            i.putExtra("emp_id" , Integer.parseInt(txtEmployID.getText().toString()));
+                            startActivity(i);
+                        }
+                    }).setCancelable(false);
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } catch (Exception e) {
+            Log.d("test" , e.toString());
+        }
+    }
 
 }

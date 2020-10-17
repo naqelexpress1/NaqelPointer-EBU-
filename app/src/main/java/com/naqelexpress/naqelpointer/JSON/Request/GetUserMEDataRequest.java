@@ -12,5 +12,7 @@ public class GetUserMEDataRequest {
     public String AndroidID = "";
     public int FacilityID = 0;
     public int Odometer = 0;
+    public boolean IsLastLoggingOutError;
+
 
 }

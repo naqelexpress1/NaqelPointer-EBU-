@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NaqelPointerAndroid.iml" filepath="$PROJECT_DIR$/NaqelPointerAndroid.iml" group="NaqelPointerAndroid" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="NaqelPointerAndroid/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/TFS_-_PointerMobileAppNew.iml" filepath="$PROJECT_DIR$/.idea/modules/TFS_-_PointerMobileAppNew.iml" group="TFS_-_PointerMobileAppNew" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="TFS - PointerMobileAppNew/app" />
     </modules>
   </component>
 </project>

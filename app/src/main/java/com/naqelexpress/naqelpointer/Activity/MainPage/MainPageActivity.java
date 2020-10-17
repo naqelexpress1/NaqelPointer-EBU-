@@ -88,6 +88,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.DataSync;
 import com.naqelexpress.naqelpointer.JSON.Request.GetDeliveryStatusRequest;
+import com.naqelexpress.naqelpointer.JSON.Request.UpdateLoginStatusRequest;
 import com.naqelexpress.naqelpointer.MainActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.LocationService;
@@ -323,13 +324,11 @@ public class MainPageActivity
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-//                                int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-//                                UserMeLogin userMeLogin = new UserMeLogin(id);
-//                                dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-//                                finish();
-//                                Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-//                                startActivity(intent);
-                                Logout();
+                                if (GlobalVar.isCourier(getApplicationContext()))
+                                    new UpdateLoginStatus().execute();
+                                else {
+                                    Logout();
+                                }
                             }
                         }).setNegativeButton("Cancel", null).setCancelable(false);
                 AlertDialog alertDialog = builder.create();
@@ -2549,6 +2548,107 @@ public class MainPageActivity
                 });
 
         alertDialog.show();
+    }
+
+    private class UpdateLoginStatus extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+        private ProgressDialog progressDialog;
+        String DomainURL = "";
+        String isInternetAvailable = "";
+
+        @Override
+        protected void onPreExecute() {
+
+            if (progressDialog == null)
+                progressDialog = ProgressDialog.show(MainPageActivity.this, "Please wait.",
+                        "Update user information ...", true);
+
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            super.onPreExecute();
+
+        }
+
+        @SuppressWarnings("deprecation")
+        protected String doInBackground(String... params) {
+
+            UpdateLoginStatusRequest updateLoginStatusRequest = new UpdateLoginStatusRequest();
+            updateLoginStatusRequest.IsLogin = false;
+            updateLoginStatusRequest.EmployID = GlobalVar.GV().EmployID;
+            String jsonData = JsonSerializerDeserializer.serialize(updateLoginStatusRequest, true);
+
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(DomainURL + "UpdateLoginStatus");
+
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.getBoolean("HasError"))
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), jsonObject.getString("ErrorMessage"), GlobalVar.AlertType.Error);
+                    else
+                        Logout();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+            }
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        }
     }
 
 }

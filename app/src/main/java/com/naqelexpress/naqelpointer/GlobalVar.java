@@ -85,6 +85,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class GlobalVar {
 
     public UserSettings currentSettings;
+    public boolean autoLogout = false;
 
     public String AppVersion = "271 - (06-10-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
@@ -100,8 +101,7 @@ public class GlobalVar {
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
-    //
-    //
+
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -754,6 +754,43 @@ public class GlobalVar {
         dbConnections.close();
         return isvalid;
     }
+
+    public static boolean isEmpty (EditText editText ) {
+
+        if (editText.getText().toString().trim().length() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isCourier(Context context) {
+        String division = GlobalVar.GV().getDivisionID(context, GlobalVar.GV().EmployID);
+        if (division.equals("Courier"))
+            return true;
+        else
+            return false;
+    }
+
+
+    public static int getBinMasterCount(Context context) {
+        try {
+            DBConnections dbConnections = new DBConnections(context, null);
+            return dbConnections.getCount("BINMaster", "", context);
+        } catch (Exception ex) {
+        }
+        return 0;
+    }
+
+
+    public static boolean isBinMasterValueExists(String value , Context context) {
+        try {
+            DBConnections dbConnections = new DBConnections(context, null);
+            return dbConnections.isValueExist("BINMaster" , "BINNumber" , value , context);
+        } catch (Exception ex) {
+            return true;
+        }
+    }
+
 
 //    public static void updateApp(final Activity activity) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(activity);

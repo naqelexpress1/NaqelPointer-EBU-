@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,7 +41,7 @@ public class UpdatePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_password);
         context = this;
-
+        Log.d("test" , "IN");
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             employeeID = extras.getInt("emp_id");
@@ -94,7 +95,8 @@ public class UpdatePasswordActivity extends AppCompatActivity {
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            // Todo Riyam Update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
 
         }
 
@@ -168,7 +170,7 @@ public class UpdatePasswordActivity extends AppCompatActivity {
                     startActivity(i);
                     finishAffinity();
                 } else
-                    etPassword.getText().clear();
+                etPassword.getText().clear();
                 etConfirmPassword.getText().clear();
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), updateUserPwdResult.ErrorMessage, GlobalVar.AlertType.Error);
             } else {

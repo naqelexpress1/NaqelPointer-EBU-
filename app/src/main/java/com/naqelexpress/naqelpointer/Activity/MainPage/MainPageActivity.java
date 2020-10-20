@@ -72,6 +72,7 @@ import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
 import com.naqelexpress.naqelpointer.Activity.WaybillMeasurments.WaybillMeasurementActivity;
+//import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.ContactNo.Contact;
@@ -2563,7 +2564,8 @@ public class MainPageActivity
                 progressDialog = ProgressDialog.show(MainPageActivity.this, "Please wait.",
                         "Update user information ...", true);
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
             super.onPreExecute();
 
         }

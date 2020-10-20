@@ -97,6 +97,7 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
+
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
@@ -121,6 +122,8 @@ public class GlobalVar {
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
+    private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
+
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
     public int Connandtimeout30000 = 30000;
@@ -3217,6 +3220,10 @@ public class GlobalVar {
         DBConnections dbConnections = new DBConnections(context, null);
         return dbConnections.GetPrimaryDomain(context);
 
+    }
+
+    public static String getTestAPIURL (Context context) {
+        return NaqelAPITest_V10;
     }
 
     public String GetDomainURLforService(Context context, String ServiceName) {

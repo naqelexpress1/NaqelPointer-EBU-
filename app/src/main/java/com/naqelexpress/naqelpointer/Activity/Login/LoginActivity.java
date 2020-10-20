@@ -881,7 +881,7 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
                     "Bringing User Details.", true);
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
 
         }
 
@@ -1564,12 +1564,14 @@ public class LoginActivity extends AppCompatActivity {
                             Intent i = new Intent(LoginActivity.this , UpdatePasswordActivity.class);
                             i.putExtra("emp_id" , Integer.parseInt(txtEmployID.getText().toString()));
                             startActivity(i);
+                            Log.d("Login" , "Start");
+
                         }
                     }).setCancelable(false);
             AlertDialog alertDialog = builder.create();
             alertDialog.show();
         } catch (Exception e) {
-            Log.d("test" , e.toString());
+            Log.d("Login" , "Login activity" + e.toString());
         }
     }
 

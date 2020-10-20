@@ -13,6 +13,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
@@ -60,7 +61,6 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
-
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -80,6 +80,7 @@ public class SplashScreenActivity
             dbConnections.close();
 
             if (dbConnections.UpdateLoginStatusCount(getApplicationContext()) >= 1){
+                Log.d("test" , "IF");
                 GlobalVar.GV().autoLogout = true;
                 int employID = dbConnections.getUpdateLoginStatus(getApplicationContext());
                 dbConnections.DeleteUpdateLoginStatus(getApplicationContext());
@@ -653,7 +654,10 @@ public class SplashScreenActivity
                         startActivity(intent);
 
                     } else {
-                        new UpdateLoginStatus().execute();
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        intent.putExtra("getMaster", 0);
+                        startActivity(intent);
+                       // new UpdateLoginStatus().execute();
                     }
                     finish();
 
@@ -763,7 +767,8 @@ public class SplashScreenActivity
         @Override
         protected void onPreExecute() {
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //Todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
             super.onPreExecute();
 
         }

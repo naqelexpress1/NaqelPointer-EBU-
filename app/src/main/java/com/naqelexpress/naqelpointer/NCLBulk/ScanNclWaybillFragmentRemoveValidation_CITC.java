@@ -15,23 +15,29 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
+import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.joda.time.DateTime;
 
@@ -43,6 +49,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -61,6 +68,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     ArrayList<String> isduplicate = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
+    private List<Integer> allowedDestStationIDs = new ArrayList<>();
+    private SearchableSpinner searchableSpinnerDest;
+    private boolean isNCLDestChosen;
+
+    private DBConnections dbConnections = new DBConnections(getContext(), null);
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,6 +86,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
 
             txtBarcode = (EditText) rootView.findViewById(R.id.txtBarcode);
+
+            if (!isNCLDestChosen) {
+                txtBarcode.setEnabled(false);
+                txtBarcode.setHint("Chose NCL destination first to scan barcode");
+            }
+
             txtCitcCount = (TextView) rootView.findViewById(R.id.citccount);
             txtCitcCount.setVisibility(View.VISIBLE);
             LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.ll);
@@ -110,10 +130,20 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
-
-                        //AddNewWaybill(String.valueOf(barcodeInfoResult.WayBillNo));
-                        AddNewPiece(txtBarcode.getText().toString(), "0", 0);
-
+                        try {
+                            if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
+                                String barcode = txtBarcode.getText().toString();
+                                if (isValidPieceBarcode(barcode)) {
+                                    AddNewPiece(barcode, "0", 0);
+                                } else {
+                                    showDialog(getOnLineValidationPiece(barcode));
+                                    Log.d("test", "Not valid");
+                                }
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), e.toString(), Toast.LENGTH_LONG).show();
+                            Log.d("test", "ScanNclWaybill" + e.toString());
+                        }
                     }
 
                 }
@@ -434,6 +464,143 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
     }
+
+    public void onNclDestChange(int nclDestStationID) {
+        updateAllowedDesList(nclDestStationID);
+        isNCLDestChosen = true;
+        txtBarcode.setHint("Scan barcode");
+        txtBarcode.setEnabled(true);
+    }
+
+    private void updateAllowedDesList(int nclDestStationID) {
+
+        if (allowedDestStationIDs != null && allowedDestStationIDs.size() > 0)
+            allowedDestStationIDs.clear();
+
+        allowedDestStationIDs = dbConnections.getAllowedNclStationDestIDs(nclDestStationID, getContext());
+    }
+
+    private ArrayList<Station> getAllowedDestCode () {
+        ArrayList<Station> stationArrayList = new ArrayList<>();
+        for (int i = 0 ; i < allowedDestStationIDs.size(); i++) {
+            stationArrayList.add(dbConnections.getStationByID(allowedDestStationIDs.get(i) , getContext()));
+        }
+        return stationArrayList;
+    }
+
+    // Todo Riyam - What if barcode is not in file?
+    private boolean isValidPieceBarcode(String pieceBarcode) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+                if (!allowedDestStationIDs.contains(onLineValidation.getDestID())) {
+                    onLineValidation.setIsDestNotBelongToNcl(1);
+                    isValid = false;
+                }
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidationList.add(onLineValidation);
+                }
+                return isValid;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        return isValid;
+    }
+
+
+    public void showDialog(OnLineValidation pieceDetails) {
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText(pieceDetails.getPieceBarcode());
+
+                LinearLayout llDifDest = dialogView.findViewById(R.id.ll_wrong_dest);
+                llDifDest.setVisibility(View.VISIBLE);
+
+                TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
+                tvWrongDest.setText("Piece Destination doesn't belong no NCL destination");
+
+                searchableSpinnerDest = (SearchableSpinner) dialogView.findViewById(R.id.spinner_destinations);
+                searchableSpinnerDest.setVisibility(View.VISIBLE);
+                ArrayAdapter<Station> addressArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, getAllowedDestCode());
+                addressArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                searchableSpinnerDest.setAdapter(addressArrayAdapter);
+                searchableSpinnerDest.setTitle("Change Destination");
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+                Button btnQuit = dialogView.findViewById(R.id.btn_quit);
+                btnQuit.setVisibility(View.VISIBLE);
+                btnQuit.setText("Quit");
+
+
+                if (pieceDetails.getIsStopShipment() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isStopShipment");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+                Log.d("test" , "Show");
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                            Log.d("test" , "OK btn");
+                        }
+                    }
+                });
+
+                btnQuit.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getPieceBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
+
 
     private class BringBarcodeInfo extends AsyncTask<String, Void, String> {
         private ProgressDialog progressDialog;

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:background="@drawable/custom_alert_dialog"
+    android:layout_height="match_parent">
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:background="@color/NaqelBlue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/White"
+            android:textSize="20sp"
+            android:paddingLeft="15dp"
+            android:textStyle="bold"
+            android:text="Piece Validation"/>
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="160dp"
+            android:src="@drawable/complain"/>
+    </RelativeLayout>
+
+
+
+    <TextView
+        android:id="@+id/tv_barcode"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:textColor="@color/NaqelBlue"
+        />
+
+    <!--Wrong Dest -->
+    <LinearLayout
+        android:id="@+id/ll_wrong_dest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4.8dp"
+                android:layout_marginStart="10dp"
+                android:src="@drawable/black_circle"
+                />
+
+            <TextView
+                android:id="@+id/tv_wrong_dest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:textColor="@color/Black"
+                />
+        </LinearLayout>
+
+
+        <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+            android:id="@+id/spinner_destinations"
+            style="@style/spinner_style"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawSelectorOnTop="true"/>
+
+    </LinearLayout>
+
+    <!--NoAttepmts -->
+    <LinearLayout
+        android:id="@+id/ll_no_attempts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4.8dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/black_circle"
+            />
+
+        <TextView
+            android:id="@+id/tv_no_of_attempts"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/Black"
+            android:text="Number of attepmts : 1"/>
+
+
+
+    </LinearLayout>
+
+    <!--MultiPiece -->
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+
+      <LinearLayout
+          android:id="@+id/ll_is_multi_piece"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="30dp"
+          android:visibility="gone"
+          android:orientation="horizontal">
+
+          <ImageView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="4.8dp"
+              android:layout_marginStart="10dp"
+              android:src="@drawable/black_circle"
+              />
+
+          <TextView
+              android:id="@+id/tv_multiPiece"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginStart="10dp"
+              android:textColor="@color/Black"
+              android:text="Multiple pieces - Please check pieces"/>
+
+
+      </LinearLayout>
+
+
+          <RadioGroup
+              android:id="@+id/rg_multi_piece"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:orientation="horizontal"
+              android:layout_marginTop="5dp"
+              android:visibility="gone">
+
+              <RadioButton
+                  android:id="@+id/rb_yes"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:checked="false"
+                  android:text="Yes" />
+
+                  <Space
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginStart="30dp" />
+
+              <RadioButton
+                  android:id="@+id/rb_no"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:checked="false"
+                  android:text="No" />
+          </RadioGroup>
+  </LinearLayout>
+
+    <!--StopShipment -->
+    <LinearLayout
+        android:id="@+id/ll_is_stop_shipment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4.8dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/black_circle"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/Black"
+            android:text="Stop shipment , Please hold."/>
+
+
+
+    </LinearLayout>
+
+    <!--RTO -->
+    <LinearLayout
+        android:id="@+id/ll_is_rto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4.8dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/black_circle"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/Black"
+            android:text="RTO"/>
+
+
+
+    </LinearLayout>
+
+    <!--DeliveryReq -->
+    <LinearLayout
+        android:id="@+id/ll_is_delivery_req"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4.8dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/black_circle"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/Black"
+            android:text="RTO"/>
+
+
+
+    </LinearLayout>
+
+    <!--Relabel -->
+    <LinearLayout
+        android:id="@+id/ll_is_relabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:visibility="gone"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4.8dp"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/black_circle"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/Black"
+            android:text="Relabel"/>
+
+
+
+    </LinearLayout>
+
+    <!--Buttons-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:gravity="center_horizontal">
+
+
+        <Button
+            android:id="@+id/btn_confirm"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:background="@color/NaqelBlue"
+            android:visibility="gone"
+            android:textColor="@color/White"/>
+
+
+
+        <Button
+            android:id="@+id/btn_quit"
+            android:layout_width="100dp"
+            android:layout_height="30dp"
+            android:layout_marginStart="5dp"
+            android:visibility="gone"
+            android:background="@color/NaqelBlue"
+            android:textColor="@color/White"/>
+
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" />
+
+</LinearLayout>

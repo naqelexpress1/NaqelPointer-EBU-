@@ -171,6 +171,11 @@ public class GlobalVar {
     public static boolean gs = false, dsl = false, cptl = false, cptdl = false, cptddl = false, nnvdl = false;
 //    private ArrayList<String> DataTypeList = new ArrayList<>();
 
+    public static final int NclAndArrival = 1;
+    public static final int DsAndInventory = 2;
+    public static final int DsValidation = 3;
+
+
     public static GlobalVar GV() {
         if (GlobalVar.gv == null) {
             GlobalVar.gv = new GlobalVar();

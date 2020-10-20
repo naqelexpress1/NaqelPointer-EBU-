@@ -10,10 +10,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,7 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
@@ -39,6 +43,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Hasna on 11/11/18.
@@ -53,12 +58,13 @@ public class ValidationDS extends AppCompatActivity {
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
 
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
+    private DBConnections dbConnections;
     private GridView waybilgrid;
     BarCode adapter;
-    EditText txtBarcode;
+    EditText txtBarcode , employid;
     TextView count;
 
-    EditText employid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,8 +80,9 @@ public class ValidationDS extends AppCompatActivity {
         ScanbyDevice.clear();
         ConflictBarcode.clear();
 
-        waybilgrid = (GridView) findViewById(R.id.barcode);
-//        adapter = new BarCode(ScannedBarCode, getApplicationContext());
+        dbConnections = new DBConnections(getApplicationContext(), null);
+
+        waybilgrid = findViewById(R.id.barcode);
         adapter = new BarCode(conflict, getApplicationContext());
         waybilgrid.setAdapter(adapter);
 
@@ -138,7 +145,10 @@ public class ValidationDS extends AppCompatActivity {
                         GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                         if (!ConflictBarcode.contains(result))
                             ConflictBarcode.add(result);
-                        conflict(result);
+
+                        isValidPieceBarcode(result);
+                        showDialog(getOnLineValidationPiece(result) , true);
+                        //conflict(result);
                     }
                     txtBarcode.setText("");
                     doaction();
@@ -167,7 +177,8 @@ public class ValidationDS extends AppCompatActivity {
 
         if (employid.getText().toString().length() > 4) {
 
-            insertDiscrepancy();
+            //todo riyam uncomment
+           // insertDiscrepancy();
 
             count.setText("Count - 0");
             conflict.clear();
@@ -203,37 +214,37 @@ public class ValidationDS extends AppCompatActivity {
         alertDialog.show();
     }
 
-
-    private void insertDiscrepancy() {
-        if (ConflictBarcode.size() > 0) {
-            try {
-                JSONObject header = new JSONObject();
-                JSONArray jsonArray = new JSONArray();
-
-                for (int i = 0; i < ConflictBarcode.size(); i++) {
-                    JSONObject jsonObject = new JSONObject();
-
-                    jsonObject.put("BarCode", ConflictBarcode.get(i));
-                    jsonObject.put("OperationEmp", GlobalVar.GV().EmployID);
-                    jsonObject.put("EmployID", employid.getText().toString());
-                    jsonObject.put("ScanDate", DateTime.now().toString());
-                    jsonArray.put(jsonObject);
-
-                }
-
-                header.put("Discrepancy", jsonArray);
-                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.InsertDiscrepancy(header.toString(), getApplicationContext());
-                dbConnections.close();
-
-                stopService(new Intent(ValidationDS.this, Discrepancy.class));
-                startService(new Intent(ValidationDS.this, Discrepancy.class));
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//todo Riyam uncomment
+//    private void insertDiscrepancy() {
+//        if (ConflictBarcode.size() > 0) {
+//            try {
+//                JSONObject header = new JSONObject();
+//                JSONArray jsonArray = new JSONArray();
+//
+//                for (int i = 0; i < ConflictBarcode.size(); i++) {
+//                    JSONObject jsonObject = new JSONObject();
+//
+//                    jsonObject.put("BarCode", ConflictBarcode.get(i));
+//                    jsonObject.put("OperationEmp", GlobalVar.GV().EmployID);
+//                    jsonObject.put("EmployID", employid.getText().toString());
+//                    jsonObject.put("ScanDate", DateTime.now().toString());
+//                    jsonArray.put(jsonObject);
+//
+//                }
+//
+//                header.put("Discrepancy", jsonArray);
+//                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//                dbConnections.InsertDiscrepancy(header.toString(), getApplicationContext());
+//                dbConnections.close();
+//
+//                stopService(new Intent(ValidationDS.this, Discrepancy.class));
+//                startService(new Intent(ValidationDS.this, Discrepancy.class));
+//
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 
     private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
@@ -321,6 +332,8 @@ public class ValidationDS extends AppCompatActivity {
                         temp.put("bgcolor", "2");
                         scannedBarCode.add(jsonObject.getString("BarCode"));
                         waybilldetails.add(temp);
+                         if (!isValidPieceBarcode(jsonObject.getString("BarCode")))
+                             showDialog(getOnLineValidationPiece(jsonObject.getString("BarCode")) , false);
                         conflict.add(temp);
                         count.setText("Piece Count - " + String.valueOf(waybilldetails.size()));
                     }
@@ -336,6 +349,109 @@ public class ValidationDS extends AppCompatActivity {
             if (progressDialog != null)
                 progressDialog.dismiss();
         }
+    }
+
+    // Todo Riyam - What if barcode is not in file?
+    private boolean isValidPieceBarcode(String pieceBarcode) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidationList.add(onLineValidation);
+                }
+                return isValid;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        return isValid;
+    }
+
+
+    public void showDialog(OnLineValidation pieceDetails , boolean isConflict) {
+        Log.d("test" , "Show dialog");
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(ValidationDS.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                if (isConflict)
+                    tvBarcode.setText("This Piece " + pieceDetails.getPieceBarcode() + " is not belong to this Employee");
+                else
+                    tvBarcode.setText(pieceDetails.getPieceBarcode());
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+
+
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+                    Log.d("test" , "MultiPiece");
+                }
+
+                if (pieceDetails.getIsStopShipment() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isStopShipment");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getPieceBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
     }
 
 //    private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
@@ -632,7 +748,8 @@ public class ValidationDS extends AppCompatActivity {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        insertDiscrepancy();
+                        //todo Riyam uncomment
+                       // insertDiscrepancy();
                         ValidationDS.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);

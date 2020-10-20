@@ -6,11 +6,17 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
@@ -36,15 +42,25 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     private ArrayList<Integer> mSelectedIndices;
     private int mCameraId = -1;
 
-    public static ArrayList<String> scannedBarCode = new ArrayList<>();
-    public static ArrayList<String> ScanbyDevice = new ArrayList<>();
-    public static ArrayList<String> ConflictBarcode = new ArrayList<>();
+    public static ArrayList<String> scannedBarCode = new ArrayList<>(); // For barcode belong to emp by api
+    public static ArrayList<String> ScanbyDevice = new ArrayList<>(); // For barcode scanned by emp that belongs to him
+    public static ArrayList<String> ConflictBarcode = new ArrayList<>(); // For barcode that doesn't belong to emp
+    private DBConnections dbConnections ;
+    private List<OnLineValidation> onLineValidationList;
+
+
 
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.newbarcodescanner);
+        try {
+            dbConnections = new DBConnections(getApplicationContext() , null);
+            onLineValidationList = new ArrayList<>();
+        } catch (Exception e ) {
+             Log.d("test" , "Scanner " + e.toString());
+        }
 
 //        scannedBarCode.clear();
 //        ScanbyDevice.clear();
@@ -142,8 +158,15 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             if (!ConflictBarcode.contains(result))
                 ConflictBarcode.add(result);
-            conflict(result);
-
+            //todo riyam why comment
+            //conflict(result);
+            try {
+                validatePieceBarcode(result);
+                showDialog(getOnLineValidationPiece(result));
+                // conflict(result);
+            } catch (Exception e) {
+                Log.d("test" , "Scanner " + e.toString());
+            }
         }
 
     }
@@ -204,6 +227,105 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
         }
     }
+
+    // Todo Riyam - What if barcode is not in file?
+    private boolean validatePieceBarcode(String pieceBarcode) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidationList.add(onLineValidation);
+                }
+                return isValid;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        return isValid;
+    }
+
+
+    public void showDialog(OnLineValidation pieceDetails) {
+        Log.d("test" , "Show dialog");
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(NewBarCodeScannerForVS.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("This Piece " + pieceDetails.getPieceBarcode() + " is not belong to this Employee");
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+                    Log.d("test" , "MultiPiece");
+                }
+
+                if (pieceDetails.getIsStopShipment() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isStopShipment");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                            mScannerView.resumeCameraPreview(NewBarCodeScannerForVS.this);
+                        }
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getPieceBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
 
     @Override
     public void onBackPressed() {

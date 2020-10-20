@@ -20,11 +20,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
@@ -32,10 +34,12 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -57,6 +61,8 @@ public class ThirdFragment
 //    private boolean add = false;
     private Intent intent;
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
+    private DBConnections dbConnections = new DBConnections(getContext(), null);
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
 
 
     @Override
@@ -93,8 +99,14 @@ public class ThirdFragment
                         }
                     } else {
                         if (txtBarCode != null && txtBarCode.getText().length() == 13) {
+                            String barcode = txtBarCode.getText().toString();
                             if (IsValid()) {
-                                AddNewPiece();
+                                if (isValidPieceBarcode(barcode)) {
+                                    AddNewPiece();
+                                } else {
+                                    showDialog(getOnLineValidationPiece(barcode));
+                                }
+
                             } else {
                                 requestfocus();
                             }
@@ -647,4 +659,127 @@ public class ThirdFragment
 
         return isValid;
     }
+
+    // Todo Riyam - What if barcode is not in file?
+    private boolean isValidPieceBarcode(String pieceBarcode) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+                if (onLineValidationLocal.getDestID() != GlobalVar.GV().StationID) {
+                    onLineValidation.setIsWrongDest(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsRelabel() == 1) {
+                    onLineValidation.setIsRelabel(1);
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidationList.add(onLineValidation);
+                    if (onLineValidation.getIsWrongDest() == 0)  // Arrival scan shouldn't be captured if it's wrong dest
+                        AddNewPiece();
+                    else
+                        txtBarCode.getText().clear();
+                }
+
+                return isValid;
+            } else {
+                Log.d("test" , "null");
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        return isValid;
+    }
+
+
+    public void showDialog(OnLineValidation pieceDetails) {
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText(pieceDetails.getPieceBarcode());
+
+                if (pieceDetails.getIsWrongDest() == 1) {
+                    LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
+                    llWrongDest.setVisibility(View.VISIBLE);
+                    TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
+                    tvWrongDest.setText("Wrong Destination");
+                    Log.d("test" , "isWrongDest");
+                }
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isMultiPiece");
+                }
+
+                if (pieceDetails.getIsStopShipment() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isStopShipment");
+                }
+
+                if (pieceDetails.getIsRelabel() == 1) {
+                    LinearLayout llRelabel = dialogView.findViewById(R.id.ll_is_relabel);
+                    llRelabel.setVisibility(View.VISIBLE);
+                    Log.d("test" , "isRelabel");
+                }
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                            Log.d("test" , "OK btn");
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getPieceBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
 }

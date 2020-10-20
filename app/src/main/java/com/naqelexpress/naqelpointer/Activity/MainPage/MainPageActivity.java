@@ -2564,7 +2564,8 @@ public class MainPageActivity
                 progressDialog = ProgressDialog.show(MainPageActivity.this, "Please wait.",
                         "Update user information ...", true);
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
             super.onPreExecute();
 
         }

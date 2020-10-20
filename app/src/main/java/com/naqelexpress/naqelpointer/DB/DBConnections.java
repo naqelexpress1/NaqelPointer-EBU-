@@ -1303,7 +1303,7 @@ public class DBConnections
 
 
             db.delete("UserMELogin", "Date!=?", args);
-            db.delete("UserME", "Date!=?", args);
+            result = db.delete("UserME", "Date!=?", args);
 
             if (result != 0) {
                 InsertUpdateLoginStatus(userME , context);

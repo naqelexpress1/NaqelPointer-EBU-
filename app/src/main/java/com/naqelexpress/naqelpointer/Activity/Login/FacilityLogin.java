@@ -315,8 +315,18 @@ public class FacilityLogin
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
+                    //todo riyam check if courier
                     if (!jsonObject.getBoolean("HasError")) {
-                        new UpdateLoginStatus().execute();
+                        if (GlobalVar.isCourier(getApplicationContext())) {
+                            new UpdateLoginStatus().execute();
+                        }
+                        else {
+                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                            dbConnections.FacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID);
+                            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
 
                 } catch (JSONException e) {
@@ -394,7 +404,8 @@ public class FacilityLogin
                 progressDialog = ProgressDialog.show(FacilityLogin.this, "Please wait.",
                         "Update user information ...", true);
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
             super.onPreExecute();
 
         }

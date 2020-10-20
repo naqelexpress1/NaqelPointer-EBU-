@@ -148,7 +148,8 @@ public class UpdatePasswordModule extends AppCompatActivity {
             progressDialog.setCancelable(false);
             progressDialog.show();
 
-            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
+            //Todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
 
         }
 

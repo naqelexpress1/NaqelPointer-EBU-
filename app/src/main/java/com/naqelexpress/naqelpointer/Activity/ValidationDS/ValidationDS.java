@@ -25,8 +25,11 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
 import org.joda.time.DateTime;
@@ -49,7 +52,7 @@ import java.util.List;
  * Created by Hasna on 11/11/18.
  */
 
-public class ValidationDS extends AppCompatActivity {
+public class ValidationDS extends AppCompatActivity implements AsyncTaskCompleteListener {
 
     ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
@@ -71,6 +74,14 @@ public class ValidationDS extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.validationds);
+
+
+        if (!isValidOnlineValidationFile()) {
+            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
+            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));
+        } else {
+            Log.d("test" , "Inventory valid file");
+        }
 
 
         conflict.clear();
@@ -158,6 +169,15 @@ public class ValidationDS extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),errorMessage, GlobalVar.AlertType.Error);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }
+
+
     public void conflict(String Barcode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(ValidationDS.this);
         builder.setTitle("Warning " + Barcode)
@@ -213,6 +233,17 @@ public class ValidationDS extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsValidation , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
 
 //todo Riyam uncomment
 //    private void insertDiscrepancy() {

@@ -241,8 +241,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
-        Log.d("test" ,"Has error" + hasError);
-        Log.d("test" , errorMessage);
         if (hasError)
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),errorMessage, GlobalVar.AlertType.Error);
         else

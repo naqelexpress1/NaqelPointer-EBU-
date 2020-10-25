@@ -6260,11 +6260,11 @@ public class DBConnections
                     stmt.bindString(8, "0");
 
                     //TODO Riyam for testing
-                     if (i == 4) {
-                         int a = 0;
-                         int b = 1;
-                         int c = b/a;
-                     }
+//                     if (i == 4) {
+//                         int a = 0;
+//                         int b = 1;
+//                         int c = b/a;
+//                     }
 
                     long entryID = stmt.executeInsert();
                      if (entryID == -1) {
@@ -6376,8 +6376,8 @@ public class DBConnections
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String fileUploadDate = getOnlineValidationUploadDate(context);
-            //todo riyam remove
-            fileUploadDate  = "2020-10-24 16:48";
+            //todo riyam remove testing only
+            //fileUploadDate  = "2020-10-24 16:48";
             //Split date and time
             DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date d = f.parse(fileUploadDate);
@@ -6399,6 +6399,13 @@ public class DBConnections
 
             if (process == GlobalVar.DsAndInventory) {
                 if (!GlobalVar.getCurrentDate().equals(sDate) && hourPart >= 15) {
+                    return true;
+                }
+            }
+
+
+            if (process == GlobalVar.DsValidation) {
+                if (!GlobalVar.getCurrentDate().equals(sDate) && hourPart >= 5) {
                     return true;
                 }
             }

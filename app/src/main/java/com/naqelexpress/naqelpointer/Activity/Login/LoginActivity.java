@@ -89,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         if (GlobalVar.GV().LoginVariation)
             setContentView(R.layout.loginebu);
         else

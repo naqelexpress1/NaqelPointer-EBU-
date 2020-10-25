@@ -1,9 +1,13 @@
 package com.naqelexpress.naqelpointer.OnlineValidation;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.naqelexpress.naqelpointer.Activity.Login.LoginActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 
@@ -23,22 +27,31 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     //todo riyam check warning
     private AsyncTaskCompleteListener<String> callback;
     private Context context;
+    private Activity activity;
     private StringBuffer buffer;
+    private ProgressDialog progressDialog = null;
     private String DomainURL = "";
     private String errorMessage;
     private boolean hasError;
     private int processType;
 
-    public OnlineValidationAsyncTask(Context context, AsyncTaskCompleteListener<String> callback) {
+    public OnlineValidationAsyncTask(Context context, Activity activity,AsyncTaskCompleteListener<String> callback) {
         this.context = context;
+        this.activity = activity;
         this.callback = callback;
     }
 
     @Override
     protected void onPreExecute() {
-        //todo riyam change to live + cause a crash
-        DomainURL = "http://172.19.20.70:45455//api/pointer/";
-        super.onPreExecute();
+      try {
+          //todo riyam change to live + cause a crash
+          Log.d("test" , "On pre");
+          progressDialog = ProgressDialog.show(activity, "Loading", "Upload online validation file , Please wait...", true);
+          DomainURL = "http://172.19.20.70:45455//api/pointer/";
+          super.onPreExecute();
+      } catch (Exception e) {
+          Log.d("test" , "On pre exception " + e.toString());
+      }
     }
 
     @Override
@@ -61,7 +74,8 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             if (processType == GlobalVar.DsValidation)
                 url = new URL(DomainURL + "GetOvDsValidationPieces");
 
-            //TODO RIyam test process type e.g 6
+
+            //TODO Riyam test process type e.g 6 (other)
 
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setReadTimeout(300000); //240000
@@ -102,24 +116,32 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+
         try {
-            //todo riyam try server down - no internert
+            Log.d("test" , "On post");
+            //todo riyam try server down - no internet
             super.onPostExecute("");
             if (result != null) {
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-
                     if (!jsonObject.getBoolean("HasError")) {
                         JSONArray filteredPiecesList = jsonObject.getJSONArray("ViewFilteredPieces");
 
                         DBConnections dbConnections = new DBConnections(context, null);
 
-                        //todo check if indersted successfully
+                        //todo riyam check if indersted successfully let inser returns boolean
+                        //TODO if inserted insert in in file details
+                        // if any error pass it to has error with error message
+                        boolean isInserted = false;
                         if (filteredPiecesList.length() > 0)
-                            dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
+                            isInserted = dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
 
-                        hasError = false;
+                        if (!isInserted) {
+                            hasError = true;
+                            errorMessage = "File couldn't be saved locally";
+                        }
+
                         dbConnections.close();
                     } else {
                         hasError = true;
@@ -128,11 +150,13 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            } else {
+                Log.d("test" , "Post result is null");
             }
             callback.onTaskComplete(hasError,errorMessage);
         } catch (Exception e ) {
-            Log.d("test" , "pre " + e.toString());
+            Log.d("test" , "Post");
         }
+        progressDialog.dismiss();
     }
-
 }

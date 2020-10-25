@@ -3,6 +3,7 @@ package com.naqelexpress.naqelpointer.Classes;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -91,6 +92,7 @@ public class NewBarCodeScanner extends AppCompatActivity
     public void handleResult(Result rawResult) {
         Intent intent = new Intent();
         String result = rawResult.getContents();
+        Log.d("test" , "result " + result);
         intent.putExtra("barcode", result);
         setResult(RESULT_OK, intent);
         finish();

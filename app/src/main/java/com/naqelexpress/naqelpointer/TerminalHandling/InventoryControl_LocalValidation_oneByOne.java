@@ -15,6 +15,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
@@ -41,12 +42,15 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
+import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
@@ -69,7 +73,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener {
+public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener , AsyncTaskCompleteListener {
 
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
@@ -101,8 +105,17 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.inventory_new);
 
+
+        Log.d("test" , "Inventory");
         dbConnections = new DBConnections(getApplicationContext(), null);
 
+
+        if (!isValidOnlineValidationFile()) {
+            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
+        } else {
+            Log.d("test" , "Inventory valid file");
+        }
 
         lbTotal = (TextView) findViewById(R.id.lbTotal);
         citccount = (TextView) findViewById(R.id.citccount);
@@ -193,6 +206,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 }
             }
         });
+        Log.d("test" , "Bring ncl");
+
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         Cursor result = dbConnections.Fill("select * from RtoReq ", getApplicationContext());
         if (result.getCount() > 0) {
@@ -204,12 +219,34 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 jsonObject.put("OriginID", 0);
                 jsonObject.put("DestinationID", GlobalVar.GV().StationID);
                 new BringNCLData().execute(jsonObject.toString());
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
         binMasterCount = GlobalVar.getBinMasterCount(getApplicationContext());
+    }
+
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsAndInventory , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
+
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        Log.d("test" ,"Has error" + hasError);
+        Log.d("test" , errorMessage);
+        if (hasError)
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),errorMessage, GlobalVar.AlertType.Error);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
 
 
@@ -231,7 +268,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
-                        String barcode = extras.getString("barcode");
+                        String barcode = extras.getString("barcode").trim();
                         //if (barcode.length() == 13) {
                         txtBarCode.setText(barcode);
                         AddNewPiece();
@@ -259,6 +296,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
 
+        String barcode = txtBarCode.getText().toString().toUpperCase();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
@@ -305,7 +343,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         boolean rtoreq = false;
         boolean ismatch = false;
-        String barcode = txtBarCode.getText().toString();
 
         GetNCLDatafromDB(txtBarCode.getText().toString());
 

@@ -100,8 +100,8 @@ public class GlobalVar {
 
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -2683,6 +2683,13 @@ public class GlobalVar {
         return datetime;
     }
 
+    public static String getCurrentDate() {
+        Calendar calander = Calendar.getInstance();
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+        String test = simpledateformat.format(calander.getTime());
+        return simpledateformat.format(calander.getTime());
+    }
+
     public static String getDateMinus2Days() {
         Calendar calander = Calendar.getInstance();
         calander.add(Calendar.DATE, -2);
@@ -2747,7 +2754,6 @@ public class GlobalVar {
             devision = result.getString(result.getColumnIndex("Division"));
             if (devision.equals("0")) {
                 devision = "Courier";
-
             }
         }
         return devision;

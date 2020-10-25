@@ -469,7 +469,8 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnLineValidationFileDetails\" " +
                 "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
-                " \"UplodatDate\"  DATETIME NOT NULL )");
+                " \"Process\"  INTEGER NOT NULL ," +
+                " \"UploadDate\"  DATETIME NOT NULL)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"NCLDestinations\" " +
@@ -765,7 +766,8 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"OnLineValidationFileDetails\" " +
                     "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    " \"UplodatDate\"  DATETIME NOT NULL )");
+                    " \"Process\"  INTEGER NOT NULL ," +
+                    " \"UploadDate\"  DATETIME NOT NULL)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"NCLDestinations\" " +
                     "(\"NCLDestID\" INTEGER NOT NULL ," +
@@ -6207,8 +6209,9 @@ public class DBConnections
             Log.d("test" , "ex " + ex.toString());
         }
     }
-    //todo riyam make it boolean
-    public void insertOnLineValidation(JSONArray onLineValidation, int processType ,Context context) {
+
+    public boolean insertOnLineValidation(JSONArray onLineValidation, int processType ,Context context) {
+        boolean hasError = false;
 
         try {
             String sql = "insert into OnlineValidation (Barcode,DestID," +
@@ -6218,6 +6221,11 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             db.beginTransaction();
             SQLiteStatement stmt = db.compileStatement(sql);
+
+
+            if (!isOnlineValidationFileEmpty(db , context))
+                db.execSQL("delete from OnlineValidation");
+
 
             for (int i = 0; i < onLineValidation.length(); i++) {
                 try {
@@ -6250,21 +6258,45 @@ public class DBConnections
 
                     // todo riyam relabel
                     stmt.bindString(8, "0");
+
+                    //TODO Riyam for testing
+                     if (i == 4) {
+                         int a = 0;
+                         int b = 1;
+                         int c = b/a;
+                     }
+
                     long entryID = stmt.executeInsert();
+                     if (entryID == -1) {
+                         hasError = true;
+                         return hasError;
+                     }
+
                     stmt.clearBindings();
 
-                } catch (JSONException ex) {
-                    Log.d("test" , "insert online validation " + ex.toString());
+                } catch (Exception ex) {
+                    hasError = true;
+                    Log.d("test" , "insert online validation transaction " + ex.toString());
                 }
-                //todo riyam insert date
             }
-            db.setTransactionSuccessful();
-            db.endTransaction();
+
+           boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+
+            if (!isFileDetailsInserted) {
+                Log.d("test" , "file details not inserted");
+                return false;
+            }
+
+            if (!hasError) {
+                 db.setTransactionSuccessful();
+                 db.endTransaction();
+             }
             db.close();
         } catch (Exception ex) {
+            hasError = true;
             Log.d("test" , "insert online validation2 " + ex.toString());
         }
-
+      return !hasError;
     }
 
     public OnLineValidation getPieceInformationByBarcode (String barcode , Context context) {
@@ -6293,56 +6325,59 @@ public class DBConnections
         return onLineValidation;
     }
 
-    public boolean insertOnLineValidationFileDetails(String todayDatetime, Context context) {
+    public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
         long result = 0;
+        Log.d("test" , "insertOnLineValidationFileDetails");
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+             if (db == null)
+                  db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from OnLineValidationFileDetails");
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put("UplodatDate", todayDatetime);
+            contentValues.put("UploadDate", todayDatetime);
+            contentValues.put("Process", Process);
+
+            //Todo Riyam for tesging
+//             int a = 0;
+//             int b = 1;
+//             b = b/a;
 
             result = db.insert("OnLineValidationFileDetails", null, contentValues);
-
-            db.close();
-        } catch (SQLiteException e) {
+        } catch (Exception e) {
             Log.d("test" , "insertOnLineValidationFileDetails " + e.toString());
         }
         return result != -1;
     }
 
-    public String getOnlineValidationUploadDate(Context context) {
-        String date = null;
-        Cursor cursor = null;
-        try {
+    public boolean isValidOnlineValidationFile(int process , Context context) {
 
-            String selectQuery = "select UplodatDate  from OnLineValidationFileDetails" ;
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor = db.rawQuery(selectQuery, null);
-
-            if (cursor != null && cursor.moveToFirst())
-                date = cursor.getString(cursor.getColumnIndex("UplodatDate"));
-
-            cursor.close();
+        if (isOnlineValidationFileEmpty( context)) {
+            Log.d("test" , "Empty");
+            return false;
+        }
+        if (getOnlineValidationProcess(context) != process) {
+            Log.d("test" , "Different process");
+            return false;
         }
 
-        catch (SQLiteException e) {
+        if (isOnlineValidationFileOutDated(process , context)) {
+            Log.d("test" , "Out dated");
+            return false;
         }
-        return date;
+
+        return true;
     }
 
-
+    //todo Riyam test the case
     public boolean isOnlineValidationFileOutDated(int process , Context context){
-        //todo riyam remove
-        if (true)
-            return true;
         try {
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            if (isOnlineValidationFileEmpty(context))
-                return true;
-
             String fileUploadDate = getOnlineValidationUploadDate(context);
-
+            //todo riyam remove
+            fileUploadDate  = "2020-10-24 16:48";
             //Split date and time
             DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             Date d = f.parse(fileUploadDate);
@@ -6362,21 +6397,29 @@ public class DBConnections
                 }
             }
 
+            if (process == GlobalVar.DsAndInventory) {
+                if (!GlobalVar.getCurrentDate().equals(sDate) && hourPart >= 15) {
+                    return true;
+                }
+            }
+
             db.close();
-        } catch (SQLiteException | ParseException e) {
+        } catch (Exception e) {
             Log.d("test" , "insertOnLineValidationFileDetails " + e.toString());
         }
-        return true;
+        return false;
     }
 
     public boolean isOnlineValidationFileEmpty(Context context) {
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
-            Cursor cur = db.rawQuery("SELECT COUNT(*) FROM OnlineValidation", null);
+           SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
             if (cur != null ) {
                 cur.moveToFirst();
 
+                Log.d("test" , "File count " + cur.getCount());
                 return cur.getCount() <= 0 ;
             }
             db.close();
@@ -6384,6 +6427,68 @@ public class DBConnections
             Log.d("test" , "isOnlineValidationFileEmpty " + e.toString());
         }
         return true;
+    }
+
+    public boolean isOnlineValidationFileEmpty(SQLiteDatabase db , Context context) {
+        try {
+
+            if (db == null)
+                 db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
+
+            if (cur != null ) {
+                cur.moveToFirst();
+
+                Log.d("test" , "File count " + cur.getCount());
+                return cur.getCount() <= 0 ;
+            }
+        } catch (SQLiteException e) {
+            Log.d("test" , "isOnlineValidationFileEmpty " + e.toString());
+        }
+        return true;
+    }
+
+    public String getOnlineValidationUploadDate(Context context) {
+        String date = null;
+        Cursor cursor = null;
+        try {
+
+            String selectQuery = "select UploadDate  from OnLineValidationFileDetails" ;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.moveToFirst())
+                date = cursor.getString(cursor.getColumnIndex("UploadDate"));
+
+            cursor.close();
+        }
+
+        catch (SQLiteException e) {
+            Log.d("test" , "getOnlineValidationUploadDate() " + e.toString());
+        }
+        return date;
+    }
+
+    public int getOnlineValidationProcess(Context context) {
+        int process = -1;
+        Cursor cursor = null;
+        try {
+
+            String selectQuery = "select Process  from OnLineValidationFileDetails" ;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.moveToFirst())
+                process = cursor.getInt(cursor.getColumnIndex("Process"));
+
+            cursor.close();
+        }
+
+        catch (SQLiteException e) {
+            Log.d("test" , "getOnlineValidationProcess " + e.toString());
+        }
+        return process;
     }
 
     public void insertNCLDestinations(JSONArray nclDestinations, Context context) {
@@ -6415,8 +6520,6 @@ public class DBConnections
             Log.d("test" , "insertNCLDestinations " + ex.toString());
         }
     }
-
-
 
     public int CountDomainURL(Context context, int type) {
         int Count = 0;

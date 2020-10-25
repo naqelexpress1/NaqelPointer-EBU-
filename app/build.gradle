@@ -19,7 +19,7 @@ android {
         targetSdkVersion 29
         versionName '2.6.7.1'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 271
+        versionCode 405 //271 courier
     }
     buildTypes {
 

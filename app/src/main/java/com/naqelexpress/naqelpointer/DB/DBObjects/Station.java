@@ -84,4 +84,32 @@ public class Station {
             System.out.println(ignored.getMessage());
         }
     }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public void setCode(String code) {
+        Code = code;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public void setFName(String FName) {
+        this.FName = FName;
+    }
+
+    public void setCountryID(int countryID) {
+        CountryID = countryID;
+    }
+
+    public void setIsNCLDest(int isNCLDest) {
+        IsNCLDest = isNCLDest;
+    }
+
+    public void setRootView(View rootView) {
+        this.rootView = rootView;
+    }
 }

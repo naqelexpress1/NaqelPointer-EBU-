@@ -1182,9 +1182,6 @@ public class LoginActivity extends AppCompatActivity {
                     if (GlobalVar.GV().EmployID == 19127) //&& GlobalVar.GV().EmployID == 17099
                         versioncode = jo.getInt("VersionCode");
 
-                    Log.d("test" , "vc server" + jo.getInt("VersionCode"));
-                    Log.d("test" , "vc local" + versioncode);
-
                     if (jo.getInt("VersionCode") == versioncode) {
                         // if (jo.getInt("ChangesMainMenu") == 1) {
                         JSONArray station = jsonObject.getJSONArray("Station");

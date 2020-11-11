@@ -2,14 +2,23 @@ package com.naqelexpress.naqelpointer.OnlineValidation;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Login.LoginActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +43,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     private String errorMessage;
     private boolean hasError;
     private int processType;
+    int  count = 0;
 
     public OnlineValidationAsyncTask(Context context, Activity activity,AsyncTaskCompleteListener<String> callback) {
         this.context = context;
@@ -45,8 +55,31 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     protected void onPreExecute() {
       try {
           //todo riyam change to live + cause a crash
-          Log.d("test" , "On pre");
-          progressDialog = ProgressDialog.show(activity, "Loading", "Upload online validation file , Please wait...", true);
+
+         progressDialog = ProgressDialog.show(activity, "Loading", "Upload online validation file , Please wait...", true);
+          new CountDownTimer(300000, 30000) { // counter time is 5 min , update text every
+
+              public void onTick(long millisUntilFinished) {
+                  //here you can have your logic to set message
+                  count++;
+                  if (count == 1){
+                      progressDialog.setMessage("Uploading online validation file , Please wait...");
+                  }else if (count == 2){
+                      progressDialog.setMessage("Processing your request .. Kindly wait.");
+                  } else if (count == 3) {
+                      progressDialog.setMessage("This might take some time .. Kindly wait");
+                  } else if (count == 4) {
+                      progressDialog.setMessage("Uploading online validation file , Please wait...");
+                  }
+
+              }
+
+              public void onFinish() {
+
+              }
+
+          }.start();
+
           DomainURL = "http://172.19.20.70:45455//api/pointer/";
           super.onPreExecute();
       } catch (Exception e) {
@@ -96,6 +129,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             }
             return String.valueOf(buffer);
         } catch (Exception ignored) {
+            Log.d("test" , ignored.toString());
             hasError = true;
             errorMessage = ignored.toString();
         } finally {
@@ -103,6 +137,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 if (ist != null)
                     ist.close();
             } catch (IOException e) {
+                Log.d("test" , e.toString());
                 hasError = true;
                 errorMessage = e.toString();
                 e.printStackTrace();
@@ -118,7 +153,6 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
 
         try {
-            Log.d("test" , "On post");
             //todo riyam try server down - no internet
             super.onPostExecute("");
             if (result != null) {
@@ -130,9 +164,6 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
                         DBConnections dbConnections = new DBConnections(context, null);
 
-                        //todo riyam check if indersted successfully let inser returns boolean
-                        //TODO if inserted insert in in file details
-                        // if any error pass it to has error with error message
                         boolean isInserted = false;
                         if (filteredPiecesList.length() > 0)
                             isInserted = dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
@@ -158,5 +189,8 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             Log.d("test" , "Post");
         }
         progressDialog.dismiss();
+        count = 0;
     }
+
+
 }

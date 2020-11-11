@@ -46,6 +46,7 @@ import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivit
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
@@ -238,16 +239,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         return false;
     }
 
-
-    @Override
-    public void onTaskComplete(boolean hasError, String errorMessage) {
-        if (hasError)
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),errorMessage, GlobalVar.AlertType.Error);
-        else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-    }
-
-
     private void initViews() {
         recyclerView = (RecyclerView) findViewById(R.id.card_recycler_view);
         recyclerView.setHasFixedSize(true);
@@ -346,6 +337,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
 
         //Online Validation
+        //TODO Riyam only TH APP
         if (!isValidPieceBarcode(barcode))
             showDialog(getOnLineValidationPiece(barcode));
 
@@ -2270,8 +2262,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     }
 
-        // Todo Riyam - What if barcode is not in file?
-        private boolean isValidPieceBarcode(String pieceBarcode) {
+    private boolean isValidPieceBarcode(String pieceBarcode) {
             boolean isValid = true;
             try {
                 OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
@@ -2281,6 +2272,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
                     if (onLineValidationLocal.getDestID() != GlobalVar.GV().StationID) {
                         onLineValidation.setIsWrongDest(1);
+                        onLineValidation.setDestID(onLineValidationLocal.getDestID());
                         isValid = false;
                     }
 
@@ -2296,6 +2288,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
                     if (onLineValidationLocal.getIsRTORequest() == 1) {
                         onLineValidation.setIsRTORequest(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsDeliveryRequest() == 1) {
+                        onLineValidation.setIsDeliveryRequest(1);
                         isValid = false;
                     }
 
@@ -2319,18 +2316,16 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             return isValid;
         }
 
-
-        public void showDialog(OnLineValidation pieceDetails) {
-            Log.d("test" , "Show dialog");
+    public void showDialog(OnLineValidation pieceDetails) {
             try {
                 if (pieceDetails != null) {
                     final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(InventoryControl_LocalValidation_oneByOne.this);
                     LayoutInflater inflater = this.getLayoutInflater();
-                    View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                    View dialogView = inflater.inflate(R.layout.test, null);
                     dialogBuilder.setView(dialogView);
 
                     TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                    tvBarcode.setText(pieceDetails.getPieceBarcode());
+                    tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
 
 
                     Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
@@ -2339,46 +2334,72 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
 
                     if (pieceDetails.getIsWrongDest() == 1) {
+                        String stationName = "";
+                        try {
+                            Station station = dbConnections.getStationByID(pieceDetails.getDestID() , getApplicationContext());
+                            if (station != null)
+                                stationName = station.Name;
+                            else
+                                Log.d("test" , "Station is null");
+                        } catch (Exception e) { Log.d("test" , "showDialog " + e.toString());}
+
+
                         LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
                         llWrongDest.setVisibility(View.VISIBLE);
-                        TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
-                        tvWrongDest.setText("Wrong Destination");
-                    }
 
-                    if (pieceDetails.getIsMultiPiece() == 1) {
-                        LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
-                        llMultiPiece.setVisibility(View.VISIBLE);
-                        Log.d("test" , "MultiPiece");
+                        TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_wrong_dest_header);
+                        tvWrongDestHeader.setText("Wrong Destination");
+
+                        TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
+                        tvWrongDestBody.setText("Shipment destination station : " + stationName);
                     }
 
                     if (pieceDetails.getIsStopShipment() == 1) {
                         LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                         llStopShipment.setVisibility(View.VISIBLE);
-                        Log.d("test" , "isStopShipment");
+
+                        TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                        tvStopShipmentHeader.setText("Stop Shipment");
+
+                        TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                        tvStopShipmentBody.setText("Stop shipment.Please Hold.");
                     }
 
                     if (pieceDetails.getIsRTORequest() == 1) {
                         LinearLayout llRto = dialogView.findViewById(R.id.ll_is_rto);
                         llRto.setVisibility(View.VISIBLE);
-                        Log.d("test" , "IsRTORequest");
+
+                        TextView tvRTOHeader = dialogView.findViewById(R.id.tv_rto_header);
+                        tvRTOHeader.setText("RTO Request");
+
+                        TextView tvRTOBody = dialogView.findViewById(R.id.tv_rto_body);
+                        tvRTOBody.setText("RTO Request.");
                     }
 
                     if (pieceDetails.getIsDeliveryRequest() == 1) {
                         LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_is_delivery_req);
                         llDeliveryReq.setVisibility(View.VISIBLE);
-                        Log.d("test" , "IsDeliveryRequest");
+
+                        TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_delivery_req_header);
+                        tvDeliveryRequestHeader.setText("Delivery Request");
+
+                        TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_delivery_req_body);
+                        tvDeliveryRequestBody.setText("Delivery Request.");
                     }
 
-                    if (pieceDetails.getIsRelabel() == 1) {
+                   /* if (pieceDetails.getIsRelabel() == 1) {
                         LinearLayout llIsRelabel = dialogView.findViewById(R.id.ll_is_relabel);
                         llIsRelabel.setVisibility(View.VISIBLE);
                         Log.d("test" , "IsRelabel");
-                    }
+                    }*/
 
                     LinearLayout llNoOfAttempts = dialogView.findViewById(R.id.ll_no_attempts);
                     llNoOfAttempts.setVisibility(View.VISIBLE);
-                    TextView tvNoOfAttempts = dialogView.findViewById(R.id.tv_no_of_attempts);
-                    tvNoOfAttempts.setText("Number of attempts : " + pieceDetails.getNoOfAttempts());
+                    TextView tvNoOfAttemptsHeader = dialogView.findViewById(R.id.tv_no_attempts_header);
+                    tvNoOfAttemptsHeader.setText("Number of attempts");
+                    TextView tvNoOfAttemptsBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
+                    tvNoOfAttemptsBody.setText("Number of attempts : " + pieceDetails.getNoOfAttempts());
+
 
                     final android.app.AlertDialog alertDialog = dialogBuilder.create();
                     alertDialog.show();
@@ -2400,7 +2421,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
         }
 
-        private OnLineValidation getOnLineValidationPiece (String barcode) {
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
             try {
                 for (OnLineValidation pieceDetail : onLineValidationList) {
                     if (pieceDetail.getPieceBarcode().equals(barcode))
@@ -2412,5 +2433,14 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
             return null;
         }
+
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }
+
     }
 

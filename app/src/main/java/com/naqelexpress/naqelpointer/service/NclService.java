@@ -193,7 +193,6 @@ public class NclService extends Service {
                         db.close();
                     e.printStackTrace();
                 }
-
             }
         }, new Response.ErrorListener() {
             @Override

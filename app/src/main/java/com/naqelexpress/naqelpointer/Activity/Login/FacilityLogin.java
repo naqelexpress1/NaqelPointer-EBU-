@@ -18,11 +18,13 @@ import android.widget.Spinner;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserFacility;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.GetUserMEDataRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.UpdateLoginStatusRequest;
 import com.naqelexpress.naqelpointer.R;
+import com.pusher.chatkit.users.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -126,7 +128,6 @@ public class FacilityLogin
             result.moveToFirst();
             do {
                 HashMap<String, String> temp = new HashMap<>();
-
                 temp.put("ID", String.valueOf(result.getInt(result.getColumnIndex("FacilityID"))));
                 temp.put("Code", result.getString(result.getColumnIndex("Code")));
                 temp.put("Name", result.getString(result.getColumnIndex("Name")));
@@ -237,6 +238,7 @@ public class FacilityLogin
         StringBuffer buffer;
         String DomainURL = "";
         String isInternetAvailable = "";
+        JSONObject GetUserMEDataRequest;
 
         @Override
         protected void onPreExecute() {
@@ -254,6 +256,12 @@ public class FacilityLogin
 
             //GetFacilityStatusRequest getDeliveryStatusRequest = new GetFacilityStatusRequest();
             String jsonData = params[0];
+
+            try {
+                GetUserMEDataRequest = new JSONObject(jsonData);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
@@ -315,14 +323,18 @@ public class FacilityLogin
 
                 try {
                     JSONObject jsonObject = new JSONObject(result);
-                    //todo riyam check if courier
                     if (!jsonObject.getBoolean("HasError")) {
+
+                        //Update user facility
+                        UserFacility userFacility = new UserFacility();
+                        userFacility.setEmployID(GlobalVar.GV().EmployID);
+                        userFacility.setFacilityID(GetUserMEDataRequest.getInt("FacilityID"));
+                        updateUserFacility(userFacility);
+
                         if (GlobalVar.isCourier(getApplicationContext())) {
                             new UpdateLoginStatus().execute();
                         }
                         else {
-                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                            dbConnections.FacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID);
                             Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
                             startActivity(intent);
                             finish();
@@ -388,8 +400,6 @@ public class FacilityLogin
         else
             asynthread.execute("");
     }
-
-
 
     private class UpdateLoginStatus extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
@@ -494,15 +504,18 @@ public class FacilityLogin
                 progressDialog.dismiss();
                 progressDialog = null;
             }
-
-
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             dbConnections.DeleteUpdateLoginStatusError(getApplicationContext());
-            dbConnections.FacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID);
             Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
             startActivity(intent);
             finish();
 
         }
     }
+
+    private void updateUserFacility(UserFacility userFacility) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.FacilityLoggedIn(getApplicationContext(), userFacility);
+    }
+
 }

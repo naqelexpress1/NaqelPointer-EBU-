@@ -110,4 +110,22 @@ public class OnLineValidation {
     public int getIsPiecesAvailable() {
         return IsPiecesAvailable;
     }
+
+    @Override
+    public String toString() {
+        return "OnLineValidation{" +
+                "ID=" + ID +
+                ", PieceBarcode='" + PieceBarcode + '\'' +
+                ", DestID=" + DestID +
+                ", NoOfAttempts=" + NoOfAttempts +
+                ", IsMultiPiece=" + IsMultiPiece +
+                ", IsStopShipment=" + IsStopShipment +
+                ", IsRTORequest=" + IsRTORequest +
+                ", IsDeliveryRequest=" + IsDeliveryRequest +
+                ", IsRelabel=" + IsRelabel +
+                ", IsWrongDest=" + IsWrongDest +
+                ", IsDestNotBelongToNcl=" + IsDestNotBelongToNcl +
+                ", IsPiecesAvailable=" + IsPiecesAvailable +
+                '}';
+    }
 }

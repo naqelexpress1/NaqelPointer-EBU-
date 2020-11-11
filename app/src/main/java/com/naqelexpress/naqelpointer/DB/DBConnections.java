@@ -13,6 +13,8 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 
+import com.naqelexpress.naqelpointer.DB.DBObjects.FacilityStatus;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserFacility;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Booking;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint;
@@ -74,7 +76,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 132; // MyRouteActivity
+    private static final int Version = 133; //1-11-2020  added facilityID
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -89,7 +91,6 @@ public class DBConnections
 
     public DBConnections(Context context, View view) {
         super(context, DBName, null, Version);
-        //this.context = context;
         this.rootView = view;
     }
 
@@ -285,7 +286,7 @@ public class DBConnections
                 "  \"ImageName\"  TEXT NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
+                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -984,11 +985,13 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteActionActivity", "LastScanWaybillNo"))
                 db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN LastScanWaybillNo  Text ");
+
+            if (!isColumnExist("Station", "IsNCLDest"))
+                db.execSQL("ALTER TABLE Station ADD COLUMN  IsNCLDest INTEGER ");
+
+            if (!isColumnExist("FacilityLoggedIn" , "FacilityID"))
+                db.execSQL("ALTER TABLE FacilityLoggedIn ADD COLUMN  FacilityID INTEGER ");
         }
-
-        if (!isColumnExist("Station", "IsNCLDest"))
-            db.execSQL("ALTER TABLE Station ADD COLUMN  IsNCLDest INTEGER ");
-
 
     }
 
@@ -1015,14 +1018,15 @@ public class DBConnections
     }
 
     public Station getStationByID (int stationID , Context context) {
-        Station station = new Station();
+        Station station = null;
         try {
-
-            String selectQuery = "SELECT * FROM Station WHERE ID = " + stationID ;
+            String selectQuery = "SELECT * FROM Station WHERE ID = " + stationID + " LIMIT 1";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
-            if (cursor.moveToFirst()) {
+            if (cursor != null && cursor.getCount() > 0 ) {
+                cursor.moveToFirst();
+                station = new Station();
                 station.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
                 station.setCode(cursor.getString(cursor.getColumnIndex("Code")));
                 station.setName(cursor.getString(cursor.getColumnIndex("Name")));
@@ -1033,7 +1037,6 @@ public class DBConnections
         }
         return station;
     }
-
 
     public boolean EmployeInfo(int EmpID, String EmpName, String IqamaNumber, String MobileNo, int StationID, String ImageName, Context context) {
         long result = 0;
@@ -1318,20 +1321,22 @@ public class DBConnections
         return result != -1;
     }
 
-    public boolean FacilityLoggedIn(Context context, int EmpID) {
+    public boolean FacilityLoggedIn(Context context, UserFacility userFacility) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             ContentValues contentValues = new ContentValues();
             contentValues.put("IsDate", GlobalVar.getDate());
-            contentValues.put("EmpID", EmpID);
+            contentValues.put("EmpID", userFacility.getEmployID());
+            contentValues.put("FacilityID" , userFacility.getFacilityID());
 
             result = db.insert("FacilityLoggedIn", null, contentValues);
             db.close();
+            Log.d("test" , "FacilityLoggedIn inserted");
 
         } catch (SQLiteException e) {
-
+          Log.d("test" , "FacilityLoggedIn " + e.toString());
         }
         return result != -1;
     }
@@ -1371,6 +1376,45 @@ public class DBConnections
         return result != -1;
     }
 
+    public int getUserFacilityID(Context context) {
+        int facilityID = -1;
+        Cursor cursor;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor =  db.rawQuery("select FacilityID from FacilityLoggedIn", null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                facilityID = cursor.getInt(cursor.getColumnIndex("FacilityID"));
+            }
+
+            db.close();
+
+        } catch (SQLiteException e) {
+            Log.d("test" , "getFacilityID " + e.toString());
+        }
+        return facilityID;
+    }
+
+    public FacilityStatus getFacility(Context context , int facilityID) {
+        FacilityStatus facilityStatus = new FacilityStatus();
+        Cursor cursor;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor =  db.rawQuery("select * from Facility where FacilityID = " + facilityID, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                facilityStatus.ID = cursor.getInt(cursor.getColumnIndex("FacilityID"));
+                facilityStatus.Code = cursor.getString(cursor.getColumnIndex("Code"));
+                facilityStatus.Name = cursor.getString(cursor.getColumnIndex("Name"));
+            }
+
+            db.close();
+
+        } catch (SQLiteException e) {
+            Log.d("test" , "getFacility " + e.toString());
+        }
+        return facilityStatus;
+    }
 
     public boolean DeleteExsistingLogin(Context context) {
         long result = 0;
@@ -6280,6 +6324,45 @@ public class DBConnections
                 }
             }
 
+            //Todo Riyam for testiing remove it
+          try {
+              ContentValues contentValues = new ContentValues();
+              contentValues.put("BarCode" , "4011452500001");
+              contentValues.put("DestID" , 502);
+              contentValues.put("IsMultiPieces" , 1);
+              contentValues.put("IsRTORequest" , 1);
+              contentValues.put("IsStopped" , 1);
+              contentValues.put("IsDeliveryRequest" , 1);
+              contentValues.put("NoOfAttempts" , 1);
+              contentValues.put("IsRelabel" , 0);
+              db.insert("OnlineValidation", null, contentValues);
+
+              ContentValues contentValues2 = new ContentValues();
+              contentValues2.put("BarCode" , "4011452600001");
+              contentValues2.put("DestID" , 502);
+              contentValues2.put("IsMultiPieces" , 0);
+              contentValues2.put("IsRTORequest" , 0);
+              contentValues2.put("IsStopped" , 1);
+              contentValues2.put("IsDeliveryRequest" , 0);
+              contentValues2.put("NoOfAttempts" , 0);
+              contentValues2.put("IsRelabel" , 0);
+              db.insert("OnlineValidation", null, contentValues2);
+
+
+              ContentValues contentValues3 = new ContentValues();
+              contentValues3.put("BarCode" , "4011452600002");
+              contentValues3.put("DestID" , 501);
+              contentValues3.put("IsMultiPieces" , 0);
+              contentValues3.put("IsRTORequest" , 0);
+              contentValues3.put("IsStopped" , 1);
+              contentValues3.put("IsDeliveryRequest" , 0);
+              contentValues3.put("NoOfAttempts" , 0);
+              contentValues3.put("IsRelabel" , 0);
+              db.insert("OnlineValidation", null, contentValues3);
+          } catch (Exception e) {
+              Log.d("test" , "inserting for test" + e.toString());
+          }
+
            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
 
             if (!isFileDetailsInserted) {
@@ -6353,6 +6436,8 @@ public class DBConnections
 
     public boolean isValidOnlineValidationFile(int process , Context context) {
 
+        Log.d("test" , "isValidOnlineValidationFile " + process);
+
         if (isOnlineValidationFileEmpty( context)) {
             Log.d("test" , "Empty");
             return false;
@@ -6406,6 +6491,12 @@ public class DBConnections
 
             if (process == GlobalVar.DsValidation) {
                 if (!GlobalVar.getCurrentDate().equals(sDate) && hourPart >= 5) {
+                    return true;
+                }
+            }
+
+            if (process == GlobalVar.NclAndArrival) {
+                if (!GlobalVar.getCurrentDate().equals(sDate) && hourPart >= 3) {
                     return true;
                 }
             }
@@ -6495,6 +6586,7 @@ public class DBConnections
         catch (SQLiteException e) {
             Log.d("test" , "getOnlineValidationProcess " + e.toString());
         }
+        Log.d("test" , "getOnlineValidationProcess " + process);
         return process;
     }
 

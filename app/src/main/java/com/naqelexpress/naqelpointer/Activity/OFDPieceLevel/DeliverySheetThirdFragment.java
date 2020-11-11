@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.OFDPieceLevel;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -30,9 +31,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
@@ -65,6 +68,7 @@ public class DeliverySheetThirdFragment extends Fragment {
     private int edit_position;
     private View view;
     private boolean add = false , isPiecesAvailable;
+    private Context mContext;
 
     public ArrayList<String> PieceBarCodeList = new ArrayList<>();
     public ArrayList<String> PieceBarCodeWaybill = new ArrayList<>();
@@ -165,6 +169,19 @@ public class DeliverySheetThirdFragment extends Fragment {
         ReadFromLocal();
         return rootView;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+    }
+
 
 
     private void initViews() {
@@ -421,6 +438,7 @@ public class DeliverySheetThirdFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(finalJson);
                     if (jsonObject.getBoolean("HasError") == false) {
                          String barcode = txtBarCode.getText().toString();
+                         //TODO Riyam TH App Only
                         if (isValidPieceBarcode(barcode)) {
                             AddNewWaybill(String.valueOf(jsonObject.getInt("WaybillNo")));
                             AddNewPiece(String.valueOf(jsonObject.getInt("WaybillNo")));
@@ -515,7 +533,7 @@ public class DeliverySheetThirdFragment extends Fragment {
 
     }
 
-    // Todo Riyam - What if barcode is not in file?
+
     private boolean isValidPieceBarcode(String pieceBarcode) {
         boolean isValid = true;
         try {
@@ -526,6 +544,7 @@ public class DeliverySheetThirdFragment extends Fragment {
 
                 if (onLineValidationLocal.getDestID() != GlobalVar.GV().StationID) {
                     onLineValidation.setIsWrongDest(1);
+                    onLineValidation.setDestID(onLineValidationLocal.getDestID());
                     isValid = false;
                 }
 
@@ -562,18 +581,17 @@ public class DeliverySheetThirdFragment extends Fragment {
         return isValid;
     }
 
-
     public void showDialog(final OnLineValidation pieceDetails , final String waybill) {
         final View dialogView;
         try {
             if (pieceDetails != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
                 LayoutInflater inflater = this.getLayoutInflater();
-                dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogView = inflater.inflate(R.layout.test, null);
                 dialogBuilder.setView(dialogView);
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText(pieceDetails.getPieceBarcode());
+                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
 
 
                 Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
@@ -582,60 +600,94 @@ public class DeliverySheetThirdFragment extends Fragment {
 
 
                 if (pieceDetails.getIsWrongDest() == 1) {
-                    LinearLayout llDiffDest = dialogView.findViewById(R.id.ll_wrong_dest);
-                    llDiffDest.setVisibility(View.VISIBLE);
-                    TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
-                    tvWrongDest.setText("Wrong Destination");
-                    Log.d("test" , "getIsWrongDest");
+
+                    String stationName = "";
+                    try {
+                        Station station = dbConnections.getStationByID(pieceDetails.getDestID() , mContext);
+                        if (station != null)
+                            stationName = station.Name;
+                        else
+                            Log.d("test" , "Station is null");
+                    } catch (Exception e) { Log.d("test" , "showDialog " + e.toString());}
+
+
+                    LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
+                    llWrongDest.setVisibility(View.VISIBLE);
+
+                    TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_wrong_dest_header);
+                    tvWrongDestHeader.setText("Wrong Destination");
+
+                    TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
+                    tvWrongDestBody.setText("Shipment destination station : " + stationName);
+
                 }
 
                 if (pieceDetails.getIsMultiPiece() == 1) {
+
                     LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
                     llMultiPiece.setVisibility(View.VISIBLE);
-                    TextView tvMultiPiece = dialogView.findViewById(R.id.tv_multiPiece);
-                    tvMultiPiece.setText("Multi Pieces - Please confirm all pcs are available.");
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please confirm all pcs are available.");
+
                     RadioGroup rgMultiPiece = dialogView.findViewById(R.id.rg_multi_piece);
                     rgMultiPiece.setVisibility(View.VISIBLE);
                     radioGroupCheckListener(dialogView);
-                    Log.d("test" , "MultiPiece");
                 }
 
                 if (pieceDetails.getIsStopShipment() == 1) {
+
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
-                    Log.d("test" , "isStopShipment");
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
+
                 }
 
                 if (pieceDetails.getIsRTORequest() == 1) {
+
                     LinearLayout llRto = dialogView.findViewById(R.id.ll_is_rto);
                     llRto.setVisibility(View.VISIBLE);
-                    Log.d("test" , "IsRTORequest");
+
+                    TextView tvRTOHeader = dialogView.findViewById(R.id.tv_rto_header);
+                    tvRTOHeader.setText("RTO Request");
+
+                    TextView tvRTOBody = dialogView.findViewById(R.id.tv_rto_body);
+                    tvRTOBody.setText("RTO Request.");
                 }
 
                 if (pieceDetails.getIsDeliveryRequest() == 1) {
+
                     LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_is_delivery_req);
                     llDeliveryReq.setVisibility(View.VISIBLE);
-                    Log.d("test" , "IsDeliveryRequest");
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_delivery_req_header);
+                    tvDeliveryRequestHeader.setText("Delivery Request");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_delivery_req_body);
+                    tvDeliveryRequestBody.setText("Delivery Request.");
                 }
 
-                if (pieceDetails.getIsRelabel() == 1) {
+              /*  if (pieceDetails.getIsRelabel() == 1) {
                     LinearLayout llIsRelabel = dialogView.findViewById(R.id.ll_is_relabel);
                     llIsRelabel.setVisibility(View.VISIBLE);
-                    Log.d("test" , "IsRelabel");
-                }
+                }*/
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
                 alertDialog.show();
-                Log.d("test" , "Show");
 
                 btnConfirm.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // To avoid leaked window
                         if (alertDialog != null && alertDialog.isShowing()) {
-                            Log.d("test" , "Btn confirm - " + pieceDetails.getPieceBarcode());
-                            Log.d("test" , "Btn confirm - " + pieceDetails.getIsMultiPiece());
-
                             if (pieceDetails.getIsMultiPiece() == 1) {
                                 if (isRadioButtonSelected(dialogView)) {
                                     if (isPiecesAvailable){
@@ -648,10 +700,13 @@ public class DeliverySheetThirdFragment extends Fragment {
                                         }
                                     } else {
                                         Log.d("test" , "pcs not available");
+                                        Toast.makeText(getContext() ,"Pieces not available. Scan won't be recorded" , Toast.LENGTH_LONG ).show();
                                         txtBarCode.getText().clear();
+                                        alertDialog.dismiss();
                                      }
                                  } else {
-                                    GlobalVar.GV().ShowSnackbar(rootView, "Kindly check number of pieces", GlobalVar.AlertType.Error);
+                                     if (getContext() != null)
+                                        Toast.makeText(getContext() ,"Kindly confirm all pieces are available." , Toast.LENGTH_LONG ).show();
                                 }
                             } else {
                                 AddNewWaybill(pieceDetails.getPieceBarcode());

@@ -31,6 +31,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.OnCloadingForD;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.OptimizedOutOfDeliveryShipmentRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.OptimizedOutOfDeliveryShipmentResult;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
@@ -113,28 +114,6 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
         }
     }
 
-    private boolean isValidOnlineValidationFile() {
-        boolean isValid;
-        try {
-          Log.d("test" , "Checking");
-          DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-          isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsAndInventory , getApplicationContext());
-          if (isValid)
-              return true;
-      } catch (Exception ex) {
-            Log.d("test" , "isValidOnlineValidationFile() e " + ex.toString());
-        }
-        return false;
-    }
-
-
-    @Override
-    public void onTaskComplete(boolean hasError, String errorMessage) {
-        if (hasError)
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),errorMessage, GlobalVar.AlertType.Error);
-        else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-    }
 
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -495,6 +474,14 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }
+
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getApplication()
                 .getSystemService(Context.ACTIVITY_SERVICE);
@@ -506,4 +493,33 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
         }
         return false;
     }
+
+    private void ErrorAlert(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(DeliverySheetActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsAndInventory , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , "isValidOnlineValidationFile() e " + ex.toString());
+        }
+        return false;
+    }
+
 }

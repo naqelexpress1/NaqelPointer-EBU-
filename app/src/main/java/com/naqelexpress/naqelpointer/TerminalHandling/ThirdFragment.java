@@ -33,6 +33,7 @@ import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
@@ -43,8 +44,8 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ThirdFragment
-        extends Fragment {
+public class ThirdFragment extends Fragment {
+
     View rootView;
     TextView lbTotal;
     public static EditText txtBarCode;
@@ -53,14 +54,11 @@ public class ThirdFragment
     private DataAdapter adapter;
     private RecyclerView recyclerView;
     private Paint p = new Paint();
-
-    //    private AlertDialog.Builder alertDialog;
-//    private EditText txtBarCodePiece;
-//    private int edit_position;
-//    private View view;
-//    private boolean add = false;
     private Intent intent;
+    private Context mContext;
+
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
+
     private DBConnections dbConnections = new DBConnections(getContext(), null);
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
 
@@ -98,6 +96,7 @@ public class ThirdFragment
                             }
                         }
                     } else {
+                        // Todo Riyam only TH app
                         if (txtBarCode != null && txtBarCode.getText().length() == 13) {
                             String barcode = txtBarCode.getText().toString();
                             if (IsValid()) {
@@ -136,6 +135,20 @@ public class ThirdFragment
 
         return rootView;
     }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+    }
+
 
     private void requestfocus() {
         txtBarCode.setText("");
@@ -660,7 +673,6 @@ public class ThirdFragment
         return isValid;
     }
 
-    // Todo Riyam - What if barcode is not in file?
     private boolean isValidPieceBarcode(String pieceBarcode) {
         boolean isValid = true;
         try {
@@ -670,6 +682,7 @@ public class ThirdFragment
             if (onLineValidationLocal != null) {
                 if (onLineValidationLocal.getDestID() != GlobalVar.GV().StationID) {
                     onLineValidation.setIsWrongDest(1);
+                    onLineValidation.setDestID(onLineValidationLocal.getDestID());
                     isValid = false;
                 }
 
@@ -710,41 +723,65 @@ public class ThirdFragment
 
 
     public void showDialog(OnLineValidation pieceDetails) {
+        DBConnections dbConnections = new DBConnections(mContext , null);
         try {
             if (pieceDetails != null) {
-                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(mContext);
                 LayoutInflater inflater = this.getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                View dialogView = inflater.inflate(R.layout.test, null);
                 dialogBuilder.setView(dialogView);
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText(pieceDetails.getPieceBarcode());
+                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
 
                 if (pieceDetails.getIsWrongDest() == 1) {
+                    String stationName = "";
+                  try {
+                      Station station = dbConnections.getStationByID(pieceDetails.getDestID() , mContext);
+                      if (station != null)
+                          stationName = station.Name;
+                      else
+                          Log.d("test" , "Station is null");
+                  } catch (Exception e) {}
+
                     LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
                     llWrongDest.setVisibility(View.VISIBLE);
-                    TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
-                    tvWrongDest.setText("Wrong Destination");
-                    Log.d("test" , "isWrongDest");
+
+                    TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_wrong_dest_header);
+                    tvWrongDestHeader.setText("Wrong Destination");
+
+                    TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
+                    tvWrongDestBody.setText("Shipment destination station : " + stationName);
                 }
 
                 if (pieceDetails.getIsMultiPiece() == 1) {
+
                     LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
                     llMultiPiece.setVisibility(View.VISIBLE);
-                    Log.d("test" , "isMultiPiece");
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please check pieces.");
                 }
 
                 if (pieceDetails.getIsStopShipment() == 1) {
+
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
-                    Log.d("test" , "isStopShipment");
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
                 }
 
-                if (pieceDetails.getIsRelabel() == 1) {
+                /*if (pieceDetails.getIsRelabel() == 1) {
                     LinearLayout llRelabel = dialogView.findViewById(R.id.ll_is_relabel);
                     llRelabel.setVisibility(View.VISIBLE);
-                    Log.d("test" , "isRelabel");
-                }
+                } */
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
                 alertDialog.show();
@@ -759,7 +796,6 @@ public class ThirdFragment
                         // To avoid leaked window
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
-                            Log.d("test" , "OK btn");
                         }
                     }
                 });

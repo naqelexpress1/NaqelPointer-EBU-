@@ -44,6 +44,7 @@ public class NclServiceBulk extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.d("test" , "NclServiceBulk Started");
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -127,15 +128,19 @@ public class NclServiceBulk extends Service {
 
 
     public void SaveNcl(final DBConnections db, final String input, final int id) {
+        Log.d("test" , "NclServiceBulk SaveNcl");
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"; //NclSubmit
+        //todo riyam
+        String URL = "http://192.168.3.16:45455//api/pointer/" + "NclSubmitInsertWaybillManual_v2"; //NclSubmit
+       // String URL = GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual_v2"; //NclSubmit
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
+                Log.d("test" , "NclServiceBulk onResponse");
 
                 try {
                     if (response.contains("Created")) {

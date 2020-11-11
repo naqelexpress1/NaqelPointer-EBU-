@@ -23,6 +23,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,23 +56,29 @@ import java.util.List;
 import static android.app.Activity.RESULT_OK;
 
 
-public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
-    View rootView;
-    public EditText txtBarcode;
-    TextView lbTotal, lbNclNo, txtCitcCount, inserteddate, validupto;
-    public static ArrayList<String> WaybillList = new ArrayList<>();
+public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
 
-    public static ArrayList<PieceDetail> PieceCodeList = new ArrayList<PieceDetail>();
+    public EditText txtBarcode;
+    public TextView lbNclNo;
+    private View rootView;
+    private TextView lbTotal, txtCitcCount, inserteddate, validupto;
     private RecyclerView recyclerView;
+    private SearchableSpinner searchableSpinnerDest;
+
     public NclAdapterRemoveValidation_CITC adapter;
     public static double waybillweight = 0.0;
-    int WaybillCount = 0, PiecesCount = 0;
-    ArrayList<String> isduplicate = new ArrayList<>();
+
+    private int WaybillCount = 0, PiecesCount = 0;
+    private boolean isNCLDestChosen , isDestChanged;
+    private int NCLDestStationID , newDestID;
+
+    public static ArrayList<String> WaybillList = new ArrayList<>();
+    public static ArrayList<PieceDetail> PieceCodeList = new ArrayList<PieceDetail>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
     private List<Integer> allowedDestStationIDs = new ArrayList<>();
-    private SearchableSpinner searchableSpinnerDest;
-    private boolean isNCLDestChosen;
+    private ArrayList<String> isduplicate = new ArrayList<>();
+
 
     private DBConnections dbConnections = new DBConnections(getContext(), null);
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
@@ -89,17 +97,21 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             if (!isNCLDestChosen) {
                 txtBarcode.setEnabled(false);
-                txtBarcode.setHint("Chose NCL destination first to scan barcode");
+                txtBarcode.setHint("Generate NCL No first");
             }
 
             txtCitcCount = (TextView) rootView.findViewById(R.id.citccount);
             txtCitcCount.setVisibility(View.VISIBLE);
-            LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.ll);
-            ll.setVisibility(View.VISIBLE);
+
             inserteddate = (TextView) rootView.findViewById(R.id.inserteddate);
             validupto = (TextView) rootView.findViewById(R.id.validupto);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             lbNclNo = (TextView) rootView.findViewById(R.id.lbNclNo);
+
+            LinearLayout ll = (LinearLayout) rootView.findViewById(R.id.ll);
+            ll.setVisibility(View.VISIBLE);
+
+
             WaybillCount = 0;
             PiecesCount = 0;
             PieceCodeList.clear();
@@ -133,11 +145,15 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         try {
                             if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
                                 String barcode = txtBarcode.getText().toString();
+                                //Todo riyam only if courier || th
                                 if (isValidPieceBarcode(barcode)) {
-                                    AddNewPiece(barcode, "0", 0);
+                                    PieceDetail pieceDetail = new PieceDetail();
+                                    pieceDetail.Barcode = barcode;
+                                    pieceDetail.Waybill = "0";
+                                    pieceDetail.Weight = 0;
+                                    AddNewPiece(pieceDetail);
                                 } else {
                                     showDialog(getOnLineValidationPiece(barcode));
-                                    Log.d("test", "Not valid");
                                 }
                             }
                         } catch (Exception e) {
@@ -153,6 +169,59 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
         ReadFromLocal();
         return rootView;
+    }
+
+
+    private void initViews() {
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.shipmentBarCodes);
+        recyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new NclAdapterRemoveValidation_CITC(PieceCodeList);
+        recyclerView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        initSwipe();
+    }
+
+    private void initSwipe() {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)//| ItemTouchHelper.RIGHT)
+        {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+
+                if (direction == ItemTouchHelper.LEFT) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Confirm Deleting")
+                            .setMessage("Are you sure you want to delete?")
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                                    isduplicate.remove(PieceCodeList.get(position).Barcode);
+                                    adapter.removeItem(position);
+                                    lbTotal.setText(getString(R.string.lbCount) + adapter.getItemCount());
+                                    PiecesCount = PiecesCount - 1;
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    initViews();
+                                }
+                            })
+                            .setCancelable(false);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                }
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
     }
 
     @Override
@@ -172,23 +241,75 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         }
     }
 
-    private void AddNewWaybill(String WaybillNo) {
-        if (WaybillNo.length() >= 8)
-            WaybillNo = WaybillNo.substring(0, 8);
-        if (WaybillNo.toString().length() == 8) {
-            if (!WaybillList.contains(WaybillNo.toString())) {
-                WaybillCount = WaybillCount + 1;
-                WaybillList.add(0, WaybillNo.toString());
-            }
-        }
-    }
+//    private void AddNewPiece(String PieceCode, String WaybillNo, double Weight) {
+//
+//        if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
+//            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+//                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+//                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", PieceCode, WaybillNo, Weight);
+//                return;
+//            }
+//        } else {
+//            GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+//            GlobalVar.RedirectSettings(getActivity());
+//            return;
+//        }
+//
+//        GetNCLDatafromDB(txtBarcode.getText().toString());
+//
+//        boolean rtoreq = false;
+//        boolean ismatch = false;
+//
+//
+//        if (iscitcshipments.contains(txtBarcode.getText().toString())) {
+//
+//            ismatch = true;
+//            GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
+//            ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ", PieceCode, WaybillNo, Weight);
+//            return;
+//
+//        }
+//
+//        if (!ismatch) {
+//            if (isdeliveryReq.contains(txtBarcode.getText().toString())) {
+//                if (isrtoReq.contains(txtBarcode.getText().toString())) {
+//                    ismatch = true;
+//                    rtoreq = true;
+//
+//                    GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
+//                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery & RTO ", PieceCode, WaybillNo, Weight);
+//
+//                    return;
+//                } else {
+//
+//                    GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
+//                    ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery ", PieceCode, WaybillNo, Weight);
+//                    return;
+//                }
+//
+//
+//            }
+//        }
+//        if (!rtoreq) {
+//            if (isrtoReq.contains(txtBarcode.getText().toString())) {
+//
+//                GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
+//                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For RTO ", PieceCode, WaybillNo, Weight);
+//                return;
+//
+//            }
+//        }
+//
+//        GlobalVar.hideKeyboardFrom(getContext(), rootView);
+//        AddPiece(PieceCode, WaybillNo, Weight,false , 0);
+//    }
 
-    private void AddNewPiece(String PieceCode, String WaybillNo, double Weight) {
+    private void AddNewPiece(PieceDetail pieceDetail) {
 
         if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", PieceCode, WaybillNo, Weight);
+                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", pieceDetail);
                 return;
             }
         } else {
@@ -207,7 +328,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             ismatch = true;
             GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
-            ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ", PieceCode, WaybillNo, Weight);
+            ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ", pieceDetail);
             return;
 
         }
@@ -219,13 +340,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     rtoreq = true;
 
                     GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery & RTO ", PieceCode, WaybillNo, Weight);
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery & RTO ", pieceDetail);
 
                     return;
                 } else {
 
                     GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
-                    ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery ", PieceCode, WaybillNo, Weight);
+                    ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery ", pieceDetail);
                     return;
                 }
 
@@ -236,47 +357,37 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             if (isrtoReq.contains(txtBarcode.getText().toString())) {
 
                 GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
-                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For RTO ", PieceCode, WaybillNo, Weight);
+                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For RTO ", pieceDetail);
                 return;
 
             }
         }
 
-//        if (iscitcshipments.contains(txtBarcode.getText().toString())) {
-//
-//
-//            GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
-//            ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ");
-//            //  return;
-//
-//        }
-
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
-        AddPiece(PieceCode, WaybillNo, Weight);
-        //if (!IsDuplicate(PieceCode)) {
-
-
+        AddPiece(pieceDetail);
     }
 
-    private void AddPiece(String PieceCode, String WaybillNo, double Weight) {
-        if (!isduplicate.contains(PieceCode)) {
-            if (PieceCode.length() == 13) {
-                //SaveData(WaybillNo, PieceCode);
-                isduplicate.add(PieceCode);
+    private void AddPiece(PieceDetail pieceDetail) {
+        if (!isduplicate.contains(pieceDetail.Barcode)) {
+            if (pieceDetail.Barcode.length() == 13) {
+
+                isduplicate.add(pieceDetail.Barcode);
                 PiecesCount = PiecesCount + 1;
-                PieceCodeList.add(0, new PieceDetail(PieceCode, WaybillNo, Weight));
-                waybillweight = waybillweight + Weight;
+
+               if (pieceDetail.IsDestChanged)
+                PieceCodeList.add(0, pieceDetail);
+               else
+                PieceCodeList.add(0, pieceDetail);
+
+                waybillweight = waybillweight + pieceDetail.Weight;
                 lbTotal.setText(getString(R.string.lbCount) + String.valueOf(isduplicate.size()));
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
 
                 txtBarcode.setText("");
                 txtBarcode.requestFocus();
-                //if (PieceCodeList.size() > 5)
-                //     PieceCodeList.remove(5);
+
                 initViews();
             }
-
-
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
@@ -290,7 +401,42 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         }
     }
 
-    private void ErrorAlert(final String title, String message, final String PieceCode, final String Waybillno, final double Weight) {
+//    private void AddPiece(String PieceCode, String WaybillNo, double Weight , boolean isDestChanged , int newDestID) {
+//        if (!isduplicate.contains(PieceCode)) {
+//            if (PieceCode.length() == 13) {
+//
+//                isduplicate.add(PieceCode);
+//                PiecesCount = PiecesCount + 1;
+//
+//                if (isDestChanged)
+//                    PieceCodeList.add(0, new PieceDetail(PieceCode, WaybillNo, Weight , isDestChanged , newDestID ));
+//                else
+//                    PieceCodeList.add(0, new PieceDetail(PieceCode, WaybillNo, Weight , isDestChanged , 0));
+//
+//                waybillweight = waybillweight + Weight;
+//                lbTotal.setText(getString(R.string.lbCount) + String.valueOf(isduplicate.size()));
+//                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+//
+//                txtBarcode.setText("");
+//                txtBarcode.requestFocus();
+//
+//                initViews();
+//            }
+//        } else {
+//            GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+//            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+//            txtBarcode.setText("");
+//        }
+//
+//        if (PieceCodeList.size() >= 20) {
+//            SaveData(PieceCodeList, WaybillList);
+//            PieceCodeList.clear();
+//            WaybillList.clear();
+//        }
+//    }
+
+
+    private void ErrorAlert(final String title, String message, final PieceDetail pieceDetail) {
         android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
@@ -299,11 +445,9 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        AddPiece(PieceCode, Waybillno, Weight);
+                        AddPiece(pieceDetail);
                         txtBarcode.setText("");
                         txtBarcode.requestFocus();
-
-
                     }
                 });
 
@@ -311,14 +455,6 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
-//                        isduplicate.remove(0);
-//                        PiecesCount = PiecesCount - 1;
-//                        double tw = PieceCodeList.get(0).Weight;
-//                        PieceCodeList.remove(0);
-//                        waybillweight = waybillweight - tw;
-//                        lbTotal.setText(getString(R.string.lbCount) + String.valueOf(isduplicate.size()));
-
                         txtBarcode.setText("");
                         txtBarcode.requestFocus();
 
@@ -328,6 +464,34 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
         alertDialog.show();
     }
+//    private void ErrorAlert(final String title, String message, final String PieceCode, final String Waybillno, final double Weight) {
+//        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
+//        alertDialog.setCancelable(false);
+//        alertDialog.setTitle(title);
+//        alertDialog.setMessage(message);
+//        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "ADD",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        AddPiece(PieceCode, Waybillno, Weight,false , 0);
+//                        txtBarcode.setText("");
+//                        txtBarcode.requestFocus();
+//                    }
+//                });
+//
+//        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "No",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        txtBarcode.setText("");
+//                        txtBarcode.requestFocus();
+//
+//
+//                    }
+//                });
+//
+//        alertDialog.show();
+//    }
 
     public ArrayList<String> iscitcshipments = new ArrayList<>();
 
@@ -353,16 +517,10 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
                 cursor.moveToFirst();
                 do {
-
                     iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
-//                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
-//                        isNclCitc.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
 
                 } while (cursor.moveToNext());
             }
-
-            //cursor.close();
-
 
             isrtoReq.clear();
 
@@ -392,103 +550,148 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
     }
 
-    private void initViews() {
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.shipmentBarCodes);
-        recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new NclAdapterRemoveValidation_CITC(PieceCodeList);
-        recyclerView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-        initSwipe();
+
+    public void clearList() {
+        initViews();
+        PiecesCount = 0;
+        isduplicate.clear();
+        adapter.clearAll();
+        PieceCodeList.clear();
+        WaybillList.clear();
+        lbTotal.setText(getString(R.string.lbCount) + String.valueOf(PiecesCount));
+        txtBarcode.setText("");
     }
 
-    private void removeWaybill(String waybillNo) {
-        int index = WaybillList.indexOf(waybillNo);
-        WaybillList.remove(index);
+
+    private boolean IsValid() {
+        boolean isValid = true;
+        if (NclShipmentActivity.NclNo == "0") {
+            GlobalVar.GV().ShowSnackbar(rootView, "Please generate Ncl No", GlobalVar.AlertType.Error);
+            isValid = false;
+        }
+
+        return isValid;
     }
 
-    public boolean IsDuplicate(String pieceCode) {
-        boolean result = false;
-        for (int i = 0; i < PieceCodeList.size(); i++) {
-            if (PieceCodeList.get(i).Barcode.equals(pieceCode)) {
-                result = true;
-                break;
+    private void SaveData(ArrayList<PieceDetail> PieceCodeList, ArrayList<String> WaybillList) {
+
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        if (IsValid()) {
+
+            DateTime TimeIn = DateTime.now();
+            ArrayList<String> waybill = new ArrayList<String>();
+
+            Ncl ncl = new Ncl();
+            ncl.NclNo = NclShipmentActivity.NclNo;
+            ncl.Date = TimeIn;
+            ncl.UserID = GlobalVar.GV().UserID;
+            ncl.PieceCount = PieceCodeList.size();
+            ncl.WaybillCount = waybill.size();
+            ncl.IsSync = false;
+            ncl.EmployID = GlobalVar.GV().EmployID;
+            ncl.StationID = GlobalVar.GV().StationID;
+
+            String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
+            String Dest[] = ScanNclNoFragment.txtDestination.getText().toString().split(":");
+            if (Origin.length > 1)
+                ncl.OrgDest = Origin[0];
+            if (Dest.length > 1)
+                ncl.OrgDest = ncl.OrgDest + " / " + Dest[0];
+
+
+            for (int i = 0; i < PieceCodeList.size(); i++) {
+
+                ncl.ncldetails.add(i,
+                        new NclDetail(PieceCodeList.get(i).Barcode, 0));
+            }
+
+            String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
+            jsonData = jsonData.replace("Date(-", "Date(");
+
+            boolean isinsert = dbConnections.InsertNclBulk(jsonData, getContext(), PieceCodeList.size());
+
+            if (isinsert) {
+                if (!isMyServiceRunning(NclServiceBulk.class)) {
+                    getActivity().startService(
+                            new Intent(getActivity(), NclServiceBulk.class));
+
+                }
+
+                PieceCodeList.clear();
+                WaybillList.clear();
+                initViews();
             }
         }
-        return result;
+        dbConnections.close();
     }
 
-    private void initSwipe() {
-        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT)//| ItemTouchHelper.RIGHT)
-        {
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getContext()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager
+                .getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
             }
+        }
+        return false;
+    }
 
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                final int position = viewHolder.getAdapterPosition();
+    private void ReadFromLocal() {
 
-                if (direction == ItemTouchHelper.LEFT) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                    builder.setTitle("Confirm Deleting")
-                            .setMessage("Are you sure you want to delete?")
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int which) {
-                                    //String waybillNo = adapter.GetWaybillNo(position);
-                                    //removeWaybill(waybillNo);
-                                    isduplicate.remove(PieceCodeList.get(position).Barcode);
-                                    adapter.removeItem(position);
-                                    lbTotal.setText(getString(R.string.lbCount) + adapter.getItemCount());
-                                    PiecesCount = PiecesCount - 1;
-                                }
-                            })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    initViews();
-                                }
-                            })
-                            .setCancelable(false);
-                    AlertDialog alertDialog = builder.create();
-                    alertDialog.show();
+        try {
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getContext());
+
+            Cursor delreq = dbConnections.Fill("select * from DeliverReq where ReqType = 1 Limit 1", getContext());
+            if (delreq.getCount() > 0) {
+                delreq.moveToFirst();
+                try {
+                    validupto.setText("Upto : " + delreq.getString(delreq.getColumnIndex("ValidDate")) + " 16:30");
+                    inserteddate.setText("DLD : " + delreq.getString(delreq.getColumnIndex("InsertedDate")));
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
 
             }
 
 
-        };
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                txtCitcCount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
+            }
+
+            cursor.close();
+            dbConnections.close();
+
+        } catch (
+                Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public void onNclDestChange(int nclDestStationID) {
-        updateAllowedDesList(nclDestStationID);
-        isNCLDestChosen = true;
-        txtBarcode.setHint("Scan barcode");
-        txtBarcode.setEnabled(true);
-    }
-
-    private void updateAllowedDesList(int nclDestStationID) {
-
-        if (allowedDestStationIDs != null && allowedDestStationIDs.size() > 0)
-            allowedDestStationIDs.clear();
-
-        allowedDestStationIDs = dbConnections.getAllowedNclStationDestIDs(nclDestStationID, getContext());
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+      try {
+          isNCLDestChosen = true;
+          this.NCLDestStationID = NCLDestStationID;
+          allowedDestStationIDs = allowedDestStations;
+          txtBarcode.setHint("Scan barcode");
+          txtBarcode.setEnabled(true);
+      } catch (Exception ex) {}
     }
 
     private ArrayList<Station> getAllowedDestCode () {
         ArrayList<Station> stationArrayList = new ArrayList<>();
         for (int i = 0 ; i < allowedDestStationIDs.size(); i++) {
-            stationArrayList.add(dbConnections.getStationByID(allowedDestStationIDs.get(i) , getContext()));
+            Station tempStation = dbConnections.getStationByID(allowedDestStationIDs.get(i) , getContext());
+             if (tempStation != null )
+                 stationArrayList.add(tempStation);
         }
         return stationArrayList;
     }
 
-    // Todo Riyam - What if barcode is not in file?
+
     private boolean isValidPieceBarcode(String pieceBarcode) {
         boolean isValid = true;
         try {
@@ -497,11 +700,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             if (onLineValidationLocal != null) {
 
-                if (!allowedDestStationIDs.contains(onLineValidation.getDestID())) {
+                if (NCLDestStationID != 0 && NCLDestStationID != onLineValidation.getDestID()) {
+                    Log.d("test" , "isValidPieceBarcode() Dest not belongs to NCL");
                     onLineValidation.setIsDestNotBelongToNcl(1);
                     isValid = false;
                 }
                 if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    Log.d("test" , "isValidPieceBarcode() Stop shipment");
                     onLineValidation.setIsStopShipment(1);
                     isValid = false;
                 }
@@ -520,49 +725,54 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
 
-    public void showDialog(OnLineValidation pieceDetails) {
+    public void showDialog(final OnLineValidation pieceDetails) {
         try {
             if (pieceDetails != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
                 LayoutInflater inflater = this.getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                View dialogView = inflater.inflate(R.layout.test, null);
                 dialogBuilder.setView(dialogView);
 
-                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText(pieceDetails.getPieceBarcode());
-
-                LinearLayout llDifDest = dialogView.findViewById(R.id.ll_wrong_dest);
-                llDifDest.setVisibility(View.VISIBLE);
-
-                TextView tvWrongDest = dialogView.findViewById(R.id.tv_wrong_dest);
-                tvWrongDest.setText("Piece Destination doesn't belong no NCL destination");
-
-                searchableSpinnerDest = (SearchableSpinner) dialogView.findViewById(R.id.spinner_destinations);
-                searchableSpinnerDest.setVisibility(View.VISIBLE);
-                ArrayAdapter<Station> addressArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, getAllowedDestCode());
-                addressArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                searchableSpinnerDest.setAdapter(addressArrayAdapter);
-                searchableSpinnerDest.setTitle("Change Destination");
-
+                final TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
                 Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
                 btnConfirm.setVisibility(View.VISIBLE);
-                btnConfirm.setText("OK");
+                btnConfirm.setText("OK & Quit");
 
-                Button btnQuit = dialogView.findViewById(R.id.btn_quit);
-                btnQuit.setVisibility(View.VISIBLE);
-                btnQuit.setText("Quit");
+                if (pieceDetails.getIsDestNotBelongToNcl() == 1) {
+
+                    LinearLayout llDifDest = dialogView.findViewById(R.id.ll_ncl_wrong_dest);
+                    llDifDest.setVisibility(View.VISIBLE);
+
+                    TextView tvNclHeader = dialogView.findViewById(R.id.tv_ncl_header);
+                    tvNclHeader.setText("NCL Destination");
+
+                    TextView tvNclBody = dialogView.findViewById(R.id.tv_ncl_body);
+                    tvNclBody.setText("Piece destination doesn’t belong to NCL.");
+
+                    // add on click listener
+                    radioGroupCheckListener(dialogView , btnConfirm);
+
+                }
 
 
                 if (pieceDetails.getIsStopShipment() == 1) {
+
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
-                    Log.d("test" , "isStopShipment");
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment , Please hold.");
+
                 }
+
 
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
                 alertDialog.show();
-                Log.d("test" , "Show");
 
                 btnConfirm.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -570,15 +780,29 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         // To avoid leaked window
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
-                            Log.d("test" , "OK btn");
-                        }
-                    }
-                });
+                            int DestID = 0;
+                            if (pieceDetails.getIsDestNotBelongToNcl() == 1 && isDestChanged) {
+                                Station station = (Station) searchableSpinnerDest.getSelectedItem();
+                                DestID = station.ID; // New ID
+                                PieceDetail pieceDetail = new PieceDetail();
+                                pieceDetail.Barcode = pieceDetails.getPieceBarcode();
+                                pieceDetail.Waybill = "0";
+                                pieceDetail.Weight = 0;
+                                pieceDetail.IsDestChanged = true;
+                                pieceDetail.DestinationStationID = DestID;
+                                AddNewPiece(pieceDetail);
+                                isDestChanged = false;
 
-                btnQuit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        alertDialog.dismiss();
+                            } else if (pieceDetails.getIsDestNotBelongToNcl() == 0) {
+                                PieceDetail pieceDetail = new PieceDetail();
+                                pieceDetail.Barcode = pieceDetails.getPieceBarcode();
+                                pieceDetail.Waybill = "0";
+                                pieceDetail.Weight = 0;
+                                pieceDetail.IsDestChanged = false;
+                                pieceDetail.DestinationStationID = 0;
+                                AddNewPiece(pieceDetail);
+                            }
+                        }
                     }
                 });
             }
@@ -601,7 +825,64 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
 
+    private void radioGroupCheckListener(final View v , final Button btnConfirm) {
+        final RadioButton rbDiscard = v.findViewById(R.id.rb_change_discard);
+        RadioGroup radioGroup = v.findViewById(R.id.rg_change_dest);
+        radioGroup.setVisibility(View.VISIBLE);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch(checkedId){
+                    case R.id.rb_change_dest:
+                        btnConfirm.setText("OK & Save");
+                        isDestChanged = true;
+                        searchableSpinnerDest = (SearchableSpinner) v.findViewById(R.id.spinner_ncl_destinations);
+                        searchableSpinnerDest.setVisibility(View.VISIBLE);
+                        ArrayAdapter<Station> addressArrayAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, getAllowedDestCode());
+                        addressArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        searchableSpinnerDest.setAdapter(addressArrayAdapter);
+                        searchableSpinnerDest.setTitle("Change Piece Destination");
+                        rbDiscard.setVisibility(View.VISIBLE);
 
+                        break;
+                    case R.id.rb_change_discard:
+                        btnConfirm.setText("OK & Quit");
+                        isDestChanged = false;
+                        searchableSpinnerDest.setVisibility(View.GONE);
+                        RadioButton rbDiscard = v.findViewById(R.id.rb_change_discard);
+                        rbDiscard.setVisibility(View.GONE);
+                        break;
+
+                }
+            }
+        });
+    }
+
+
+    public class PieceDetail {
+        public String Barcode;
+        public String Waybill;
+        public double Weight;
+        public boolean IsDestChanged;
+        public int DestinationStationID;
+
+        public PieceDetail () {}
+
+        public PieceDetail(String barcode, String waybill, double weight) {
+            Barcode = barcode;
+            Waybill = waybill;
+            Weight = weight;
+        }
+        public PieceDetail(String barcode, String waybill, double weight , boolean isDestChanged , int destID) {
+            Barcode = barcode;
+            Waybill = waybill;
+            Weight = weight;
+            IsDestChanged = isDestChanged;
+            DestinationStationID = destID;
+        }
+    }
+
+
+/*
     private class BringBarcodeInfo extends AsyncTask<String, Void, String> {
         private ProgressDialog progressDialog;
         String result = "";
@@ -691,7 +972,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         }
     }
 
-    private boolean IsValid(BarcodeInfoResult barcodeInfoResult) {
+private boolean IsValid(BarcodeInfoResult barcodeInfoResult) {
 
         boolean Result = true;
 
@@ -711,143 +992,37 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         txtBarcode.requestFocus();
         return Result;
     }
+private void removeWaybill(String waybillNo) {
+    int index = WaybillList.indexOf(waybillNo);
+    WaybillList.remove(index);
+}
 
-    public class PieceDetail {
-        public String Barcode;
-        public String Waybill;
-        public double Weight;
-
-        public PieceDetail(String barcode, String waybill, double weight) {
-            Barcode = barcode;
-            Waybill = waybill;
-            Weight = weight;
-        }
-
-    }
-
-    public void clearList() {
-        initViews();
-        PiecesCount = 0;
-        isduplicate.clear();
-        adapter.clearAll();
-        PieceCodeList.clear();
-        WaybillList.clear();
-        lbTotal.setText(getString(R.string.lbCount) + String.valueOf(PiecesCount));
-        txtBarcode.setText("");
-    }
-
-
-    private boolean IsValid() {
-        boolean isValid = true;
-        if (NclShipmentActivity.NclNo == "0") {
-            GlobalVar.GV().ShowSnackbar(rootView, "Please generate Ncl No", GlobalVar.AlertType.Error);
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
-    private void SaveData(ArrayList<PieceDetail> PieceCodeList, ArrayList<String> WaybillList) {
-
-        DBConnections dbConnections = new DBConnections(getContext(), null);
-        if (IsValid()) {
-
-            DateTime TimeIn = DateTime.now();
-            // Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
-            ArrayList<String> waybill = new ArrayList<String>();
-
-            Ncl ncl = new Ncl();
-            ncl.NclNo = NclShipmentActivity.NclNo;
-            ncl.Date = TimeIn;
-            ncl.UserID = GlobalVar.GV().UserID;
-            ncl.PieceCount = PieceCodeList.size();
-            ncl.WaybillCount = waybill.size();
-            ncl.IsSync = false;
-            ncl.EmployID = GlobalVar.GV().EmployID;
-            ncl.StationID = GlobalVar.GV().StationID;
-
-            String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
-            String Dest[] = ScanNclNoFragment.txtDestination.getText().toString().split(":");
-            if (Origin.length > 1)
-                ncl.OrgDest = Origin[0];
-            if (Dest.length > 1)
-                ncl.OrgDest = ncl.OrgDest + " / " + Dest[0];
-
-
-            for (int i = 0; i < PieceCodeList.size(); i++) {
-
-                ncl.ncldetails.add(i,
-                        new NclDetail(PieceCodeList.get(i).Barcode, 0));
-            }
-
-            String jsonData = JsonSerializerDeserializer.serialize(ncl, true);
-            jsonData = jsonData.replace("Date(-", "Date(");
-
-            boolean isinsert = dbConnections.InsertNclBulk(jsonData, getContext(), PieceCodeList.size());
-
-            if (isinsert) {
-                if (!isMyServiceRunning(NclServiceBulk.class)) {
-                    getActivity().startService(
-                            new Intent(getActivity(), NclServiceBulk.class));
-
-                }
-
-                PieceCodeList.clear();
-                WaybillList.clear();
-                initViews();
+public boolean IsDuplicate(String pieceCode) {
+        boolean result = false;
+        for (int i = 0; i < PieceCodeList.size(); i++) {
+            if (PieceCodeList.get(i).Barcode.equals(pieceCode)) {
+                result = true;
+                break;
             }
         }
-        dbConnections.close();
-
-
+        return result;
     }
-
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getContext()
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager
-                .getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
+private void AddNewWaybill(String WaybillNo) {
+    if (WaybillNo.length() >= 8)
+        WaybillNo = WaybillNo.substring(0, 8);
+    if (WaybillNo.toString().length() == 8) {
+        if (!WaybillList.contains(WaybillNo.toString())) {
+            WaybillCount = WaybillCount + 1;
+            WaybillList.add(0, WaybillNo.toString());
         }
-        return false;
     }
+}
+    private void updateAllowedDesList(int nclDestStationID) {
 
-    private void ReadFromLocal() {
+        if (allowedDestStationIDs != null && allowedDestStationIDs.size() > 0)
+            allowedDestStationIDs.clear();
 
-        try {
-            DBConnections dbConnections = new DBConnections(getContext(), null);
-            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getContext());
+        allowedDestStationIDs = dbConnections.getAllowedNclStationDestIDs(nclDestStationID, getContext());
+    } */
 
-            Cursor delreq = dbConnections.Fill("select * from DeliverReq where ReqType = 1 Limit 1", getContext());
-            if (delreq.getCount() > 0) {
-                delreq.moveToFirst();
-                try {
-                    validupto.setText("Upto : " + delreq.getString(delreq.getColumnIndex("ValidDate")) + " 16:30");
-                    inserteddate.setText("DLD : " + delreq.getString(delreq.getColumnIndex("InsertedDate")));
-                } catch (Exception e) {
-                    System.out.println(e);
-                }
-
-            }
-
-
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                txtCitcCount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
-
-
-            }
-
-            cursor.close();
-            dbConnections.close();
-
-        } catch (
-                Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 }

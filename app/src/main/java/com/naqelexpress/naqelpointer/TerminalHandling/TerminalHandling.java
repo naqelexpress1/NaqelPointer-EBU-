@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,9 @@ import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
@@ -52,10 +56,9 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class TerminalHandling extends AppCompatActivity {
+public class TerminalHandling extends AppCompatActivity implements AsyncTaskCompleteListener {
 
     FirstFragment firstFragment;
-    // SecondFragment secondFragment;
     ThirdFragment thirdFragment;
     DateTime TimeIn;
     public static double Latitude = 0;
@@ -70,7 +73,6 @@ public class TerminalHandling extends AppCompatActivity {
     static ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
     static ArrayList<String> city = new ArrayList<>();
     static ArrayList<String> operationalcity = new ArrayList<>();
-    //MyCountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,16 @@ public class TerminalHandling extends AppCompatActivity {
 
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
+
+
+        if (!isValidOnlineValidationFile()) {
+            Log.d("test" , "File is NOT valid");
+            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
+        } else {
+            Log.d("test" , "File is valid");
+        }
+
 
         status.clear();
         reason.clear();
@@ -327,6 +339,8 @@ public class TerminalHandling extends AppCompatActivity {
 
         return isValid;
     }
+
+
 
    /* private void SaveHeldOutData(int close) {
 
@@ -950,4 +964,28 @@ public class TerminalHandling extends AppCompatActivity {
 
         alertDialog.show();
     }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , "TerminalHandling Activity - isValidOnlineValidationFile() " + ex.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }
 }
+

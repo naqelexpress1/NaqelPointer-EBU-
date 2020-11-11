@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.DB.DBObjects;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -111,5 +112,11 @@ public class Station {
 
     public void setRootView(View rootView) {
         this.rootView = rootView;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return Code + " : " + Name;
     }
 }

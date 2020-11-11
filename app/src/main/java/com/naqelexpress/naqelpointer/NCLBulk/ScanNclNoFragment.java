@@ -1,6 +1,8 @@
 package com.naqelexpress.naqelpointer.NCLBulk;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,7 @@ import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.FacilityStatus;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.NclNoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.NclNoResult;
@@ -33,19 +37,37 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScanNclNoFragment extends Fragment {
-    private View rootView;
-    SpinnerDialog destSpinnerDialog;
-    public static EditText txtOrgin, txtDestination;
-    CheckBox checkMix;
-    Button btngenerate;
-    public int OriginID = 0, DestinationID = 0;
 
-    //public ArrayList<String> WaybillList = new ArrayList<>();
-    //private RecyclerView recyclerView;
-    //public DataAdapter adapter;
+    public static EditText txtOrgin, txtDestination;
+    private INclShipmentActivity iNclShipmentActivity;
+
+    private View rootView;
+    private SpinnerDialog destSpinnerDialog , destFacilitySpinnerDialog;
+    private EditText etOriginFacility , etDestFacility;
+    private CheckBox checkMix;
+    private Button btngenerate;
+
+    public int OriginID = 0, DestinationID = 0 ,
+               OriginFacilityID = 0 , DestinationFacilityID = 0;
+    private ArrayList<String> facilityList = new ArrayList<>();
+    private List<Integer> facilityIDList = new ArrayList<>();
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            iNclShipmentActivity = (INclShipmentActivity) context;
+        } catch (ClassCastException e) {
+            Log.d("test" , e.toString());
+        }
+    }
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,8 +82,24 @@ public class ScanNclNoFragment extends Fragment {
             txtOrgin.setInputType(InputType.TYPE_NULL);
             OriginID = GlobalVar.GV().StationID;
 
+
+            // Display logged in facility
+            DBConnections dbConnections = new DBConnections(getContext() , null);
+            OriginFacilityID = dbConnections.getUserFacilityID(getContext());
+            FacilityStatus facilityStatus = dbConnections.getFacility(getContext() , OriginFacilityID);
+            etOriginFacility = rootView.findViewById(R.id.et_Orgin_facility);
+            etOriginFacility.setText(facilityStatus.Code + " : " + facilityStatus.Name.toUpperCase());
+            etOriginFacility.setInputType(InputType.TYPE_NULL);
+
+
+
             txtDestination = (EditText) rootView.findViewById(R.id.txtDestination);
             txtDestination.setInputType(InputType.TYPE_NULL);
+
+            etDestFacility = rootView.findViewById(R.id.et_destination_facility);
+            etDestFacility.setInputType(InputType.TYPE_NULL);
+
+
             checkMix = (CheckBox) rootView.findViewById(R.id.checkMix);
             btngenerate = (Button) rootView.findViewById(R.id.btngenerate);
 
@@ -77,6 +115,24 @@ public class ScanNclNoFragment extends Fragment {
                         destSpinnerDialog.showSpinerDialog(false);
                 }
             });
+
+            // filter based on dest
+            etDestFacility.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                     if (txtDestination.getText().toString().trim().length() > 0) {
+                         getFacilityList(DestinationID);
+                         destFacilitySpinnerDialog = new SpinnerDialog(getActivity(), facilityList, "Select or Search Facility", R.style.DialogAnimations_SmileWindow);
+                         destFacilitySpinnerDialog.showSpinerDialog(false);
+                         bindSpinner();
+                     } else {
+                         GlobalVar.GV().ShowSnackbar(rootView, "Kindly select destination station first", GlobalVar.AlertType.Error);
+                     }
+               }
+
+            });
+
+
 
             if (GlobalVar.GV().IsEnglish())
                 destSpinnerDialog = new SpinnerDialog(getActivity(), StationNameList, "Select or Search Destination", R.style.DialogAnimations_SmileWindow);
@@ -104,17 +160,20 @@ public class ScanNclNoFragment extends Fragment {
                                                     }
                                                 }
             );
+
             btngenerate.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    if (DestinationID == 0) { //!checkMix.isChecked() &&
-                        GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_SelectDestination), GlobalVar.AlertType.Error);
+                    if (DestinationID == 0 || DestinationFacilityID == 0) { //!checkMix.isChecked() &&
+                        GlobalVar.GV().ShowSnackbar(rootView, "Please select destination station/facility", GlobalVar.AlertType.Error);
                         return;
                     }
                     NclNoRequest nclNoReq = new NclNoRequest();
                     nclNoReq.OrginID = OriginID;
                     nclNoReq.DestinationID = DestinationID;
+                    nclNoReq.OriginStationFacilityID =  OriginFacilityID;
+                    nclNoReq.DestinationStationFacilityID = DestinationFacilityID;
                     nclNoReq.IsMix = checkMix.isChecked();
                     GenerateNclNo(nclNoReq);
                 }
@@ -177,10 +236,46 @@ public class ScanNclNoFragment extends Fragment {
         txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
     }
 
+
+    private void getFacilityList(int destStationID) {
+
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+
+        facilityIDList.clear();
+        facilityList.clear();
+
+        int facilityCount = dbConnections.getCount("Facility" , "Station = " + destStationID , getContext());
+        Cursor result = null;
+
+        if (facilityCount == 0 ) {
+         result = dbConnections.Fill("select * from Facility", getContext());
+
+        } else {
+          result = dbConnections.Fill("select * from Facility where Station = " + destStationID, getContext());
+        }
+
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                int ID = Integer.parseInt(result.getString(result.getColumnIndex("FacilityID")));
+                String Code = result.getString(result.getColumnIndex("Code"));
+                String Name = result.getString(result.getColumnIndex("Name"));
+                String facilityCodeName = Code + " : " + Name;
+
+                facilityIDList.add(ID);
+                facilityList.add(facilityCodeName);
+
+            }
+            while (result.moveToNext());
+        }
+
+        dbConnections.close();
+        txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
+    }
+
     public void GenerateNclNo(NclNoRequest nclNoRequest) {
         String jsonData = JsonSerializerDeserializer.serialize(nclNoRequest, true);
         new BringNclNo().execute(jsonData);
-
     }
 
     private class BringNclNo extends AsyncTask<String, Void, String> {
@@ -190,10 +285,7 @@ public class ScanNclNoFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
-            //progressDialog = ProgressDialog.show(getContext().getApplicationContext(), "Please wait.", "Ncl No Generating.", true);
-
             progressDialog = new ProgressDialog(getActivity());
-            //progressDialog.setMax(100);
             progressDialog.setMessage("Please wait.");
             progressDialog.setTitle("Ncl No Generating.");
             progressDialog.show();
@@ -207,7 +299,8 @@ public class ScanNclNoFragment extends Fragment {
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GenerateNclNo");
+                //TODO Riyam URL
+                URL url = new URL("http://192.168.3.16:45455///api/pointer/" + "GenerateNclNo_v2");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -263,6 +356,7 @@ public class ScanNclNoFragment extends Fragment {
                 nclShipmentActivity.NclNo = noResult.NclNo;
                 nclShipmentActivity.destList = noResult.DestinationList;
                 nclShipmentActivity.IsMixed = checkMix.isChecked();
+                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID,noResult.AllowedDestStations);
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_GenerateNclNo) + " : " + noResult.NclNo, GlobalVar.AlertType.Info);
 
             } else
@@ -270,5 +364,17 @@ public class ScanNclNoFragment extends Fragment {
         }
     }
 
+    private void bindSpinner () {
+        if (destFacilitySpinnerDialog != null) {
+            destFacilitySpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
+                @Override
+                public void onClick(String item, int position) {
+                    etDestFacility.setText(facilityList.get(position));
+                    DestinationFacilityID = facilityIDList.get(position);
+                }
+            });
+
+        }
+    }
 
 }

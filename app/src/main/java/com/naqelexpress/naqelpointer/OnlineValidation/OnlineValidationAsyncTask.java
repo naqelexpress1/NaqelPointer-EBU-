@@ -99,13 +99,13 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             URL url = null;
 
             if (processType == GlobalVar.NclAndArrival)
-                url = new URL(DomainURL + "GetOvNclArrivalPieces");
+                url = new URL(DomainURL + "GetNclArrivalPieces");
 
             if (processType == GlobalVar.DsAndInventory)
-                url = new URL(DomainURL + "GetOvDsInventoryPieces");
+                url = new URL(DomainURL + "GetDsInventoryPieces");
 
             if (processType == GlobalVar.DsValidation)
-                url = new URL(DomainURL + "GetOvDsValidationPieces");
+                url = new URL(DomainURL + "GetDsValidationPieces");
 
 
             //TODO Riyam test process type e.g 6 (other)

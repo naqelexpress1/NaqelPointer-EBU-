@@ -245,6 +245,7 @@ public class LoginActivity extends AppCompatActivity {
         LoginIntoOpenMainPage();
     }
 
+
     private void LoginIntoOpenMainPage() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         String empID = txtEmployID.getText().toString();

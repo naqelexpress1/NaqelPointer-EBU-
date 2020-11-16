@@ -730,8 +730,9 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
             if (pieceDetails != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
                 LayoutInflater inflater = this.getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.test, null);
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
                 dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
 
                 final TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
                 tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());

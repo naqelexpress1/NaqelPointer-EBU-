@@ -120,7 +120,7 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL , \"IsNCLDest\" INTEGER NOT NULL  )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL)");
         //db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
@@ -985,9 +985,6 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteActionActivity", "LastScanWaybillNo"))
                 db.execSQL("ALTER TABLE MyRouteActionActivity ADD COLUMN LastScanWaybillNo  Text ");
-
-            if (!isColumnExist("Station", "IsNCLDest"))
-                db.execSQL("ALTER TABLE Station ADD COLUMN  IsNCLDest INTEGER ");
 
             if (!isColumnExist("FacilityLoggedIn" , "FacilityID"))
                 db.execSQL("ALTER TABLE FacilityLoggedIn ADD COLUMN  FacilityID INTEGER ");
@@ -1910,7 +1907,6 @@ public class DBConnections
             contentValues.put("Name", instance.Name);
             contentValues.put("FName", instance.FName);
             contentValues.put("CountryID", instance.CountryID);
-            contentValues.put("IsNCLDest", instance.IsNCLDest);
             result = db.insert("Station", null, contentValues);
             db.close();
         } catch (SQLiteException e) {
@@ -6254,6 +6250,82 @@ public class DBConnections
         }
     }
 
+
+
+//    public boolean insertOnLineValidation_Test( int processType ,Context context) {
+//        boolean hasError = false;
+//
+//        try {
+//            String sql = "insert into OnlineValidation (Barcode,DestID," +
+//                    "IsMultiPieces , IsRTORequest , IsDeliveryRequest, IsStopped , " +
+//                    "NoOfAttempts , IsRelabel ) " +
+//                    "values ( ?, ? , ? , ? , ? , ? , ? , ? );";
+//            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+//            db.beginTransaction();
+//            SQLiteStatement stmt = db.compileStatement(sql);
+//
+//
+//            if (!isOnlineValidationFileEmpty(db , context))
+//                db.execSQL("delete from OnlineValidation");
+//
+//            try {
+//                ContentValues contentValues = new ContentValues();
+//                contentValues.put("BarCode" , "4011452500001");
+//                contentValues.put("DestID" , 502);
+//                contentValues.put("IsMultiPieces" , 1);
+//                contentValues.put("IsRTORequest" , 1);
+//                contentValues.put("IsStopped" , 1);
+//                contentValues.put("IsDeliveryRequest" , 1);
+//                contentValues.put("NoOfAttempts" , 1);
+//                contentValues.put("IsRelabel" , 0);
+//                db.insert("OnlineValidation", null, contentValues);
+//
+//                ContentValues contentValues2 = new ContentValues();
+//                contentValues2.put("BarCode" , "4000020299290");
+//                contentValues2.put("DestID" , 502);
+//                contentValues2.put("IsMultiPieces" , 1);
+//                contentValues2.put("IsRTORequest" , 0);
+//                contentValues2.put("IsStopped" , 1);
+//                contentValues2.put("IsDeliveryRequest" , 0);
+//                contentValues2.put("NoOfAttempts" , 0);
+//                contentValues2.put("IsRelabel" , 0);
+//                db.insert("OnlineValidation", null, contentValues2);
+//
+//
+//                ContentValues contentValues3 = new ContentValues();
+//                contentValues3.put("BarCode" , "4011452600002");
+//                contentValues3.put("DestID" , 501);
+//                contentValues3.put("IsMultiPieces" , 0);
+//                contentValues3.put("IsRTORequest" , 0);
+//                contentValues3.put("IsStopped" , 1);
+//                contentValues3.put("IsDeliveryRequest" , 0);
+//                contentValues3.put("NoOfAttempts" , 0);
+//                contentValues3.put("IsRelabel" , 0);
+//                db.insert("OnlineValidation", null, contentValues3);
+//            } catch (Exception e) {
+//                Log.d("test" , "inserting for test" + e.toString());
+//            }
+//
+//            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+//
+//            if (!isFileDetailsInserted) {
+//                Log.d("test" , "file details not inserted");
+//                return false;
+//            }
+//
+//            if (!hasError) {
+//                db.setTransactionSuccessful();
+//                db.endTransaction();
+//            }
+//            db.close();
+//        } catch (Exception ex) {
+//            hasError = true;
+//            Log.d("test" , "insert online validation2 " + ex.toString());
+//        }
+//        return !hasError;
+//    }
+
+
     public boolean insertOnLineValidation(JSONArray onLineValidation, int processType ,Context context) {
         boolean hasError = false;
 
@@ -6300,15 +6372,10 @@ public class DBConnections
                     else
                         stmt.bindString(7, "0");
 
-                    // todo riyam relabel
+                    // todo relabel
                     stmt.bindString(8, "0");
 
-                    //TODO Riyam for testing
-//                     if (i == 4) {
-//                         int a = 0;
-//                         int b = 1;
-//                         int c = b/a;
-//                     }
+
 
                     long entryID = stmt.executeInsert();
                      if (entryID == -1) {
@@ -6323,45 +6390,6 @@ public class DBConnections
                     Log.d("test" , "insert online validation transaction " + ex.toString());
                 }
             }
-
-            //Todo Riyam for testiing remove it
-          try {
-              ContentValues contentValues = new ContentValues();
-              contentValues.put("BarCode" , "4011452500001");
-              contentValues.put("DestID" , 502);
-              contentValues.put("IsMultiPieces" , 1);
-              contentValues.put("IsRTORequest" , 1);
-              contentValues.put("IsStopped" , 1);
-              contentValues.put("IsDeliveryRequest" , 1);
-              contentValues.put("NoOfAttempts" , 1);
-              contentValues.put("IsRelabel" , 0);
-              db.insert("OnlineValidation", null, contentValues);
-
-              ContentValues contentValues2 = new ContentValues();
-              contentValues2.put("BarCode" , "4011452600001");
-              contentValues2.put("DestID" , 502);
-              contentValues2.put("IsMultiPieces" , 0);
-              contentValues2.put("IsRTORequest" , 0);
-              contentValues2.put("IsStopped" , 1);
-              contentValues2.put("IsDeliveryRequest" , 0);
-              contentValues2.put("NoOfAttempts" , 0);
-              contentValues2.put("IsRelabel" , 0);
-              db.insert("OnlineValidation", null, contentValues2);
-
-
-              ContentValues contentValues3 = new ContentValues();
-              contentValues3.put("BarCode" , "4011452600002");
-              contentValues3.put("DestID" , 501);
-              contentValues3.put("IsMultiPieces" , 0);
-              contentValues3.put("IsRTORequest" , 0);
-              contentValues3.put("IsStopped" , 1);
-              contentValues3.put("IsDeliveryRequest" , 0);
-              contentValues3.put("NoOfAttempts" , 0);
-              contentValues3.put("IsRelabel" , 0);
-              db.insert("OnlineValidation", null, contentValues3);
-          } catch (Exception e) {
-              Log.d("test" , "inserting for test" + e.toString());
-          }
 
            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
 
@@ -6422,11 +6450,6 @@ public class DBConnections
             contentValues.put("UploadDate", todayDatetime);
             contentValues.put("Process", Process);
 
-            //Todo Riyam for tesging
-//             int a = 0;
-//             int b = 1;
-//             b = b/a;
-
             result = db.insert("OnLineValidationFileDetails", null, contentValues);
         } catch (Exception e) {
             Log.d("test" , "insertOnLineValidationFileDetails " + e.toString());
@@ -6455,13 +6478,13 @@ public class DBConnections
         return true;
     }
 
-    //todo Riyam test the case
+
     public boolean isOnlineValidationFileOutDated(int process , Context context){
         try {
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String fileUploadDate = getOnlineValidationUploadDate(context);
-            //todo riyam remove testing only
+            //todo testing only
             //fileUploadDate  = "2020-10-24 16:48";
             //Split date and time
             DateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm");

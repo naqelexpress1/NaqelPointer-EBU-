@@ -60,15 +60,15 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
 
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
+    private DBConnections dbConnections;
+
     private GridView waybilgrid;
     BarCode adapter;
     EditText txtBarcode;
     TextView count;
 
     EditText employid;
-
-    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
-    private DBConnections dbConnections;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,26 +149,25 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
             public void afterTextChanged(Editable s) {
                 if (txtBarcode != null && txtBarcode.getText().length() == 13) {
                     String result = txtBarcode.getText().toString();
-
-                    if (isValidPieceBarcode(result)){
-                        if (scannedBarCode.contains(result)) {
-                            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                            if (!ScanbyDevice.contains(result))
-                                ScanbyDevice.add(result);
-
-                        } else {
-                            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                            if (!ConflictBarcode.contains(result))
-                                ConflictBarcode.add(result);
-                            conflict(result);
+                    if (scannedBarCode.contains(result)) {
+                        Log.d("test" ,"Belong to emp");
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                        if (!ScanbyDevice.contains(result)) {
+                            ScanbyDevice.add(result);
+                            isValidPieceBarcode(result , false);
                         }
-                        txtBarcode.setText("");
-                        doaction();
+
                     } else {
-                        showDialog(getOnLineValidationPiece(result));
+                        Log.d("test" ,"Conflict not in list");
+                        isValidPieceBarcode(result , true);
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                        if (!ConflictBarcode.contains(result)) {
+                            ConflictBarcode.add(result);
+                        }
+                       // conflict(result);
                     }
-
-
+                    txtBarcode.setText("");
+                    doaction();
                 }
             }
         });
@@ -194,8 +193,7 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
 
         if (employid.getText().toString().length() > 4) {
 
-            //todo riyam
-            //insertDiscrepancy();
+            insertDiscrepancy();
 
             count.setText("Count - 0");
             conflict.clear();
@@ -232,7 +230,8 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
     }
 
 
-    /*private void insertDiscrepancy() {
+    private void insertDiscrepancy() {
+
         if (ConflictBarcode.size() > 0) {
             try {
                 JSONObject header = new JSONObject();
@@ -261,7 +260,7 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
                 e.printStackTrace();
             }
         }
-    } */
+    }
 
 
     private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
@@ -366,7 +365,320 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
         }
     }
 
-//    private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            if (requestCode == 2 && resultCode == RESULT_OK) {
+                if (data != null) {
+                    Bundle extras = data.getExtras();
+                    if (extras != null) {
+                        if (extras.containsKey("scannedBarCode")) {
+                            scannedBarCode.clear();
+                            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+
+                        }
+                        if (extras.containsKey("ScanbyDevice")) {
+                            ScanbyDevice.clear();
+                            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+
+                        }
+                        if (extras.containsKey("ConflictBarcode")) {
+                            ConflictBarcode.clear();
+                            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+
+                        }
+                    }
+
+                }
+            }
+        } catch (Exception ex) {
+            Toast.makeText(ValidationDS.this, ex.toString(),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        doaction();
+
+    }
+
+    private void doaction()
+
+    {
+        conflict.clear();
+        for (int i = 0; i < ConflictBarcode.size(); i++) {
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", "");
+            temp.put("BarCode", ConflictBarcode.get(i));
+            temp.put("bgcolor", "3");
+            conflict.add(temp);
+        }
+
+        for (int i = 0; i < waybilldetails.size(); i++) {
+            String barcode = waybilldetails.get(i).get("BarCode");
+            boolean added = false;
+            for (int j = 0; j < ScanbyDevice.size(); j++) {
+                if (barcode.equals(ScanbyDevice.get(j))) {
+                    added = true;
+                    waybilldetails.get(i).put("bgcolor", "1");
+                    conflict.add(waybilldetails.get(i));
+                    break;
+                }
+            }
+            if (!added) {
+                waybilldetails.get(i).put("bgcolor", "2");
+                conflict.add(waybilldetails.get(i));
+            }
+
+        }
+
+        adapter.notifyDataSetChanged();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (employid.getText().toString().trim().replace(" ", "").length() > 0)
+            outState.putString("CourierID", employid.getText().toString());
+        else
+            outState.putString("CourierID", "");
+        outState.putString("Count", count.getText().toString());
+        outState.putInt("EmployID", GlobalVar.GV().EmployID);
+        outState.putInt("UserID", GlobalVar.GV().UserID);
+        outState.putInt("StationID", GlobalVar.GV().StationID);
+        outState.putString("EmployMobileNo", GlobalVar.GV().EmployMobileNo);
+        outState.putString("EmployName", GlobalVar.GV().EmployName);
+        outState.putString("EmployStation", GlobalVar.GV().EmployStation);
+        outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
+        outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
+        outState.putStringArrayList("scannedBarCode", scannedBarCode);
+        outState.putStringArrayList("ScanbyDevice", ScanbyDevice);
+        outState.putStringArrayList("ConflictBarcode", ConflictBarcode);
+        outState.putSerializable("conflict", conflict);
+        outState.putSerializable("waybilldetails", waybilldetails);
+        outState.putSerializable("ScannedBarCode", ScannedBarCode);
+        //Parcelable state = waybilgrid.onSaveInstanceState();
+        //outState.putParcelable("state", state);
+
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            employid.setText(savedInstanceState.getString("CourierID"));
+            count.setText(savedInstanceState.getString("Count"));
+            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
+            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
+            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
+            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
+            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
+            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
+            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
+            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+            scannedBarCode = savedInstanceState.getStringArrayList("scannedBarCode");
+            ScanbyDevice = savedInstanceState.getStringArrayList("ScanbyDevice");
+            ConflictBarcode = savedInstanceState.getStringArrayList("ConflictBarcode");
+            conflict = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("conflict");
+            waybilldetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("waybilldetails");
+            ScannedBarCode = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("ScannedBarCode");
+//            waybilgrid.setAdapter(adapter);
+//            waybilgrid.onRestoreInstanceState(savedInstanceState.getParcelable("state"));
+
+            adapter = new BarCode(conflict, getApplicationContext());
+            waybilgrid.setAdapter(adapter);
+
+            doaction();
+
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Exit ValidationDS")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        insertDiscrepancy();
+                        ValidationDS.super.onBackPressed();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }
+    private void ErrorAlert(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ValidationDS.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getPieceBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
+    public void showDialog(boolean isValid , OnLineValidation pieceDetails) {
+        try {
+            if (pieceDetails != null && !isValid) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(ValidationDS.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+//                if (isConflict)
+//                    tvBarcode.setText("This Piece " + pieceDetails.getPieceBarcode() + " is not belong to this Employee");
+//                else
+                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please check pieces.");
+                }
+
+                if (pieceDetails.getIsStopShipment() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
+                }
+
+                if (pieceDetails.getIsConflict() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_ds_validation);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_ds_validation_header);
+                    tvStopShipmentHeader.setText("DS Validation");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_ds_validation_body);
+                    tvStopShipmentBody.setText("Shipment is not belong to employee.");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private void isValidPieceBarcode(String pieceBarcode , boolean isConflict) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isValid = false;
+                }
+            }
+
+            if (isConflict) {
+                onLineValidation.setIsConflict(1);
+                isValid = false;
+            }
+
+            if (!isValid) {
+                onLineValidation.setPieceBarcode(pieceBarcode);
+                onLineValidationList.add(onLineValidation);
+            }
+
+            showDialog(isValid , getOnLineValidationPiece(pieceBarcode));
+
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        // return isValid;
+    }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsValidation , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
+
+    //    private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
 //        private ProgressDialog progressDialog;
 //        String result = "";
 //        StringBuffer buffer;
@@ -492,40 +804,6 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
 //        }
 //    }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        try {
-            if (requestCode == 2 && resultCode == RESULT_OK) {
-                if (data != null) {
-                    Bundle extras = data.getExtras();
-                    if (extras != null) {
-                        if (extras.containsKey("scannedBarCode")) {
-                            scannedBarCode.clear();
-                            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
-
-                        }
-                        if (extras.containsKey("ScanbyDevice")) {
-                            ScanbyDevice.clear();
-                            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
-
-                        }
-                        if (extras.containsKey("ConflictBarcode")) {
-                            ConflictBarcode.clear();
-                            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
-
-                        }
-                    }
-
-                }
-            }
-        } catch (Exception ex) {
-            Toast.makeText(ValidationDS.this, ex.toString(),
-                    Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        if (requestCode == 2 && resultCode == RESULT_OK) {
 //            if (data != null) {
@@ -551,268 +829,4 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
 //            }
 //        }
 //    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        doaction();
-
-    }
-
-    private void doaction()
-
-    {
-        conflict.clear();
-        for (int i = 0; i < ConflictBarcode.size(); i++) {
-            HashMap<String, String> temp = new HashMap<>();
-            temp.put("WayBillNo", "");
-            temp.put("BarCode", ConflictBarcode.get(i));
-            temp.put("bgcolor", "3");
-            conflict.add(temp);
-        }
-
-        for (int i = 0; i < waybilldetails.size(); i++) {
-            String barcode = waybilldetails.get(i).get("BarCode");
-            boolean added = false;
-            for (int j = 0; j < ScanbyDevice.size(); j++) {
-                if (barcode.equals(ScanbyDevice.get(j))) {
-                    added = true;
-                    waybilldetails.get(i).put("bgcolor", "1");
-                    conflict.add(waybilldetails.get(i));
-                    break;
-                }
-            }
-            if (!added) {
-                waybilldetails.get(i).put("bgcolor", "2");
-                conflict.add(waybilldetails.get(i));
-            }
-
-        }
-
-        adapter.notifyDataSetChanged();
-
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (employid.getText().toString().trim().replace(" ", "").length() > 0)
-            outState.putString("CourierID", employid.getText().toString());
-        else
-            outState.putString("CourierID", "");
-        outState.putString("Count", count.getText().toString());
-        outState.putInt("EmployID", GlobalVar.GV().EmployID);
-        outState.putInt("UserID", GlobalVar.GV().UserID);
-        outState.putInt("StationID", GlobalVar.GV().StationID);
-        outState.putString("EmployMobileNo", GlobalVar.GV().EmployMobileNo);
-        outState.putString("EmployName", GlobalVar.GV().EmployName);
-        outState.putString("EmployStation", GlobalVar.GV().EmployStation);
-        outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
-        outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
-        outState.putStringArrayList("scannedBarCode", scannedBarCode);
-        outState.putStringArrayList("ScanbyDevice", ScanbyDevice);
-        outState.putStringArrayList("ConflictBarcode", ConflictBarcode);
-        outState.putSerializable("conflict", conflict);
-        outState.putSerializable("waybilldetails", waybilldetails);
-        outState.putSerializable("ScannedBarCode", ScannedBarCode);
-        //Parcelable state = waybilgrid.onSaveInstanceState();
-        //outState.putParcelable("state", state);
-
-
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        if (savedInstanceState != null) {
-            employid.setText(savedInstanceState.getString("CourierID"));
-            count.setText(savedInstanceState.getString("Count"));
-            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
-            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
-            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
-            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
-            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
-            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
-            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
-            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
-            scannedBarCode = savedInstanceState.getStringArrayList("scannedBarCode");
-            ScanbyDevice = savedInstanceState.getStringArrayList("ScanbyDevice");
-            ConflictBarcode = savedInstanceState.getStringArrayList("ConflictBarcode");
-            conflict = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("conflict");
-            waybilldetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("waybilldetails");
-            ScannedBarCode = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("ScannedBarCode");
-//            waybilgrid.setAdapter(adapter);
-//            waybilgrid.onRestoreInstanceState(savedInstanceState.getParcelable("state"));
-
-            adapter = new BarCode(conflict, getApplicationContext());
-            waybilgrid.setAdapter(adapter);
-
-            doaction();
-
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Exit ValidationDS")
-                .setMessage("Are you sure you want to exit without saving?")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        //todo riyam
-                       // insertDiscrepancy();
-                        ValidationDS.super.onBackPressed();
-                    }
-                }).setNegativeButton("Cancel", null).setCancelable(false);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    private boolean isValidOnlineValidationFile() {
-        boolean isValid;
-
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsValidation , getApplicationContext());
-        if (isValid)
-            return true;
-        return false;
-    }
-
-    private boolean isValidPieceBarcode(String pieceBarcode) {
-        boolean isValid = true;
-        try {
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
-            OnLineValidation onLineValidation = new OnLineValidation();
-
-            if (onLineValidationLocal != null) {
-
-
-                if (onLineValidationLocal.getIsMultiPiece() == 1) {
-                    onLineValidation.setIsMultiPiece(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    onLineValidation.setPieceBarcode(pieceBarcode);
-                    onLineValidationList.add(onLineValidation);
-                }
-                return isValid;
-            }
-
-        } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
-        }
-        return isValid;
-    }
-
-
-    public void showDialog(OnLineValidation pieceDetails) {
-        try {
-            if (pieceDetails != null) {
-                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(ValidationDS.this);
-                LayoutInflater inflater = this.getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.test, null);
-                dialogBuilder.setView(dialogView);
-
-                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-//                if (isConflict)
-//                    tvBarcode.setText("This Piece " + pieceDetails.getPieceBarcode() + " is not belong to this Employee");
-//                else
-                    tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
-
-
-                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
-                btnConfirm.setVisibility(View.VISIBLE);
-                btnConfirm.setText("OK");
-
-
-
-
-                if (pieceDetails.getIsMultiPiece() == 1) {
-                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
-                    llMultiPiece.setVisibility(View.VISIBLE);
-
-                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
-                    tvMultiPieceHeader.setText("Multi Piece");
-
-                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
-                    tvMultiPieceBody.setText("Please check pieces.");
-                }
-
-                if (pieceDetails.getIsStopShipment() == 1) {
-                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
-                    llStopShipment.setVisibility(View.VISIBLE);
-
-                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
-                    tvStopShipmentHeader.setText("Stop Shipment");
-
-                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
-                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
-                }
-
-
-                final android.app.AlertDialog alertDialog = dialogBuilder.create();
-                alertDialog.show();
-
-                btnConfirm.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // To avoid leaked window
-                        if (alertDialog != null && alertDialog.isShowing()) {
-                            alertDialog.dismiss();
-                        }
-                    }
-                });
-
-
-            }
-        } catch (Exception e) {
-            Log.d("test" , "showDialog " + e.toString());
-        }
-    }
-
-    private OnLineValidation getOnLineValidationPiece (String barcode) {
-        try {
-            for (OnLineValidation pieceDetail : onLineValidationList) {
-                if (pieceDetail.getPieceBarcode().equals(barcode))
-                    return pieceDetail;
-            }
-
-        } catch (Exception e) {
-            Log.d("test" , "getOnLineValidationPiece " + e.toString());
-        }
-        return null;
-    }
-
-    @Override
-    public void onTaskComplete(boolean hasError, String errorMessage) {
-        if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
-        else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-    }
-
-    private void ErrorAlert(final String title, String message) {
-        AlertDialog alertDialog = new AlertDialog.Builder(ValidationDS.this).create();
-        alertDialog.setCancelable(false);
-        alertDialog.setTitle(title);
-        alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                    }
-                });
-
-        alertDialog.show();
-    }
-
-
 }

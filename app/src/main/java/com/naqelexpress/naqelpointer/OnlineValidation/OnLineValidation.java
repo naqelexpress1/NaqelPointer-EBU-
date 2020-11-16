@@ -14,6 +14,7 @@ public class OnLineValidation {
     private int IsWrongDest;
     private int IsDestNotBelongToNcl;
     private int IsPiecesAvailable = 1;
+    private int IsConflict;
 
     public void setID(int ID) {
         this.ID = ID;
@@ -63,6 +64,10 @@ public class OnLineValidation {
         IsPiecesAvailable = isPiecesAvailable;
     }
 
+    public void setIsConflict(int isConflict) {
+        IsConflict = isConflict;
+    }
+
     public int getID() {
         return ID;
     }
@@ -109,6 +114,10 @@ public class OnLineValidation {
 
     public int getIsPiecesAvailable() {
         return IsPiecesAvailable;
+    }
+
+    public int getIsConflict() {
+        return IsConflict;
     }
 
     @Override

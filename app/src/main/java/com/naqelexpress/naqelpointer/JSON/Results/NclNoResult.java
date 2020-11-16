@@ -27,7 +27,6 @@ public class NclNoResult extends DefaultResult {
                 }
             }
 
-            //Todo Riyam make it null
             JSONArray JsonAllowedDestStations= jsonObject.getJSONArray("AllowedDestStations");
             if (JsonAllowedDestStations != null) {
                 for ( int i = 0; i < JsonAllowedDestStations.length(); i++ ){

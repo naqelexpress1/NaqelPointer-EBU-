@@ -33,7 +33,7 @@ import java.net.URL;
 
 public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
-    //todo riyam check warning
+    //todo check warning
     private AsyncTaskCompleteListener<String> callback;
     private Context context;
     private Activity activity;
@@ -54,7 +54,6 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPreExecute() {
       try {
-          //todo riyam change to live + cause a crash
 
          progressDialog = ProgressDialog.show(activity, "Loading", "Upload online validation file , Please wait...", true);
           new CountDownTimer(300000, 30000) { // counter time is 5 min , update text every
@@ -73,6 +72,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                   }
 
               }
+
 
               public void onFinish() {
 
@@ -108,7 +108,6 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 url = new URL(DomainURL + "GetDsValidationPieces");
 
 
-            //TODO Riyam test process type e.g 6 (other)
 
             httpURLConnection = (HttpURLConnection) url.openConnection();
             httpURLConnection.setReadTimeout(300000); //240000
@@ -153,7 +152,6 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     protected void onPostExecute(String result) {
 
         try {
-            //todo riyam try server down - no internet
             super.onPostExecute("");
             if (result != null) {
 

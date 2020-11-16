@@ -299,8 +299,7 @@ public class ScanNclNoFragment extends Fragment {
             InputStream ist = null;
 
             try {
-                //TODO Riyam URL
-                URL url = new URL("http://192.168.3.16:45455///api/pointer/" + "GenerateNclNo_v2");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GenerateNclNo");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");

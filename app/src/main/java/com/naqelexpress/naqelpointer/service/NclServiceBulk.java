@@ -133,8 +133,7 @@ public class NclServiceBulk extends Service {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         //todo riyam
-        String URL = "http://192.168.3.16:45455//api/pointer/" + "NclSubmitInsertWaybillManual_v2"; //NclSubmit
-       // String URL = GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual_v2"; //NclSubmit
+        String URL = GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"; //NclSubmit
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {

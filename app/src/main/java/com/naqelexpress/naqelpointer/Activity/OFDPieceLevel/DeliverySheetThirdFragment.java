@@ -241,8 +241,6 @@ public class DeliverySheetThirdFragment extends Fragment {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int which) {
                                     adapter.removeItem(position);
-                                    //todo riyam added. Once piece is deleted and scanned again
-                                    // It says already exists.
                                     PieceBarCodeList.remove(position);
                                     lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
                                 }
@@ -587,8 +585,10 @@ public class DeliverySheetThirdFragment extends Fragment {
             if (pieceDetails != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
                 LayoutInflater inflater = this.getLayoutInflater();
-                dialogView = inflater.inflate(R.layout.test, null);
+                dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
                 dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
                 tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());

@@ -884,10 +884,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
                 InputStream ist = null;
 
                 try {
-                    //todo URL riyam
-                    URL url = new URL("http://192.168.3.16:45455//api/pointer/" + "NclSubmitInsertWaybillManual_v2"); //LoadtoDestination
-
-                    //URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual_v2"); //LoadtoDestination
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"); //LoadtoDestination
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");

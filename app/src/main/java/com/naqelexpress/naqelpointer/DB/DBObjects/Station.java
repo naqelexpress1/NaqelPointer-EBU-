@@ -17,7 +17,6 @@ public class Station {
     public String Name;
     public String FName;
     public int CountryID;
-    public int IsNCLDest;
 
 
     public Station() {
@@ -68,13 +67,6 @@ public class Station {
                         instance.FName = jsonObject.getString("FName");
                         instance.CountryID = jsonObject.getInt("CountryID");
                         instance.Code = jsonObject.getString("Code");
-
-                        // todo hardcoded for testing purpose
-                        if (instance.ID != 502 && instance.ID != 511)
-                            instance.IsNCLDest = 0;
-                        else
-                            instance.IsNCLDest = 1;
-
                         dbConnections.InsertStation(instance, context);
                     } catch (JSONException ignored) {
                     }
@@ -104,10 +96,6 @@ public class Station {
 
     public void setCountryID(int countryID) {
         CountryID = countryID;
-    }
-
-    public void setIsNCLDest(int isNCLDest) {
-        IsNCLDest = isNCLDest;
     }
 
     public void setRootView(View rootView) {

@@ -2321,8 +2321,9 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 if (pieceDetails != null) {
                     final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(InventoryControl_LocalValidation_oneByOne.this);
                     LayoutInflater inflater = this.getLayoutInflater();
-                    View dialogView = inflater.inflate(R.layout.test, null);
+                    View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
                     dialogBuilder.setView(dialogView);
+                    dialogBuilder.setCancelable(false);
 
                     TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
                     tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());

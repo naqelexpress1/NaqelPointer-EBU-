@@ -672,16 +672,16 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
     }
 
     public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
-      try {
+     /* try {
           isNCLDestChosen = true;
           this.NCLDestStationID = NCLDestStationID;
           allowedDestStationIDs = allowedDestStations;
           txtBarcode.setHint("Scan barcode");
           txtBarcode.setEnabled(true);
-      } catch (Exception ex) {}
+      } catch (Exception ex) {} */
     }
 
-    private ArrayList<Station> getAllowedDestCode () {
+   /* private ArrayList<Station> getAllowedDestCode () {
         ArrayList<Station> stationArrayList = new ArrayList<>();
         for (int i = 0 ; i < allowedDestStationIDs.size(); i++) {
             Station tempStation = dbConnections.getStationByID(allowedDestStationIDs.get(i) , getContext());
@@ -689,7 +689,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                  stationArrayList.add(tempStation);
         }
         return stationArrayList;
-    }
+    }*/
 
 
     private boolean isValidPieceBarcode(String pieceBarcode) {
@@ -752,7 +752,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     tvNclBody.setText("Piece destination doesn’t belong to NCL.");
 
                     // add on click listener
-                    radioGroupCheckListener(dialogView , btnConfirm);
+                   // radioGroupCheckListener(dialogView , btnConfirm);
 
                 }
 
@@ -826,7 +826,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
     }
 
 
-    private void radioGroupCheckListener(final View v , final Button btnConfirm) {
+ /*   private void radioGroupCheckListener(final View v , final Button btnConfirm) {
         final RadioButton rbDiscard = v.findViewById(R.id.rb_change_discard);
         RadioGroup radioGroup = v.findViewById(R.id.rg_change_dest);
         radioGroup.setVisibility(View.VISIBLE);
@@ -856,7 +856,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 }
             }
         });
-    }
+    }*/
 
 
     public class PieceDetail {

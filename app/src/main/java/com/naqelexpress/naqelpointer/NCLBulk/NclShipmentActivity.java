@@ -104,6 +104,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
+
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
         bundle = getIntent().getExtras();
@@ -1060,9 +1061,9 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 
     @Override
     public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
-        try {
+      /*  try {
             secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {} */
     }
 
     @Override

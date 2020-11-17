@@ -121,7 +121,6 @@ public class DBConnections
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL)");
-        //db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
                 "\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT , SeqOrder INTEGER )");
@@ -474,9 +473,6 @@ public class DBConnections
                 " \"UploadDate\"  DATETIME NOT NULL)");
 
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"NCLDestinations\" " +
-                "(\"NCLDestID\" INTEGER NOT NULL ," +
-                " \"StationID\" INTEGER NOT NULL )");
     }
 
     public int getVersion() {
@@ -583,8 +579,10 @@ public class DBConnections
                     " \"MobileNo\"  TEXT NOT NULL , \"StationID\"  INTEGER NOT NULL," +
                     "  \"ImageName\"  TEXT NOT NULL )");
 
+
             db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
+                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
+
 
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -770,9 +768,7 @@ public class DBConnections
                     " \"Process\"  INTEGER NOT NULL ," +
                     " \"UploadDate\"  DATETIME NOT NULL)");
 
-            db.execSQL("CREATE TABLE IF NOT EXISTS \"NCLDestinations\" " +
-                    "(\"NCLDestID\" INTEGER NOT NULL ," +
-                    " \"StationID\" INTEGER NOT NULL )");
+
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -1061,26 +1057,6 @@ public class DBConnections
         return result != -1;
     }
 
-    public List<Integer> getAllowedNclStationDestIDs (int nclDest , Context context) {
-        List<Integer> stationsIDs = new ArrayList<>();
-        try {
-
-            String selectQuery = "SELECT StationID FROM NCLDestinations WHERE NCLDestID = " + nclDest ;
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            Cursor cursor = db.rawQuery(selectQuery, null);
-
-            if (cursor.moveToFirst()) {
-                stationsIDs.add(Integer.parseInt(cursor.getString(cursor.getColumnIndex("StationID"))));
-            }
-            cursor.close();
-
-        } catch (Exception e) {
-            Log.d("test" , "getAllowedNclDestIDs - " + e.toString());
-        }
-        return stationsIDs;
-    }
-
-
 
     public String getDBPath(Context context) {
         String path = "";
@@ -1330,7 +1306,6 @@ public class DBConnections
 
             result = db.insert("FacilityLoggedIn", null, contentValues);
             db.close();
-            Log.d("test" , "FacilityLoggedIn inserted");
 
         } catch (SQLiteException e) {
           Log.d("test" , "FacilityLoggedIn " + e.toString());
@@ -1539,7 +1514,6 @@ public class DBConnections
     }
 
 
-
     public boolean UpdateUserDivision(String division, View view, int UpdateMenu) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -1573,7 +1547,6 @@ public class DBConnections
         db.close();
         return true;
     }
-
 
     public boolean UpdateUserMeLogin(UserMeLogin instance) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -6438,7 +6411,6 @@ public class DBConnections
 
     public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
         long result = 0;
-        Log.d("test" , "insertOnLineValidationFileDetails");
         try {
 
              if (db == null)
@@ -6459,8 +6431,6 @@ public class DBConnections
 
     public boolean isValidOnlineValidationFile(int process , Context context) {
 
-        Log.d("test" , "isValidOnlineValidationFile " + process);
-
         if (isOnlineValidationFileEmpty( context)) {
             Log.d("test" , "Empty");
             return false;
@@ -6477,7 +6447,6 @@ public class DBConnections
 
         return true;
     }
-
 
     public boolean isOnlineValidationFileOutDated(int process , Context context){
         try {
@@ -6609,39 +6578,9 @@ public class DBConnections
         catch (SQLiteException e) {
             Log.d("test" , "getOnlineValidationProcess " + e.toString());
         }
-        Log.d("test" , "getOnlineValidationProcess " + process);
         return process;
     }
 
-    public void insertNCLDestinations(JSONArray nclDestinations, Context context) {
-        try {
-            String sql = "insert into NCLDestinations (NCLDestID,StationID) " +
-                    "values (?, ?);";
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            db.beginTransaction();
-            SQLiteStatement stmt = db.compileStatement(sql);
-
-            for (int i = 0; i < nclDestinations.length(); i++) {
-                try {
-
-                    JSONObject jsonObject = nclDestinations.getJSONObject(i);
-                    stmt.bindString(1, jsonObject.getString("NCLDestID"));
-                    stmt.bindString(2, jsonObject.getString("StationID"));
-                    long entryID = stmt.executeInsert();
-                    stmt.clearBindings();
-
-                } catch (JSONException e) {
-                    Log.d("test" , "insertNCLDestinations " + e.toString());
-                    e.printStackTrace();
-                }
-            }
-            db.setTransactionSuccessful();
-            db.endTransaction();
-            db.close();
-        } catch (Exception ex) {
-            Log.d("test" , "insertNCLDestinations " + ex.toString());
-        }
-    }
 
     public int CountDomainURL(Context context, int type) {
         int Count = 0;

@@ -355,7 +355,7 @@ public class ScanNclNoFragment extends Fragment {
                 nclShipmentActivity.NclNo = noResult.NclNo;
                 nclShipmentActivity.destList = noResult.DestinationList;
                 nclShipmentActivity.IsMixed = checkMix.isChecked();
-                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID,noResult.AllowedDestStations);
+                //iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID,noResult.AllowedDestStations);
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_GenerateNclNo) + " : " + noResult.NclNo, GlobalVar.AlertType.Info);
 
             } else

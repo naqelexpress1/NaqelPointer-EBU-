@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class NclNoResult extends DefaultResult {
     public String  NclNo ;
     public ArrayList<Integer> DestinationList= new ArrayList<>();
-    public ArrayList<Integer> AllowedDestStations= new ArrayList<>();
+   // public ArrayList<Integer> AllowedDestStations= new ArrayList<>();
     public int NCLDestStationID;
 
     public NclNoResult(String finalJson)
@@ -27,12 +27,12 @@ public class NclNoResult extends DefaultResult {
                 }
             }
 
-            JSONArray JsonAllowedDestStations= jsonObject.getJSONArray("AllowedDestStations");
+       /*     JSONArray JsonAllowedDestStations= jsonObject.getJSONArray("AllowedDestStations");
             if (JsonAllowedDestStations != null) {
                 for ( int i = 0; i < JsonAllowedDestStations.length(); i++ ){
                     AllowedDestStations.add(JsonAllowedDestStations.getInt(i));
                 }
-            }
+            } */
 
         }
         catch (JSONException e)

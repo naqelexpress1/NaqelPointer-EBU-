@@ -299,7 +299,8 @@ public class ScanNclNoFragment extends Fragment {
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GenerateNclNo");
+
+                URL url = new URL(GlobalVar.getUATUrl(getContext())+ "GenerateNclNo_v2");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -355,7 +356,7 @@ public class ScanNclNoFragment extends Fragment {
                 nclShipmentActivity.NclNo = noResult.NclNo;
                 nclShipmentActivity.destList = noResult.DestinationList;
                 nclShipmentActivity.IsMixed = checkMix.isChecked();
-                //iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID,noResult.AllowedDestStations);
+                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID);
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_GenerateNclNo) + " : " + noResult.NclNo, GlobalVar.AlertType.Info);
 
             } else

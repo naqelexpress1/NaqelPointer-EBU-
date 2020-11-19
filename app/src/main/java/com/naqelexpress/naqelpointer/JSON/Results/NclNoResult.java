@@ -12,6 +12,7 @@ public class NclNoResult extends DefaultResult {
    // public ArrayList<Integer> AllowedDestStations= new ArrayList<>();
     public int NCLDestStationID;
 
+
     public NclNoResult(String finalJson)
     {
         JSONObject jsonObject;

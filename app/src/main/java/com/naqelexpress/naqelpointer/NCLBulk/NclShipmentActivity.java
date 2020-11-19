@@ -119,7 +119,6 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         }
 
 
-
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -1060,11 +1059,18 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     }
 
     @Override
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID ) {
+        try {
+            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID);
+        } catch (Exception ex) {}
+    }
+
+  /*  @Override
     public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
       /*  try {
             secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
         } catch (Exception ex) {} */
-    }
+  //  }
 
     @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {

@@ -535,7 +535,7 @@ public class DeliverySheetThirdFragment extends Fragment {
     private boolean isValidPieceBarcode(String pieceBarcode) {
         boolean isValid = true;
         try {
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode2(pieceBarcode, getContext());
             OnLineValidation onLineValidation = new OnLineValidation();
 
             if (onLineValidationLocal != null) {

@@ -671,7 +671,17 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
         }
     }
 
-    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID ) {
+      try {
+          isNCLDestChosen = true;
+          this.NCLDestStationID = NCLDestStationID;
+          txtBarcode.setHint("Scan barcode");
+          txtBarcode.setEnabled(true);
+      } catch (Exception ex) {}
+    }
+
+
+  //  public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
      /* try {
           isNCLDestChosen = true;
           this.NCLDestStationID = NCLDestStationID;
@@ -679,7 +689,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
           txtBarcode.setHint("Scan barcode");
           txtBarcode.setEnabled(true);
       } catch (Exception ex) {} */
-    }
+  //  }
 
    /* private ArrayList<Station> getAllowedDestCode () {
         ArrayList<Station> stationArrayList = new ArrayList<>();
@@ -700,7 +710,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
 
             if (onLineValidationLocal != null) {
 
-                if (NCLDestStationID != 0 && NCLDestStationID != onLineValidation.getDestID()) {
+                if (NCLDestStationID != 0 && NCLDestStationID != onLineValidationLocal.getDestID()) {
                     Log.d("test" , "isValidPieceBarcode() Dest not belongs to NCL");
                     onLineValidation.setIsDestNotBelongToNcl(1);
                     isValid = false;
@@ -795,6 +805,14 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                                 isDestChanged = false;
 
                             } else if (pieceDetails.getIsDestNotBelongToNcl() == 0) {
+                                PieceDetail pieceDetail = new PieceDetail();
+                                pieceDetail.Barcode = pieceDetails.getPieceBarcode();
+                                pieceDetail.Waybill = "0";
+                                pieceDetail.Weight = 0;
+                                pieceDetail.IsDestChanged = false;
+                                pieceDetail.DestinationStationID = 0;
+                                AddNewPiece(pieceDetail);
+                            } else {
                                 PieceDetail pieceDetail = new PieceDetail();
                                 pieceDetail.Barcode = pieceDetails.getPieceBarcode();
                                 pieceDetail.Waybill = "0";

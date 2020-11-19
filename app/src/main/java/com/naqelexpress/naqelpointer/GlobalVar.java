@@ -87,7 +87,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "271 - (06-10-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "406 - (18-11-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -123,6 +123,7 @@ public class GlobalVar {
     public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
+    private static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
 
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
@@ -3161,7 +3162,6 @@ public class GlobalVar {
             return false;
         else
             return true;
-
     }
 
     public String getDeviceName() {
@@ -3235,6 +3235,10 @@ public class GlobalVar {
 
     public static String getTestAPIURL (Context context) {
         return NaqelAPITest_V10;
+    }
+
+    public static String getUATUrl (Context context) {
+        return NaqelAPIUAT;
     }
 
     public String GetDomainURLforService(Context context, String ServiceName) {

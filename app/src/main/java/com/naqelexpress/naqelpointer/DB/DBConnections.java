@@ -466,6 +466,18 @@ public class DBConnections
                 "\"NoOfAttempts\" INTEGER NOT NULL," +
                 "\"IsRelabel\" INTEGER NOT NULL )");
 
+        //todo riyam for testing only
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OnlineValidation2\" " +
+                "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                " \"Barcode\" INTEGER NOT NULL ," +
+                " \"DestID\" INTEGER NOT NULL," +
+                " \"IsMultiPieces\" INTEGER NOT NULL , " +
+                "\"IsRTORequest\" INTEGER NOT NULL , " +
+                "\"IsStopped\" INTEGER NOT NULL, " +
+                "\"IsDeliveryRequest\" INTEGER NOT NULL," +
+                "\"NoOfAttempts\" INTEGER NOT NULL," +
+                "\"IsRelabel\" INTEGER NOT NULL )");
+
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnLineValidationFileDetails\" " +
                 "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
@@ -768,6 +780,18 @@ public class DBConnections
                     " \"Process\"  INTEGER NOT NULL ," +
                     " \"UploadDate\"  DATETIME NOT NULL)");
 
+
+            //todo riyam for testing only
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"OnlineValidation2\" " +
+                    "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    " \"Barcode\" INTEGER NOT NULL ," +
+                    " \"DestID\" INTEGER NOT NULL," +
+                    " \"IsMultiPieces\" INTEGER NOT NULL , " +
+                    "\"IsRTORequest\" INTEGER NOT NULL , " +
+                    "\"IsStopped\" INTEGER NOT NULL, " +
+                    "\"IsDeliveryRequest\" INTEGER NOT NULL," +
+                    "\"NoOfAttempts\" INTEGER NOT NULL," +
+                    "\"IsRelabel\" INTEGER NOT NULL )");
 
 
             if (!isColumnExist("CallLog", "EmpID"))
@@ -6383,6 +6407,79 @@ public class DBConnections
       return !hasError;
     }
 
+    //todo riyam for testing only
+
+    public boolean insertOnLineValidation2(JSONArray onLineValidation, int processType ,Context context) {
+        boolean hasError = false;
+
+        try {
+            String sql = "insert into OnlineValidation2 (Barcode,DestID," +
+                    "IsMultiPieces , IsRTORequest, IsStopped , " +
+                    " IsDeliveryRequest,NoOfAttempts , IsRelabel ) " +
+                    "values ( ?, ? , ? , ? , ? , ? , ? , ? );";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            db.beginTransaction();
+            SQLiteStatement stmt = db.compileStatement(sql);
+
+
+            if (!isOnlineValidationFileEmpty(db , context))
+                db.execSQL("delete from OnlineValidation");
+
+
+            for (int i = 0; i < onLineValidation.length(); i++) {
+                try {
+                    JSONObject jsonObject = onLineValidation.getJSONObject(i);
+
+                    // Common columns
+                    stmt.bindString(1, jsonObject.getString("Barcode"));
+                    stmt.bindString(2, jsonObject.getString("DestID"));
+                    stmt.bindString(3, jsonObject.getString("IsMultiPieces"));
+                    stmt.bindString(4, jsonObject.getString("IsRTORequest"));
+                    stmt.bindString(5, jsonObject.getString("IsStopped"));
+                    stmt.bindString(6, jsonObject.getString("IsDeliveryRequest"));
+                    stmt.bindString(7, jsonObject.getString("NoOfAttempts"));
+
+
+                    // todo relabel
+                    stmt.bindString(8, "0");
+
+
+
+                    long entryID = stmt.executeInsert();
+                    if (entryID == -1) {
+                        hasError = true;
+                        return hasError;
+                    }
+
+                    stmt.clearBindings();
+
+                } catch (Exception ex) {
+                    hasError = true;
+                    Log.d("test" , "insert online validation transaction " + ex.toString());
+                }
+            }
+
+            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+
+            if (!isFileDetailsInserted) {
+                Log.d("test" , "file details not inserted");
+                return false;
+            }
+
+            if (!hasError) {
+                db.setTransactionSuccessful();
+                db.endTransaction();
+            }
+            db.close();
+        } catch (Exception ex) {
+            hasError = true;
+            Log.d("test" , "insert online validation2 " + ex.toString());
+        }
+        return !hasError;
+    }
+
+
+
     public OnLineValidation getPieceInformationByBarcode (String barcode , Context context) {
         OnLineValidation onLineValidation = null;
         try {
@@ -6408,6 +6505,35 @@ public class DBConnections
         }
         return onLineValidation;
     }
+
+
+    //todo riyam for test only
+    public OnLineValidation getPieceInformationByBarcode2 (String barcode , Context context) {
+        OnLineValidation onLineValidation = null;
+        try {
+            String selectQuery = "SELECT * FROM OnLineValidation2 WHERE Barcode = " + barcode ;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                onLineValidation = new OnLineValidation();
+                onLineValidation.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
+                onLineValidation.setPieceBarcode(cursor.getString(cursor.getColumnIndex("Barcode")));
+                onLineValidation.setDestID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("DestID"))));
+                onLineValidation.setNoOfAttempts(Integer.parseInt(cursor.getString(cursor.getColumnIndex("NoOfAttempts"))));
+                onLineValidation.setIsMultiPiece(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsMultiPieces"))));
+                onLineValidation.setIsStopShipment(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
+                onLineValidation.setIsRTORequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRTORequest"))));
+                onLineValidation.setIsDeliveryRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsDeliveryRequest"))));
+                onLineValidation.setIsRelabel(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRelabel"))));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return onLineValidation;
+    }
+
 
     public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
         long result = 0;
@@ -6518,6 +6644,26 @@ public class DBConnections
         }
         return true;
     }
+
+    public boolean isOnlineValidationFileEmpty2(Context context) {
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation2", null);
+            if (cur != null ) {
+                cur.moveToFirst();
+
+                Log.d("test" , "File2 count " + cur.getCount());
+                return cur.getCount() <= 0 ;
+            }
+            db.close();
+        } catch (SQLiteException e) {
+            Log.d("test" , "isOnlineValidationFileEmpty2 " + e.toString());
+        }
+        return true;
+    }
+
 
     public boolean isOnlineValidationFileEmpty(SQLiteDatabase db , Context context) {
         try {

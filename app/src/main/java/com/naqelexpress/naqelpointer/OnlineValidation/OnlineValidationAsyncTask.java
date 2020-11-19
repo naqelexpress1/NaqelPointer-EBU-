@@ -80,7 +80,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
           }.start();
 
-          DomainURL = "http://172.19.20.70:45455//api/pointer/";
+          DomainURL = GlobalVar.getUATUrl(context);
           super.onPreExecute();
       } catch (Exception e) {
           Log.d("test" , "On pre exception " + e.toString());
@@ -102,15 +102,14 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 url = new URL(DomainURL + "GetNclArrivalPieces");
 
             if (processType == GlobalVar.DsAndInventory)
-                url = new URL(DomainURL + "GetDsInventoryPieces");
+                url = new URL("http://172.19.20.57:45455//api/pointer/" + "GetDsInventoryPieces");
 
             if (processType == GlobalVar.DsValidation)
                 url = new URL(DomainURL + "GetDsValidationPieces");
 
 
-
             httpURLConnection = (HttpURLConnection) url.openConnection();
-            httpURLConnection.setReadTimeout(300000); //240000
+            httpURLConnection.setReadTimeout(300000); //240000 4 min
             httpURLConnection.setConnectTimeout(300000);
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
@@ -163,8 +162,15 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                         DBConnections dbConnections = new DBConnections(context, null);
 
                         boolean isInserted = false;
-                        if (filteredPiecesList.length() > 0)
-                            isInserted = dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
+                        if (filteredPiecesList.length() > 0) {
+                            //todo riyam for testing only
+                            if (processType == GlobalVar.DsAndInventory) {
+                                isInserted = dbConnections.insertOnLineValidation2(filteredPiecesList,processType,context);
+
+                            } else {
+                                isInserted = dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
+                            }
+                        }
 
                         if (!isInserted) {
                             hasError = true;

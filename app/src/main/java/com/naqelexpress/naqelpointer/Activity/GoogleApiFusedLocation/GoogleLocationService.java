@@ -31,7 +31,8 @@ public class GoogleLocationService {
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
 
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
+   //public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
+   public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
 
 
     public GoogleLocationService(Context activity, LocationUpdateListener locationUpdateListener) {
@@ -54,7 +55,8 @@ public class GoogleLocationService {
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(15000);
+        //mLocationRequest.setFastestInterval(15000);
+        mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 

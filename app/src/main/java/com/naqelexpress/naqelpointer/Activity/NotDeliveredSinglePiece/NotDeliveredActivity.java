@@ -23,8 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
+import com.android.volley.BuildConfig;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -176,7 +176,7 @@ public class NotDeliveredActivity
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid() && dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), firstFragment.txtReason.getText().toString(),
-                firstFragment.txtWaybillNo.getText().toString())) {
+                firstFragment.txtWaybillNo.getText().toString(), bundle.getInt("SeqNo"), bundle.getBoolean("isupdate"))) {
             dbConnections.UpdateProductivity_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
             String Barcode = "";
@@ -189,7 +189,7 @@ public class NotDeliveredActivity
                         Barcode = Barcode + "," + firstFragment.ShipmentBarCodeList.get(i);
                 } else {
                     GlobalVar.GV().MakeSound(this.getApplicationContext(), R.raw.wrongbarcodescan);
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this.getApplicationContext());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(NotDeliveredActivity.this);
                     builder.setMessage("This piece(" + firstFragment.ShipmentBarCodeList.get(i) + ") is " +
                             "already delivered cannot scan again")
 
@@ -212,7 +212,8 @@ public class NotDeliveredActivity
                     TimeIn, DateTime.now(), String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.ReasonID,
                     firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId, Barcode);
 
-            Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());
+            Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString()
+                    + "' and HasComplaint = 1", getApplicationContext());
             if (result.getCount() > 0)
                 dbConnections.UpdateComplaint_Exceptions(GlobalVar.getDate(), getApplicationContext());
 
@@ -234,11 +235,12 @@ public class NotDeliveredActivity
                 }*/
 
                 if (IsSaved) {
-                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.NotDelivery.class)) {
-                        startService(
-                                new Intent(NotDeliveredActivity.this,
-                                        com.naqelexpress.naqelpointer.service.NotDelivery.class));
-                    }
+                    if (!GlobalVar.GV().isFortesting)
+                        if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.NotDelivery.class)) {
+                            startService(
+                                    new Intent(NotDeliveredActivity.this,
+                                            com.naqelexpress.naqelpointer.service.NotDelivery.class));
+                        }
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
                     finish();
                 } else
@@ -270,6 +272,7 @@ public class NotDeliveredActivity
     }
 
     private boolean IsValid() {
+
         GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
         boolean isValid = true;
         if (firstFragment == null) {

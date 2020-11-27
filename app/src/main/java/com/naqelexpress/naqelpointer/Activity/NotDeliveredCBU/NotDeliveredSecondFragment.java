@@ -120,6 +120,14 @@ public class NotDeliveredSecondFragment
     }
 
     private void AddNewPiece() {
+
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         if (NotDeliveredFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
             if (!NotDeliveredBarCodeList.contains(txtBarCode.getText().toString())) {
                 if (txtBarCode.getText().toString().length() == 13) {

@@ -68,6 +68,18 @@
         <item name="android:background">@color/White</item>
     </style>
 
+    <style name="NaqelPointer.ET" parent="TextAppearance.AppCompat">
+        <item name="colorAccent">@android:color/white</item>
+        <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:textColor">@color/NaqelBlue</item>
+        <item name="android:gravity">center</item>
+        <item name="android:colorActivatedHighlight">@color/White</item>
+        <item name="android:textCursorDrawable">@color/White</item>
+        <item name="android:background">@color/White</item>
+    </style>
+
+
+
     <!--/////////////////////////// Button //////////////////////////-->
     <style name="NaqelPointer.BlueButton" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/White</item>

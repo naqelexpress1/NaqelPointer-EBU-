@@ -13,8 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,27 +97,46 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 }
             });
 
-            txtBarcode.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
-
-                        //AddNewWaybill(String.valueOf(barcodeInfoResult.WayBillNo));
+            txtBarcode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                         AddNewPiece(txtBarcode.getText().toString(), "0", 0);
 
-                    }
 
+                        return true;
+                    }
+                    return false;
                 }
             });
 
+
+//            txtBarcode.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
+//
+//                        //AddNewWaybill(String.valueOf(barcodeInfoResult.WayBillNo));
+//                        AddNewPiece(txtBarcode.getText().toString(), "0", 0);
+//
+//                    }
+//
+//                }
+//            });
+//
         }
 
         ReadFromLocal();
@@ -154,6 +172,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
     private void AddNewPiece(String PieceCode, String WaybillNo, double Weight) {
+
+        if (!GlobalVar.GV().isValidBarcodeCons(PieceCode)) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarcode.setText("");
+            return;
+        }
 
         if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
 //            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
@@ -681,6 +706,22 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void onBackpressed() {
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit NCL ")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        android.support.v7.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
     }
 }

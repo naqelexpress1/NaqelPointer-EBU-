@@ -285,7 +285,8 @@ public class DeliveryActivity extends AppCompatActivity {
 //            return;
 //        }
 
-        if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), "Delivered", WaybillNo)) {
+        if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), "Delivered", WaybillNo, bundle.getInt("SeqNo"),
+                bundle.getBoolean("isupdate"))) {
             GlobalVar.ShowDialog(DeliveryActivity.this, "Warning",
                     "Something went wrong , kindly save again", true);
             return;

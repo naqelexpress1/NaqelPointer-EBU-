@@ -226,7 +226,8 @@ public class TakePicture extends Fragment implements View.OnClickListener {
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View layout = layoutInflater.inflate(R.layout.tripplanpopup, viewGroup);
-        final PopupWindow popup = new PopupWindow(layout, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        final PopupWindow popup = new PopupWindow(layout, ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
 
         txtBarCode = (EditText) layout.findViewById(R.id.palletbarcode);
         txtBarCode.setHint("Scan Piece Code");

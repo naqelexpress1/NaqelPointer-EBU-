@@ -93,6 +93,12 @@ public class ThirdFragment
                         }
                     } else {
                         if (txtBarCode != null && txtBarCode.getText().length() == 13) {
+                            if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+                                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                                txtBarCode.setText("");
+                                return;
+                            }
                             if (IsValid()) {
                                 AddNewPiece();
                             } else {
@@ -564,7 +570,7 @@ public class ThirdFragment
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

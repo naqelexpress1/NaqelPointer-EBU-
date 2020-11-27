@@ -86,7 +86,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "271 - (06-10-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "CBU - RLS GbyPno (27-11-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -120,6 +120,7 @@ public class GlobalVar {
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
+    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
@@ -1244,6 +1245,7 @@ public class GlobalVar {
                     myRouteShipments.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
                     myRouteShipments.BillingType = result.getString(result.getColumnIndex("BillingType"));
                     myRouteShipments.OrderNo = Integer.parseInt(result.getString(result.getColumnIndex("OrderNo")));
+                    myRouteShipments.DsOrderNo = Integer.parseInt(result.getString(result.getColumnIndex("DsOrderNo")));
                     myRouteShipments.ItemNo = result.getString(result.getColumnIndex("ItemNo"));
 
                     myRouteShipments.TypeID = Integer.parseInt(result.getString(result.getColumnIndex("TypeID")));
@@ -1258,17 +1260,21 @@ public class GlobalVar {
                             !myRouteShipments.Latitude.equals("null") && !myRouteShipments.Longitude.equals("null")) {
                         Location sp = new Location("");
                         try {
-                            haslocation.add(position);
+
                             sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
                             sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
-                            sp.setSpeed(position);
+                            if (Double.parseDouble(myRouteShipments.Longitude) != 0.0) {
+                                haslocation.add(position);
+                                sp.setSpeed(position);
+                            }
                         } catch (Exception e) {
                             sp.setLatitude(0);
                             sp.setLongitude(0);
                         }
 
                         //Places places = new Places(position, latlong);
-                        MyRouteActivity.places.add(sp);
+                        if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
+                            MyRouteActivity.places.add(sp);
                     }
 
                     myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -1361,6 +1367,9 @@ public class GlobalVar {
         }
         myRouteShipmentList.clear();
         myRouteShipmentList = new ArrayList<>();
+        if (result != null)
+            result.close();
+
         LoadMyRouteShipments_CBU("0", CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
         LoadMyRouteShipments_CBU(orderBy, CheckComplaintandDeliveryRequest, context, view, Waybillno, orderNo);
     }
@@ -1425,17 +1434,21 @@ public class GlobalVar {
                             !myRouteShipments.Latitude.equals("null") && !myRouteShipments.Longitude.equals("null")) {
                         Location sp = new Location("");
                         try {
-                            haslocation.add(position);
+
                             sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
                             sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
-                            sp.setSpeed(position);
+                            if (Double.parseDouble(myRouteShipments.Longitude) != 0.0) {
+                                haslocation.add(position);
+                                sp.setSpeed(position);
+                            }
                         } catch (Exception e) {
                             sp.setLatitude(0);
                             sp.setLongitude(0);
                         }
 
                         //Places places = new Places(position, latlong);
-                        MyRouteActivity.places.add(sp);
+                        if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
+                            MyRouteActivity.places.add(sp);
                     }
 
                     myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -1482,6 +1495,9 @@ public class GlobalVar {
 
                 // ReOrderMyRouteShipments(CheckComplaintandDeliveryRequest, view, context);
             }
+            if (result != null)
+                result.close();
+
             ArrayList<MyRouteShipments> locallist = new ArrayList<>();
 
             if (orderBy.equals("0")) {
@@ -1501,6 +1517,7 @@ public class GlobalVar {
                 myRouteShipmentList.addAll(locallist);
             }
         }
+
         dbConnections.close();
     }
 
@@ -2638,6 +2655,22 @@ public class GlobalVar {
         return datetime;
     }
 
+    public static String getCurrentDatewithCustomSeconds(int seconds, String dt) {
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        Calendar c = Calendar.getInstance();
+        try {
+            c.setTime(dateformat.parse(dt));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        c.add(Calendar.SECOND, seconds);
+
+        String datetime = dateformat.format(c.getTime());
+
+        return datetime;
+    }
+
+
     public static String getDateMinus2Days() {
         Calendar calander = Calendar.getInstance();
         calander.add(Calendar.DATE, -2);
@@ -2931,7 +2964,7 @@ public class GlobalVar {
             return true;
         }
         Location location = GlobalVar.getLastKnownLocation(context);
-        int radius = 200;
+        int radius = 400;
         double foundLongitude = 0.0, foundLatitude = 0.0;
 
         if (location != null) {
@@ -3240,4 +3273,159 @@ public class GlobalVar {
 
     }
 
+
+    public boolean isValidBarcode(String Barcode) {
+        boolean isvalid = true;
+//        try {
+//            double barcode = Double.parseDouble(Barcode);
+//            if (Barcode.length() == 13) {
+//                String validChar = Barcode.substring(8, 12);
+//                if (!validChar.equals("0000"))
+//                    isvalid = false;
+//            } else
+//                isvalid = false;
+//
+//        } catch (Exception e) {
+//            isvalid = false;
+//        }
+
+        return isvalid;
+
+    }
+
+
+    public boolean isValidBarcodeCons(String Barcode) {
+        boolean isvalid = true;
+        try {
+            double barcode = Double.parseDouble(Barcode);
+            if (Barcode.length() == 13) {
+                String validChar = Barcode.substring(8, 12);
+                if (!validChar.equals("0000"))
+                    isvalid = false;
+            } else
+                isvalid = false;
+
+        } catch (Exception e) {
+            isvalid = false;
+        }
+
+        return isvalid;
+
+    }
+
+    public boolean isValidNumber(String Barcode) {
+        boolean isvalid = true;
+        try {
+            double barcode = Double.parseDouble(Barcode);
+
+            String validChar = Barcode.substring(8, 12);
+            if (!validChar.equals("0000"))
+                isvalid = false;
+
+
+        } catch (Exception e) {
+            isvalid = false;
+        }
+
+        return isvalid;
+
+    }
+
+    public MyRouteShipments FetchMyRouteShipments(Context context, int notifywaybillno, String colorCode, String Lat, String Lng, boolean isupdate) {
+
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where IsNotDelivered in(1 , 2) order by OnDeliveryDate Desc Limit 1", context);
+
+        MyRouteShipments myRouteShipments = new MyRouteShipments();
+
+        if (result.getCount() > 0) {
+
+            result.moveToFirst();
+
+
+            if (result.getInt(result.getColumnIndex("IsNotDelivered")) == 1)
+                return null;
+            myRouteShipments.IsDelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+            myRouteShipments.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+            myRouteShipments.BillingType = result.getString(result.getColumnIndex("BillingType"));
+            myRouteShipments.OrderNo = Integer.parseInt(result.getString(result.getColumnIndex("OrderNo")));
+            myRouteShipments.ItemNo = result.getString(result.getColumnIndex("ItemNo"));
+            myRouteShipments.DsOrderNo = result.getInt(result.getColumnIndex("DsOrderNo"));
+
+            myRouteShipments.TypeID = Integer.parseInt(result.getString(result.getColumnIndex("TypeID")));
+            myRouteShipments.CODAmount = getDoubleFromString(result.getString(result.getColumnIndex("CODAmount")));
+            myRouteShipments.DeliverySheetID = Integer.parseInt(result.getString(result.getColumnIndex("DeliverySheetID")));
+            myRouteShipments.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+            myRouteShipments.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("ExpectedTime")));
+
+            myRouteShipments.Latitude = result.getString(result.getColumnIndex("Latitude"));
+            myRouteShipments.Longitude = result.getString(result.getColumnIndex("Longitude"));
+            if ((myRouteShipments.Latitude.length() > 0 && myRouteShipments.Longitude.length() > 0) &&
+                    !myRouteShipments.Latitude.equals("null") && !myRouteShipments.Longitude.equals("null")) {
+                Location sp = new Location("");
+                try {
+
+                    sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
+                    sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
+                } catch (Exception e) {
+                    sp.setLatitude(0);
+                    sp.setLongitude(0);
+                }
+
+                //Places places = new Places(position, latlong);
+                if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
+                    MyRouteActivity.places.add(sp);
+            }
+
+            myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
+            myRouteShipments.ClientName = result.getString(result.getColumnIndex("ClientName"));
+            myRouteShipments.ClientFName = result.getString(result.getColumnIndex("ClientFName"));
+            myRouteShipments.ClientAddressPhoneNumber = result.getString(result.getColumnIndex("ClientAddressPhoneNumber"));
+            myRouteShipments.ClientAddressFirstAddress = result.getString(result.getColumnIndex("ClientAddressFirstAddress"));
+            myRouteShipments.ClientAddressSecondAddress = result.getString(result.getColumnIndex("ClientAddressSecondAddress"));
+            myRouteShipments.ClientContactName = result.getString(result.getColumnIndex("ClientContactName"));
+            myRouteShipments.ClientContactFName = result.getString(result.getColumnIndex("ClientContactFName"));
+            myRouteShipments.ClientContactPhoneNumber = result.getString(result.getColumnIndex("ClientContactPhoneNumber"));
+            myRouteShipments.ClientContactMobileNo = result.getString(result.getColumnIndex("ClientContactMobileNo"));
+            myRouteShipments.ConsigneeName = result.getString(result.getColumnIndex("ConsigneeName"));
+            myRouteShipments.ConsigneeFName = result.getString(result.getColumnIndex("ConsigneeFName"));
+            myRouteShipments.ConsigneePhoneNumber = result.getString(result.getColumnIndex("ConsigneePhoneNumber"));
+            myRouteShipments.ConsigneeFirstAddress = result.getString(result.getColumnIndex("ConsigneeFirstAddress"));
+            myRouteShipments.ConsigneeSecondAddress = result.getString(result.getColumnIndex("ConsigneeSecondAddress"));
+            myRouteShipments.ConsigneeNear = result.getString(result.getColumnIndex("ConsigneeNear"));
+            myRouteShipments.ConsigneeMobile = result.getString(result.getColumnIndex("ConsigneeMobile"));
+            myRouteShipments.Origin = result.getString(result.getColumnIndex("Origin"));
+            myRouteShipments.Destination = result.getString(result.getColumnIndex("Destination"));
+            myRouteShipments.PODNeeded = Boolean.parseBoolean(result.getString(result.getColumnIndex("PODNeeded")));
+            myRouteShipments.PODDetail = result.getString(result.getColumnIndex("PODDetail"));
+            myRouteShipments.PODTypeCode = result.getString(result.getColumnIndex("PODTypeCode"));
+            myRouteShipments.PODTypeName = result.getString(result.getColumnIndex("PODTypeName"));
+
+            myRouteShipments.IsPartialDelivered = result.getInt(result.getColumnIndex("PartialDelivered")) > 0;
+            myRouteShipments.NotDelivered = result.getInt(result.getColumnIndex("NotDelivered")) > 0;
+            myRouteShipments.CourierDailyRouteID = Integer.parseInt(result.getString(result.getColumnIndex("CourierDailyRouteID")));
+            myRouteShipments.OptimzeSerialNo = Integer.parseInt(result.getString(result.getColumnIndex("OptimzeSerialNo")));
+            myRouteShipments.HasComplaint = result.getInt(result.getColumnIndex("HasComplaint")) > 0;
+            myRouteShipments.HasDeliveryRequest = result.getInt(result.getColumnIndex("HasDeliveryRequest")) > 0;
+            myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
+            myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
+            myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
+            myRouteShipments.BGColor = colorCode;
+            myRouteShipments.isupdate = isupdate;
+            myRouteShipments.Position = result.getInt(result.getColumnIndex("DsOrderNo")) - 1;
+
+            if (notifywaybillno > 0) {
+                myRouteShipments.IsNotifyWaybillNo = notifywaybillno;
+                myRouteShipments.IsNotifyCust = false;
+                myRouteShipments.ParentLatitude = Lat;
+                myRouteShipments.ParentLongitude = Lng;
+            }
+
+        }
+        if (result != null)
+            result.close();
+        dbConnections.close();
+        return myRouteShipments;
+    }
 }

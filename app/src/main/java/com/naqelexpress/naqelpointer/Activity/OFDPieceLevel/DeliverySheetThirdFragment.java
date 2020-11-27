@@ -101,6 +101,12 @@ public class DeliverySheetThirdFragment
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (txtBarCode != null && txtBarCode.getText().length() == 13) {
+                        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+                            GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
+                            txtBarCode.setText("");
+                            return;
+                        }
                         if (!pieceDenied.contains(txtBarCode.getText().toString()))
                             new GetWaybillInfo().execute(txtBarCode.getText().toString());
                         else {

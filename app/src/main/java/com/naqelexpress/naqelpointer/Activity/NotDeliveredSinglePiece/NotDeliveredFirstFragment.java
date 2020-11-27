@@ -261,6 +261,10 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
 
             ReadFromLocal(result, dbConnections);
         }
+        if (result != null)
+            result.close();
+        if (dbConnections != null)
+            dbConnections.close();
     }
 
     public static ArrayList<String> ShipmentBarCodeList = new ArrayList<>();

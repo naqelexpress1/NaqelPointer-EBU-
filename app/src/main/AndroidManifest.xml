@@ -233,6 +233,22 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn"
+            android:label="My Route"
+            android:screenOrientation="portrait"
+            android:theme="@style/myroute.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+
         <!--
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
@@ -603,6 +619,12 @@
 
         <activity
             android:name=".Activity.Login.FacilityLogin"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".Activity.Login.VerifyMobileNo"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />

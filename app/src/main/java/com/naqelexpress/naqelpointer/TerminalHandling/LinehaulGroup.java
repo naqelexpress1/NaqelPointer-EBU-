@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 //import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 
-// Created by Ismail on 21/03/2018.
+// Created by Ismail on 21/03/2018. this package is using
 
 public class LinehaulGroup extends AppCompatActivity implements View.OnClickListener {
 

@@ -15,8 +15,12 @@
       },
       "oauth_client": [
         {
-          "client_id": "423289246434-t3p12g7a639mpbs00lsve26m3mig272h.apps.googleusercontent.com",
-          "client_type": 3
+          "client_id": "423289246434-3gm74vvhja7gdnlml7d5avvilqsl4ekh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.naqelexpress.naqelpointer",
+            "certificate_hash": "4ff2b3a332bfa8e9c3d42dbc492bf275a4294163"
+          }
         },
         {
           "client_id": "423289246434-t3p12g7a639mpbs00lsve26m3mig272h.apps.googleusercontent.com",
@@ -25,19 +29,24 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDTu2_51gfqW2eBqkQRwW563-ZX48HzuHI"
+          "current_key": "AIzaSyBuikI2-libgqGhSMo9D3J8DZKkNTgSz-k"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "111262992201215347192",
+              "client_type": 3
+            },
+            {
+              "client_id": "423289246434-ck6nhi6u73j1laftoliltnud09jmiall.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.naqelexpress.naqel"
+              }
+            }
+          ]
         }
       }
     }

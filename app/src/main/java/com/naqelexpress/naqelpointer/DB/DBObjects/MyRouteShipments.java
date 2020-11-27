@@ -87,10 +87,19 @@ public class MyRouteShipments implements Parcelable {
     public int IsPaid = 0;
     public int IsMap = 0;
     public int IsPlan = 0;
+    public boolean IsDuplicateCustomer = false;
+    public boolean IsNotifyCust = true;
+    public int IsNotifyWaybillNo = 0;
+    public String ParentLatitude = "0";
+    public String ParentLongitude = "0";
+    public String BGColor = "0";
+    public boolean isupdate = true;
+
 
     public MyRouteShipments() {
 
     }
+
 
     public MyRouteShipments(int id) {
         ID = id;
@@ -233,7 +242,8 @@ public class MyRouteShipments implements Parcelable {
                     sp.setLongitude(Double.parseDouble(instance.Longitude));
 
                     //Places places = new Places(position, latlong);
-                    MyRouteActivity.places.add(sp);
+                    if (sp.getLatitude() != 0.0)
+                        MyRouteActivity.places.add(sp);
                 }
 
                 instance.Origin = jsonObject.getString("Origin");
@@ -707,4 +717,6 @@ public class MyRouteShipments implements Parcelable {
 //    public String getWaybillNo() {
 //        return ItemNo;
 //    }
+
+
 }

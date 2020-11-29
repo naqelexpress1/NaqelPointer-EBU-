@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -154,12 +155,16 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 
                 break;
             case R.id.invbyncl:
-                InventorybyNCL("1");
-
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    InventorybyNCL("1");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.delbyNCL:
-                InventoryReqbyNCL("1");
-
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    InventoryReqbyNCL("1");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.group2:
 //                fetchgroup("2");
@@ -174,26 +179,35 @@ public class InventoryGroup extends AppCompatActivity implements View.OnClickLis
 //                fetchgroup("5");
                 break;
             case R.id.ncl:
-                Intent intent = new Intent(this, NclShipmentActivity.class);
-                startActivity(intent);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent intent = new Intent(this, NclShipmentActivity.class);
+                    startActivity(intent);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.loadtrotrip:
-
-                Intent tripdetails = new Intent(InventoryGroup.this, BringTripDetails.class);
-                startActivity(tripdetails);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent tripdetails = new Intent(InventoryGroup.this, BringTripDetails.class);
+                    startActivity(tripdetails);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.heldin:
-
-                Intent heldin = new Intent(InventoryGroup.this,
-                        com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldIn.class);
-                startActivity(heldin);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent heldin = new Intent(InventoryGroup.this,
+                            com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldIn.class);
+                    startActivity(heldin);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
 
                 break;
             case R.id.heldout:
-
-                Intent heldout = new Intent(InventoryGroup.this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldOut.class);
-                startActivity(heldout);
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+                    Intent heldout = new Intent(InventoryGroup.this, com.naqelexpress.naqelpointer.TerminalHandling.InventoryHeldOut.class);
+                    startActivity(heldout);
+                } else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
 
                 break;
 

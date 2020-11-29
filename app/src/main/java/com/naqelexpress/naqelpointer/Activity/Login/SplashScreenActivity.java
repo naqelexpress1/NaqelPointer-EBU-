@@ -570,7 +570,8 @@ public class SplashScreenActivity
 
                     ActivityCompat.requestPermissions(
                             SplashScreenActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                            new String[]{
+                                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                             7
                     );
 
@@ -645,7 +646,8 @@ public class SplashScreenActivity
                         } else {
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    new String[]{
+                                            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                                     7
                             );
                         }

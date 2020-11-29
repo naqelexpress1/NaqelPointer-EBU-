@@ -79,6 +79,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
@@ -3427,5 +3429,67 @@ public class GlobalVar {
             result.close();
         dbConnections.close();
         return myRouteShipments;
+    }
+
+    public void PermissionAlert(final Activity activity) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(false);
+        eDialog.setTitleText("Info");
+        eDialog.setContentText("Our app need the Backgroud Location Permission,please kindly allow me");
+        eDialog.setConfirmText("Ok");
+
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+
+            }
+        });
+        eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+                activity.finish();
+
+            }
+        });
+        eDialog.show();
+
+    }
+
+    public void PermissionAlertInfo(final Activity activity) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(activity, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(false);
+        eDialog.setTitleText("App need the Backgroud Location Permission");
+        eDialog.setContentText("Go to Settings - Location - Allow All Time");
+        eDialog.setConfirmText("Ok");
+        eDialog.setCancelText("Cancel");
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+
+            }
+        });
+        eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+                activity.finish();
+
+            }
+        });
+        eDialog.show();
+
+    }
+
+    public int isPermissionEnabled(String permissions, Activity activity) {
+        return ContextCompat.checkSelfPermission(activity, permissions);
     }
 }

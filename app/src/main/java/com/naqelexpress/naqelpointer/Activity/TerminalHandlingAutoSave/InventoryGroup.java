@@ -13,12 +13,12 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 
 // Created by Ismail on 21/03/2018.
 

@@ -405,14 +405,20 @@
             android:label="Pending COD"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.NewBarCodeScanner"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.NewBarCodeScannerForVS"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.BarcodeScan"
             android:screenOrientation="portrait"

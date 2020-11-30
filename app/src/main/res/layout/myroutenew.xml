@@ -23,29 +23,44 @@
 
     </android.support.design.widget.AppBarLayout>
 
+    <TextView
+        android:id="@+id/laststopseqtime"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="right"
+        android:text="Estimated Time of last Sequenced stop is : "
+        android:textColor="@color/NaqelRed"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top"
+        app:layout_constraintVertical_bias="0.493"
+        tools:ignore="RtlHardcoded" />
 
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/myRouteListView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/btnStartTrip"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/top"
+        app:layout_constraintTop_toBottomOf="@id/laststopseqtime"
         app:layout_constraintVertical_bias="0.493" />
 
     <Button
         android:id="@+id/btnStartTrip"
         android:layout_width="50dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/starttrip"
         app:layout_constraintBottom_toTopOf="@+id/txtStartTrip"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -55,8 +70,8 @@
         android:id="@+id/txtStartTrip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="12dp"
+        android:layout_marginBottom="8dp"
         android:text="Start Trip"
         android:textColor="@color/NaqelBlue"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -67,8 +82,8 @@
         android:id="@+id/btnCloseTrip"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginRight="16dp"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/closetrip"
         app:layout_constraintBottom_toTopOf="@+id/txtCloseTrip"
         app:layout_constraintRight_toRightOf="parent"
@@ -78,8 +93,8 @@
         android:id="@+id/txtCloseTrip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:text="Close Trip"
         android:textColor="@color/NaqelBlue"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -110,15 +110,21 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         bundle = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        if (!isValidOnlineValidationFile()) {
-            Log.d("test" , "File is NOT valid");
-            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
-            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
-        } else {
-            Log.d("test" , "File is valid");
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+        if (division.equals("Courier")) {
+            if (!isValidOnlineValidationFile()) {
+                Log.d("test" , "File is NOT valid");
+                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
+            } else {
+                Log.d("test" , "File is valid");
+            }
         }
 
 
+
+        setSupportActionBar(toolbar);
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -1031,6 +1037,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     }
 
     private boolean isValidOnlineValidationFile() {
+        Log.d("test" , "NCL - isValidOnlineValidationFile");
         boolean isValid;
         try {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -1058,28 +1065,28 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         alertDialog.show();
     }
 
-    @Override
+   /* @Override
     public void onNCLGenerated(String NCLNo , int NCLDestStationID ) {
         try {
             secondFragment.onNCLGenerated(NCLNo , NCLDestStationID);
         } catch (Exception ex) {}
-    }
+    }*/
 
-  /*  @Override
+   @Override
     public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
-      /*  try {
+        try {
             secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
-        } catch (Exception ex) {} */
-  //  }
+        } catch (Exception ex) {}
+     }
 
     @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
-      try {
-          if (hasError)
-              ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
-          else
-              GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-      } catch (Exception ex) {}
+        try {
+            if (hasError)
+                ErrorAlert("Server Issue" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
     }
 
 

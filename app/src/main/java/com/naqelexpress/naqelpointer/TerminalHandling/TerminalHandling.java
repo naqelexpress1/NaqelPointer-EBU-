@@ -80,17 +80,22 @@ public class TerminalHandling extends AppCompatActivity implements AsyncTaskComp
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
+
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
 
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-        if (!isValidOnlineValidationFile()) {
-            Log.d("test" , "File is NOT valid");
-            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
-            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
-        } else {
-            Log.d("test" , "File is valid");
-        }
+        if (division.equals("Courier")) {
+         if (!isValidOnlineValidationFile()) {
+             Log.d("test" , "File is NOT valid");
+             OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
+         } else {
+             Log.d("test" , "File is valid");
+         }
+     }
+
 
 
         status.clear();

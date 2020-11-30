@@ -87,6 +87,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         operationalcity = bundle.getStringArrayList("operationalcity");
 
         group = bundle.getString("group");
+        Log.d("test" , "Linhul group " + group);
 
     }
 
@@ -252,6 +253,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         bundle.putStringArrayList("city", city);
         bundle.putStringArrayList("operationalcity", operationalcity);
         bundle.putString("group", "Group " + group);
+
 
 
         Intent intent = new Intent(this, TerminalHandling.class);

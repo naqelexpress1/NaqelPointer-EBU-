@@ -99,7 +99,6 @@ public class NclShipmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
-        Log.d("test" , "NCL");
 
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();

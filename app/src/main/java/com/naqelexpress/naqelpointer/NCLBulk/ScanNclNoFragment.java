@@ -75,7 +75,7 @@ public class ScanNclNoFragment extends Fragment {
 
 
         if (rootView == null) {
-            rootView = inflater.inflate(R.layout.scannclno, container, false);
+            rootView = inflater.inflate(R.layout.th_scan_nclno, container, false);
 
 
             txtOrgin = (EditText) rootView.findViewById(R.id.txtOrgin);
@@ -212,65 +212,73 @@ public class ScanNclNoFragment extends Fragment {
     }
 
     public void GetStationList() {
-        DBConnections dbConnections = new DBConnections(getContext(), null);
-        StationList.clear();
-        StationNameList.clear();
-        StationFNameList.clear();
+     try {
+         DBConnections dbConnections = new DBConnections(getContext(), null);
+         StationList.clear();
+         StationNameList.clear();
+         StationFNameList.clear();
 
-        Cursor result = dbConnections.Fill("select * from Station", getContext());
-        if (result.getCount() > 0) {
-            result.moveToFirst();
-            do {
-                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-                String Code = result.getString(result.getColumnIndex("Code"));
-                String Name = result.getString(result.getColumnIndex("Name"));
-                String FName = result.getString(result.getColumnIndex("FName"));
+         Cursor result = dbConnections.Fill("select * from Station", getContext());
+         if (result.getCount() > 0) {
+             result.moveToFirst();
+             do {
+                 int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                 String Code = result.getString(result.getColumnIndex("Code"));
+                 String Name = result.getString(result.getColumnIndex("Name"));
+                 String FName = result.getString(result.getColumnIndex("FName"));
 
-                StationList.add(ID);
-                StationNameList.add(Code + " : " + Name);
-                StationFNameList.add(FName);
-            }
-            while (result.moveToNext());
-        }
-        dbConnections.close();
-        txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
+                 StationList.add(ID);
+                 StationNameList.add(Code + " : " + Name);
+                 StationFNameList.add(FName);
+             }
+             while (result.moveToNext());
+         }
+         dbConnections.close();
+         txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
+     } catch (Exception e) {
+         Log.d("test" , "Get stations " + e.toString());
+     }
     }
 
 
     private void getFacilityList(int destStationID) {
 
-        DBConnections dbConnections = new DBConnections(getContext(), null);
+        try {
+            DBConnections dbConnections = new DBConnections(getContext(), null);
 
-        facilityIDList.clear();
-        facilityList.clear();
+            facilityIDList.clear();
+            facilityList.clear();
 
-        int facilityCount = dbConnections.getCount("Facility" , "Station = " + destStationID , getContext());
-        Cursor result = null;
+            int facilityCount = dbConnections.getCount("Facility" , "Station = " + destStationID , getContext());
+            Cursor result = null;
 
-        if (facilityCount == 0 ) {
-         result = dbConnections.Fill("select * from Facility", getContext());
+            if (facilityCount == 0 ) {
+                result = dbConnections.Fill("select * from Facility", getContext());
 
-        } else {
-          result = dbConnections.Fill("select * from Facility where Station = " + destStationID, getContext());
-        }
-
-        if (result.getCount() > 0) {
-            result.moveToFirst();
-            do {
-                int ID = Integer.parseInt(result.getString(result.getColumnIndex("FacilityID")));
-                String Code = result.getString(result.getColumnIndex("Code"));
-                String Name = result.getString(result.getColumnIndex("Name"));
-                String facilityCodeName = Code + " : " + Name;
-
-                facilityIDList.add(ID);
-                facilityList.add(facilityCodeName);
-
+            } else {
+                result = dbConnections.Fill("select * from Facility where Station = " + destStationID, getContext());
             }
-            while (result.moveToNext());
-        }
 
-        dbConnections.close();
-        txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                do {
+                    int ID = Integer.parseInt(result.getString(result.getColumnIndex("FacilityID")));
+                    String Code = result.getString(result.getColumnIndex("Code"));
+                    String Name = result.getString(result.getColumnIndex("Name"));
+                    String facilityCodeName = Code + " : " + Name;
+
+                    facilityIDList.add(ID);
+                    facilityList.add(facilityCodeName);
+
+                }
+                while (result.moveToNext());
+            }
+
+            dbConnections.close();
+            txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
+        } catch (Exception e) {
+            Log.d("test" , "get facility " + e.toString());
+        }
     }
 
     public void GenerateNclNo(NclNoRequest nclNoRequest) {
@@ -300,7 +308,7 @@ public class ScanNclNoFragment extends Fragment {
 
             try {
 
-                URL url = new URL(GlobalVar.getUATUrl(getContext())+ "GenerateNclNo_v2");
+                URL url = new URL(GlobalVar.GV().getUATUrl(getContext())+ "GenerateNclNo_v2");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -356,7 +364,7 @@ public class ScanNclNoFragment extends Fragment {
                 nclShipmentActivity.NclNo = noResult.NclNo;
                 nclShipmentActivity.destList = noResult.DestinationList;
                 nclShipmentActivity.IsMixed = checkMix.isChecked();
-                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID);
+                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID , noResult.AllowedDestStations);
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_GenerateNclNo) + " : " + noResult.NclNo, GlobalVar.AlertType.Info);
 
             } else

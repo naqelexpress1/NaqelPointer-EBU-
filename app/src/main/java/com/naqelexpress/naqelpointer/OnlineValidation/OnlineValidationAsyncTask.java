@@ -80,7 +80,8 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
           }.start();
 
-          DomainURL = GlobalVar.getUATUrl(context);
+          DomainURL = "http://35.188.10.142:8087/api/pointer/";
+
           super.onPreExecute();
       } catch (Exception e) {
           Log.d("test" , "On pre exception " + e.toString());
@@ -99,13 +100,13 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             URL url = null;
 
             if (processType == GlobalVar.NclAndArrival)
-                url = new URL(DomainURL + "GetNclArrivalPieces");
+                url = new URL(DomainURL + "GetOnlineValidationData");
 
             if (processType == GlobalVar.DsAndInventory)
-                url = new URL("http://172.19.20.57:45455//api/pointer/" + "GetDsInventoryPieces");
+                url = new URL(DomainURL + "GetOnlineValidationData");
 
             if (processType == GlobalVar.DsValidation)
-                url = new URL(DomainURL + "GetDsValidationPieces");
+                url = new URL(DomainURL + "GetOnlineValidationData");
 
 
             httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -157,19 +158,13 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 try {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.getBoolean("HasError")) {
-                        JSONArray filteredPiecesList = jsonObject.getJSONArray("ViewFilteredPieces");
+                        JSONArray onlineValidationData = jsonObject.getJSONArray("OnLineValidationData");
 
                         DBConnections dbConnections = new DBConnections(context, null);
 
                         boolean isInserted = false;
-                        if (filteredPiecesList.length() > 0) {
-                            //todo riyam for testing only
-                            if (processType == GlobalVar.DsAndInventory) {
-                                isInserted = dbConnections.insertOnLineValidation2(filteredPiecesList,processType,context);
-
-                            } else {
-                                isInserted = dbConnections.insertOnLineValidation(filteredPiecesList,processType,context);
-                            }
+                        if (onlineValidationData.length() > 0) {
+                                isInserted = dbConnections.insertOnLineValidation(onlineValidationData,processType,context);
                         }
 
                         if (!isInserted) {
@@ -183,9 +178,14 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                         errorMessage =  jsonObject.getString("ErrorMessage");
                     }
                 } catch (JSONException e) {
+                    hasError = true;
+                    errorMessage =  e.toString();
+                    Log.d("test" , "AsyncTask " + e.toString());
                     e.printStackTrace();
                 }
             } else {
+                hasError = true;
+                errorMessage =  "Something went wrong , Please try again.";
                 Log.d("test" , "Post result is null");
             }
             callback.onTaskComplete(hasError,errorMessage);

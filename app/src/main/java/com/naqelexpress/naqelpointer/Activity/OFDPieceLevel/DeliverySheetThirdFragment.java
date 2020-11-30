@@ -69,6 +69,8 @@ public class DeliverySheetThirdFragment extends Fragment {
     private View view;
     private boolean add = false , isPiecesAvailable;
     private Context mContext;
+    private String division;
+
 
     public ArrayList<String> PieceBarCodeList = new ArrayList<>();
     public ArrayList<String> PieceBarCodeWaybill = new ArrayList<>();
@@ -94,6 +96,9 @@ public class DeliverySheetThirdFragment extends Fragment {
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
+
+            division = GlobalVar.GV().getDivisionID(getContext(), GlobalVar.GV().EmployID);
+
 
             DBConnections dbConnections = new DBConnections(getContext(), null);
             if (GlobalVar.ValidateAutomacticDate(getContext())) {
@@ -436,13 +441,19 @@ public class DeliverySheetThirdFragment extends Fragment {
                     JSONObject jsonObject = new JSONObject(finalJson);
                     if (jsonObject.getBoolean("HasError") == false) {
                          String barcode = txtBarCode.getText().toString();
-                         //TODO Riyam TH App Only
-                        if (isValidPieceBarcode(barcode)) {
-                            AddNewWaybill(String.valueOf(jsonObject.getInt("WaybillNo")));
-                            AddNewPiece(String.valueOf(jsonObject.getInt("WaybillNo")));
-                        } else {
-                            showDialog(getOnLineValidationPiece(barcode) , String.valueOf(jsonObject.getInt("WaybillNo")));
-                        }
+
+                         if (division.equals("Courier")) {
+                             if (isValidPieceBarcode(barcode)) {
+                                 AddNewWaybill(String.valueOf(jsonObject.getInt("WaybillNo")));
+                                 AddNewPiece(String.valueOf(jsonObject.getInt("WaybillNo")));
+                             } else {
+                                 showDialog(getOnLineValidationPiece(barcode) , String.valueOf(jsonObject.getInt("WaybillNo")));
+                             }
+                         } else {
+                             AddNewWaybill(String.valueOf(jsonObject.getInt("WaybillNo")));
+                             AddNewPiece(String.valueOf(jsonObject.getInt("WaybillNo")));
+                         }
+
 
                     } else {
 
@@ -535,14 +546,24 @@ public class DeliverySheetThirdFragment extends Fragment {
     private boolean isValidPieceBarcode(String pieceBarcode) {
         boolean isValid = true;
         try {
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode2(pieceBarcode, getContext());
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
             OnLineValidation onLineValidation = new OnLineValidation();
 
             if (onLineValidationLocal != null) {
 
-                if (onLineValidationLocal.getDestID() != GlobalVar.GV().StationID) {
+                int isManifested = onLineValidationLocal.getIsManifested();
+
+
+
+                if (isManifested == 0 && onLineValidationLocal.getCustomerWaybillDestID() != GlobalVar.GV().StationID) {
                     onLineValidation.setIsWrongDest(1);
-                    onLineValidation.setDestID(onLineValidationLocal.getDestID());
+                    onLineValidation.setCustomerWaybillDestID(onLineValidationLocal.getCustomerWaybillDestID());
+                    isValid = false;
+                }
+
+                if (isManifested == 1 && onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+                    onLineValidation.setIsWrongDest(1);
+                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
                     isValid = false;
                 }
 
@@ -567,10 +588,14 @@ public class DeliverySheetThirdFragment extends Fragment {
                 }
 
                 if (!isValid) {
-                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidation.setBarcode(pieceBarcode);
                     onLineValidationList.add(onLineValidation);
                 }
                 return isValid;
+                // if is show warning showdialog
+            } else {
+                //Add piece
+                GlobalVar.GV().ShowSnackbar(rootView, "Shipment is not in the file", GlobalVar.AlertType.Info);
             }
 
         } catch (Exception e) {
@@ -591,7 +616,7 @@ public class DeliverySheetThirdFragment extends Fragment {
 
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
 
 
                 Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
@@ -603,7 +628,16 @@ public class DeliverySheetThirdFragment extends Fragment {
 
                     String stationName = "";
                     try {
-                        Station station = dbConnections.getStationByID(pieceDetails.getDestID() , mContext);
+                        Station station = null;
+
+                      /*   if (pieceDetails.getIsManifested() == 0)
+                              station = dbConnections.getStationByID(pieceDetails.getCustomerWaybillDestID() , mContext);
+                         else
+                             station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext); */
+
+                        station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext);
+
+
                         if (station != null)
                             stationName = station.Name;
                         else
@@ -618,7 +652,7 @@ public class DeliverySheetThirdFragment extends Fragment {
                     tvWrongDestHeader.setText("Wrong Destination");
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
-                    tvWrongDestBody.setText("Shipment destination station : " + stationName);
+                    tvWrongDestBody.setText("Shipment destination: " + stationName);
 
                 }
 
@@ -631,7 +665,7 @@ public class DeliverySheetThirdFragment extends Fragment {
                     tvMultiPieceHeader.setText("Multi Piece");
 
                     TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
-                    tvMultiPieceBody.setText("Please confirm all pcs are available.");
+                    tvMultiPieceBody.setText("Please confirm if all pcs are available.");
 
                     RadioGroup rgMultiPiece = dialogView.findViewById(R.id.rg_multi_piece);
                     rgMultiPiece.setVisibility(View.VISIBLE);
@@ -663,18 +697,6 @@ public class DeliverySheetThirdFragment extends Fragment {
                     tvRTOBody.setText("RTO Request.");
                 }
 
-                if (pieceDetails.getIsDeliveryRequest() == 1) {
-
-                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_is_delivery_req);
-                    llDeliveryReq.setVisibility(View.VISIBLE);
-
-                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_delivery_req_header);
-                    tvDeliveryRequestHeader.setText("Delivery Request");
-
-                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_delivery_req_body);
-                    tvDeliveryRequestBody.setText("Delivery Request.");
-                }
-
               /*  if (pieceDetails.getIsRelabel() == 1) {
                     LinearLayout llIsRelabel = dialogView.findViewById(R.id.ll_is_relabel);
                     llIsRelabel.setVisibility(View.VISIBLE);
@@ -694,22 +716,23 @@ public class DeliverySheetThirdFragment extends Fragment {
                                         Log.d("test" , "pcs available");
                                         pieceDetails.setIsPiecesAvailable(isPiecesAvailable? 1 : 0);
                                         if (pieceDetails.getIsPiecesAvailable() != 0) { // Record shouldn't be captured if not all pieces are available
-                                            AddNewWaybill(pieceDetails.getPieceBarcode());
+                                            AddNewWaybill(pieceDetails.getBarcode());
                                             AddNewPiece(waybill);
                                             alertDialog.dismiss();
                                         }
                                     } else {
                                         Log.d("test" , "pcs not available");
-                                        Toast.makeText(getContext() ,"Pieces not available. Scan won't be recorded" , Toast.LENGTH_LONG ).show();
                                         txtBarCode.getText().clear();
                                         alertDialog.dismiss();
-                                     }
+                                        GlobalVar.GV().ShowSnackbar(rootView, "Pieces are not available. Scan won't be recorded", GlobalVar.AlertType.Info);
+
+                                    }
                                  } else {
                                      if (getContext() != null)
                                         Toast.makeText(getContext() ,"Kindly confirm all pieces are available." , Toast.LENGTH_LONG ).show();
                                 }
                             } else {
-                                AddNewWaybill(pieceDetails.getPieceBarcode());
+                                AddNewWaybill(pieceDetails.getBarcode());
                                 AddNewPiece(waybill);
                                 alertDialog.dismiss();
                             }
@@ -725,7 +748,7 @@ public class DeliverySheetThirdFragment extends Fragment {
     private OnLineValidation getOnLineValidationPiece (String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
-                if (pieceDetail.getPieceBarcode().equals(barcode))
+                if (pieceDetail.getBarcode().equals(barcode))
                     return pieceDetail;
             }
 

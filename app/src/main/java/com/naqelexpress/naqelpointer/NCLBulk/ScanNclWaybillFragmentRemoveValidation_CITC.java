@@ -71,6 +71,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
     private int WaybillCount = 0, PiecesCount = 0;
     private boolean isNCLDestChosen , isDestChanged;
     private int NCLDestStationID , newDestID;
+    private String division;
+
 
     public static ArrayList<String> WaybillList = new ArrayList<>();
     public static ArrayList<PieceDetail> PieceCodeList = new ArrayList<PieceDetail>();
@@ -91,6 +93,9 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
 
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.scannclwaybill, container, false);
+
+
+            division = GlobalVar.GV().getDivisionID(getContext(), GlobalVar.GV().EmployID);
 
 
             txtBarcode = (EditText) rootView.findViewById(R.id.txtBarcode);
@@ -145,16 +150,17 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                         try {
                             if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
                                 String barcode = txtBarcode.getText().toString();
-                                //Todo riyam only if courier || th
-                                if (isValidPieceBarcode(barcode)) {
-                                    PieceDetail pieceDetail = new PieceDetail();
-                                    pieceDetail.Barcode = barcode;
-                                    pieceDetail.Waybill = "0";
-                                    pieceDetail.Weight = 0;
+                                PieceDetail pieceDetail = new PieceDetail(barcode,"0" , 0);
+                                if (division.equals("Courier"))  {
+                                   if (isValidPieceBarcode(barcode)) {
+                                       AddNewPiece(pieceDetail);
+                                   } else {
+                                       showDialog(getOnLineValidationPiece(barcode));
+                                   }
+                               } else {
                                     AddNewPiece(pieceDetail);
-                                } else {
-                                    showDialog(getOnLineValidationPiece(barcode));
-                                }
+                               }
+
                             }
                         } catch (Exception e) {
                             Toast.makeText(getContext(), e.toString(), Toast.LENGTH_LONG).show();
@@ -374,10 +380,10 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 isduplicate.add(pieceDetail.Barcode);
                 PiecesCount = PiecesCount + 1;
 
-               if (pieceDetail.IsDestChanged)
-                PieceCodeList.add(0, pieceDetail);
-               else
-                PieceCodeList.add(0, pieceDetail);
+                if (pieceDetail.IsDestChanged)
+                    PieceCodeList.add(0, pieceDetail);
+                else
+                    PieceCodeList.add(0, pieceDetail);
 
                 waybillweight = waybillweight + pieceDetail.Weight;
                 lbTotal.setText(getString(R.string.lbCount) + String.valueOf(isduplicate.size()));
@@ -671,27 +677,28 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
         }
     }
 
-    public void onNCLGenerated(String NCLNo , int NCLDestStationID ) {
-      try {
-          isNCLDestChosen = true;
-          this.NCLDestStationID = NCLDestStationID;
-          txtBarcode.setHint("Scan barcode");
-          txtBarcode.setEnabled(true);
-      } catch (Exception ex) {}
-    }
+   /* public void onNCLGenerated(String NCLNo , int NCLDestStationID ) {
+        try {
+            isNCLDestChosen = true;
+            this.NCLDestStationID = NCLDestStationID;
+            txtBarcode.setHint("Scan barcode");
+            txtBarcode.setEnabled(true);
+        } catch (Exception ex) {}
+    }*/
 
-
-  //  public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
-     /* try {
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+     try {
           isNCLDestChosen = true;
           this.NCLDestStationID = NCLDestStationID;
           allowedDestStationIDs = allowedDestStations;
           txtBarcode.setHint("Scan barcode");
           txtBarcode.setEnabled(true);
-      } catch (Exception ex) {} */
-  //  }
+      } catch (Exception ex) {
+         Log.d("test" , "onNCLGenerated " + ex.toString());
+      }
+     }
 
-   /* private ArrayList<Station> getAllowedDestCode () {
+    private ArrayList<Station> getAllowedDestCode () {
         ArrayList<Station> stationArrayList = new ArrayList<>();
         for (int i = 0 ; i < allowedDestStationIDs.size(); i++) {
             Station tempStation = dbConnections.getStationByID(allowedDestStationIDs.get(i) , getContext());
@@ -699,7 +706,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                  stationArrayList.add(tempStation);
         }
         return stationArrayList;
-    }*/
+    }
 
 
     private boolean isValidPieceBarcode(String pieceBarcode) {
@@ -710,19 +717,27 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
 
             if (onLineValidationLocal != null) {
 
-                if (NCLDestStationID != 0 && NCLDestStationID != onLineValidationLocal.getDestID()) {
-                    Log.d("test" , "isValidPieceBarcode() Dest not belongs to NCL");
-                    onLineValidation.setIsDestNotBelongToNcl(1);
-                    isValid = false;
-                }
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    Log.d("test" , "isValidPieceBarcode() Stop shipment");
-                    onLineValidation.setIsStopShipment(1);
-                    isValid = false;
-                }
+               /*   if (onLineValidationLocal.getIsManifested() == 0) {
+                     Log.d("test" , "isValidPieceBarcode() Not manifested");
+                      onLineValidation.setIsManifested(0);
+                     isValid = false;
+                   } else {*/
+
+
+                    if (NCLDestStationID != 0 && NCLDestStationID != onLineValidationLocal.getWaybillDestID()) {
+                        Log.d("test" , "isValidPieceBarcode() Dest not belongs to NCL");
+                        onLineValidation.setIsDestNotBelongToNcl(1);
+                        isValid = false;
+                    }
+                    if (onLineValidationLocal.getIsStopShipment() == 1) {
+                        Log.d("test" , "isValidPieceBarcode() Stop shipment");
+                        onLineValidation.setIsStopShipment(1);
+                        isValid = false;
+                    }
+                //}
 
                 if (!isValid) {
-                    onLineValidation.setPieceBarcode(pieceBarcode);
+                    onLineValidation.setBarcode(pieceBarcode);
                     onLineValidationList.add(onLineValidation);
                 }
                 return isValid;
@@ -745,41 +760,52 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 dialogBuilder.setCancelable(false);
 
                 final TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
                 Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
                 btnConfirm.setVisibility(View.VISIBLE);
                 btnConfirm.setText("OK & Quit");
 
-                if (pieceDetails.getIsDestNotBelongToNcl() == 1) {
-
-                    LinearLayout llDifDest = dialogView.findViewById(R.id.ll_ncl_wrong_dest);
+                //If not in filee
+                if (pieceDetails.getIsManifested() == 0) {
+                    LinearLayout llDifDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llDifDest.setVisibility(View.VISIBLE);
 
-                    TextView tvNclHeader = dialogView.findViewById(R.id.tv_ncl_header);
-                    tvNclHeader.setText("NCL Destination");
+                    TextView tvNclHeader = dialogView.findViewById(R.id.tv_not_manifested_header);
+                    tvNclHeader.setText("Manifest");
 
-                    TextView tvNclBody = dialogView.findViewById(R.id.tv_ncl_body);
-                    tvNclBody.setText("Piece destination doesn’t belong to NCL.");
+                    TextView tvNclBody = dialogView.findViewById(R.id.tv_not_manifested_body);
+                    tvNclBody.setText("Shipment is not manifested yet.Scan will not be recorded");
+                } else {
+                    if (pieceDetails.getIsDestNotBelongToNcl() == 1) {
 
-                    // add on click listener
-                   // radioGroupCheckListener(dialogView , btnConfirm);
+                        LinearLayout llDifDest = dialogView.findViewById(R.id.ll_ncl_wrong_dest);
+                        llDifDest.setVisibility(View.VISIBLE);
 
+                        TextView tvNclHeader = dialogView.findViewById(R.id.tv_ncl_header);
+                        tvNclHeader.setText("NCL Destination");
+
+                        TextView tvNclBody = dialogView.findViewById(R.id.tv_ncl_body);
+                        tvNclBody.setText("Piece destination doesn’t belong to NCL.");
+
+                        // add on click listener
+                         radioGroupCheckListener(dialogView , btnConfirm);
+
+                    }
+
+
+                    if (pieceDetails.getIsStopShipment() == 1) {
+
+                        LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                        llStopShipment.setVisibility(View.VISIBLE);
+
+                        TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                        tvStopShipmentHeader.setText("Stop Shipment");
+
+                        TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                        tvStopShipmentBody.setText("Stop shipment , Please hold.");
+
+                    }
                 }
-
-
-                if (pieceDetails.getIsStopShipment() == 1) {
-
-                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
-                    llStopShipment.setVisibility(View.VISIBLE);
-
-                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
-                    tvStopShipmentHeader.setText("Stop Shipment");
-
-                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
-                    tvStopShipmentBody.setText("Stop shipment , Please hold.");
-
-                }
-
 
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
@@ -792,11 +818,26 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
                             int DestID = 0;
-                            if (pieceDetails.getIsDestNotBelongToNcl() == 1 && isDestChanged) {
+
+
+                            //All valid && pieceDetails.getIsDestNotBelongToNcl() == 0
+                            if (pieceDetails.getIsManifested() == 1 ) {
+                                PieceDetail pieceDetail = new PieceDetail();
+                                pieceDetail.Barcode = pieceDetails.getBarcode();
+                                pieceDetail.Waybill = "0";
+                                pieceDetail.Weight = 0;
+                                pieceDetail.IsDestChanged = true;
+                                pieceDetail.DestinationStationID = DestID;
+                                AddNewPiece(pieceDetail);
+                            } else {
+                                txtBarcode.getText().clear();
+                            }
+
+                          /*  if (pieceDetails.getIsDestNotBelongToNcl() == 1 && isDestChanged) {
                                 Station station = (Station) searchableSpinnerDest.getSelectedItem();
                                 DestID = station.ID; // New ID
                                 PieceDetail pieceDetail = new PieceDetail();
-                                pieceDetail.Barcode = pieceDetails.getPieceBarcode();
+                                pieceDetail.Barcode = pieceDetails.getBarcode();
                                 pieceDetail.Waybill = "0";
                                 pieceDetail.Weight = 0;
                                 pieceDetail.IsDestChanged = true;
@@ -820,7 +861,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                                 pieceDetail.IsDestChanged = false;
                                 pieceDetail.DestinationStationID = 0;
                                 AddNewPiece(pieceDetail);
-                            }
+                            }*/
                         }
                     }
                 });
@@ -833,7 +874,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
     private OnLineValidation getOnLineValidationPiece (String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
-                if (pieceDetail.getPieceBarcode().equals(barcode))
+                if (pieceDetail.getBarcode().equals(barcode))
                     return pieceDetail;
             }
 
@@ -844,7 +885,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
     }
 
 
- /*   private void radioGroupCheckListener(final View v , final Button btnConfirm) {
+    private void radioGroupCheckListener(final View v , final Button btnConfirm) {
         final RadioButton rbDiscard = v.findViewById(R.id.rb_change_discard);
         RadioGroup radioGroup = v.findViewById(R.id.rg_change_dest);
         radioGroup.setVisibility(View.VISIBLE);
@@ -874,7 +915,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 }
             }
         });
-    }*/
+    }
 
 
     public class PieceDetail {

@@ -29,6 +29,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -87,7 +88,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "406 - (18-11-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "406 - OnlineValidation UAT (29-11-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -1761,6 +1762,25 @@ public class GlobalVar {
 
     }
 
+    public boolean isValidBarcode(String Barcode) {
+        boolean isvalid = true;
+//        try {
+//            double barcode = Double.parseDouble(Barcode);
+//            if (Barcode.length() == 13) {
+//                String validChar = Barcode.substring(8, 12);
+//                if (!validChar.equals("0000"))
+//                    isvalid = false;
+//            } else
+//                isvalid = false;
+//
+//        } catch (Exception e) {
+//            isvalid = false;
+//        }
+
+        return isvalid;
+
+    }
+
 
     public static ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> getPickupSyncData
             (Context context) {
@@ -2641,24 +2661,29 @@ public class GlobalVar {
 //    }
 
     public static int getlastlogin(Context context) {
-//        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
+      try {
+          //        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
 //        return pref.getInt("EmpID", 0); // Storing integer
-        DBConnections dbConnections = new DBConnections(context, null);
-        Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
+          DBConnections dbConnections = new DBConnections(context, null);
+          Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
 
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
-            cursor.close();
-            dbConnections.close();
-            return empid;
+          if (cursor != null && cursor.getCount() > 0) {
+              cursor.moveToFirst();
+              int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
+              cursor.close();
+              dbConnections.close();
+              return empid;
 
-        } else {
-            dbConnections.close();
-            cursor.close();
-            return 0;
-        }
+          } else {
+              dbConnections.close();
+              cursor.close();
+              return 0;
+          }
 
+      } catch (Exception e) {
+          Log.d("test" , "getlastlogin " + e.toString());
+      }
+      return 0;
     }
 
 

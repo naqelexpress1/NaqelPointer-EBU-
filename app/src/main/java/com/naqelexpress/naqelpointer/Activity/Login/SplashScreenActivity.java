@@ -63,60 +63,64 @@ public class SplashScreenActivity
 
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
 
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            dbConnections.InsertDomain_ForDelService(getApplicationContext());
-            dbConnections.InsertDomain_ForNotDeliveredService(getApplicationContext());
-            dbConnections.InsertDomain_ForDelSheetService(getApplicationContext());
-            dbConnections.InsertDomain(getApplicationContext());
-            dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
-            dbConnections.DeleteExsistingLogin(getApplicationContext());
-            dbConnections.DeleteAllSyncData(getApplicationContext());
-            //dbConnections.DeleteSuggestLocation(getApplicationContext());
-            dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
-            dbConnections.InsertDomain_ForArrivedatDest(getApplicationContext());
-            dbConnections.InsertDomain_ForAtorigin(getApplicationContext());
-            dbConnections.InsertDomain_ForPickup(getApplicationContext());
+             try {
+                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                 dbConnections.InsertDomain_ForDelService(getApplicationContext());
+                 dbConnections.InsertDomain_ForNotDeliveredService(getApplicationContext());
+                 dbConnections.InsertDomain_ForDelSheetService(getApplicationContext());
+                 dbConnections.InsertDomain(getApplicationContext());
+                 dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
+                 dbConnections.DeleteExsistingLogin(getApplicationContext());
+                 dbConnections.DeleteAllSyncData(getApplicationContext());
+                 //dbConnections.DeleteSuggestLocation(getApplicationContext());
+                 dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
+                 dbConnections.InsertDomain_ForArrivedatDest(getApplicationContext());
+                 dbConnections.InsertDomain_ForAtorigin(getApplicationContext());
+                 dbConnections.InsertDomain_ForPickup(getApplicationContext());
 
-            dbConnections.close();
+                 dbConnections.close();
 
-            if (dbConnections.UpdateLoginStatusCount(getApplicationContext()) >= 1){
-                Log.d("test" , "IF");
-                GlobalVar.GV().autoLogout = true;
-                int employID = dbConnections.getUpdateLoginStatus(getApplicationContext());
-                dbConnections.DeleteUpdateLoginStatus(getApplicationContext());
-                new UpdateLoginStatus().execute(String.valueOf(employID));
-            } else {
-                GlobalVar.GV().autoLogout = false;
-            }
-
-
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                 if (dbConnections.UpdateLoginStatusCount(getApplicationContext()) >= 1){
+                     Log.d("test" , "IF");
+                     GlobalVar.GV().autoLogout = true;
+                     int employID = dbConnections.getUpdateLoginStatus(getApplicationContext());
+                     dbConnections.DeleteUpdateLoginStatus(getApplicationContext());
+                     new UpdateLoginStatus().execute(String.valueOf(employID));
+                 } else {
+                     GlobalVar.GV().autoLogout = false;
+                 }
 
 
-            if (GlobalVar.GV().IsEnglish())
-                imageView.setImageResource(R.drawable.naqellogowhite);
-            else
-                imageView.setImageResource(R.drawable.naqellogowhitear);
+                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                 ImageView imageView = (ImageView) findViewById(R.id.imageView);
 
 
-            Thread myThread = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(2000);
+                 if (GlobalVar.GV().IsEnglish())
+                     imageView.setImageResource(R.drawable.naqellogowhite);
+                 else
+                     imageView.setImageResource(R.drawable.naqellogowhitear);
 
-                        loginPage();
 
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            };
-            myThread.start();
+                 Thread myThread = new Thread() {
+                     @Override
+                     public void run() {
+                         try {
+                             sleep(2000);
 
-            if (savedInstanceState != null)
-                setSavedInstance(savedInstanceState);
+                             loginPage();
+
+                         } catch (InterruptedException e) {
+                             e.printStackTrace();
+                         }
+                     }
+                 };
+                 myThread.start();
+
+                 if (savedInstanceState != null)
+                     setSavedInstance(savedInstanceState);
+             } catch (Exception e) {
+                 Log.d("test" , "Splash " + e.toString());
+             }
 
         } else
 

@@ -3,8 +3,9 @@ package com.naqelexpress.naqelpointer.OnlineValidation;
 public class OnLineValidation {
 
     private int ID;
-    private String PieceBarcode;
-    private int DestID;
+    private String Barcode;
+    private int CustomerWaybillDestID;
+    private int WaybillDestID;
     private int NoOfAttempts;
     private int IsMultiPiece;
     private int IsStopShipment;
@@ -15,17 +16,22 @@ public class OnLineValidation {
     private int IsDestNotBelongToNcl;
     private int IsPiecesAvailable = 1;
     private int IsConflict;
+    private int IsManifested = 1;
+    private int IsCITCComplain;
+    private int WaybillNo;
+    private boolean IsNotInFile;
+
 
     public void setID(int ID) {
         this.ID = ID;
     }
 
-    public void setPieceBarcode(String pieceBarcode) {
-        PieceBarcode = pieceBarcode;
+    public void setBarcode(String Barcode) {
+        this.Barcode = Barcode;
     }
 
-    public void setDestID(int destID) {
-        DestID = destID;
+    public void setNotInFile(boolean notInFile) {
+        IsNotInFile = notInFile;
     }
 
     public void setNoOfAttempts(int noOfAttempts) {
@@ -48,12 +54,32 @@ public class OnLineValidation {
         IsDeliveryRequest = isDeliveryRequest;
     }
 
+    public void setIsCITCComplain(int isCITCComplain) {
+        IsCITCComplain = isCITCComplain;
+    }
+
+    public void setWaybillNo(int waybillNo) {
+        WaybillNo = waybillNo;
+    }
+
+    public void setIsManifested(int isManifested) {
+        IsManifested = isManifested;
+    }
+
     public void setIsWrongDest(int isWrongDest) {
         IsWrongDest = isWrongDest;
     }
 
     public void setIsDestNotBelongToNcl(int isDestBelongToNcl) {
         IsDestNotBelongToNcl = isDestBelongToNcl;
+    }
+
+    public void setCustomerWaybillDestID(int customerWaybillDestID) {
+        CustomerWaybillDestID = customerWaybillDestID;
+    }
+
+    public void setWaybillDestID(int waybillDestID) {
+        WaybillDestID = waybillDestID;
     }
 
     public void setIsRelabel(int isRelabel) {
@@ -72,12 +98,16 @@ public class OnLineValidation {
         return ID;
     }
 
-    public String getPieceBarcode() {
-        return PieceBarcode;
+    public String getBarcode() {
+        return Barcode;
     }
 
-    public int getDestID() {
-        return DestID;
+    public int getCustomerWaybillDestID() {
+        return CustomerWaybillDestID;
+    }
+
+    public int getWaybillDestID() {
+        return WaybillDestID;
     }
 
     public int getNoOfAttempts() {
@@ -104,6 +134,14 @@ public class OnLineValidation {
         return IsRelabel;
     }
 
+    public int getIsManifested() {
+        return IsManifested;
+    }
+
+    public int getWaybillNo() {
+        return WaybillNo;
+    }
+
     public int getIsWrongDest() {
         return IsWrongDest;
     }
@@ -120,12 +158,21 @@ public class OnLineValidation {
         return IsConflict;
     }
 
+    public int getIsCITCComplain() {
+        return IsCITCComplain;
+    }
+
+    public boolean isNotInFile() {
+        return IsNotInFile;
+    }
+
     @Override
     public String toString() {
         return "OnLineValidation{" +
                 "ID=" + ID +
-                ", PieceBarcode='" + PieceBarcode + '\'' +
-                ", DestID=" + DestID +
+                ", Barcode='" + Barcode + '\'' +
+                ", CustomerWaybillDestID=" + CustomerWaybillDestID +
+                ", WaybillDestID=" + WaybillDestID +
                 ", NoOfAttempts=" + NoOfAttempts +
                 ", IsMultiPiece=" + IsMultiPiece +
                 ", IsStopShipment=" + IsStopShipment +
@@ -135,6 +182,9 @@ public class OnLineValidation {
                 ", IsWrongDest=" + IsWrongDest +
                 ", IsDestNotBelongToNcl=" + IsDestNotBelongToNcl +
                 ", IsPiecesAvailable=" + IsPiecesAvailable +
+                ", IsConflict=" + IsConflict +
+                ", IsManifested=" + IsManifested +
+                ", WaybillNo=" + WaybillNo +
                 '}';
     }
 }

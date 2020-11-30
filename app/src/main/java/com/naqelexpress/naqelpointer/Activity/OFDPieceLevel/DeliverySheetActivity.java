@@ -60,31 +60,19 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("test" , "ds");
 
         setContentView(R.layout.deliverysheet);
 
-        //todo riyam for testing only
-        // add check if it exsists
-        try {
-            DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
-            if (dbConnections.isOnlineValidationFileEmpty2(getApplicationContext())) {
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+        if (division.equals("Courier")) {
+            if (!isValidOnlineValidationFile()) {
                 OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
                 onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
-
+            } else {
+                Log.d("test" , "File is valid");
             }
-        } catch(Exception e) {
-
         }
 
-
-//        if (!isValidOnlineValidationFile()) {
-//            Log.d("test" , "Starting");
-//            OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
-//            onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
-//        } else {
-//            Log.d("test" , "File is valid");
-//        }
 
 
         Toolbar toolbar = findViewById(R.id.toolbar);

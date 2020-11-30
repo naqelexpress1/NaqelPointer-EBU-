@@ -33,6 +33,7 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 public class NewBarCodeScannerForVS extends AppCompatActivity
         implements ZBarScannerView.ResultHandler {
+
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
     private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
@@ -43,30 +44,25 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     private ArrayList<Integer> mSelectedIndices;
     private int mCameraId = -1;
 
-    public static ArrayList<String> scannedBarCode = new ArrayList<>(); // For barcode belong to emp by api
-    public static ArrayList<String> ScanbyDevice = new ArrayList<>(); // For barcode scanned by emp(by device) that belongs to him
-    public static ArrayList<String> ConflictBarcode = new ArrayList<>(); // For barcode that doesn't belong to emp
-
+    public static ArrayList<String> scannedBarCode = new ArrayList<>();
+    public static ArrayList<String> ScanbyDevice = new ArrayList<>();
+    public static ArrayList<String> ConflictBarcode = new ArrayList<>();
     private DBConnections dbConnections ;
     private List<OnLineValidation> onLineValidationList;
-
+    private String division;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.newbarcodescanner);
 
-//        scannedBarCode.clear();
-//        ScanbyDevice.clear();
-//        ConflictBarcode.clear();
-
         try {
+            division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
             dbConnections = new DBConnections(getApplicationContext() , null);
             onLineValidationList = new ArrayList<>();
         } catch (Exception e ) {
             Log.d("test" , "Scanner " + e.toString());
         }
-
 
         if (state != null) {
             mFlash = state.getBoolean(FLASH_STATE, false);
@@ -84,6 +80,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                 scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
                 ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
                 ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+
             }
         }
 
@@ -150,20 +147,26 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     public void handleResult(Result rawResult) {
 
         String result = rawResult.getContents();
+
+        // To show onlineValidation warning if any
+        boolean isConflict = !scannedBarCode.contains(result);
+        if (division.equals("Courier")) {
+            onlineValidation(result ,isConflict );
+        }
+
         if (scannedBarCode.contains(result)) {
             GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-            if (!ScanbyDevice.contains(result)) {
+            if (!ScanbyDevice.contains(result))
                 ScanbyDevice.add(result);
-                isValidPieceBarcode(result , false);
-            }
 
-         //   mScannerView.resumeCameraPreview(this);
+            mScannerView.resumeCameraPreview(this);
         } else {
-            isValidPieceBarcode(result , true);
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             if (!ConflictBarcode.contains(result))
                 ConflictBarcode.add(result);
-          //  conflict(result);
+
+            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                conflict(result);
 
         }
 
@@ -231,27 +234,55 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-//        Bundle bundle = new Bundle();
         Intent intent = new Intent();
         intent.putExtra("test", "test");
         intent.putExtra("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("ScanbyDevice", ScanbyDevice);
         intent.putExtra("ScanbyDevice", ScanbyDevice);
-//        bundle.putSerializable("ConflictBarcode", ConflictBarcode);
         intent.putExtra("ConflictBarcode", ConflictBarcode);
-        //intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
-
-//        finish();//finishing activity
         super.onBackPressed();
     }
 
+    private void onlineValidation(String pieceBarcode , boolean isConflict) {
+        boolean isShowWarning = false;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isShowWarning = true;
+                }
+
+                if (onLineValidationLocal.getIsStopShipment() == 1) {
+                    onLineValidation.setIsStopShipment(1);
+                    isShowWarning = true;
+                }
+            }
+
+            if (isConflict) {
+                onLineValidation.setIsConflict(1);
+                isShowWarning = true;
+            }
+
+            if (isShowWarning) {
+                onLineValidation.setBarcode(pieceBarcode);
+                onLineValidationList.add(onLineValidation);
+                showDialog(getOnLineValidationPiece(pieceBarcode));
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+    }
 
     private OnLineValidation getOnLineValidationPiece (String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
-                if (pieceDetail.getPieceBarcode().equals(barcode))
+                if (pieceDetail.getBarcode().equals(barcode))
                     return pieceDetail;
             }
 
@@ -261,9 +292,9 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
         return null;
     }
 
-    public void showDialog(boolean isValid , OnLineValidation pieceDetails) {
+    public void showDialog(OnLineValidation pieceDetails) {
         try {
-            if (pieceDetails != null && !isValid) {
+            if (pieceDetails != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(NewBarCodeScannerForVS.this);
                 LayoutInflater inflater = this.getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
@@ -271,10 +302,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                 dialogBuilder.setCancelable(false);
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-//                if (isConflict)
-//                    tvBarcode.setText("This Piece " + pieceDetails.getPieceBarcode() + " is not belong to this Employee");
-//                else
-                tvBarcode.setText("Piece #" + pieceDetails.getPieceBarcode());
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
 
 
                 Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
@@ -334,54 +362,5 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
         } catch (Exception e) {
             Log.d("test" , "showDialog " + e.toString());
         }
-    }
-
-    private void isValidPieceBarcode(String pieceBarcode , boolean isConflict) {
-        boolean isValid = true;
-        try {
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
-            OnLineValidation onLineValidation = new OnLineValidation();
-
-            if (onLineValidationLocal != null) {
-
-
-                if (onLineValidationLocal.getIsMultiPiece() == 1) {
-                    onLineValidation.setIsMultiPiece(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
-                    isValid = false;
-                }
-            }
-
-            if (isConflict) {
-                onLineValidation.setIsConflict(1);
-                isValid = false;
-            }
-
-            if (!isValid) {
-                onLineValidation.setPieceBarcode(pieceBarcode);
-                onLineValidationList.add(onLineValidation);
-            }
-
-            showDialog(isValid , getOnLineValidationPiece(pieceBarcode));
-
-
-        } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
-        }
-        // return isValid;
-    }
-
-    private boolean isValidOnlineValidationFile() {
-        boolean isValid;
-
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsValidation , getApplicationContext());
-        if (isValid)
-            return true;
-        return false;
     }
 }

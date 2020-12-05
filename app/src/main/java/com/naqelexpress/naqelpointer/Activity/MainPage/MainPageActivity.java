@@ -72,6 +72,7 @@ import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
 import com.naqelexpress.naqelpointer.Activity.WaybillMeasurments.WaybillMeasurementActivity;
+//import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.ContactNo.Contact;
@@ -88,6 +89,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.DataSync;
 import com.naqelexpress.naqelpointer.JSON.Request.GetDeliveryStatusRequest;
+import com.naqelexpress.naqelpointer.JSON.Request.UpdateLoginStatusRequest;
 import com.naqelexpress.naqelpointer.MainActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.LocationService;
@@ -323,13 +325,11 @@ public class MainPageActivity
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-//                                int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-//                                UserMeLogin userMeLogin = new UserMeLogin(id);
-//                                dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-//                                finish();
-//                                Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-//                                startActivity(intent);
-                                Logout();
+                                if (GlobalVar.isCourier(getApplicationContext()))
+                                    new UpdateLoginStatus().execute();
+                                else {
+                                    Logout();
+                                }
                             }
                         }).setNegativeButton("Cancel", null).setCancelable(false);
                 AlertDialog alertDialog = builder.create();
@@ -886,7 +886,7 @@ public class MainPageActivity
                 position = itemposition.get(position);
                 switch (position) {
                     case 0:
-
+                       Log.d("test" , "0");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 6)) {
                                 if (!GetDivision()) {
@@ -914,6 +914,7 @@ public class MainPageActivity
 
                         break;
                     case 1:
+                        Log.d("test" , "1");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Location(MainPageActivity.this, 1)) {
                                 if (!GlobalVar.isMyServiceRunning(LocationService.class, getApplicationContext())) {
@@ -941,6 +942,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 2:
+                        Log.d("test" , "2");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 2)) {
 
@@ -962,6 +964,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 3:
+                        Log.d("test" , "3");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 10)) {
                                 if (LoadDeliverysheet()) {
@@ -981,6 +984,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 4:
+                        Log.d("test" , "4");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 3)) {
                                 if (LoadDeliverysheet()) {
@@ -1007,6 +1011,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 5:
+                        Log.d("test" , "5");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 4)) {
                                 if (GetDivision()) {
@@ -1040,6 +1045,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 6:
+                        Log.d("test" , "6");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
                                 Intent waybillMeasurement = new Intent(getApplicationContext(), WaybillMeasurementActivity.class);
@@ -1052,6 +1058,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 7:
+                        Log.d("test" , "7");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent settings = new Intent(getApplicationContext(), SettingActivity.class);
                             startActivity(settings);
@@ -1060,6 +1067,7 @@ public class MainPageActivity
                         break;
 
                     case 8:
+                        Log.d("test" , "8");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent checkCOD = new Intent(getApplicationContext(), CODCheckingActivity.class);
                             startActivity(checkCOD);
@@ -1067,6 +1075,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 9:
+                        Log.d("test" , "9");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent pendingMoney = new Intent(getApplicationContext(), PendingMoneyActivity.class);
                             startActivity(pendingMoney);
@@ -1074,6 +1083,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 10:
+                        Log.d("test" , "10");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
                                 Intent checkPoint = new Intent(getApplicationContext(), CheckPointsActivity.class);
@@ -1086,6 +1096,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 11:
+                        Log.d("test" , "11");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
                                 if (!GetDivision()) {
@@ -1103,6 +1114,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 12:
+                        Log.d("test" , "12");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 5)) {
 //                            Intent atorigin = new Intent(getApplicationContext(), ArrivedatDestination.class);
@@ -1118,6 +1130,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 13:
+                        Log.d("test" , "13");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent history = new Intent(getApplicationContext(), History.class);
                             startActivity(history);
@@ -1125,6 +1138,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 14:
+                        Log.d("test" , "14");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
                                 showPopup(MainPageActivity.this, p, 0);
@@ -1136,6 +1150,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 15:
+                        Log.d("test" , "15");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (VersionMatct()) {
                                 showPopup(MainPageActivity.this, p, 1);
@@ -1147,6 +1162,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 16:
+                        Log.d("test" , "16");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent contact = new Intent(getApplicationContext(), Contact.class);
                             startActivity(contact);
@@ -1154,6 +1170,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 17:
+                        Log.d("test" , "17");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent cvds = new Intent(getApplicationContext(), ValidationDS.class);
                             startActivity(cvds);
@@ -1161,6 +1178,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 18:
+                        Log.d("test" , "18");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Location(MainPageActivity.this, 8)) {
                                 if (!GlobalVar.isMyServiceRunning(LocationService.class, getApplicationContext())) {
@@ -1181,6 +1199,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 19:
+                        Log.d("test" , "19");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Location(MainPageActivity.this, 11)) {
                                 if (!GlobalVar.isMyServiceRunning(LocationService.class, getApplicationContext())) {
@@ -1196,6 +1215,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 20:
+                        Log.d("test" , "20");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             Intent checkPoint = new Intent(getApplicationContext(), Incident.class);
                             startActivity(checkPoint);
@@ -1203,6 +1223,7 @@ public class MainPageActivity
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
                         break;
                     case 21:
+                        Log.d("test" , "21");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
 
                             if (GlobalVar.AskPermission_Location(MainPageActivity.this, 11)) {
@@ -1224,11 +1245,13 @@ public class MainPageActivity
                         break;
 
                     case 22:
+                        Log.d("test" , "22");
                         Intent checkPoint = new Intent(getApplicationContext(), SyncTripDetails.class);
                         startActivity(checkPoint);
 
                         break;
                     case 23:
+                        Log.d("test" , "23");
                         if (VersionMatct()) {
                             Intent terminalhandling = new Intent(getApplicationContext(), TerminalHandlingGroup.class);
                             startActivity(terminalhandling);
@@ -1238,6 +1261,7 @@ public class MainPageActivity
                         }
                         break;
                     case 24:
+                        Log.d("test" , "24");
                         if (VersionMatct()) {
                             Intent changepwd = new Intent(getApplicationContext(), UpdatePasswordModule.class);
                             startActivity(changepwd);
@@ -1248,6 +1272,7 @@ public class MainPageActivity
                         break;
 
                     case 25:
+                        Log.d("test" , "25");
                         if (VersionMatct()) {
                             Intent chat = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(chat);
@@ -1257,6 +1282,7 @@ public class MainPageActivity
                         }
                         break;
                     case 26:
+                        Log.d("test" , "26");
                         if (VersionMatct()) {
                             Intent chat = new Intent(getApplicationContext(), CourierKpi.class);
                             startActivity(chat);
@@ -1266,6 +1292,7 @@ public class MainPageActivity
                         }
                         break;
                     case 27:
+                        Log.d("test" , "27");
                         if (VersionMatct()) {
                             Intent chat = new Intent(getApplicationContext(), IncCabChecklist.class);
                             chat.putExtra("close", 1);
@@ -1276,7 +1303,7 @@ public class MainPageActivity
                         }
                         break;
                     case 28:
-
+                        Log.d("test" , "28");
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 6)) {
 
@@ -2575,6 +2602,108 @@ public class MainPageActivity
                 });
 
         alertDialog.show();
+    }
+
+    private class UpdateLoginStatus extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+        private ProgressDialog progressDialog;
+        String DomainURL = "";
+        String isInternetAvailable = "";
+
+        @Override
+        protected void onPreExecute() {
+
+            if (progressDialog == null)
+                progressDialog = ProgressDialog.show(MainPageActivity.this, "Please wait.",
+                        "Update user information ...", true);
+
+            //todo Riyam update url
+            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
+            super.onPreExecute();
+
+        }
+
+        @SuppressWarnings("deprecation")
+        protected String doInBackground(String... params) {
+
+            UpdateLoginStatusRequest updateLoginStatusRequest = new UpdateLoginStatusRequest();
+            updateLoginStatusRequest.IsLogin = false;
+            updateLoginStatusRequest.EmployID = GlobalVar.GV().EmployID;
+            String jsonData = JsonSerializerDeserializer.serialize(updateLoginStatusRequest, true);
+
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(DomainURL + "UpdateLoginStatus");
+
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (jsonObject.getBoolean("HasError"))
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), jsonObject.getString("ErrorMessage"), GlobalVar.AlertType.Error);
+                    else
+                        Logout();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+            }
+            if (progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+                progressDialog = null;
+            }
+        }
     }
 
 }

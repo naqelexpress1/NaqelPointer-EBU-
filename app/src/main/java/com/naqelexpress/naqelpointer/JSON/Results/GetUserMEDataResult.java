@@ -28,6 +28,8 @@ public class GetUserMEDataResult
     public int CountryID = 0;
     public String CountryCode;
     public String PhoneNo = "";
+    public boolean PwdNeedUpdate;
+
 
     public GetUserMEDataResult(String finalJson) {
         JSONObject jsonObject;
@@ -55,6 +57,7 @@ public class GetUserMEDataResult
             DisableEnabletxtBox = jsonObject.getInt("DisableEnabletxtBox");
             CountryID = jsonObject.getInt("CountryID");
             CountryCode = jsonObject.getString("CountryCode");
+            PwdNeedUpdate = jsonObject.getBoolean("PwdNeedUpdate");
 
             HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
             ErrorMessage = jsonObject.getString("ErrorMessage");

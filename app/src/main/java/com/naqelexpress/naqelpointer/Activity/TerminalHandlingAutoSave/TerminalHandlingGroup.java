@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +49,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
 
         //countDownTimer = new MyCountDownTimer(startTime, interval);
+
 
         setContentView(R.layout.terminalgroup);
         ImageView group1 = (ImageView) findViewById(R.id.group1);

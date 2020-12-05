@@ -15,6 +15,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +31,9 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.OnCloadingForD;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.OptimizedOutOfDeliveryShipmentRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.OptimizedOutOfDeliveryShipmentResult;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.DeliverysheetbyPiece;
 
@@ -44,11 +48,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class DeliverySheetActivity
-        extends AppCompatActivity {
+public class DeliverySheetActivity extends AppCompatActivity implements AsyncTaskCompleteListener {
+
     DeliverySheetFirstFragment firstFragment;
     DeliverySheetSecondFragment secondFragment;
     DeliverySheetThirdFragment thirdFragment;
+
     DateTime TimeIn;
     TabLayout tabLayout;
 
@@ -58,14 +63,29 @@ public class DeliverySheetActivity
 
         setContentView(R.layout.deliverysheet);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+
+
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+        if (division.equals("Courier")) {
+            if (!isValidOnlineValidationFile()) {
+                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
+            } else {
+                Log.d("test" , "File is valid");
+            }
+        }
+
+
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
+        ViewPager mViewPager = findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         GlobalVar.GV().ResetTriedCount();
@@ -124,8 +144,6 @@ public class DeliverySheetActivity
                 for (int i = 0; i < thirdFragment.PieceBarCodeWaybill.size(); i++) { //thirdFragment.PieceBarCodeList
 
                     String split[] = thirdFragment.PieceBarCodeWaybill.get(i).split("-");
-//                    OnCLoadingForDDetail onCLoadingForDDetail = new OnCLoadingForDDetail(thirdFragment.PieceBarCodeList.get(i),
-//                            OnCloadingForDID);
 
                     OFDPieceLevel onCLoadingForDDetail = new OFDPieceLevel(split[0],
                             OnCloadingForDID, split[1]);
@@ -226,13 +244,6 @@ public class DeliverySheetActivity
                         return firstFragment;
                     } else
                         return firstFragment;
-//                case 1:
-//                    if (secondFragment == null) {
-//                        secondFragment = new DeliverySheetSecondFragment();
-//                        return secondFragment;
-//                    } else {
-//                        return secondFragment;
-//                    }
                 case 1:
                     if (thirdFragment == null) {
                         thirdFragment = new DeliverySheetThirdFragment();
@@ -254,8 +265,6 @@ public class DeliverySheetActivity
             switch (position) {
                 case 0:
                     return getResources().getString(R.string.OFDEmpInfo);
-//                case 1:
-//                    return getResources().getString(R.string.DeliverySheetSecondFragment);
                 case 1:
                     return getResources().getString(R.string.DeliverySheetThirdFragment);
             }
@@ -281,11 +290,7 @@ public class DeliverySheetActivity
     //--------------Get My Route Shipments -------------------------------
     public void GetMyRouteShipments() {
         GlobalVar.GV().optimizedOutOfDeliveryShipmentList = new ArrayList<>();
-//        if (!GlobalVar.GV().HasInternetAccess)
-//            return;
-
         OptimizedOutOfDeliveryShipmentRequest optimizedOutOfDeliveryShipmentRequest = new OptimizedOutOfDeliveryShipmentRequest();
-
         String jsonData = JsonSerializerDeserializer.serialize(optimizedOutOfDeliveryShipmentRequest, true);
         new GetMyRouteShipmentsData().execute(jsonData);
     }
@@ -449,12 +454,8 @@ public class DeliverySheetActivity
             GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
             GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
 
-
             firstFragment = (DeliverySheetFirstFragment) getSupportFragmentManager().getFragment(savedInstanceState, "firstFragment");
-//            if(firstFragment.rootView == null)
-//
             secondFragment = (DeliverySheetSecondFragment) getSupportFragmentManager().getFragment(savedInstanceState, "secondFragment");
-            //if(thirdFragment !=null)
             thirdFragment = (DeliverySheetThirdFragment) getSupportFragmentManager().getFragment(savedInstanceState, "thirdFragment");
             GlobalVar.GV().optimizedOutOfDeliveryShipmentList = savedInstanceState.getStringArrayList("optimizedOutOfDeliveryShipmentList");
 
@@ -472,12 +473,18 @@ public class DeliverySheetActivity
         outState.putString("EmployStation", GlobalVar.GV().EmployStation);
         outState.putStringArrayList("optimizedOutOfDeliveryShipmentList", GlobalVar.GV().optimizedOutOfDeliveryShipmentList);
         getSupportFragmentManager().putFragment(outState, "firstFragment", firstFragment);
-//        getSupportFragmentManager().putFragment(outState, "secondFragment", secondFragment);
         if (thirdFragment != null)
             getSupportFragmentManager().putFragment(outState, "thirdFragment", thirdFragment);
 
-
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
@@ -491,4 +498,33 @@ public class DeliverySheetActivity
         }
         return false;
     }
+
+    private void ErrorAlert(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(DeliverySheetActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsAndInventory , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , "isValidOnlineValidationFile() e " + ex.toString());
+        }
+        return false;
+    }
+
 }

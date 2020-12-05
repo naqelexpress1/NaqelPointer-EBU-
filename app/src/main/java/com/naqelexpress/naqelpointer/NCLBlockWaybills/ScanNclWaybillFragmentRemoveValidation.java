@@ -166,7 +166,6 @@ public class ScanNclWaybillFragmentRemoveValidation extends Fragment {
                     initViews();
                 }
 
-
             } else {
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);

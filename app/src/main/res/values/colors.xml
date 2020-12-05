@@ -6,7 +6,13 @@
     <color name="NaqelYello">#ffd600</color>
     <color name="NaqelGray">#EFEFF4</color>
     <color name="White">#FFFFFF</color>
+    <color name="Black">#000000</color>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="bg_color">#f2f3f4</color>
+    <color name="txt_color">#313131</color>
+    <color name="hint_txt_color">#adadad</color>
+    <color name="colorAccent_2">#198d58</color>
+
 </resources>

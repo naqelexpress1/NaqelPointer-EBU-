@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.DB.DBObjects;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.view.View;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -16,6 +17,7 @@ public class Station {
     public String Name;
     public String FName;
     public int CountryID;
+
 
     public Station() {
     }
@@ -65,7 +67,6 @@ public class Station {
                         instance.FName = jsonObject.getString("FName");
                         instance.CountryID = jsonObject.getInt("CountryID");
                         instance.Code = jsonObject.getString("Code");
-
                         dbConnections.InsertStation(instance, context);
                     } catch (JSONException ignored) {
                     }
@@ -75,5 +76,35 @@ public class Station {
         } catch (JSONException ignored) {
             System.out.println(ignored.getMessage());
         }
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
+    public void setCode(String code) {
+        Code = code;
+    }
+
+    public void setName(String name) {
+        Name = name;
+    }
+
+    public void setFName(String FName) {
+        this.FName = FName;
+    }
+
+    public void setCountryID(int countryID) {
+        CountryID = countryID;
+    }
+
+    public void setRootView(View rootView) {
+        this.rootView = rootView;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return Code + " : " + Name;
     }
 }

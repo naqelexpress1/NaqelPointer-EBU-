@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -85,13 +86,17 @@ public class GoogleLocationService {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (location.hasAccuracy()) {
+            try {
+                if (location.hasAccuracy()) {
 //                if (location.getAccuracy() < 30) {
-                locationUpdateListener.updateLocation(location);
+                    locationUpdateListener.updateLocation(location);
 
 //                Toast.makeText(activity, String.valueOf(location.getLatitude() + " " +
 //                        location.getLongitude()), Toast.LENGTH_LONG).show();
 //                }
+                }
+            } catch (Exception e) {
+                Log.d("test" , "onLocationChanged " + e.toString());
             }
         }
     }

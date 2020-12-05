@@ -1021,6 +1021,9 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity android:name=".Activity.Login.UpdatePasswordActivity"/>
+
+
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
             android:process=":naqelsignature" />

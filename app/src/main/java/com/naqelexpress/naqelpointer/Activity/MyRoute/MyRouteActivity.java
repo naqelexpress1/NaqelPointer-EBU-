@@ -74,6 +74,9 @@ public class MyRouteActivity
 
         setContentView(R.layout.myroutenew);
 
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 

@@ -31,7 +31,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
-
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.GetWaybillDetailsRequest;

@@ -90,6 +90,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Log.d("test" , "group by");
+
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Search");
@@ -353,7 +355,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             btnCloseTrip.setVisibility(View.GONE);
             txtCloseTrip.setVisibility(View.GONE);
         }
-
+      // && CreateNewRoute
         if (GlobalVar.GV().CourierDailyRouteID == 0 && CreateNewRoute) {
             BringMyRouteShipmentsRequest bringMyRouteShipmentsRequest = new BringMyRouteShipmentsRequest();
             progressflag = 1;

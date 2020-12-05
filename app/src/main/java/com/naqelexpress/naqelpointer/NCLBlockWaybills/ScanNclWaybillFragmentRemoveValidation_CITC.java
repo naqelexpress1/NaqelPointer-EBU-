@@ -13,8 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,27 +97,46 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 }
             });
 
-            txtBarcode.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
-
-                        //AddNewWaybill(String.valueOf(barcodeInfoResult.WayBillNo));
+            txtBarcode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                         AddNewPiece(txtBarcode.getText().toString(), "0", 0);
 
-                    }
 
+                        return true;
+                    }
+                    return false;
                 }
             });
 
+
+//            txtBarcode.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    if (txtBarcode != null && txtBarcode.getText().toString().length() == 13) {
+//
+//                        //AddNewWaybill(String.valueOf(barcodeInfoResult.WayBillNo));
+//                        AddNewPiece(txtBarcode.getText().toString(), "0", 0);
+//
+//                    }
+//
+//                }
+//            });
+//
         }
 
         ReadFromLocal();
@@ -155,64 +173,72 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
     private void AddNewPiece(String PieceCode, String WaybillNo, double Weight) {
 
-        if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
+        if (!GlobalVar.GV().isValidBarcodeCons(PieceCode)) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarcode.setText("");
+            return;
+        }
+        if (!ScanNclNoFragment.pieceDenied.contains(txtBarcode.getText().toString())) {
+
+            if (GlobalVar.GV().ValidateAutomacticDate(getContext())) {
 //            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
 //                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
 //                ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)", PieceCode, WaybillNo, Weight);
 //                return;
 //            }
 
-        } else {
-            GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
-            GlobalVar.RedirectSettings(getActivity());
-            return;
-        }
-
-        //Commented by ismail  09-09-2020 by ashik no need this function any more
-        //  GetNCLDatafromDB(txtBarcode.getText().toString());
-
-        boolean rtoreq = false;
-        boolean ismatch = false;
-
-
-        if (iscitcshipments.contains(txtBarcode.getText().toString())) {
-
-            ismatch = true;
-            GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
-            ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ", PieceCode, WaybillNo, Weight);
-            return;
-
-        }
-
-        if (!ismatch) {
-            if (isdeliveryReq.contains(txtBarcode.getText().toString())) {
-                if (isrtoReq.contains(txtBarcode.getText().toString())) {
-                    ismatch = true;
-                    rtoreq = true;
-
-                    GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery & RTO ", PieceCode, WaybillNo, Weight);
-
-                    return;
-                } else {
-
-                    GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
-                    ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery ", PieceCode, WaybillNo, Weight);
-                    return;
-                }
-
-
+            } else {
+                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                GlobalVar.RedirectSettings(getActivity());
+                return;
             }
-        }
-        if (!rtoreq) {
-            if (isrtoReq.contains(txtBarcode.getText().toString())) {
 
+            //Commented by ismail  09-09-2020 by ashik no need this function any more
+            //  GetNCLDatafromDB(txtBarcode.getText().toString());
+
+            boolean rtoreq = false;
+            boolean ismatch = false;
+
+
+            if (iscitcshipments.contains(txtBarcode.getText().toString())) {
+
+                ismatch = true;
                 GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
-                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For RTO ", PieceCode, WaybillNo, Weight);
+                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarcode.getText().toString() + ") has CITC Complaint ", PieceCode, WaybillNo, Weight);
                 return;
 
             }
-        }
+
+            if (!ismatch) {
+                if (isdeliveryReq.contains(txtBarcode.getText().toString())) {
+                    if (isrtoReq.contains(txtBarcode.getText().toString())) {
+                        ismatch = true;
+                        rtoreq = true;
+
+                        GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
+                        ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery & RTO ", PieceCode, WaybillNo, Weight);
+
+                        return;
+                    } else {
+
+                        GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
+                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For Delivery ", PieceCode, WaybillNo, Weight);
+                        return;
+                    }
+
+
+                }
+            }
+            if (!rtoreq) {
+                if (isrtoReq.contains(txtBarcode.getText().toString())) {
+
+                    GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
+                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarcode.getText().toString() + ") is Request For RTO ", PieceCode, WaybillNo, Weight);
+                    return;
+
+                }
+            }
 
 //        if (iscitcshipments.contains(txtBarcode.getText().toString())) {
 //
@@ -222,8 +248,27 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 //            //  return;
 //
 //        }
+        } else {
+            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this.getContext());
+            builder.setTitle("No Bayan No");
+            builder.setMessage("This piece(" + txtBarcode.getText().toString() + ") no Bayan No.kindly contact GateWay team ")
 
+                    .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int which) {
+//                                lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+                            txtBarcode.setText("");
+                        }
+                    })
+                    .setCancelable(true);
+            android.support.v7.app.AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+            ;
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarcode.setText("");
+        }
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
+
         AddPiece(PieceCode, WaybillNo, Weight);
         //if (!IsDuplicate(PieceCode)) {
 
@@ -681,6 +726,22 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void onBackpressed() {
+
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit NCL ")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        android.support.v7.app.AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
     }
 }

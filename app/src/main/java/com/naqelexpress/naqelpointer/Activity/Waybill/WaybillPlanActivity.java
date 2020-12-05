@@ -29,6 +29,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -68,6 +69,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
     SupportMapFragment mapFragment;
+//    MapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
 
@@ -84,6 +86,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
+//            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             mapFragment.getMapAsync(this);
 
@@ -316,7 +319,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
     public void Delivered() {
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (GetDivision()) {
             if (ConsigneeLatitude.length() == 0) {
                 ConsigneeLatitude = "0.0";
@@ -338,6 +341,8 @@ public class WaybillPlanActivity extends AppCompatActivity
     public void NotDelivered() {
 
         if (GetDivision()) {
+
+
             if (ConsigneeLatitude.length() == 0) {
                 ConsigneeLatitude = "0.0";
                 ConsigneeLongitude = "0.0";

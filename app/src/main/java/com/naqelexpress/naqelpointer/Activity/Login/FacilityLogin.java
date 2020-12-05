@@ -317,9 +317,16 @@ public class FacilityLogin
 
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                         dbConnections.FacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID);
-                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-                        startActivity(intent);
-                        finish();
+                        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+                        if (GlobalVar.GV().IsTerminalApp || division.equals("IRS")) {
+                            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), VerifyMobileNo.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
 
                 } catch (JSONException e) {

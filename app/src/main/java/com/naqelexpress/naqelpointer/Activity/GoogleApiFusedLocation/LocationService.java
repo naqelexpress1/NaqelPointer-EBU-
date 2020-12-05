@@ -32,7 +32,14 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.CourierDetailsFirebase;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.SendNotificationtoConsignee;
@@ -127,6 +134,8 @@ public class LocationService extends Service {
         startForeground(11, notification);
     }
 
+    String EmpName = "", Mno = "", NWNo = "", ConsLocation = "", EID = "", ConsigneeName = "", isnotify = "0", BillingType, CollectedAmount;
+    ;
 
     //get current location os user
     private void updateLocation(Context context) {
@@ -144,7 +153,8 @@ public class LocationService extends Service {
             //update location to our servers for tracking purpose
 
             @Override
-            public void updateLocation(Location location) {
+            public void updateLocation(final Location location) {
+
                 if (location != null) {
 
                     if (ActivityCompat.checkSelfPermission(getApplicationContext(),
@@ -157,25 +167,31 @@ public class LocationService extends Service {
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                     int lastlogin = GlobalVar.getlastlogin(getApplicationContext());
                     String devision = "";
+
+
                     Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
                             lastlogin, getApplicationContext());
 
                     if (result != null && result.getCount() > 0) {
                         result.moveToFirst();
                         devision = result.getString(result.getColumnIndex("Division"));
-
+                        EmpName = result.getString(result.getColumnIndex("EmployName"));
+                        Mno = result.getString(result.getColumnIndex("MobileNo"));
                     }
 
                     if (!devision.equals("Courier"))
                         return;
 
                     String empid = dbConnections.getDeliverysheetEmpID(getApplicationContext());
+
                     String split[] = empid.split(",");
                     //                    dbConnections.
-
+                    EID = split[0].split("-")[0];
                     try {
 
                         JSONObject jsonObject = new JSONObject();
+                        String WaybillNo = "";
+
                         try {
 
 
@@ -187,29 +203,119 @@ public class LocationService extends Service {
                             //String wd = dbConnections.GetLastActionWaybill(getApplicationContext());
                             String wd = dbConnections.GetLastActionWaybill_MyRouteActionActivity(getApplicationContext());
                             String NextWNo = dbConnections.FindMyRouteActionActivityNextSeqNo(getApplicationContext());
-                            if (!wd.equals("0_0_")) {
-                                jsonObject.put("WaybillNo", wd.split("_")[0]);
-                                jsonObject.put("DsID", wd.split("_")[1]);
-                                // if (!wd.split("_")[2].equals("NoData"))
-                                jsonObject.put("NDReason", wd.split("_")[2]);
-                            } else
-                                jsonObject.put("WaybillNo", wd);
 
-                            jsonObject.put("EmpID", empid);
-                            if (!NextWNo.equals("0")) {
-                                jsonObject.put("NextWNo", NextWNo.split("_")[0].split(",")[0]);
-                                jsonObject.put("StartTime", NextWNo.split("_")[0].split(",")[1]);
-                                jsonObject.put("ConLocation", NextWNo.split("_")[1]);
+                            isnotify = "0";
+                            if (!wd.equals("0")) {
+                                if (!wd.equals("0_0_")) {
+                                    WaybillNo = wd.split("_")[0];
+                                    jsonObject.put("WaybillNo", wd.split("_")[0]);
+                                    jsonObject.put("DsID", wd.split("_")[1]);
+                                    // if (!wd.split("_")[2].equals("NoData"))
+                                    jsonObject.put("NDReason", wd.split("_")[2]);
+                                    isnotify = wd.split("_")[3];
+                                    //EID = split[0];
+                                } else
+                                    jsonObject.put("WaybillNo", wd);
+
+                                jsonObject.put("EmpID", empid);
+                                if (!NextWNo.equals("0")) {
+                                    jsonObject.put("NextWNo", NextWNo.split("_")[0].split(",")[0]);
+                                    NWNo = NextWNo.split("_")[0].split(",")[0];
+                                    jsonObject.put("StartTime", NextWNo.split("_")[0].split(",")[1]);
+                                    jsonObject.put("ConLocation", NextWNo.split("_")[1]);
+                                    ConsLocation = NextWNo.split("_")[1];
+                                    ConsigneeName = NextWNo.split("_")[2];
+                                    BillingType = NextWNo.split("_")[3];
+                                    CollectedAmount = NextWNo.split("_")[4];
+                                } else {
+                                    WaybillNo = "0";
+                                    ConsLocation = "0.0";
+                                    NWNo = "0";
+                                    ConsigneeName = "";
+                                    isnotify = "0";
+                                    BillingType = "";
+                                    CollectedAmount = "";
+                                }
+                                jsonObject.put("Division", devision);
+                                jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
+                                jsonObject.put("EmpName", EmpName);
+                                jsonObject.put("MobileNo", Mno);
+
+                                dbConnections.close();
+                                result.close();
+                            } else {
+                                WaybillNo = "0";
+                                ConsLocation = "0.0";
+                                NWNo = "0";
+                                ConsigneeName = "";
+                                isnotify = "0";
+                                BillingType = "";
+                                CollectedAmount = "";
+
                             }
-                            jsonObject.put("Division", devision);
-                            jsonObject.put("Date", GlobalVar.GV().getCurrentDateTimeSS());
-
-                            dbConnections.close();
-                            result.close();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
+
+                        if (devision.equals("Courier")) {
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+                            final DatabaseReference myRef = database.getReference("LiveTracking");
+
+                            //String EmpID, String LatLng, String EmpName, String WaybillNo, String MobileNo, String ConsLocation
+                            final CourierDetailsFirebase user = new CourierDetailsFirebase(EID, String.valueOf(location.getLatitude() + "," + location.getLongitude()),
+                                    EmpName, WaybillNo, Mno, ConsLocation, NWNo, location.getSpeed(), isnotify, BillingType, CollectedAmount);
+
+
+                            myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.getValue() == null) {
+                                        String userid = myRef.push().getKey();
+                                        myRef.child(userid).setValue(user);
+                                        return;
+                                    }
+                                    CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
+                                    if (fetchuser.EmpID != null)
+                                        fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
+
+                                    if (fetchuser.ID != null) {
+                                        //Firebase userRef = ref.child("user");
+                                        Map newUserData = new HashMap();
+                                        newUserData.put("LatLng", String.valueOf(location.getLatitude() + "," + location.getLongitude()));
+                                        newUserData.put("NextWaybillNo", NWNo);
+                                        newUserData.put("EmpID", EID);
+                                        newUserData.put("MobileNo", Mno);
+                                        newUserData.put("ConsLocation", ConsLocation);
+                                        newUserData.put("ConsigneeName", ConsigneeName);
+                                        newUserData.put("Speed", location.getSpeed());
+                                        newUserData.put("isnotify", isnotify);
+                                        newUserData.put("BillingType", BillingType);
+                                        newUserData.put("CollectedAmount", CollectedAmount);
+                                        //  newUserData.put("ConsLocation", ConsLocation);
+                                        myRef.child(fetchuser.ID).updateChildren(newUserData);
+                                        // myRef.updateChildren(newUserData);
+
+
+                                    }
+//                                    else {
+//                                        String userid = myRef.push().getKey();
+//                                        myRef.child(userid).setValue(user);
+//                                    }
+                                    //  Log.d("User", "");
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.d("User", "");
+                                }
+
+
+                            });
+                        }
+
+                        //Commented below for testing
                         if (requestQueue != null)
                             requestQueue.cancelAll("old");
                         if (split.length > 1 && split[1].equals("1"))
@@ -217,12 +323,16 @@ public class LocationService extends Service {
                             saveLiveLocation(jsonObject.toString());
                         if (split[0].equals("19127"))
                             saveLiveLocation(jsonObject.toString());
+                        //-------------------------------------
+
                         //shareLiveLocation(jsonObject.toString()); //if you need  Live just uncomment
 
                         //sendNotificationtoConsignee(location.getLatitude(), location.getLongitude()); //Comment because of Data usage
 
+
                         flag_thread = false;
                     } catch (Exception e) {
+                        FirebaseApp.initializeApp(getApplicationContext());
                         e.printStackTrace();
                     }
 

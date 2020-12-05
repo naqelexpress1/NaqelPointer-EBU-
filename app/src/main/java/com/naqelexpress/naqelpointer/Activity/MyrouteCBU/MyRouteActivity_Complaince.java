@@ -76,6 +76,7 @@ public class MyRouteActivity_Complaince
     static int progressflag = 0;
 
     private SearchView searchView;
+    TextView lastseqstoptime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +97,7 @@ public class MyRouteActivity_Complaince
         mapListview = (RecyclerView) findViewById(R.id.myRouteListView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mapListview.setLayoutManager(mLayoutManager);
-
+        lastseqstoptime = (TextView) findViewById(R.id.laststopseqtime);
 
         adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
                 "CourierKpi", this);
@@ -258,7 +259,7 @@ public class MyRouteActivity_Complaince
 
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
-
+        GetPlannedLocation();
     }
 
     private void ValidateDatas() {
@@ -805,6 +806,7 @@ public class MyRouteActivity_Complaince
                         mapListview.setAdapter(adapter);
 
                         hideenableListview();
+                        GetPlannedLocation();
                     }
 
                 }
@@ -858,11 +860,13 @@ public class MyRouteActivity_Complaince
 
             try {
                 String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
+                function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //BringDeliverySheetbyOFDPiece_PlanAll
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
                     function = "BringMyRouteShipments"; //EBU Divison
                 if (GlobalVar.GV().isFortesting)
-                    function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
+                    // function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
+                    function = "BringDeliverySheetbyOFDPiece_PlanAll";
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence
                 URL url = new URL(DomainURL + function); //Geofence
@@ -1623,7 +1627,8 @@ public class MyRouteActivity_Complaince
             InputStream ist = null;
 
             try {
-                URL url = new URL(DomainURL + "SendNotificationtoConsigneeForCustApp");
+                //URL url = new URL(DomainURL + "SendNotificationtoConsigneeForCustApp");
+                URL url = new URL(DomainURL + "SendNotificationtoConsigneeForCustApp"); //SpecificCons
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1738,5 +1743,57 @@ public class MyRouteActivity_Complaince
         pDialog.setContentText("Notify to the Consignee, Kindly wait..");
         pDialog.setCancelable(false);
         pDialog.show();
+    }
+
+    public void GetPlannedLocation() {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        String sd = dbConnections.isMyRouteComplainceDate(getApplicationContext());
+        String addtime = sd;
+        Cursor result = dbConnections.Fill("select * from plannedLocation where   Date ='" + GlobalVar.getDate()
+                + "' and  EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
+
+        int seconds = 0;
+        int count = result.getCount();
+        int exit = 1;
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+            do {
+
+                int value = result.getInt(result.getColumnIndex("PETA_Value"));
+                int WaybillNo = result.getInt(result.getColumnIndex("WaybillNo"));
+                addtime = GlobalVar.getCurrentDatewithCustomSeconds(value + seconds, addtime);
+                if (exit == count - 1)
+                    break;
+                seconds = 420;
+
+                exit = exit + 1;
+
+//                String data = result.getString(result.getColumnIndex("StringData"));
+//
+//                if (data.contains("ZERO_RESULTS")) {
+//                    System.out.println("true");
+//                }
+//
+//                try {
+//                    JSONObject jsonObject = new JSONObject(data);
+//                    JSONArray jRoutes = jsonObject.getJSONArray("routes");
+//                    for (int i = 0; i < jRoutes.length(); i++) {
+//                        JSONArray jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+//                        lastseqstoptime.setText((String) ((JSONObject) ((JSONObject) jLegs.get(i)).get("duration")).get("text"));
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+
+            } while (result.moveToNext());
+        }
+        lastseqstoptime.setText("Last Seq Stop time : " + addtime);
+        result.close();
+        dbConnections.close();
+
     }
 }

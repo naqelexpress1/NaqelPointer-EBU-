@@ -172,10 +172,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.group1:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("1");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                //if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                fetchgroup("1");
+//                else
+//                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.group2:
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))

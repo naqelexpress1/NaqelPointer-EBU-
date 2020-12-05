@@ -32,6 +32,10 @@ import com.squareup.okhttp.Response;
 
 import org.json.JSONObject;
 
+//import com.google.firebase.BuildConfig;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
+
 public class SplashScreenActivity
         extends AppCompatActivity {
 
@@ -47,6 +51,82 @@ public class SplashScreenActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
+
+
+        //Write a message to the database
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//
+//        final DatabaseReference myRef = database.getReference("LiveTracking");
+//
+//        final CourierDetailsFirebase user = new CourierDetailsFirebase("19127", "24.428261,39.606400");
+//
+//
+//        myRef.orderByChild("EmpID").equalTo("19127").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.getValue() == null) {
+//                    String userid = myRef.push().getKey();
+//                    myRef.child(userid).setValue(user);
+//                    return;
+//                }
+//                CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
+//                if (fetchuser.EmpID != null)
+//                    fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
+//
+//                if (fetchuser.ID != null) {
+//                    myRef.child(fetchuser.ID).child("LatLng").setValue("24.428261,39.606400");
+//                } else {
+//                    String userid = myRef.push().getKey();
+//                    myRef.child(userid).setValue(user);
+//                }
+//                //  Log.d("User", "");
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                Log.d("User", "");
+//            }
+//
+//
+//        });
+
+
+//        Query queryRef = myRef
+//                .orderByChild("EmpID")
+//                .equalTo("19128");
+//
+//        queryRef.addChildEventListener(new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//                //TODO auto generated
+//                System.out.println(s);
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//                //TODO auto generated;
+//                System.out.println(s);
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//                //TODO auto generated;
+//                System.out.println(dataSnapshot);
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//                //TODO auto generated
+//                System.out.println(s);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                //TODO auto generated
+//                System.out.println(databaseError);
+//            }
+//        });
+
 
         //getCallLog();
 
@@ -328,10 +408,17 @@ public class SplashScreenActivity
                             );
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-                        intent.putExtra("getMaster", 0);
-                        startActivity(intent);
-                        finish();
+                        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+                        if (GlobalVar.GV().IsTerminalApp || division.equals("IRS") || division.equals("Express")) {
+                            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+                            intent.putExtra("getMaster", 0);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), VerifyMobileNo.class);
+                            startActivity(intent);
+                            finish();
+                        }
                     }
                 }
 
@@ -395,14 +482,27 @@ public class SplashScreenActivity
 //                    }
 //                    loginPage();
 
-                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-                        intent.putExtra("getMaster", 0);
-                        startActivity(intent);
+//                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+//                        intent.putExtra("getMaster", 0);
+//                        startActivity(intent);
+//
+////                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+////                    intent.putExtra("getMaster", 0);
+////                    startActivity(intent);
+//                        finish();
 
-//                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-//                    intent.putExtra("getMaster", 0);
-//                    startActivity(intent);
-                        finish();
+                        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+                        if (GlobalVar.GV().IsTerminalApp || division.equals("IRS") || division.equals("Express")) {
+                            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+                            intent.putExtra("getMaster", 0);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), VerifyMobileNo.class);
+                            startActivity(intent);
+                            finish();
+                        }
+
                     } else {
                         GlobalVar.enableLocationSettings(SplashScreenActivity.this);
                     }
@@ -470,7 +570,8 @@ public class SplashScreenActivity
 
                     ActivityCompat.requestPermissions(
                             SplashScreenActivity.this,
-                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                            new String[]{
+                                    Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                             7
                     );
 
@@ -545,7 +646,8 @@ public class SplashScreenActivity
                         } else {
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                                    new String[]{
+                                            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                                     7
                             );
                         }
@@ -666,9 +768,17 @@ public class SplashScreenActivity
                         startActivity(intent);
                     } else if (redirctcalss == 1) {
 
-                        Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-                        intent.putExtra("getMaster", 0);
-                        startActivity(intent);
+                        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+                        if (GlobalVar.GV().IsTerminalApp || division.equals("IRS") || division.equals("Express")) {
+                            Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+                            intent.putExtra("getMaster", 0);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), VerifyMobileNo.class);
+                            startActivity(intent);
+                            finish();
+                        }
 
                     } else {
                         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);

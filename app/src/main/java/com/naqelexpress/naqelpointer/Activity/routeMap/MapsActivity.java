@@ -24,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -49,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private static final String TAG = MapsActivity.class.getSimpleName();
     SupportMapFragment mapFragment;
+//    MapFragment mapFragment;
     private GoogleMap mMap;
     private List<LatLng> polyLineList;
     private Marker marker;
@@ -71,6 +73,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+//        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         polyLineList = new ArrayList<>();
         button = (Button) findViewById(R.id.destination_button);
         destinationEditText = (EditText) findViewById(R.id.edittext_place);

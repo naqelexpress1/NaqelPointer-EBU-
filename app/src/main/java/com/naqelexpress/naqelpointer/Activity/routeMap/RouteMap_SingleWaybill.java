@@ -80,6 +80,7 @@ public class RouteMap_SingleWaybill extends AppCompatActivity implements OnMapRe
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
+    //    MapFragment mapFragment;
     private GoogleMap mMap;
     private ArrayList<MyRouteShipments> myRouteShipmentList;
     //static ArrayList<Places> places; // = new ArrayList<>();
@@ -101,6 +102,7 @@ public class RouteMap_SingleWaybill extends AppCompatActivity implements OnMapRe
         myRouteShipmentList = extras.getParcelableArrayList("myroute");
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+//        mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //myRouteShipmentList = new ArrayList<>();
         //Bundle bundle = getIntent().getExtras();
@@ -407,7 +409,7 @@ public class RouteMap_SingleWaybill extends AppCompatActivity implements OnMapRe
                     wno = myRouteShipmentList.get((int) places.get(i).getSpeed() + 1).ItemNo;
 
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.InsertPlannedLocation(getApplicationContext(), result, Integer.parseInt(position));
+                dbConnections.InsertPlannedLocation(getApplicationContext(), result, Integer.parseInt(position), Integer.parseInt(wno));
                 dbConnections.close();
 
                 ParserTask parserTask = new ParserTask();

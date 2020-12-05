@@ -129,6 +129,14 @@ public class ValidationDS extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (txtBarcode != null && txtBarcode.getText().length() == 13) {
                     String result = txtBarcode.getText().toString();
+                    if (!GlobalVar.GV().isValidBarcode(result)) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                        txtBarcode.setText("");
+                        return;
+                    }
+
+
                     if (scannedBarCode.contains(result)) {
                         GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
                         if (!ScanbyDevice.contains(result))
@@ -531,9 +539,7 @@ public class ValidationDS extends AppCompatActivity {
 
     }
 
-    private void doaction()
-
-    {
+    private void doaction() {
         conflict.clear();
         for (int i = 0; i < ConflictBarcode.size(); i++) {
             HashMap<String, String> temp = new HashMap<>();

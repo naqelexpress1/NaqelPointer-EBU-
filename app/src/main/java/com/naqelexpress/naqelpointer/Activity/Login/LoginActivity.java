@@ -79,7 +79,7 @@ public class LoginActivity
     //Context context;
     TextView lbVersion;
     Button btnLogin, btnForgotPassword, btnScan;
-    EditText txtEmployID, txtPassword;
+    EditText txtEmployID, txtPassword, txtMobileNo;
 
     EditText truck, odometer;
     ArrayList<FindVehilceObject> vehicles;
@@ -95,7 +95,7 @@ public class LoginActivity
             setContentView(R.layout.login);
 
 
-        boolean asd = GlobalVar.GV().IsAllowtoScan("Upto : 2019-12-11 16.30".replace("Upto : ", ""));
+        // boolean asd = GlobalVar.GV().IsAllowtoScan("Upto : 2019-12-11 16.30".replace("Upto : ", ""));
 
         //GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
 
@@ -123,6 +123,9 @@ public class LoginActivity
         txtEmployID = (EditText) findViewById(R.id.txtEmployID);
         txtPassword = (EditText) findViewById(R.id.txtPassword);
 
+        if (!GlobalVar.GV().IsTerminalApp && !GlobalVar.GV().LoginVariation) {
+            txtMobileNo = (EditText) findViewById(R.id.txtPhoneNo);
+        }
         GlobalVar.ResetTriedCount();
 
 //        if (savedInstanceState != null)
@@ -304,9 +307,21 @@ public class LoginActivity
         startActivity(intent);
     }
 
+    String PNo;
+
     public void Login(View view) throws ParseException {
 
         GlobalVar.GV().UserPassword = txtPassword.getText().toString();
+
+//        if (!GlobalVar.GV().LoginVariation && !GlobalVar.GV().IsTerminalApp) {
+//            PNo = txtMobileNo.getText().toString();
+//            if (PNo.equals("") || PNo.length() == 0) {
+//                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the Correct MobileNo with Country Code", GlobalVar.AlertType.Warning);
+//                return;
+//            }
+//
+//        }
+
         if (GlobalVar.GV().ThereIsMandtoryVersion) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "There is a new version, you have to install it first. Contact IT department if you need any support.", GlobalVar.AlertType.Warning);
             return;
@@ -1156,7 +1171,15 @@ public class LoginActivity
 
             try {
 
-                URL url = new URL(DomainURL + "GetUserMEData");
+                String function = "GetUserMEData"; //CBU division BringDeliverySheetbyOFDPiece
+//                String function = "BringMyRouteShipments";
+                if (!GetDivision())
+                    function = "GetUserMEData"; //EBU Divison
+
+                //  if (GlobalVar.GV().isFortesting)
+                //       function = "BringDeliverySheetbyOFDPiece_ExcludeRoute";
+
+                URL url = new URL(DomainURL + function);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 try {
@@ -1222,7 +1245,8 @@ public class LoginActivity
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;
-                    instance.Password =  txtPassword.getText().toString();//getUserMEDataResult.Password;
+
+                    instance.Password = txtPassword.getText().toString();//getUserMEDataResult.Password;
                     instance.RoleMEID = getUserMEDataResult.RoleMEID;
                     instance.StationID = getUserMEDataResult.StationID;
                     instance.StatusID = getUserMEDataResult.StatusID;
@@ -1230,6 +1254,8 @@ public class LoginActivity
                     instance.EmployName = getUserMEDataResult.EmployName;
                     instance.EmployFName = getUserMEDataResult.EmployFName;
                     instance.MobileNo = getUserMEDataResult.MobileNo;
+                    if (!GlobalVar.GV().LoginVariation && !GlobalVar.GV().IsTerminalApp)
+                        instance.MobileNo = PNo;
                     instance.StationCode = getUserMEDataResult.StationCode;
                     instance.StationName = getUserMEDataResult.StationName;
                     instance.StationFName = getUserMEDataResult.StationFName;

@@ -42,6 +42,7 @@ public class DirectionsJSONParser {
                 km = (String) ((JSONObject) ((JSONObject) jLegs.get(i)).get("distance")).get("text");
                 String duration = "";
                 duration = (String) ((JSONObject) ((JSONObject) jLegs.get(i)).get("duration")).get("text");
+                int durationvalue = (int) ((JSONObject) ((JSONObject) jLegs.get(i)).get("duration")).get("value");
                 hm_.put("km", km);
                 hm_.put("time", duration);
                 hm_.put("address", ((JSONObject) jLegs.get(i)).getString("end_address"));
@@ -50,7 +51,7 @@ public class DirectionsJSONParser {
                 if (division == 0) {
                     DBConnections dbConnections = new DBConnections(conext, null);
                     dbConnections.UpdatePlannedLocation(km, duration, ((JSONObject) jLegs.get(i)).getString("start_address"),
-                            ((JSONObject) jLegs.get(i)).getString("end_address"), position);
+                            ((JSONObject) jLegs.get(i)).getString("end_address"), position, durationvalue);
                     dbConnections.close();
                 }
 

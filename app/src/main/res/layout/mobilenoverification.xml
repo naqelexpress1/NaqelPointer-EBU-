@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/NaqelBlue"
+
+    tools:context="com.naqelexpress.naqelpointer.Activity.Login.LoginActivity">
+
+    <ImageView
+        android:id="@+id/imgNaqelLogo"
+        android:layout_width="150dp"
+        android:layout_height="100dp"
+        android:layout_above="@id/rl"
+        android:layout_centerInParent="true"
+        app:srcCompat="@drawable/naqellogowhite"
+        tools:ignore="ContentDescription" />
+
+    <RelativeLayout
+        android:id="@+id/rl"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_centerInParent="true"
+
+        android:padding="20dp">
+
+        <LinearLayout
+            android:id="@+id/ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_margin="2dp"
+            android:weightSum="1">
+
+            <EditText
+                android:id="@+id/countrycode"
+                style="@style/NaqelPointer.ET"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="0.2"
+                android:digits="0123456789"
+                android:hint="Code"
+                android:inputType="phone"
+                android:maxLength="3"
+                android:text=""
+                android:textColor="@color/NaqelBlue" />
+
+            <EditText
+                android:id="@+id/txtPhoneNo"
+                style="@style/NaqelPointer.ET"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="16dp"
+                android:layout_weight="0.8"
+                android:digits="0123456789"
+                android:ems="10"
+                android:hint="Phone No"
+                android:inputType="phone"
+                android:text=""
+                android:textColor="@color/NaqelBlue"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/otpno"
+            style="@style/NaqelPointer.EditText"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/ll"
+            android:layout_margin="2dp"
+            android:hint="Otp No"
+            android:inputType="phone"
+            android:text=""
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/btnLogin"
+            style="@style/NaqelPointer.BlueButton"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_below="@id/otpno"
+            android:layout_margin="10dp"
+
+            android:background="@drawable/roundshape"
+            android:maxLength="10"
+
+            android:text="Validate" />
+
+    </RelativeLayout>
+</RelativeLayout>

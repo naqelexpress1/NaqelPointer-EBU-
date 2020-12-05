@@ -236,6 +236,14 @@ public class DeliveryThirdFragment extends Fragment {
     }
 
     private void AddNewPiece() {
+
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
             if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
 

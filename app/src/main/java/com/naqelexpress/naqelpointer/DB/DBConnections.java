@@ -457,6 +457,7 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnlineValidation\" " +
                 "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                " \"WaybillNo\" TEXT NOT NULL ," +
                 " \"Barcode\" INTEGER NOT NULL ," +
                 " \"WaybillDestID\" INTEGER NOT NULL," +
                 "\"IsMultiPiece\" INTEGER NOT NULL , " +
@@ -6198,6 +6199,8 @@ public class DBConnections
         return result != -1;
     }
 
+
+
     public void insertBinMasterBulk(JSONArray binMasterList, Context context) {
         try {
             String sql = "insert into BINMaster (ID,BINNumber) values (?, ?);";
@@ -6226,91 +6229,18 @@ public class DBConnections
         }
     }
 
-
-
-//    public boolean insertOnLineValidation_Test( int processType ,Context context) {
-//        boolean hasError = false;
-//
-//        try {
-//            String sql = "insert into OnlineValidation (Barcode,DestID," +
-//                    "IsMultiPieces , IsRTORequest , IsDeliveryRequest, IsStopped , " +
-//                    "NoOfAttempts , IsRelabel ) " +
-//                    "values ( ?, ? , ? , ? , ? , ? , ? , ? );";
-//            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-//            db.beginTransaction();
-//            SQLiteStatement stmt = db.compileStatement(sql);
-//
-//
-//            if (!isOnlineValidationFileEmpty(db , context))
-//                db.execSQL("delete from OnlineValidation");
-//
-//            try {
-//                ContentValues contentValues = new ContentValues();
-//                contentValues.put("BarCode" , "4011452500001");
-//                contentValues.put("DestID" , 502);
-//                contentValues.put("IsMultiPieces" , 1);
-//                contentValues.put("IsRTORequest" , 1);
-//                contentValues.put("IsStopped" , 1);
-//                contentValues.put("IsDeliveryRequest" , 1);
-//                contentValues.put("NoOfAttempts" , 1);
-//                contentValues.put("IsRelabel" , 0);
-//                db.insert("OnlineValidation", null, contentValues);
-//
-//                ContentValues contentValues2 = new ContentValues();
-//                contentValues2.put("BarCode" , "4000020299290");
-//                contentValues2.put("DestID" , 502);
-//                contentValues2.put("IsMultiPieces" , 1);
-//                contentValues2.put("IsRTORequest" , 0);
-//                contentValues2.put("IsStopped" , 1);
-//                contentValues2.put("IsDeliveryRequest" , 0);
-//                contentValues2.put("NoOfAttempts" , 0);
-//                contentValues2.put("IsRelabel" , 0);
-//                db.insert("OnlineValidation", null, contentValues2);
-//
-//
-//                ContentValues contentValues3 = new ContentValues();
-//                contentValues3.put("BarCode" , "4011452600002");
-//                contentValues3.put("DestID" , 501);
-//                contentValues3.put("IsMultiPieces" , 0);
-//                contentValues3.put("IsRTORequest" , 0);
-//                contentValues3.put("IsStopped" , 1);
-//                contentValues3.put("IsDeliveryRequest" , 0);
-//                contentValues3.put("NoOfAttempts" , 0);
-//                contentValues3.put("IsRelabel" , 0);
-//                db.insert("OnlineValidation", null, contentValues3);
-//            } catch (Exception e) {
-//                Log.d("test" , "inserting for test" + e.toString());
-//            }
-//
-//            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
-//
-//            if (!isFileDetailsInserted) {
-//                Log.d("test" , "file details not inserted");
-//                return false;
-//            }
-//
-//            if (!hasError) {
-//                db.setTransactionSuccessful();
-//                db.endTransaction();
-//            }
-//            db.close();
-//        } catch (Exception ex) {
-//            hasError = true;
-//            Log.d("test" , "insert online validation2 " + ex.toString());
-//        }
-//        return !hasError;
-//    }
-
+    /********* Online Validation *********/
 
     public boolean insertOnLineValidation(JSONArray onLineValidation, int processType ,Context context) {
         boolean hasError = false;
 
         try {
 
-            String sql = "insert into OnlineValidation (Barcode," +
+            String sql = "insert into OnlineValidation (WaybillNo, Barcode ," +
                     "WaybillDestID , IsMultiPiece, IsStopped , " +
                     "IsDeliveryRequest , IsRTORequest, NoOfAttempts , IsRelabel) " +
                     "values ( ?, ? , ? , ? , ? , ? , ? , ? );";
+
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             db.beginTransaction();
             SQLiteStatement stmt = db.compileStatement(sql);
@@ -6324,14 +6254,15 @@ public class DBConnections
                 try {
                     JSONObject jsonObject = onLineValidation.getJSONObject(i);
 
-                    stmt.bindString(1, jsonObject.getString("Barcode"));
-                    stmt.bindString(2, jsonObject.getString("WaybillDestID"));
-                    stmt.bindString(3, jsonObject.getString("IsMultiPiece"));
-                    stmt.bindString(4, jsonObject.getString("IsStopped"));
-                    stmt.bindString(5, jsonObject.getString("IsDeliveryRequest"));
-                    stmt.bindString(6, jsonObject.getString("IsRTORequest"));
-                    stmt.bindString(7, jsonObject.getString("NoOfAttempts"));
-                    stmt.bindString(8, "0");
+                    stmt.bindString(1, jsonObject.getString("WaybillNo"));
+                    stmt.bindString(2, jsonObject.getString("Barcode"));
+                    stmt.bindString(3, jsonObject.getString("WaybillDestID"));
+                    stmt.bindString(4, jsonObject.getString("IsMultiPiece"));
+                    stmt.bindString(5, jsonObject.getString("IsStopped"));
+                    stmt.bindString(6, jsonObject.getString("IsDeliveryRequest"));
+                    stmt.bindString(7, jsonObject.getString("IsRTORequest"));
+                    stmt.bindString(8, jsonObject.getString("NoOfAttempts"));
+                    stmt.bindString(9, "0");
 
                  /*
                     // Common columns
@@ -6440,7 +6371,6 @@ public class DBConnections
         }
         return onLineValidation;
     }
-
 
     public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
         long result = 0;
@@ -6617,6 +6547,23 @@ public class DBConnections
             Log.d("test" , "getOnlineValidationProcess " + e.toString());
         }
         return process;
+    }
+
+    public boolean updateWaybillDestID (Context context , String waybillNo , int newDestID) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("WaybillDestID", newDestID);
+
+        try {
+            String args[] = {waybillNo};
+            db.update("OnlineValidation", contentValues, "WaybillNo=?", args);
+        } catch (Exception e) {
+            db.close();
+            return false;
+        }
+        db.close();
+        return true;
     }
 
 

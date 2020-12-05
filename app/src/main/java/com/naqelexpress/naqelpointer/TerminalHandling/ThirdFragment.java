@@ -858,10 +858,7 @@ public class ThirdFragment extends Fragment {
                         // To avoid leaked window
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
-                            if (pieceDetails.getIsWrongDest() == 0)  // Arrival scan shouldn't be captured if it's wrong dest
                                 AddNewPiece();
-                            else
-                                txtBarCode.getText().clear();
                         }
                     }
                 });

@@ -63,6 +63,9 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
 
         setContentView(R.layout.deliverysheet);
 
+
+
+
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
         if (division.equals("Courier")) {
             if (!isValidOnlineValidationFile()) {

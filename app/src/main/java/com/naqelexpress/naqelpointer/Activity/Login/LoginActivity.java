@@ -84,6 +84,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText truck, odometer;
     ArrayList<FindVehilceObject> vehicles;
     int truckID = 0;
+    String division;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,10 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.loginebu);
         else
             setContentView(R.layout.login);
+
+
+        division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
 
 
         // boolean asd = GlobalVar.GV().IsAllowtoScan("Upto : 2019-12-11 16.30".replace("Upto : ", ""));
@@ -496,7 +501,7 @@ public class LoginActivity extends AppCompatActivity {
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
 
-                    if (!dbConnections.isFacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID) && GetDivision()) {
+                    if (!dbConnections.isFacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID) && !division.equals("Express")) {
                         Intent intent = new Intent(getApplicationContext(), FacilityLogin.class);
                         intent.putExtra("usertype", usertype);
                         intent.putExtra("getMaster", getMaster);
@@ -857,7 +862,6 @@ public class LoginActivity extends AppCompatActivity {
         getUserMEDataRequest.EmployID = EmployID;
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
-        getUserMEDataRequest.IsLastLoggingOutError = dbConnections.UpdateLoginStatusErrorCount(EmployID , getApplicationContext()) > 0 ? true : false;
 
 
         if (GlobalVar.GV().LoginVariation)
@@ -898,7 +902,7 @@ public class LoginActivity extends AppCompatActivity {
             progressDialog = ProgressDialog.show(LoginActivity.this, "Please wait.",
                     "Bringing User Details.", true);
 
-            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
+            DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 
         }
 
@@ -913,12 +917,8 @@ public class LoginActivity extends AppCompatActivity {
             try {
 
                 String function = "GetUserMEData"; //CBU division BringDeliverySheetbyOFDPiece
-//                String function = "BringMyRouteShipments";
                 if (!GetDivision())
                     function = "GetUserMEData"; //EBU Divison
-
-                //  if (GlobalVar.GV().isFortesting)
-                //       function = "BringDeliverySheetbyOFDPiece_ExcludeRoute";
 
                 URL url = new URL(DomainURL + function);
                 httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -981,11 +981,7 @@ public class LoginActivity extends AppCompatActivity {
                 GetUserMEDataResult getUserMEDataResult = new GetUserMEDataResult(finalJson);
 
                 if (getUserMEDataResult.HasError) {
-                    if (getUserMEDataResult.PwdNeedUpdate) {
-                        updatePasswordDialog(getUserMEDataResult.ErrorMessage);
-                    } else {
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Data Not Sync Because :" + getUserMEDataResult.ErrorMessage, GlobalVar.AlertType.Error);
-                    }
                 } else {
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
@@ -1260,14 +1256,10 @@ public class LoginActivity extends AppCompatActivity {
                         try {
 
                             JSONArray binMasterList = jsonObject.getJSONArray("BinMastersList");
-
                             if (binMasterList.length() > 0)
                                 dbConnections.insertBinMasterBulk(binMasterList, getApplicationContext());
                         } catch (Exception ex) {
-                            Log.d("test" , "Insert Master Bin ex " + ex.toString());
                         }
-
-
 
                         updateUserDetails();
                         LoginIntoOpenMainPage();
@@ -1286,8 +1278,6 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
                     if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
                         GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
                     }
                     LoadDivisionError();
@@ -1315,15 +1305,6 @@ public class LoginActivity extends AppCompatActivity {
                                 14
                         );
 
-//                        new DownloadApk().execute("");
-
-//                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.naqelexpress.naqelpointer"));
-//                        startActivity(intent);
-//                        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//                        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-//                        UserMeLogin userMeLogin = new UserMeLogin(id);
-//                        dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-//                        finish();
                     }
                 }).setCancelable(false);//.setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -1453,9 +1434,6 @@ public class LoginActivity extends AppCompatActivity {
                     httpURLConnection.disconnect();
             }
             return null;
-//
-
-
         }
 
         @Override
@@ -1564,8 +1542,6 @@ public class LoginActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         if (fun == 0) {
                             JSONObject jsonObject = new JSONObject();
-                            //jsonObject.put("StationID", GlobalVar.GV().StationID);
-                            //jsonObject.put("Function", function);
                             new BringTruckData().execute(jsonObject.toString());
                         }
                         dialog.dismiss();
@@ -1580,26 +1556,5 @@ public class LoginActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void updatePasswordDialog(String message) {
-        try {
-            AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
-            builder.setTitle("Info")
-                    .setMessage(message)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int which) {
-                            Intent i = new Intent(LoginActivity.this , UpdatePasswordActivity.class);
-                            i.putExtra("emp_id" , Integer.parseInt(txtEmployID.getText().toString()));
-                            startActivity(i);
-                            Log.d("Login" , "Start");
-
-                        }
-                    }).setCancelable(false);
-            AlertDialog alertDialog = builder.create();
-            alertDialog.show();
-        } catch (Exception e) {
-            Log.d("Login" , "Login activity" + e.toString());
-        }
-    }
 
 }

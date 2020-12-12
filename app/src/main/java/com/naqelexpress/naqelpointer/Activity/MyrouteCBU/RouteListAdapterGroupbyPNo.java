@@ -82,10 +82,7 @@ public class RouteListAdapterGroupbyPNo
             Integer typeID = itemListFiltered.get(position).TypeID;
             DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
             String dateString = fmt.print(itemListFiltered.get(position).ExpectedTime);
-//            holder.txtExpectedTime.setText(dateString);
             holder.txtExpectedTime.setText(item.ExistUser);
-            //if (position %4 == 0)
-            //holder.panel.setBackgroundColor(Color.RED);
 
 
             if (itemListFiltered.get(position).HasComplaint) {
@@ -93,27 +90,20 @@ public class RouteListAdapterGroupbyPNo
                 holder.imgHasComplaint.setImageResource(R.drawable.redstar);
                 holder.imgHasComplaint.refreshDrawableState();
 
-//                HasComplaint updatemessages = new HasComplaint(holder.cl);
-//                StartAsyncTaskInParallelHasComplaint(updatemessages, "1");
 
             } else {
                 holder.imgHasComplaint.setVisibility(View.GONE);
-//                HasComplaint updatemessages = new HasComplaint(holder.cl);
-//                StartAsyncTaskInParallelHasComplaint(updatemessages, "0");
+
             }
-            //holder.header.setText(item.PODDetail);
 
             if (itemListFiltered.get(position).HasDeliveryRequest) {
-//                ImageDownloaderTask updatemessages = new ImageDownloaderTask(holder.cl);
-//                StartAsyncTaskInParallel(updatemessages, "1");
                 holder.cl.setBackgroundColor(Color.BLUE);
                 holder.imgHasDeliveryRequest.setVisibility(View.VISIBLE);
                 holder.imgHasDeliveryRequest.setImageResource(R.drawable.request);
                 holder.imgHasComplaint.refreshDrawableState();
             } else {
                 holder.imgHasDeliveryRequest.setVisibility(View.GONE);
-//                ImageDownloaderTask updatemessages = new ImageDownloaderTask(holder.cl);
-//                StartAsyncTaskInParallel(updatemessages, "0");
+
             }
 
             if (!itemListFiltered.get(position).BGColor.equals("0")) {

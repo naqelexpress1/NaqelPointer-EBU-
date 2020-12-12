@@ -45,6 +45,8 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
     private int processType;
     int  count = 0;
 
+    private final static String TAG = "OnlineValidationAsyncTask";
+
     public OnlineValidationAsyncTask(Context context, Activity activity,AsyncTaskCompleteListener<String> callback) {
         this.context = context;
         this.activity = activity;
@@ -56,10 +58,9 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
       try {
 
          progressDialog = ProgressDialog.show(activity, "Loading", "Upload online validation file , Please wait...", true);
-          new CountDownTimer(300000, 30000) { // counter time is 5 min , update text every
+          new CountDownTimer(300000, 30000) { // counter time is 5 min , update text every min
 
               public void onTick(long millisUntilFinished) {
-                  //here you can have your logic to set message
                   count++;
                   if (count == 1){
                       progressDialog.setMessage("Uploading online validation file , Please wait...");
@@ -80,17 +81,16 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
           }.start();
 
-          DomainURL = "http://35.188.10.142:8087/api/pointer/";
+          DomainURL = GlobalVar.NaqelAPIUAT;
 
           super.onPreExecute();
       } catch (Exception e) {
-          Log.d("test" , "On pre exception " + e.toString());
+          Log.d("test" , TAG + "" + e.toString());
       }
     }
 
     @Override
     protected String doInBackground(String... strings) {
-
         HttpURLConnection httpURLConnection = null;
         InputStream ist = null;
 
@@ -99,11 +99,15 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             processType = Integer.parseInt(strings[0]);
             URL url = null;
 
+            url = new URL(DomainURL);
+
+
+
             if (processType == GlobalVar.NclAndArrival)
                 url = new URL(DomainURL + "GetOnlineValidationData");
 
             if (processType == GlobalVar.DsAndInventory)
-                url = new URL(DomainURL + "GetOnlineValidationData");
+                url = new URL(DomainURL + "GetOnlineValidationData_v2");
 
             if (processType == GlobalVar.DsValidation)
                 url = new URL(DomainURL + "GetOnlineValidationData");
@@ -128,7 +132,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
             }
             return String.valueOf(buffer);
         } catch (Exception ignored) {
-            Log.d("test" , ignored.toString());
+            Log.d("test" , TAG + "" + ignored.toString());
             hasError = true;
             errorMessage = ignored.toString();
         } finally {
@@ -136,7 +140,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 if (ist != null)
                     ist.close();
             } catch (IOException e) {
-                Log.d("test" , e.toString());
+                Log.d("test" , TAG + "" + e.toString());
                 hasError = true;
                 errorMessage = e.toString();
                 e.printStackTrace();
@@ -150,6 +154,7 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        Log.d("test" , "on post");
 
         try {
             super.onPostExecute("");
@@ -180,21 +185,18 @@ public class OnlineValidationAsyncTask extends AsyncTask<String, Void, String> {
                 } catch (JSONException e) {
                     hasError = true;
                     errorMessage =  e.toString();
-                    Log.d("test" , "AsyncTask " + e.toString());
+                    Log.d("test" , TAG + "" + e.toString());
                     e.printStackTrace();
                 }
             } else {
                 hasError = true;
                 errorMessage =  "Something went wrong , Please try again.";
-                Log.d("test" , "Post result is null");
             }
             callback.onTaskComplete(hasError,errorMessage);
         } catch (Exception e ) {
-            Log.d("test" , "Post");
+            Log.d("test" , TAG + "" + e.toString());
         }
         progressDialog.dismiss();
         count = 0;
     }
-
-
 }

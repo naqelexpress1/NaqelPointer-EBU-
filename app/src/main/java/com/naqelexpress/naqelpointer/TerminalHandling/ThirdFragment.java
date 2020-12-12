@@ -121,7 +121,7 @@ public class ThirdFragment extends Fragment {
                                 return;
                             }
                             if (IsValid()) {
-
+                                String barcode = txtBarCode.getText().toString();
                                 if (division.equals("Courier")) {
                                    if (isValidPieceBarcode(barcode)) {
                                         AddNewPiece();
@@ -131,7 +131,6 @@ public class ThirdFragment extends Fragment {
                                 } else {
                                     AddNewPiece();
                                 }
-
 
                             } else {
                                 requestfocus();

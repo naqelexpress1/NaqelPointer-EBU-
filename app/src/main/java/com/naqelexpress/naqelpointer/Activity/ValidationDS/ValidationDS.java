@@ -25,10 +25,13 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 import com.naqelexpress.naqelpointer.TerminalHandling.TerminalHandling;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
@@ -52,7 +55,7 @@ import java.util.List;
  * Created by Hasna on 11/11/18.
  */
 
-public class ValidationDS extends AppCompatActivity implements AsyncTaskCompleteListener {
+public class ValidationDS extends AppCompatActivity implements IAPICallListener {
 
     ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
@@ -83,11 +86,12 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
         // Get shipment info for Courier || TH
         if (division.equals("Courier")) {
             if (!isValidOnlineValidationFile()) {
-                Log.d("test" , "File is NOT valid");
-                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));
-            } else {
-                Log.d("test" , "File is valid");
+
+                APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
+                apiCall.getOnlineValidationData(GlobalVar.DsValidation);
+
+               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
             }
         }
 
@@ -285,12 +289,22 @@ public class ValidationDS extends AppCompatActivity implements AsyncTaskComplete
         }
     }
 
-    @Override
+   /* @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
         if (hasError)
             ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Server Issue" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
     }
 
     private void ErrorAlert(final String title, String message) {

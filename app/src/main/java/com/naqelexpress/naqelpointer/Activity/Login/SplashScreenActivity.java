@@ -13,18 +13,14 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.BuildConfig;
-import com.naqelexpress.naqelpointer.Chat.ProgressDialog;
-import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.UpdateLoginStatusRequest;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.service.LocationService;
@@ -34,20 +30,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-//import com.google.firebase.BuildConfig;
-//import com.google.firebase.database.DatabaseReference;
-//import com.google.firebase.database.FirebaseDatabase;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class SplashScreenActivity
         extends AppCompatActivity {
@@ -66,180 +50,50 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
-        //Write a message to the database
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//
-//        final DatabaseReference myRef = database.getReference("LiveTracking");
-//
-//        final CourierDetailsFirebase user = new CourierDetailsFirebase("19127", "24.428261,39.606400");
-//
-//
-//        myRef.orderByChild("EmpID").equalTo("19127").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() == null) {
-//                    String userid = myRef.push().getKey();
-//                    myRef.child(userid).setValue(user);
-//                    return;
-//                }
-//                CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
-//                if (fetchuser.EmpID != null)
-//                    fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
-//
-//                if (fetchuser.ID != null) {
-//                    myRef.child(fetchuser.ID).child("LatLng").setValue("24.428261,39.606400");
-//                } else {
-//                    String userid = myRef.push().getKey();
-//                    myRef.child(userid).setValue(user);
-//                }
-//                //  Log.d("User", "");
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d("User", "");
-//            }
-//
-//
-//        });
-
-
-//        Query queryRef = myRef
-//                .orderByChild("EmpID")
-//                .equalTo("19128");
-//
-//        queryRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-//                //TODO auto generated
-//                System.out.println(s);
-//            }
-//
-//            @Override
-//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-//                //TODO auto generated;
-//                System.out.println(s);
-//            }
-//
-//            @Override
-//            public void onChildRemoved(DataSnapshot dataSnapshot) {
-//                //TODO auto generated;
-//                System.out.println(dataSnapshot);
-//            }
-//
-//            @Override
-//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-//                //TODO auto generated
-//                System.out.println(s);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                //TODO auto generated
-//                System.out.println(databaseError);
-//            }
-//        });
-
-
-        //getCallLog();
-
-        //DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
-        // dbConnections1.deleteDeliveryDeliveyDetails(getApplicationContext());
-//        dbConnections1.DeleteAllSuggestLocation(getApplicationContext());
-//        dbConnections1.close();
-
-//        startService(
-//                new Intent(this,
-//                        com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
-        // sendNotification("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff");
-        // sendNotification("et7zm9gyRaWEszgjT_zwGp:APA91bFgieA2s2HPcqbBt5By_2TmvVx34tB80adMkXtbXytL19Cjsp3jLYAbeIrxgZHRqGyjlG_GMBwQN0sEGGRrcCZd5S4mSrvH7aPN5Vm7nNNHcs-KIAMI3XOf_hwWGXJ68O213siQ");
-//        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-//        fm.send(new RemoteMessage.Builder("cty3khWlR8Kka_O6UpyIyy:APA91bEDE7g-xvSSEW4OOh0E_dhG2pKRnrOYP7nVKwvD79wE6eMFCLl79j_Vh58mfMC8P_Zqfw_8pSecMDveB8AZWocFsvgt5lxlFuLTD_pGYQ4_g5cy_M4djaHmsk32rTwwuWAkT3ff" + "@fcm.googleapis.com")
-//
-//                .setMessageId(Integer.toString(123))
-//
-//                .addData("waybillno", "123456789")
-//                .addData("EmpID","19127")
-//                .addData("Lat","23.4582")
-//                .addData("Lng","45.155")
-//                .build());
-
-        //  String time = GlobalVar.GV().getCurrentDateTime();
-//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
-//        dbConnections1.DeleteAllSuggestLocation(getApplicationContext());
-//        dbConnections1.DeleteAllPlannedLocation(getApplicationContext());
-//        dbConnections1.close();
-//
-
-//        DBConnections db = new DBConnections(getApplicationContext(), null);
-//        db.deleteAllLocation(getApplicationContext());
-//        db.close();
-
-
-//        startService(
-//                new Intent(SplashScreenActivity.this,
-//                        com.naqelexpress.naqelpointer.service.DeviceActivity.class));
-
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
 
-             try {
-                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                 dbConnections.InsertDomain_ForDelService(getApplicationContext());
-                 dbConnections.InsertDomain_ForNotDeliveredService(getApplicationContext());
-                 dbConnections.InsertDomain_ForDelSheetService(getApplicationContext());
-                 dbConnections.InsertDomain(getApplicationContext());
-                 dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
-                 dbConnections.DeleteExsistingLogin(getApplicationContext());
-                 dbConnections.DeleteAllSyncData(getApplicationContext());
-                 //dbConnections.DeleteSuggestLocation(getApplicationContext());
-                 dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
-                 dbConnections.InsertDomain_ForArrivedatDest(getApplicationContext());
-                 dbConnections.InsertDomain_ForAtorigin(getApplicationContext());
-                 dbConnections.InsertDomain_ForPickup(getApplicationContext());
-
-                 dbConnections.close();
-
-                 if (dbConnections.UpdateLoginStatusCount(getApplicationContext()) >= 1){
-                     Log.d("test" , "IF");
-                     GlobalVar.GV().autoLogout = true;
-                     int employID = dbConnections.getUpdateLoginStatus(getApplicationContext());
-                     dbConnections.DeleteUpdateLoginStatus(getApplicationContext());
-                     new UpdateLoginStatus().execute(String.valueOf(employID));
-                 } else {
-                     GlobalVar.GV().autoLogout = false;
-                 }
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.InsertDomain_ForDelService(getApplicationContext());
+            dbConnections.InsertDomain_ForNotDeliveredService(getApplicationContext());
+            dbConnections.InsertDomain_ForDelSheetService(getApplicationContext());
+            dbConnections.InsertDomain(getApplicationContext());
+            dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
+            dbConnections.DeleteExsistingLogin(getApplicationContext());
+            dbConnections.DeleteAllSyncData(getApplicationContext());
+            dbConnections.InsertDomain_ForDelSheetServicebyNCL(getApplicationContext());
+            dbConnections.InsertDomain_ForArrivedatDest(getApplicationContext());
+            dbConnections.InsertDomain_ForAtorigin(getApplicationContext());
+            dbConnections.InsertDomain_ForPickup(getApplicationContext());
+            dbConnections.close();
 
 
-                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                 ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
 
 
-                 if (GlobalVar.GV().IsEnglish())
-                     imageView.setImageResource(R.drawable.naqellogowhite);
-                 else
-                     imageView.setImageResource(R.drawable.naqellogowhitear);
+            if (GlobalVar.GV().IsEnglish())
+                imageView.setImageResource(R.drawable.naqellogowhite);
+            else
+                imageView.setImageResource(R.drawable.naqellogowhitear);
 
 
-                 Thread myThread = new Thread() {
-                     @Override
-                     public void run() {
-                         try {
-                             sleep(2000);
+            Thread myThread = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        sleep(2000);
 
-                             loginPage();
+                        loginPage();
 
-                         } catch (InterruptedException e) {
-                             e.printStackTrace();
-                         }
-                     }
-                 };
-                 myThread.start();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            myThread.start();
 
-                 if (savedInstanceState != null)
-                     setSavedInstance(savedInstanceState);
-             } catch (Exception e) {
-                 Log.d("test" , "Splash " + e.toString());
-             }
+            if (savedInstanceState != null)
+                setSavedInstance(savedInstanceState);
 
         } else
 
@@ -263,8 +117,6 @@ public class SplashScreenActivity
                         6
                 );
 
-                //OpenLoginPage();
-
                 return;
             }
 
@@ -282,8 +134,6 @@ public class SplashScreenActivity
                         new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG},
                         6
                 );
-
-//                OpenLoginPage();
 
             } else if (result.getCount() == 1) {
                 result.moveToFirst();
@@ -334,15 +184,12 @@ public class SplashScreenActivity
 
 
                         } else
-//                                OpenLoginPage();
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
                                     new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG},
                                     6
                             );
-//                        }
                     } else
-//                        OpenLoginPage();
                         ActivityCompat.requestPermissions(
                                 SplashScreenActivity.this,
                                 new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG},
@@ -353,7 +200,6 @@ public class SplashScreenActivity
                 }
                 result.close();
             } else
-//                OpenLoginPage();
                 ActivityCompat.requestPermissions(
                         SplashScreenActivity.this,
                         new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG},
@@ -361,7 +207,6 @@ public class SplashScreenActivity
                 );
             dbConnections.close();
         } else
-//            OpenLoginPage();
             ActivityCompat.requestPermissions(
                     SplashScreenActivity.this,
                     new String[]{Manifest.permission.CALL_PHONE, Manifest.permission.READ_CALL_LOG},
@@ -785,13 +630,10 @@ public class SplashScreenActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     if (redirctcalss == 0) {
-                        if (GlobalVar.GV().autoLogout) {
-                            new UpdateLoginStatus().execute();
-                        } else {
-                            Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                            intent.putExtra("getMaster", 0);
-                            startActivity(intent);
-                        }
+
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        intent.putExtra("getMaster", 0);
+                        startActivity(intent);
                     } else if (redirctcalss == 1) {
 
                         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
@@ -810,7 +652,6 @@ public class SplashScreenActivity
                         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                         intent.putExtra("getMaster", 0);
                         startActivity(intent);
-                       // new UpdateLoginStatus().execute();
                     }
                     finish();
 
@@ -908,103 +749,6 @@ public class SplashScreenActivity
             }
         }.execute();
 
-    }
-
-    private class UpdateLoginStatus extends AsyncTask<String, Integer, String> {
-        StringBuffer buffer;
-        private ProgressDialog progressDialog;
-        String DomainURL = "";
-        String isInternetAvailable = "";
-        UpdateLoginStatusRequest updateLoginStatusRequest = new UpdateLoginStatusRequest();
-
-        @Override
-        protected void onPreExecute() {
-
-            //Todo Riyam update url
-            DomainURL = GlobalVar.getTestAPIURL(getApplicationContext());
-            super.onPreExecute();
-
-        }
-
-        @SuppressWarnings("deprecation")
-        protected String doInBackground(String... params) {
-            updateLoginStatusRequest.IsLogin = false;
-            updateLoginStatusRequest.EmployID = Integer.parseInt(params[0]);
-
-            String jsonData = JsonSerializerDeserializer.serialize(updateLoginStatusRequest, true);
-
-            HttpURLConnection httpURLConnection = null;
-            OutputStream dos = null;
-            InputStream ist = null;
-
-            try {
-
-                URL url = new URL(DomainURL + "UpdateLoginStatus");
-
-                httpURLConnection = (HttpURLConnection) url.openConnection();
-                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
-                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_Contimeout);
-                httpURLConnection.setRequestMethod("POST");
-                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                httpURLConnection.setDoInput(true);
-                httpURLConnection.setDoOutput(true);
-                httpURLConnection.connect();
-
-                dos = httpURLConnection.getOutputStream();
-                httpURLConnection.getOutputStream();
-                dos.write(jsonData.getBytes());
-
-                ist = httpURLConnection.getInputStream();
-                String line;
-                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
-                buffer = new StringBuffer();
-
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line);
-                }
-                return String.valueOf(buffer);
-            } catch (Exception ignored) {
-                isInternetAvailable = ignored.toString();
-            } finally {
-                try {
-                    if (ist != null)
-                        ist.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    if (dos != null)
-                        dos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                if (httpURLConnection != null)
-                    httpURLConnection.disconnect();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute("");
-            DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
-            if (result != null) {
-
-                try {
-                    JSONObject jsonObject = new JSONObject(result);
-                    if (!jsonObject.getBoolean("HasError")) {
-                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                        intent.putExtra("getMaster", 0);
-                        startActivity(intent);
-                    } else {
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                dbConnections.InsertUpdateLoginStatusError(updateLoginStatusRequest.EmployID , getApplicationContext());
-            }
-        }
     }
 
 

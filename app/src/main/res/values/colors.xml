@@ -13,6 +13,7 @@
     <color name="bg_color">#f2f3f4</color>
     <color name="txt_color">#313131</color>
     <color name="hint_txt_color">#adadad</color>
+    <color name="graylight">#e2e2e2</color>
     <color name="colorAccent_2">#198d58</color>
 
 </resources>

@@ -115,9 +115,54 @@
 
             </LinearLayout>
 
-            <!--CITC Shipment Complain -->
+
+            <!--Shipment With No Bayam NO -->
             <LinearLayout
-                android:id="@+id/ll_citc_complain"
+                android:id="@+id/ll_no_bayan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_margin="16.7dp">
+
+                    <TextView
+                        android:id="@+id/tv_no_bayan_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_no_bayan_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+
+            <!--CITC Shipment Complaint -->
+            <LinearLayout
+                android:id="@+id/ll_citc_complaint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
@@ -156,8 +201,6 @@
                     android:background="@color/bg_color" />
 
             </LinearLayout>
-
-
 
             <!--NCL Wrong Dest -->
             <LinearLayout

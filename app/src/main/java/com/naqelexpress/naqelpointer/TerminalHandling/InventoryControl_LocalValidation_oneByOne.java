@@ -49,10 +49,13 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -74,7 +77,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener , AsyncTaskCompleteListener {
+public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener , IAPICallListener {
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
@@ -113,10 +116,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         if (division.equals("Courier")) {
             if (!isValidOnlineValidationFile()) {
-                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
-            } else {
-                Log.d("test" , "Inventory valid file");
+
+                APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
             }
         }
 
@@ -610,7 +614,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         if (iscitcshipments.contains(txtBarCode.getText().toString()) && !ismatch) {
 
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                onLineValidation.setIsCITCComplain(1);
+                onLineValidation.setIsCITCComplaint(1);
                 ismatch = true;
                 isHeldout.add(txtBarCode.getText().toString());
                 HashMap<String, String> temp = new HashMap<>();
@@ -1007,6 +1011,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         switch (v.getId()) {
         }
     }
+
 
 
     // Insert delvery Req in DeliverReq table  & Rto req in RtoReq table
@@ -1803,8 +1808,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     tvDeliveryRequestBody.setText("Delivery Request.");
                 }
 
-                if (pieceDetails.getIsCITCComplain() == 1) {
-                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complain);
+                if (pieceDetails.getIsCITCComplaint() == 1) {
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complaint);
                     llDeliveryReq.setVisibility(View.VISIBLE);
 
                     TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_citc_header);
@@ -1864,13 +1869,22 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         return null;
     }
 
-    @Override
+  /*  @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
         if (hasError)
             ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
+
 
 
 

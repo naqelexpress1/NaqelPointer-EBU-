@@ -45,9 +45,6 @@ public class VerifyMobileNo extends AppCompatActivity {
 
         try {
 
-//            Bundle bundle = getIntent().getExtras();
-//            int usertype = bundle.getInt("usertype"); //getIntent().getIntExtra("usertype", 0);
-
             GlobalVar.GV().ResetTriedCount();
 
             countrycode = (EditText) findViewById(R.id.countrycode);

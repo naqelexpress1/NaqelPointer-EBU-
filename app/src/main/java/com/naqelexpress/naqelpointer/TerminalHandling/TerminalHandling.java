@@ -36,6 +36,8 @@ import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -56,7 +58,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class TerminalHandling extends AppCompatActivity implements AsyncTaskCompleteListener {
+public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
     FirstFragment firstFragment;
     ThirdFragment thirdFragment;
@@ -80,6 +82,8 @@ public class TerminalHandling extends AppCompatActivity implements AsyncTaskComp
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
+         Log.d("test" , "In arrival");
+
 
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
@@ -88,11 +92,11 @@ public class TerminalHandling extends AppCompatActivity implements AsyncTaskComp
 
         if (division.equals("Courier")) {
          if (!isValidOnlineValidationFile()) {
-             Log.d("test" , "File is NOT valid");
-             OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
-             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
-         } else {
-             Log.d("test" , "File is valid");
+
+             APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
+             apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+            /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
          }
      }
 
@@ -344,6 +348,8 @@ public class TerminalHandling extends AppCompatActivity implements AsyncTaskComp
 
         return isValid;
     }
+
+
 
 
 
@@ -983,8 +989,18 @@ public class TerminalHandling extends AppCompatActivity implements AsyncTaskComp
         return false;
     }
 
-    @Override
+  /*  @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
                 ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);

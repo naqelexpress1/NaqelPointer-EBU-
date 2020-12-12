@@ -61,6 +61,7 @@ import com.naqelexpress.naqelpointer.JSON.Results.CheckPendingCODResult;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
+import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -79,8 +80,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -90,7 +95,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "GTW - BI Resolved (29-11-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "GWT - NCL UAT (8-12-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -103,8 +108,8 @@ public class GlobalVar {
 
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -127,7 +132,11 @@ public class GlobalVar {
     public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
-    private static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
+    public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
+    public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
+    static IPointerAPI iPointerAPI;
+
+
 
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
@@ -1781,25 +1790,6 @@ public class GlobalVar {
 
     }
 
-    public boolean isValidBarcode(String Barcode) {
-        boolean isvalid = true;
-//        try {
-//            double barcode = Double.parseDouble(Barcode);
-//            if (Barcode.length() == 13) {
-//                String validChar = Barcode.substring(8, 12);
-//                if (!validChar.equals("0000"))
-//                    isvalid = false;
-//            } else
-//                isvalid = false;
-//
-//        } catch (Exception e) {
-//            isvalid = false;
-//        }
-
-        return isvalid;
-
-    }
-
 
     public static ArrayList<com.naqelexpress.naqelpointer.Activity.Booking.Booking> getPickupSyncData
             (Context context) {
@@ -3293,6 +3283,30 @@ public class GlobalVar {
 
     }
 
+    public static IPointerAPI getIPointerAPI(String url , int readTimeOut , int connectTimeOut) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getClient(readTimeOut , connectTimeOut ))
+                .build();
+
+        iPointerAPI = retrofit.create(IPointerAPI.class);
+        return iPointerAPI;
+    }
+
+    private static OkHttpClient getClient(int readTimeOut , int connectTimeOut) {
+
+
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(readTimeOut, TimeUnit.SECONDS)
+                .connectTimeout(connectTimeOut, TimeUnit.SECONDS)
+                 .build();
+
+        return okHttpClient;
+    }
+
+
     public static String getTestAPIURL (Context context) {
         return NaqelAPITest_V10;
     }
@@ -3575,5 +3589,47 @@ public class GlobalVar {
 
     public int isPermissionEnabled(String permissions, Activity activity) {
         return ContextCompat.checkSelfPermission(activity, permissions);
+    }
+
+
+    public static String ValidateMobileNo(String mobileno) {
+
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0 && !mobileno.equals("0")) {
+            if (mobileno.length() == 10) {
+                String validate = mobileno.substring(0, 1);
+                if (validate.equals("0"))
+                    mobileno = mobileno.replaceFirst("0", "+966");
+            } else {
+                if (mobileno.length() > 10) {
+                    if (mobileno.contains("00966"))
+                        mobileno = mobileno.replaceFirst("00966", "+966");
+                    else if (mobileno.contains("+966"))
+                        mobileno = mobileno.replaceFirst("\\+966", "+966");
+                    else if (mobileno.contains("966"))
+                        mobileno = mobileno.replaceFirst("966", "+966");
+
+                } else if (mobileno.length() == 9) {
+                    mobileno = "+966" + mobileno;
+                }
+            }
+
+        }
+
+        return mobileno;
+    }
+
+    public static String ValidateMobileNoOtherCountry(String mobileno, String CountryCode) {
+
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0 && !mobileno.equals("0")) {
+            if (mobileno.length() >= 9) {
+                String mno = mobileno.substring(mobileno.length() - 9, mobileno.length());
+
+                mobileno = "+" + CountryCode + mno;
+
+            }
+
+        }
+
+        return mobileno;
     }
 }

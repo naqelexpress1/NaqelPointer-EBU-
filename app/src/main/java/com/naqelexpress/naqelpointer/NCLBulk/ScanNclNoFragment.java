@@ -53,8 +53,11 @@ public class ScanNclNoFragment extends Fragment {
 
     public int OriginID = 0, DestinationID = 0 ,
                OriginFacilityID = 0 , DestinationFacilityID = 0;
+
     private ArrayList<String> facilityList = new ArrayList<>();
     private List<Integer> facilityIDList = new ArrayList<>();
+
+    private final static String TAG = "ScanNclNoFragment";
 
 
     @Override
@@ -63,7 +66,7 @@ public class ScanNclNoFragment extends Fragment {
         try {
             iNclShipmentActivity = (INclShipmentActivity) context;
         } catch (ClassCastException e) {
-            Log.d("test" , e.toString());
+            Log.d("test" , TAG + " " + e.toString());
         }
     }
 
@@ -85,7 +88,7 @@ public class ScanNclNoFragment extends Fragment {
 
             // Display logged in facility
             DBConnections dbConnections = new DBConnections(getContext() , null);
-            OriginFacilityID = dbConnections.getUserFacilityID(getContext());
+            OriginFacilityID = dbConnections.getUserFacilityID(getContext() , GlobalVar.GV().EmployID);
             FacilityStatus facilityStatus = dbConnections.getFacility(getContext() , OriginFacilityID);
             etOriginFacility = rootView.findViewById(R.id.et_Orgin_facility);
             etOriginFacility.setText(facilityStatus.Code + " : " + facilityStatus.Name.toUpperCase());
@@ -236,7 +239,7 @@ public class ScanNclNoFragment extends Fragment {
          dbConnections.close();
          txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
      } catch (Exception e) {
-         Log.d("test" , "Get stations " + e.toString());
+         Log.d("test" , TAG + " " + e.toString());
      }
     }
 
@@ -277,7 +280,7 @@ public class ScanNclNoFragment extends Fragment {
             dbConnections.close();
             txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
         } catch (Exception e) {
-            Log.d("test" , "get facility " + e.toString());
+            Log.d("test" , TAG + " " + e.toString());
         }
     }
 

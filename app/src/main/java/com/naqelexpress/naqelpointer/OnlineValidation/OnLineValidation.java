@@ -1,6 +1,9 @@
 package com.naqelexpress.naqelpointer.OnlineValidation;
 
-public class OnLineValidation {
+
+import com.naqelexpress.naqelpointer.JSON.Results.DefaultResult;
+
+public class OnLineValidation extends DefaultResult {
 
     private int ID;
     private String Barcode;
@@ -17,9 +20,11 @@ public class OnLineValidation {
     private int IsPiecesAvailable = 1;
     private int IsConflict;
     private int IsManifested = 1;
-    private int IsCITCComplain;
+    private int IsCITCComplaint;
     private int WaybillNo;
+    private int IsNoBayanNo;
     private boolean IsNotInFile;
+    private boolean IsDestChanged;
 
 
     public void setID(int ID) {
@@ -54,8 +59,12 @@ public class OnLineValidation {
         IsDeliveryRequest = isDeliveryRequest;
     }
 
-    public void setIsCITCComplain(int isCITCComplain) {
-        IsCITCComplain = isCITCComplain;
+    public void setIsCITCComplaint(int IsCITCComplaint) {
+        IsCITCComplaint = IsCITCComplaint;
+    }
+
+    public void setIsNoBayanNo(int isNoBayanNo) {
+        IsNoBayanNo = isNoBayanNo;
     }
 
     public void setWaybillNo(int waybillNo) {
@@ -88,6 +97,10 @@ public class OnLineValidation {
 
     public void setIsPiecesAvailable(int isPiecesAvailable) {
         IsPiecesAvailable = isPiecesAvailable;
+    }
+
+    public void setDestChanged(boolean destChanged) {
+        IsDestChanged = destChanged;
     }
 
     public void setIsConflict(int isConflict) {
@@ -158,8 +171,16 @@ public class OnLineValidation {
         return IsConflict;
     }
 
-    public int getIsCITCComplain() {
-        return IsCITCComplain;
+    public int getIsCITCComplaint() {
+        return IsCITCComplaint;
+    }
+
+    public int getIsNoBayanNo() {
+        return IsNoBayanNo;
+    }
+
+    public boolean isDestChanged() {
+        return IsDestChanged;
     }
 
     public boolean isNotInFile() {

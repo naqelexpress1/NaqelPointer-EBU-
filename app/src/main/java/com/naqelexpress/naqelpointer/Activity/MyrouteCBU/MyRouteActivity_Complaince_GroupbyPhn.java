@@ -90,17 +90,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Log.d("test" , "group by");
 
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Search");
 
-
-//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//        dbConnections.clearAllCourierDailyRoute(getApplicationContext());
-////        dbConnections.deleteMyRouteShipments(getApplicationContext());
-//        dbConnections.close();
 
         progressflag = 0;
         GlobalVar.GV().haslocation.clear();
@@ -121,8 +115,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         txtStartTrip = (TextView) findViewById(R.id.txtStartTrip);
         txtCloseTrip = (TextView) findViewById(R.id.txtCloseTrip);
 
-        //if (savedInstanceState == null)
-//        checkCourierDailyRouteID(false, 1);
 
         if (GlobalVar.GV().CourierDailyRouteID == 0) {
             btnStartTrip.setVisibility(View.VISIBLE);
@@ -168,28 +160,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             }
         });
 
-//        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                if (GlobalVar.GV().CourierDailyRouteID > 0) {
-//
-//                    position = GlobalVar.GV().kpi.get(position).Position;
-//                    if (GlobalVar.GV().kpi.get(position).TypeID == 1) {
-//                        Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-//                        Bundle bundle = new Bundle();
-//                        bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                        bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                        bundle.putInt("position", position);
-//                        intent.putExtras(bundle);
-//                        startActivity(intent);
-//                    } else {
-//                        Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-//                        startActivity(intent);
-//                    }
-//                } else
-//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
-//            }
-//        });
+
 
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
@@ -232,40 +203,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             }
         };
 
-        // set creator
-//        mapListview.setMenuCreator(creator);
-//        mapListview.setOnMenuItemClickListener(new SwipeMenuListView.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
-//                switch (index) {
-//                    case 0:
-//                        if (GlobalVar.GV().kpi.get(position).TypeID == 1) {
-//                            Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                            bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                            intent.putExtras(bundle);
-//                            startActivity(intent);
-//                        } else {
-//                            Intent intent = new Intent(getApplicationContext(), BookingPlanActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            bundle.putString("ID", String.valueOf(GlobalVar.GV().kpi.get(position).ID));
-//                            bundle.putString("WaybillNo", GlobalVar.GV().kpi.get(position).ItemNo);
-//                            intent.putExtras(bundle);
-//                            startActivity(intent);
-//                        }
-//                        break;
-//                    case 1:
-//                        MyRouteShipments item = GlobalVar.GV().kpi.get(position);
-//                        GlobalVar.GV().kpi.remove(item);
-//                        adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().kpi, "CourierKpi");
-//                        mapListview.setAdapter(adapter);
-//                        break;
-//                }
-//                // false : close the menu; true : not close the menu
-//                return false;
-//            }
-//        });
 
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
@@ -757,6 +694,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
@@ -806,6 +744,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             }
         } else if (requestCode == 1 && resultCode == RESULT_OK) { //Refresh Data
             Bundle extras = data.getExtras();
+
             if (extras != null) {
                 if (extras.containsKey("result")) {
                     String result = extras.getString("result");
@@ -813,10 +752,13 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                         GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
                                 , getWindow().getDecorView().getRootView());
 
+
+
                         adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
                                 "CourierKpi", this);
                         mapListview.setAdapter(adapter);
 
+                        adapter.notifyDataSetChanged();
                         hideenableListview();
                         GetPlannedLocation();
                     }
@@ -1883,14 +1825,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
     SweetAlertDialog pDialog;
 
-    private void SweetAlertLoading() {
-        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
-        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-        pDialog.setTitleText("Loading");
-        pDialog.setContentText("Notify to the Consignee, Kindly wait..");
-        pDialog.setCancelable(false);
-        pDialog.show();
-    }
 
     public void GetPlannedLocation() {
 
@@ -1943,4 +1877,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         dbConnections.close();
 
     }
+
+
 }

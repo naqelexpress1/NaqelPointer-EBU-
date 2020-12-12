@@ -35,6 +35,8 @@ import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 import com.naqelexpress.naqelpointer.service.DeliverysheetbyPiece;
 
 import org.joda.time.DateTime;
@@ -48,7 +50,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class DeliverySheetActivity extends AppCompatActivity implements AsyncTaskCompleteListener {
+public class DeliverySheetActivity extends AppCompatActivity implements IAPICallListener {
 
     DeliverySheetFirstFragment firstFragment;
     DeliverySheetSecondFragment secondFragment;
@@ -69,10 +71,12 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
         if (division.equals("Courier")) {
             if (!isValidOnlineValidationFile()) {
-                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));
-            } else {
-                Log.d("test" , "File is valid");
+
+                APICall apiCall = new APICall(getApplicationContext() , DeliverySheetActivity.this , this);
+                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+
+                /*OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
             }
         }
 
@@ -207,6 +211,7 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
 
         return isValid;
     }
+
 
 
     public static class PlaceholderFragment extends Fragment {
@@ -479,13 +484,22 @@ public class DeliverySheetActivity extends AppCompatActivity implements AsyncTas
         super.onSaveInstanceState(outState);
     }
 
-    @Override
+   /* @Override
     public void onTaskComplete(boolean hasError, String errorMessage) {
         if (hasError)
             ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
+
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getApplication()

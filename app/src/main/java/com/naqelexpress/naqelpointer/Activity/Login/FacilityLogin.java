@@ -323,9 +323,6 @@ public class FacilityLogin
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.getBoolean("HasError")) {
 
-
-                        Log.d("test" , "Login facility");
-
                         //Update user facility
                         UserFacility userFacility = new UserFacility();
                         userFacility.setEmployID(GlobalVar.GV().EmployID);

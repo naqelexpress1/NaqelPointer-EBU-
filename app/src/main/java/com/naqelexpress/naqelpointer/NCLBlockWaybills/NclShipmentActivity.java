@@ -1429,10 +1429,12 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 
    @Override
    public void onCallComplete(boolean hasError, String errorMessage) {
-       if (hasError)
-           ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
-       else
-           GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+         try {
+             if (hasError)
+                 ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+             else
+                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+         } catch (Exception e) {}
    }
 
 

@@ -59,26 +59,29 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
     DateTime TimeIn;
     TabLayout tabLayout;
 
+    private static final String TAG =  "DeliverySheetActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.deliverysheet);
+        try {
+            String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+            if (division.equals("Courier")) {
+                if (!isValidOnlineValidationFile()) {
 
-
-
-
-        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
-
-                APICall apiCall = new APICall(getApplicationContext() , DeliverySheetActivity.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+                    APICall apiCall = new APICall(getApplicationContext() , DeliverySheetActivity.this , this);
+                    apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
 
                 /*OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
                 onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+                }
             }
+        } catch (Exception e) {
+            Log.d("test" , TAG + " " + e.toString());
         }
+
 
 
 
@@ -494,10 +497,14 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
 
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
-        if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
-        else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception e) {
+
+        }
     }
 
 

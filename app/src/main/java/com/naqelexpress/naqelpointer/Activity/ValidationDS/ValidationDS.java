@@ -73,6 +73,8 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     TextView count;
     EditText employid;
 
+    private static final String TAG = "ValidationDS";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,17 +85,21 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
 
-        // Get shipment info for Courier || TH
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
+       try {
+           // Get shipment info for Courier || TH
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
 
-                APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsValidation);
+                   APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
+                   apiCall.getOnlineValidationData(GlobalVar.DsValidation);
 
                /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
                 onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
-            }
-        }
+               }
+           }
+       } catch (Exception e) {
+           Log.d("test" , TAG + " " + e.toString());
+       }
 
         conflict.clear();
         scannedBarCode.clear();

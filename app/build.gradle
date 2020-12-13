@@ -1,6 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+
+
+
 android {
     signingConfigs {
         config {
@@ -19,7 +22,7 @@ android {
         targetSdkVersion 29
         versionName '1.5.3.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 271
+        versionCode 405
     }
     buildTypes {
 
@@ -123,10 +126,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 
 
+
 }
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android-extensions'
+
 repositories {
     mavenCentral()
 

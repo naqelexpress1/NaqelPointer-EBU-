@@ -90,15 +90,19 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-        if (division.equals("Courier")) {
-         if (!isValidOnlineValidationFile()) {
+       try {
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
 
-             APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
-             apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+                   APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
+                   apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
             /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
              onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
-         }
-     }
+               }
+           }
+       } catch (Exception e) {
+
+       }
 
 
 

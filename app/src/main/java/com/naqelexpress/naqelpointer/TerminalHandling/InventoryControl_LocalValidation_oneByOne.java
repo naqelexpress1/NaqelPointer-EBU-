@@ -114,14 +114,18 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         dbConnections = new DBConnections(getApplicationContext(), null);
         division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
+        try {
+            if (division.equals("Courier")) {
+                if (!isValidOnlineValidationFile()) {
 
-                APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+                    APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+                    apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
                /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
                 onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+                }
             }
+        } catch (Exception e) {
+
         }
 
 
@@ -156,7 +160,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     onBackPressed();
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    Log.d("test" , "Divison " + division);
                     if (!division.equals("Courier"))
                          AddNewPiece();
                     else {
@@ -521,7 +524,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     // Group all warnings + onlineValidation in one pop-up
     private void THAddNewPiece() {
 
-        Log.d("test" , "TH");
 
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()

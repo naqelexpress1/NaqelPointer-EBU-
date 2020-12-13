@@ -123,20 +123,24 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         bundle = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+       try {
+           String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
-                APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
-            }
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
+                   APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
+                   apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+               }
 
             /*if (!isValidOnlineValidationFile()) {
                 OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
                 onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
             }*/
-        }
+           }
 
+       } catch (Exception e) {
+
+       }
 
 
         setSupportActionBar(toolbar);

@@ -555,7 +555,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     tvNclHeader.setText("Manifest");
 
                     TextView tvNclBody = dialogView.findViewById(R.id.tv_not_manifested_body);
-                    tvNclBody.setText("Shipment is not manifested yet.Scan will not be recorded");
+                    tvNclBody.setText("Shipment is not manifested yet.");
                 } else {
 
                     if (onLineValidation.getIsDestNotBelongToNcl() == 1) {

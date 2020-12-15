@@ -627,13 +627,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                             alertDialog.dismiss();
 
                             //don't record if not manifested or shipment dest not belong to ncl and user didn't change the dest
-                            if (onLineValidation.isNotInFile() ){
+                            /*if (onLineValidation.isNotInFile() ){
                                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 txtBarcode.getText().clear();
                                 txtBarcode.requestFocus();
-                            }
-
-                            else if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged){
+                            }*///else if
+                                if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged){
                                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 GlobalVar.GV().ShowSnackbar(rootView, "Shipment destination not belong to NCL.Scan won't be recorded", GlobalVar.AlertType.Warning);                                txtBarcode.getText().clear();
                             }

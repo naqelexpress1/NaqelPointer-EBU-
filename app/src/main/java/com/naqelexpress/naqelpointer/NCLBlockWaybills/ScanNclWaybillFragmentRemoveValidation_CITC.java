@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Classes.BarcodeValidation;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
@@ -36,7 +35,6 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.UpdateWaybillRequest;
-import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
@@ -711,8 +709,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     onLineValidation.setIsDestNotBelongToNcl(1);
                     hasFlag = true;
                 }
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                     hasFlag = true;
                 }
 
@@ -826,7 +824,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     }
 
 
-                 if (onLineValidation.getIsStopShipment() == 1) {
+                 if (onLineValidation.getIsStopped() == 1) {
 
                         LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                         llStopShipment.setVisibility(View.VISIBLE);

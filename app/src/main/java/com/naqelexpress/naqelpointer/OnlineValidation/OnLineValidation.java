@@ -11,7 +11,7 @@ public class OnLineValidation extends DefaultResult {
     private int WaybillDestID;
     private int NoOfAttempts;
     private int IsMultiPiece;
-    private int IsStopShipment;
+    private int IsStopped;
     private int IsRTORequest;
     private int IsDeliveryRequest;
     private int IsRelabel;
@@ -47,8 +47,8 @@ public class OnLineValidation extends DefaultResult {
         IsMultiPiece = isMultiPiece;
     }
 
-    public void setIsStopShipment(int isStopShipment) {
-        IsStopShipment = isStopShipment;
+    public void setIsStopped(int isStopped) {
+        IsStopped = isStopped;
     }
 
     public void setIsRTORequest(int isRTORequest) {
@@ -131,8 +131,8 @@ public class OnLineValidation extends DefaultResult {
         return IsMultiPiece;
     }
 
-    public int getIsStopShipment() {
-        return IsStopShipment;
+    public int getIsStopped() {
+        return IsStopped;
     }
 
     public int getIsRTORequest() {
@@ -196,7 +196,7 @@ public class OnLineValidation extends DefaultResult {
                 ", WaybillDestID=" + WaybillDestID +
                 ", NoOfAttempts=" + NoOfAttempts +
                 ", IsMultiPiece=" + IsMultiPiece +
-                ", IsStopShipment=" + IsStopShipment +
+                ", IsStopShipment=" + IsStopped +
                 ", IsRTORequest=" + IsRTORequest +
                 ", IsDeliveryRequest=" + IsDeliveryRequest +
                 ", IsRelabel=" + IsRelabel +

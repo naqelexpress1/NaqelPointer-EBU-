@@ -95,7 +95,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "Online Validation (13-12-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "Online Validation (15-12-2020)"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

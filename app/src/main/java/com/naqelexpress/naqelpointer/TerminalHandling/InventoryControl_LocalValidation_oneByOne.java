@@ -505,7 +505,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     }
 
-    // Group all warnings + onlineValidation in one pop-up
+    // Group flags from ismail + onlineValidation flags in one pop-up
     private void THAddNewPiece() {
 
 
@@ -1811,13 +1811,21 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                         Log.d("test" , "IsRelabel");
                     }*/
 
+                OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceDetails.getBarcode(), getApplicationContext());
+
+                String noOfAttempts = "";
+                if (onLineValidationLocal != null || !WaybillAttempt.equals("No Data")) {
+                    noOfAttempts = String.valueOf(pieceDetails.getNoOfAttempts());
+                } else {
+                    noOfAttempts = "No Data";
+                }
+
                 LinearLayout llNoOfAttempts = dialogView.findViewById(R.id.ll_no_attempts);
                 llNoOfAttempts.setVisibility(View.VISIBLE);
                 TextView tvNoOfAttemptsHeader = dialogView.findViewById(R.id.tv_no_attempts_header);
                 tvNoOfAttemptsHeader.setText("Number of attempts");
                 TextView tvNoOfAttemptsBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
-                tvNoOfAttemptsBody.setText("Number of attempts : " + pieceDetails.getNoOfAttempts());
-
+                tvNoOfAttemptsBody.setText("Number of attempts : " + noOfAttempts);
 
 
 

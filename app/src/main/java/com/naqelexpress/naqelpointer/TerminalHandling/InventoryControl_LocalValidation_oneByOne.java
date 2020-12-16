@@ -1874,7 +1874,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
         if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            ErrorAlert("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }

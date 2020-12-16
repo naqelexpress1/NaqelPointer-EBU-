@@ -303,7 +303,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlert("Server Issue" , "Kindly contact your supervisor \n \n " + errorMessage);
+                ErrorAlert("Server Issue" , "Kindly Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
         } catch (Exception ex) {}

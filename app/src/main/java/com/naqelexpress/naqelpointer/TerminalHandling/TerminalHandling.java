@@ -57,7 +57,7 @@ import java.util.HashMap;
 import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
-
+//Shared between Arrived At Dest + Shipment processing
 public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
     FirstFragment firstFragment;
@@ -82,22 +82,18 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
-         Log.d("test" , "In arrival");
 
 
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
+        group = bundle.getString("group"); // In case of Arrival --> Group 8  In case of shipment processing --> Group 3
 
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
        try {
-           if (division.equals("Courier")) {
+           if (division.equals("Courier") && group.equals("Group 8")) { //Only in Arrival Module
                if (!isValidOnlineValidationFile()) {
-
-                   APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
-                   apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
-            /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
-             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+                 getOnlineValidation();
                }
            }
        } catch (Exception e) {
@@ -119,7 +115,6 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         city = bundle.getStringArrayList("city");
         operationalcity = bundle.getStringArrayList("operationalcity");
 
-        group = bundle.getString("group");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -980,6 +975,30 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         alertDialog.show();
     }
 
+    private void ErrorAlertOnlineValidation(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(TerminalHandling.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                      getOnlineValidation();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
+
     private boolean isValidOnlineValidationFile() {
         boolean isValid;
         try {
@@ -1007,10 +1026,18 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlert("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+                ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
         } catch (Exception ex) {}
+    }
+
+    private void getOnlineValidation () {
+
+        APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+        onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
     }
 }
 

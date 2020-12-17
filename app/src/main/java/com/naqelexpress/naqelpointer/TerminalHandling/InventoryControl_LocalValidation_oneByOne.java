@@ -101,11 +101,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         try {
             if (division.equals("Courier")) {
                 if (!isValidOnlineValidationFile()) {
-
-                    APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                    apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
-               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+                    getOnlineValidation();
                 }
             }
         } catch (Exception e) {
@@ -278,11 +274,13 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         String barcode = txtBarCode.getText().toString().toUpperCase();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
-            //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
+            //Validate Bin location - Need Nadeem approval
+
+            /*if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
-            }
+            }*/
+
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
             txtBarCode.setText("");
@@ -525,11 +523,12 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         String barcode = txtBarCode.getText().toString().toUpperCase();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
-            //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
+            //Validate Bin location - Need Nadeem approval
+           /* if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
-            }
+            }*/
+
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
             txtBarCode.setText("");
@@ -1331,6 +1330,30 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         alertDialog.show();
     }
 
+    private void ErrorAlertOnlineValidation(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation_oneByOne.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                     getOnlineValidation();
+                    }
+                });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getApplication()
@@ -1874,11 +1897,18 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
         if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+            ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
 
+
+    private void getOnlineValidation () {
+        APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+    }
 
 
 

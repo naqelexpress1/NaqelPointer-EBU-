@@ -68,7 +68,7 @@ public class APICall {
              //TODO Riyam
              url = GlobalVar.NaqelAPIUAT ;
 
-             IPointerAPI iPointerAPI = GlobalVar.getIPointerAPI(url,240,360);
+             IPointerAPI iPointerAPI = GlobalVar.getIPointerAPI(url,360,360);
              Call<RetrofitCallResponse.OnlineValidationResponse> call = iPointerAPI.GetOnlineValidationData_v2();
 
              call.enqueue(new Callback<RetrofitCallResponse.OnlineValidationResponse>() {

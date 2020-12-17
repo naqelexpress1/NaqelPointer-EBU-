@@ -6404,9 +6404,10 @@ public class DBConnections extends SQLiteOpenHelper {
         if (isOnlineValidationFileEmpty( context)) {
             return false;
         }
-        if (getOnlineValidationProcess(context) != process) {
+        //todo Riyam remove this validation it
+       /* if (getOnlineValidationProcess(context) != process) {
             return false;
-        }
+        }*/
 
         if (isOnlineValidationFileOutDated(process , context)) {
             return false;

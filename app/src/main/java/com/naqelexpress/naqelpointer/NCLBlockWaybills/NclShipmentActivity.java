@@ -111,11 +111,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 
 
          if (!isValidOnlineValidationFile()) {
-
-             APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
-             apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
-            /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
-             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+             getOnlineValidation();
           }
 
         setContentView(R.layout.nclshipment);
@@ -647,6 +643,31 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 
         alertDialog.show();
     }
+
+    private void ErrorAlertOnlineValidation(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        getOnlineValidation();
+                    }
+                });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
 
     private void SavedSucessfully(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
@@ -1431,11 +1452,17 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
    public void onCallComplete(boolean hasError, String errorMessage) {
          try {
              if (hasError)
-                 ErrorAlert("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+                 ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
              else
                  GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
          } catch (Exception e) {}
    }
 
+   public void getOnlineValidation () {
+       APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
+       apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+       /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
+       onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+   }
 
 }

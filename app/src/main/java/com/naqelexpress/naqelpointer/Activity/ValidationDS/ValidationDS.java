@@ -85,12 +85,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
            // Get shipment info for Courier || TH
            if (division.equals("Courier")) {
                if (!isValidOnlineValidationFile()) {
-
-                   APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
-                   apiCall.getOnlineValidationData(GlobalVar.DsValidation);
-
-               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
+                   getOnlineValidationFile();
                }
            }
        } catch (Exception e) {
@@ -303,7 +298,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlert("Server Issue" , "Kindly Try Again \n \n " + errorMessage);
+                ErrorAlert("File Not Loaded" , "Kindly check your internet connection & Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
         } catch (Exception ex) {}
@@ -314,11 +309,17 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       getOnlineValidationFile();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
                     }
                 });
 
@@ -856,6 +857,15 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         } catch (Exception e) {
             Log.d("test" , "showDialog " + e.toString());
         }
+    }
+
+    public void getOnlineValidationFile () {
+
+        APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsValidation);
+
+        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
+           onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
     }
 
 

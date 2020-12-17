@@ -185,13 +185,13 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
                 else
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.group3:
+            case R.id.group3: //Shipment Processing
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
                     fetchgroup("3");
                 else
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.group4:
+            case R.id.group4: //Linehul
 
                 fetchgroup("4");
                 break;
@@ -233,6 +233,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             }
         }
 
+        // Shipment processing - Group 3
         Bundle bundle = new Bundle();
         bundle.putSerializable("status", fetchdata);
         bundle.putSerializable("reason", reason);
@@ -250,7 +251,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 //            intent.putExtras(bundle);
 //            startActivity(intent);
 //        }
-        else if (group.equals("4")) {
+        else if (group.equals("4")) { //Inventory
             Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.LinehaulGroup.class);
             bundle.putSerializable("status", data);
             intent.putExtras(bundle);

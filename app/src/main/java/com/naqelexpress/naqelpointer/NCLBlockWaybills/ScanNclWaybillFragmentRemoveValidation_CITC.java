@@ -720,10 +720,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     hasFlag = true;
                 }*/
 
-            } else {
+            }
+            // Uncomment once scrip updated
+            /*else {
                 onLineValidation.setNotInFile(true);
                 hasFlag = true;
-            }
+            }*/
 
 
 
@@ -732,8 +734,6 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 onLineValidation.setIsNoBayanNo(1);
                 hasFlag = true;
             }
-
-
 
             onLineValidation.setBarcode(barcode);
             onLineValidationList.add(onLineValidation);
@@ -784,7 +784,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 btnConfirm.setText("OK & Quit");
 
                 //If barcode is not in onlineValidation table
-                 if (onLineValidation.isNotInFile()) {
+                //Uncomment once script is updated
+                 /*if (onLineValidation.isNotInFile()) {
                     LinearLayout llDifDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llDifDest.setVisibility(View.VISIBLE);
 
@@ -793,7 +794,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
                     TextView tvNclBody = dialogView.findViewById(R.id.tv_not_manifested_body);
                     tvNclBody.setText("Shipment is not manifested yet.Online Validation flags won't be available");
-                }
+                }*/
 
                  if (onLineValidation.getIsDestNotBelongToNcl() == 1) {
 

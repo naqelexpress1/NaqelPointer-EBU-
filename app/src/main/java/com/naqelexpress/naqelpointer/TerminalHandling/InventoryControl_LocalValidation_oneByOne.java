@@ -274,12 +274,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         String barcode = txtBarCode.getText().toString().toUpperCase();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
-            //Validate Bin location - Need Nadeem approval
-
-            /*if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
+            //Validate Bin location
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
-            }*/
+            }
 
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
@@ -523,11 +522,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         String barcode = txtBarCode.getText().toString().toUpperCase();
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
-            //Validate Bin location - Need Nadeem approval
-           /* if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
+            //Validate Bin location
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
-            }*/
+            }
 
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();

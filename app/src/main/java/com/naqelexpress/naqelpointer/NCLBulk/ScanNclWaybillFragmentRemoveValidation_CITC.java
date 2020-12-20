@@ -507,10 +507,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     hasFlag = true;
                 }*/
 
-            } else {
+            }
+
+            //Uncomment once script is changed.
+            /*else {
                 onLineValidation.setNotInFile(true);
                 hasFlag = true;
-            }
+            }*/
 
                 onLineValidation.setBarcode(barcode);
                 onLineValidationList.add(onLineValidation);
@@ -547,7 +550,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 btnConfirm.setText("OK & Quit");
 
                 //If barcode is not in onlineValidation table
-                if (onLineValidation.isNotInFile()) {
+                //Uncomment when changing script
+              /*  if (onLineValidation.isNotInFile()) {
                     LinearLayout llDifDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llDifDest.setVisibility(View.VISIBLE);
 
@@ -556,7 +560,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
 
                     TextView tvNclBody = dialogView.findViewById(R.id.tv_not_manifested_body);
                     tvNclBody.setText("Shipment is not manifested yet.");
-                } else {
+
+
+                } */
+
+             // else {
 
                     if (onLineValidation.getIsDestNotBelongToNcl() == 1) {
 
@@ -613,7 +621,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                         tvStopShipmentBody.setText("The Shipment has a CITC Complaint.");
 
                     }
-                }
+              //  }
 
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();

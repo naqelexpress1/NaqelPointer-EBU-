@@ -205,7 +205,6 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
                         if (clear == 2)
                             SaveData();
                         else if (clear == 3)

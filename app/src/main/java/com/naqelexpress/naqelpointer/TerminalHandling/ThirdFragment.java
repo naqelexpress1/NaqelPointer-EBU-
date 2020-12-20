@@ -110,7 +110,7 @@ public class ThirdFragment extends Fragment {
                             }
                             if (IsValid()) {
                                 String barcode = txtBarCode.getText().toString();
-                                if (division.equals("Courier")) {
+                                if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
                                    if (isValidPieceBarcode(barcode)) {
                                         AddNewPiece();
                                     } else {
@@ -318,8 +318,6 @@ public class ThirdFragment extends Fragment {
 //            ErrorAlert("Info", "Kindly save Scanned Data and Scan again...", 1, "");
 //            return;
 //        }
-
-        Log.d("test" , "Group " + TerminalHandling.group);
 
 
         if (TerminalHandling.group.equals("Group 1")) {
@@ -765,8 +763,8 @@ public class ThirdFragment extends Fragment {
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
                 tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
 
-
-                if (pieceDetails.isNotInFile()) {
+               //Uncomment once script is changed.
+                /*if (pieceDetails.isNotInFile()) {
 
                     LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llWrongDest.setVisibility(View.VISIBLE);
@@ -776,7 +774,7 @@ public class ThirdFragment extends Fragment {
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_not_manifested_body);
                     tvWrongDestBody.setText("Shipment is not manifested yet. ");
-                }
+                }*/
 
 
                 if (pieceDetails.getIsWrongDest() == 1) {
@@ -805,7 +803,7 @@ public class ThirdFragment extends Fragment {
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
                     tvWrongDestBody.setText("Shipment destination : " + stationName + "."
-                           + '\n' + "Scan won't be recorded.");
+                           );
                 }
 
                 if (pieceDetails.getIsMultiPiece() == 1) {

@@ -505,6 +505,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     // Group flags from ismail + onlineValidation flags in one pop-up
     private void THAddNewPiece() {
 
+        Log.d("test" , "TH");
 
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
@@ -910,6 +911,105 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         dbConnections.close();
     }
 
+    private void SaveData(String piece) { //43 heldin , 44 heldout
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        if (IsValid()) {
+            requestLocation();
+            com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                    (20, String.valueOf(Latitude),
+                            String.valueOf(Longitude), 0, lbTotal.getText().toString()
+                            , "", 0, Integer.parseInt(""));
+
+            if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+                int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+
+
+                CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(piece, ID);
+                dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
+
+                if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+                    startService(
+                            new Intent(InventoryControl_LocalValidation_oneByOne.this,
+                                    com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+                }
+            }
+        }
+        dbConnections.close();
+    }
+
+
+    private void resetAllData() {
+        // lbTotal.setText(getString(R.string.lbCount) + " 0");
+        inventorycontrol.clear();
+        delrtoreq.clear();
+        adapter.notifyDataSetChanged();
+    }
+
+   /* private void SaveHeldOutData(int close) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        for (HashMap temp : delrtoreq) {
+            com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                    (20, String.valueOf(Latitude),
+                            String.valueOf(Longitude), 44, temp.get("Ref").toString()
+                            , "");
+
+            if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+                int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+
+                CheckPointBarCodeDetails waybills = new CheckPointBarCodeDetails(temp.get("WayBillNo").toString(), ID);
+                if (!dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext())) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.ErrorWhileSaving),
+                            GlobalVar.AlertType.Error);
+                    break;
+
+                }
+            }
+
+        }
+        if (close == 0) {
+            stopService(
+                    new Intent(InventoryHeldIn.this,
+                            com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+
+            if (!isMyServiceRunning(TerminalHandling.class)) {
+                startService(
+                        new Intent(InventoryHeldIn.this,
+                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+            }
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+
+            resetAllData();
+            finish();
+        }
+
+    }*/
+
+
+    private void SaveHeldOutData(String piece, String refno) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (20, String.valueOf(Latitude),
+                        String.valueOf(Longitude), 44, refno
+                        , "", 0, Integer.parseInt(""));
+
+        if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+            int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+
+            CheckPointBarCodeDetails waybills = new CheckPointBarCodeDetails(piece, ID);
+            dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
+
+        }
+
+        if (!isMyServiceRunning(TerminalHandling.class)) {
+            startService(
+                    new Intent(InventoryControl_LocalValidation_oneByOne.this,
+                            com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+        }
+
+    }
 
     private boolean IsValid() {
         boolean isValid = true;
@@ -1353,6 +1453,28 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         alertDialog.show();
     }
 
+    private void SaveData(String PieceCode, String req) {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                (20, String.valueOf(Latitude),
+                        String.valueOf(Longitude), 44, req
+                        , "", 0, Integer.parseInt(""));
+
+        if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+            int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+
+            CheckPointBarCodeDetails waybills = new CheckPointBarCodeDetails(PieceCode, ID);
+            dbConnections.InsertCheckPointBarCodeDetails(waybills, getApplicationContext());
+
+        }
+        if (!isMyServiceRunning(TerminalHandling.class)) {
+            startService(
+                    new Intent(InventoryControl_LocalValidation_oneByOne.this,
+                            com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+        }
+    }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getApplication()

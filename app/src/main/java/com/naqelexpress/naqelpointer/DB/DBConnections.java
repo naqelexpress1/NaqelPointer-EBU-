@@ -74,13 +74,12 @@ import java.util.List;
 
 import static android.content.Context.TELEPHONY_SERVICE;
 
-public class DBConnections extends SQLiteOpenHelper {
-
-    public View rootView;
-
-    private static final int Version = 138; // Duplicate Customer , MobileNo Verified
+public class DBConnections
+        extends SQLiteOpenHelper {
+    private static final int Version = 135; // MyRouteActivity
     private static final String DBName = "NaqelPointerDB.db";
-
+    //    public Context context;
+    public View rootView;
 
     //Added by ismail
     public static final String TABLENAME = "signature";
@@ -179,7 +178,7 @@ public class DBConnections extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
                 "\"CheckPointTypeDetailID\" INTEGER  , \"CheckPointTypeDDetailID\" INTEGER  , \"Latitude\" TEXT, " +
-                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0)");
+                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0 , \"TripID\" INTEGER NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointBarCodeDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
@@ -839,12 +838,17 @@ public class DBConnections extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE OnCLoadingForDDetail ADD COLUMN WaybillNo TEXT ");
             if (!isColumnExist("CheckPoint", "Comments"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Comments TEXT");
+            if (!isColumnExist("CheckPoint", "TripID"))
+                db.execSQL("ALTER TABLE CheckPoint ADD COLUMN TripID INTEGER");
             if (!isColumnExist("CheckPoint", "Ref"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Ref TEXT ");
             if (!isColumnExist("BarCode", "IsDelivered"))
                 db.execSQL("ALTER TABLE BarCode ADD COLUMN IsDelivered INTEGER ");
             if (!isColumnExist("BarCode", "WayBillID"))
                 db.execSQL("ALTER TABLE BarCode ADD COLUMN WayBillID INTEGER ");
+
+
+
 
             if (!isColumnExist("TripPlanDDetails", "TripPlanNo"))
                 db.execSQL("ALTER TABLE TripPlanDDetails ADD COLUMN TripPlanNo INTEGER ");
@@ -1505,6 +1509,7 @@ public class DBConnections extends SQLiteOpenHelper {
         db.close();
         return true;
     }
+
 
     public boolean UpdateUserMeLogin(UserMeLogin instance) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -5164,6 +5169,8 @@ public class DBConnections extends SQLiteOpenHelper {
             contentValues.put("Longitude", instance.Longitude);
             contentValues.put("CheckPointTypeDetailID", instance.CheckPointTypeDetailID);
             contentValues.put("Ref", instance.Reference);
+            //mohammed
+            contentValues.put("TripID", instance.TripID);
 //            contentValues.put("Comments", instance.Comments);
             result = db.insertOrThrow("CheckPoint", null, contentValues);
             db.close();

@@ -129,6 +129,7 @@ public class ThirdFragment extends Fragment {
                 }
             });
 
+            // this one
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
@@ -180,6 +181,7 @@ public class ThirdFragment extends Fragment {
         initSwipe();
     }
 
+    //this one
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
@@ -431,11 +433,12 @@ public class ThirdFragment extends Fragment {
 
         }
 
+        //mohammed add this Integer.parseInt("")
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
                         FirstFragment.txtCheckPointTypeDDetail.getText().toString()
-                        , "", Barcodes.size());
+                        , "", Barcodes.size(), Integer.parseInt(""));
 
         int ID = 0;
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
@@ -597,6 +600,7 @@ public class ThirdFragment extends Fragment {
 
     }*/
 
+   //mohammed add this Integer.parseInt("")
     private void SaveData(String PieceCode, String req) {
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
@@ -604,7 +608,7 @@ public class ThirdFragment extends Fragment {
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "", 0);
+                        , "" , 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

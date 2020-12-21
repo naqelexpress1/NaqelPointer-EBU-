@@ -412,11 +412,12 @@ public class ThirdFragment
 
         }
 
+        //mohammed add Integer.parseInt("")
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
                         FirstFragment.txtCheckPointTypeDDetail.getText().toString()
-                        , "" , 0);
+                        , "" , 0, Integer.parseInt(""));
 
         int ID = 0;
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
@@ -441,10 +442,11 @@ public class ThirdFragment
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
 
+        //mohammed add this Integer.parseInt("")
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "" , 0);
+                        , "" , 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

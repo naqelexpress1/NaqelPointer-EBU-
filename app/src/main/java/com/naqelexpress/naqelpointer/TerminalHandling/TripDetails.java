@@ -746,7 +746,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (22, String.valueOf(Latitude),
                         String.valueOf(Longitude), 0, TripID
-                        , "", 0);
+                        , "", 0,Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext()))
             ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

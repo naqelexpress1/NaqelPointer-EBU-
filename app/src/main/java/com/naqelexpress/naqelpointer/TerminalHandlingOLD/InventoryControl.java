@@ -164,7 +164,7 @@ public class InventoryControl extends AppCompatActivity {
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                             String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID,
                             firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "" , 0);
+                            , "" , 0, Integer.parseInt(""));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

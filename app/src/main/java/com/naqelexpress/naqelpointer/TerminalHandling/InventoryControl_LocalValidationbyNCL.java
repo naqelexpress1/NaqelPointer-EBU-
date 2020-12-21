@@ -978,6 +978,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         dbConnections.close();
     }
 
+    //mohammed
     private void SaveData(String piece) { //43 heldin , 44 heldout
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -986,7 +987,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 0, lbTotal.getText().toString()
-                            , "", 0);
+                            , "", 0, Integer.parseInt(""));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -1054,13 +1055,14 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
     }*/
 
 
+   //mohammed
     private void SaveHeldOutData(String piece, String refno) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, refno
-                        , "", 0);
+                        , "", 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -1598,6 +1600,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         alertDialog.show();
     }
 
+    //mohammed
     private void SaveData(String PieceCode, String req) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -1605,7 +1608,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, req
-                        , "", 0);
+                        , "", 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

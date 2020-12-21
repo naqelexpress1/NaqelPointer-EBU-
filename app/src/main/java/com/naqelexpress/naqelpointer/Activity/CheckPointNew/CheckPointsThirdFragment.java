@@ -18,6 +18,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,9 @@ public class CheckPointsThirdFragment
                              ViewGroup container,
                              Bundle savedInstanceState) {
         if (rootView == null) {
+
+            Log.d("test", "in");
+
             rootView = inflater.inflate(R.layout.checkpointsthirdfragment, container, false);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 

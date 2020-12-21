@@ -31,7 +31,8 @@ import java.util.HashMap;
 public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     View rootView;
-    public static EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtweight, txtheight, txtlength, txtwidth;
+    public static EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtweight, txtheight, txtlength, txtwidth,
+            txtCheckPointType_TripID;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
     public static int CheckPointTypeID = 0;
     public static int CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
@@ -58,8 +59,11 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
 
 
             txtCheckPointType = (EditText) rootView.findViewById(R.id.txtCheckPointType);
-            txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
+            txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail); // Reason
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
+
+            //mohammed
+           txtCheckPointType_TripID = (EditText) rootView.findViewById(R.id.txtCheckPointType_TripID);
 
             txtweight = (EditText) rootView.findViewById(R.id.txtweight);
             txtwidth = (EditText) rootView.findViewById(R.id.txtwidth);
@@ -72,9 +76,14 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointType.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
+            //mohammed
+          txtCheckPointType_TripID.setInputType(InputType.TYPE_NULL);
+
 
             txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
             txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
+            //mohammed
+            txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
 
             txtCheckPointType.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -151,6 +160,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                     } else {
                         txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
                         txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
+                        //mohammed
+                       txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
+
                         CheckPointTypeDetailID = 0;
                         CheckPointTypeDDetailID = 0;
                     }
@@ -251,6 +263,7 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                     }
                 }
             });
+
 
             if (GlobalVar.GV().IsEnglish())
                 checkPointTypeDDetailSpinnerDialog = new SpinnerDialog(getActivity(), CheckPointTypeDDetailNameList,
@@ -516,6 +529,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
         outState.putString("txtCheckPointType", txtCheckPointType.getText().toString());
         outState.putString("txtCheckPointTypeDetail", txtCheckPointTypeDetail.getText().toString());
         outState.putString("txtCheckPointTypeDDetail", txtCheckPointTypeDDetail.getText().toString());
+        //mohammed
+       outState.putString("txtCheckPointType_TripID", txtCheckPointType_TripID.getText().toString());
+
         outState.putInt("CheckPointTypeID", CheckPointTypeID);
         outState.putIntegerArrayList("CheckPointTypeList", CheckPointTypeList);
         outState.putStringArrayList("CheckPointTypeNameList", CheckPointTypeNameList);
@@ -541,6 +557,8 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointType.setText(savedInstanceState.getString("txtCheckPointType"));
             txtCheckPointTypeDetail.setText(savedInstanceState.getString("txtCheckPointTypeDetail"));
             txtCheckPointTypeDDetail.setText(savedInstanceState.getString("txtCheckPointTypeDDetail"));
+            //mohammed
+          txtCheckPointType_TripID.setText(savedInstanceState.getString("txtCheckPointType_TripID"));
 
 
             if (CheckPointTypeDetailList.size() > 0) {
@@ -548,6 +566,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             } else {
                 txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
                 txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
+                //mohammed
+                txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
+
                 CheckPointTypeDetailID = 0;
                 CheckPointTypeDDetailID = 0;
             }

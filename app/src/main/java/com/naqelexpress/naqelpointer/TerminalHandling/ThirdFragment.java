@@ -698,10 +698,10 @@ public class ThirdFragment extends Fragment {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
             OnLineValidation onLineValidation = new OnLineValidation();
 
-            if (onLineValidationLocal == null) {
+           /* if (onLineValidationLocal == null) {
                 onLineValidation.setNotInFile(true);
                 isValid = false;
-            }  else {
+            }  else {*/
 
              /*   int isManifested = onLineValidationLocal.getIsManifested();
 
@@ -718,28 +718,30 @@ public class ThirdFragment extends Fragment {
                     isValid = false;
                 } */
 
+                if (onLineValidationLocal != null) {
+                    if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+                        onLineValidation.setIsWrongDest(1);
+                        onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
+                        isValid = false;
+                    }
 
-                if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
-                    onLineValidation.setIsWrongDest(1);
-                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
-                    isValid = false;
+                    if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                        onLineValidation.setIsMultiPiece(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsStopped() == 1) {
+                        onLineValidation.setIsStopped(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsRelabel() == 1) {
+                        onLineValidation.setIsRelabel(1);
+                        isValid = false;
+                    }
                 }
 
-                if (onLineValidationLocal.getIsMultiPiece() == 1) {
-                    onLineValidation.setIsMultiPiece(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsStopped() == 1) {
-                    onLineValidation.setIsStopped(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsRelabel() == 1) {
-                    onLineValidation.setIsRelabel(1);
-                    isValid = false;
-                }
-            }
+           // }
 
             if (!isValid) {
                 onLineValidation.setBarcode(pieceBarcode);

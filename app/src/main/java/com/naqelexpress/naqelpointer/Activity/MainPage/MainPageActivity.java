@@ -438,6 +438,17 @@ public class MainPageActivity
 
         // updateApp();
 
+        if (android.os.Build.VERSION.SDK_INT >= 29)
+            if (GlobalVar.GV().isPermissionEnabled(Manifest.permission.ACCESS_BACKGROUND_LOCATION, MainPageActivity.this) == PackageManager.PERMISSION_DENIED) {
+                GlobalVar.GV().PermissionAlert(MainPageActivity.this);
+                ActivityCompat.requestPermissions(
+                        MainPageActivity.this,
+                        new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                                Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                        15
+                );
+            }
+
     }
 
 
@@ -602,7 +613,7 @@ public class MainPageActivity
                 itemposition.put(15, 25);
                 itemposition.put(16, 26);
                 itemposition.put(17, 27);
-               // itemposition.put(18, 11);
+                // itemposition.put(18, 11);
             }
 
         }
@@ -688,7 +699,7 @@ public class MainPageActivity
                 cellIcon[15] = R.drawable.contacts; //CBU
                 cellIcon[16] = R.drawable.customclearence; //CBU
                 cellIcon[17] = R.drawable.car; //CBU
-               // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
+                // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
         if (devision.equals("IRS")) {
@@ -916,7 +927,8 @@ public class MainPageActivity
                                             startActivity(mapList);
                                         } else {
                                             //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
-                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince.class);
+                                            //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince.class);
+                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn.class);
                                             startActivity(mapList);
                                         }
                                     } else
@@ -1774,7 +1786,21 @@ public class MainPageActivity
                     }
                 }
                 break;
+            case 15:
 
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                        GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
+                        try {
+                            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                            startActivity(i);
+                        } catch (Exception e) {
+                            GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);
+                        }
+                    }
+                }
+                break;
         }
 
     }

@@ -73,7 +73,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
     HashMap<String, String> trips = new HashMap<>();
     TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount, bayancount;
-    private EditText txtBarCode;//, txtbinlocation;
+    private EditText txtBarCode, binlocation;//, txtbinlocation;
     public ArrayList<String> inventorycontrol = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
@@ -106,8 +106,11 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
 
         lbTotal.setText("");
 
+        binlocation = (EditText) findViewById(R.id.binlocation);
+        binlocation.setVisibility(View.VISIBLE);
         txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
-        txtBarCode.setHint("Bin / Piece Barcode");
+        //txtBarCode.setHint("Bin / Piece Barcode");
+        txtBarCode.setHint("Piece Barcode");
         txtBarCode.setKeyListener(null);
         txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
         txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(25)});
@@ -134,6 +137,26 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                     AddNewPiece();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        binlocation.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    lbTotal.setText(binlocation.getText().toString());
+                    txtBarCode.requestFocus();
+                    txtBarCode.setText("");
+                    inventorycontrol.clear();
+                    initViews();
                     return true;
                 }
                 return false;
@@ -292,18 +315,18 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
                         ReadFromLocal(result, dbConnections);
                     }
 
-                    if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-                        if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
-                            try {
-                                JSONObject jsonObject1 = new JSONObject();
-                                jsonObject1.put("OriginID", 0);
-                                jsonObject1.put("DestinationID", GlobalVar.GV().StationID);
-                                new BringNCLData().execute(jsonObject1.toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
+//                    if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
+//                        if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+//                            try {
+//                                JSONObject jsonObject1 = new JSONObject();
+//                                jsonObject1.put("OriginID", 0);
+//                                jsonObject1.put("DestinationID", GlobalVar.GV().StationID);
+//                                new BringNCLData().execute(jsonObject1.toString());
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
 
 
                 } catch (JSONException e) {
@@ -378,6 +401,14 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
       }
   */
     private void AddNewPiece() {
+
+        if (!GlobalVar.GV().isValidBarcodeCons(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -397,15 +428,15 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             );
         }
 
-        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
-
-            lbTotal.setText(txtBarCode.getText().toString());
-            txtBarCode.requestFocus();
-            txtBarCode.setText("");
-            inventorycontrol.clear();
-            initViews();
-            return;
-        }
+//        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+//
+//           lbTotal.setText(txtBarCode.getText().toString());
+//            txtBarCode.requestFocus();
+//            txtBarCode.setText("");
+//            inventorycontrol.clear();
+//            initViews();
+//            return;
+//        }
 
         try {
             double convert = Double.parseDouble(txtBarCode.getText().toString());
@@ -1327,15 +1358,15 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        if (callfunction == 0)
-                            try {
-                                JSONObject jsonObject = new JSONObject();
-                                jsonObject.put("OriginID", 0);
-                                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
-                                new BringNCLData().execute(jsonObject.toString());
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+//                        if (callfunction == 0)
+//                            try {
+//                                JSONObject jsonObject = new JSONObject();
+//                                jsonObject.put("OriginID", 0);
+//                                jsonObject.put("DestinationID", GlobalVar.GV().StationID);
+//                                new BringNCLData().execute(jsonObject.toString());
+//                            } catch (JSONException e) {
+//                                e.printStackTrace();
+//                            }
                         dialog.dismiss();
                     }
                 });

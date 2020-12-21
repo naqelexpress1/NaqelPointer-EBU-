@@ -27,6 +27,8 @@ public class GetUserMEDataResult
     public int DisableEnabletxtBox = 1;
     public int CountryID = 0;
     public String CountryCode;
+    public String PhoneNo = "";
+
 
     public GetUserMEDataResult(String finalJson) {
         JSONObject jsonObject;

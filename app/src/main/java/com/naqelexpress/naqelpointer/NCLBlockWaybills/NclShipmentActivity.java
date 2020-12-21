@@ -30,9 +30,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -57,7 +59,13 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.INclShipmentActivity;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
@@ -83,7 +91,8 @@ import java.util.Locale;
 
 import Error.ErrorReporter;
 
-public class NclShipmentActivity extends AppCompatActivity {
+//Used By GWT (IRS)
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener {
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -93,10 +102,21 @@ public class NclShipmentActivity extends AppCompatActivity {
     public boolean IsMixed;
     public List<Integer> destList = new ArrayList<>();
 
+    private static final String TAG = "NclShipmentActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
+
+
+         if (!isValidOnlineValidationFile()) {
+
+             APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
+             apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+            /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
+             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+          }
 
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
@@ -146,7 +166,7 @@ public class NclShipmentActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.finish:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                    ErrorAlert("Info", "Are yo sure want to Finish the Job?", 0);
+                    ErrorAlert("Info", "Are you sure want to Finish the Job?", 0);
                 } else
                     GlobalVar.RedirectSettings(NclShipmentActivity.this);
                 return true;
@@ -864,6 +884,8 @@ public class NclShipmentActivity extends AppCompatActivity {
         return isValid;
     }
 
+
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -1319,7 +1341,7 @@ public class NclShipmentActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String finalJson) {
+     protected void onPostExecute(String finalJson) {
             try {
 
                 if (progressDialog != null && progressDialog.isShowing()) {
@@ -1361,5 +1383,57 @@ public class NclShipmentActivity extends AppCompatActivity {
                 //  insertManual();
             }
         }
+
+
+    private boolean isValidOnlineValidationFile() {
+            boolean isValid;
+
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            if (isValid)
+                return true;
+            return false;
+        }
+
+
+
     }
+
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
+
+    @Override
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+        try {
+            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
+        } catch (Exception ex) {}
+    }
+
+
+   /*@Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }*/
+
+   @Override
+   public void onCallComplete(boolean hasError, String errorMessage) {
+       if (hasError)
+           ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+       else
+           GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+   }
+
+
 }

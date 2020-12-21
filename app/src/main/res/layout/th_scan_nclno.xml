@@ -1,0 +1,184 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:fillViewport="true">
+
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin">
+
+
+        <Button
+            android:id="@+id/onholdshipments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="8dp"
+            android:text="Bring OnHold Shipments"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:visibility="gone"
+            tools:ignore="RtlHardcoded" />
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/onholdshipments">
+
+
+            <CheckBox
+                android:id="@+id/checkMix"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:ems="10"
+                android:text="@string/ncl_IsMix"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!--        <View-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="1dp"-->
+            <!--            android:background="@color/Black"-->
+            <!--            android:layout_marginTop="10dp"-->
+            <!--            app:layout_constraintTop_toBottomOf="@id/checkMix"-->
+            <!--            />-->
+
+            <TextView
+                android:id="@+id/tv_origin_station"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/checkMix"
+                android:text="Origin Station "/>
+
+            <EditText
+                android:id="@+id/txtOrgin"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="8dp"
+                android:ems="5"
+                android:hint="Orgin"
+                android:textSize="15sp"
+                android:inputType="textPersonName"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_origin_station"
+                tools:ignore="HardcodedText,LabelFor,MissingConstraints,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/tv_origin_facility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/txtOrgin"
+                android:text="Origin Facility"/>
+
+            <EditText
+                android:id="@+id/et_Orgin_facility"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="8dp"
+                android:ems="10"
+                android:textSize="15sp"
+                android:inputType="textPersonName"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_origin_facility"
+                tools:ignore="HardcodedText,LabelFor,MissingConstraints,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/tv_destination_station"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/et_Orgin_facility"
+                android:text="Destination Station "/>
+
+            <EditText
+                android:id="@+id/txtDestination"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:ems="10"
+                android:textSize="15sp"
+                android:hint="Destination"
+                android:inputType="textPersonName"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_destination_station"
+                tools:ignore="HardcodedText,LabelFor,MissingConstraints" />
+
+            <TextView
+                android:id="@+id/tv_destination_facility"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="20dp"
+                android:textSize="18sp"
+                app:layout_constraintTop_toBottomOf="@id/txtDestination"
+                android:text="Destination Facility "/>
+
+            <EditText
+                android:id="@+id/et_destination_facility"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:ems="10"
+                android:textSize="15sp"
+                android:hint="Destination Facility"
+                android:inputType="textPersonName"
+                android:focusable="false"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tv_destination_facility"
+                tools:ignore="HardcodedText,LabelFor,MissingConstraints" />
+
+
+            <Button
+                android:id="@+id/btngenerate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="8dp"
+                android:text="@string/ncl_generate"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/et_destination_facility"
+                tools:ignore="RtlHardcoded" />
+
+
+        </android.support.constraint.ConstraintLayout>
+    </RelativeLayout>
+</ScrollView>

@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,12 @@ import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -52,10 +58,9 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class TerminalHandling extends AppCompatActivity {
+public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
     FirstFragment firstFragment;
-    // SecondFragment secondFragment;
     ThirdFragment thirdFragment;
 
     com.naqelexpress.naqelpointer.Activity.TerminalHandling.FirstFragment firstFragment2;
@@ -73,7 +78,6 @@ public class TerminalHandling extends AppCompatActivity {
     static ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
     static ArrayList<String> city = new ArrayList<>();
     static ArrayList<String> operationalcity = new ArrayList<>();
-    //MyCountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +85,25 @@ public class TerminalHandling extends AppCompatActivity {
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
+         Log.d("test" , "In arrival");
+
+
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
+
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+        if (division.equals("Courier")) {
+         if (!isValidOnlineValidationFile()) {
+
+             APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
+             apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+            /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+             onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+         }
+     }
+
+
 
         status.clear();
         reason.clear();
@@ -350,6 +371,10 @@ public class TerminalHandling extends AppCompatActivity {
 
         return isValid;
     }
+
+
+
+
 
    /* private void SaveHeldOutData(int close) {
 
@@ -981,4 +1006,38 @@ public class TerminalHandling extends AppCompatActivity {
 
         alertDialog.show();
     }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , "TerminalHandling Activity - isValidOnlineValidationFile() " + ex.toString());
+        }
+        return false;
+    }
+
+  /*  @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }
 }
+

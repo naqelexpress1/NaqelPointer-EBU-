@@ -336,7 +336,7 @@ public class CheckPointsActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "firstFragment", firstFragment);
-        getSupportFragmentManager().putFragment(outState, "secondFragment", secondFragment);
+//        getSupportFragmentManager().putFragment(outState, "secondFragment", secondFragment);
         if (thirdFragment != null)
             getSupportFragmentManager().putFragment(outState, "thirdFragment", thirdFragment);
         outState.putDouble("Latitude", Latitude);

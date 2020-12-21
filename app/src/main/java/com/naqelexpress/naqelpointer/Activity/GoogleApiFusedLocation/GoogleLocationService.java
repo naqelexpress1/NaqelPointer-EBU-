@@ -6,6 +6,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -31,7 +32,8 @@ public class GoogleLocationService {
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
 
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
+   //public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
+   public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
 
 
     public GoogleLocationService(Context activity, LocationUpdateListener locationUpdateListener) {
@@ -54,7 +56,8 @@ public class GoogleLocationService {
     protected void createLocationRequest() {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
-        mLocationRequest.setFastestInterval(15000);
+        //mLocationRequest.setFastestInterval(15000);
+        mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -83,13 +86,17 @@ public class GoogleLocationService {
 
         @Override
         public void onLocationChanged(Location location) {
-            if (location.hasAccuracy()) {
+            try {
+                if (location.hasAccuracy()) {
 //                if (location.getAccuracy() < 30) {
-                locationUpdateListener.updateLocation(location);
+                    locationUpdateListener.updateLocation(location);
 
 //                Toast.makeText(activity, String.valueOf(location.getLatitude() + " " +
 //                        location.getLongitude()), Toast.LENGTH_LONG).show();
 //                }
+                }
+            } catch (Exception e) {
+                Log.d("test" , "onLocationChanged " + e.toString());
             }
         }
     }

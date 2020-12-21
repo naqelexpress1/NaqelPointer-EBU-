@@ -247,6 +247,13 @@ public class PickUpSecondFragment
 
     private void AddNewPiece() {
 
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
         String preBarcode = "";
 

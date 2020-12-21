@@ -20,12 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-
+import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

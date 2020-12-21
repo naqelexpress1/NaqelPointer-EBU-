@@ -23,6 +23,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,8 @@ public class DeliveryThirdFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         if (rootView == null) {
+
+
             rootView = inflater.inflate(R.layout.deliverythirdfragment, container, false);
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
@@ -236,6 +239,14 @@ public class DeliveryThirdFragment extends Fragment {
     }
 
     private void AddNewPiece() {
+
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
             if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
 

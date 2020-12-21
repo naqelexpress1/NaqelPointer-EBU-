@@ -131,7 +131,7 @@ public class NotDeliveredActivity
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid() && dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), firstFragment.txtReason.getText().toString(),
-                firstFragment.txtWaybillNo.getText().toString())) {
+                firstFragment.txtWaybillNo.getText().toString(),bundle.getInt("SeqNo"), bundle.getBoolean("isupdate"))) {
 
             dbConnections.UpdateProductivity_Exceptions(GlobalVar.getDate(), getApplicationContext());
 

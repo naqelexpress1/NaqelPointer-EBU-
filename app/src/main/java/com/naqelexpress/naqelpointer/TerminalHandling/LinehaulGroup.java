@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 
 //import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 
-// Created by Ismail on 21/03/2018.
+// Created by Ismail on 21/03/2018. this package is using
 
 public class LinehaulGroup extends AppCompatActivity implements View.OnClickListener {
 
@@ -38,6 +39,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.d("test" , "Linhul");
         setContentView(R.layout.linehaulgroup);
 
         //countDownTimer = new MyCountDownTimer(startTime, interval);
@@ -86,6 +88,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         operationalcity = bundle.getStringArrayList("operationalcity");
 
         group = bundle.getString("group");
+        Log.d("test" , "Linhul group " + group);
 
     }
 
@@ -251,6 +254,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         bundle.putStringArrayList("city", city);
         bundle.putStringArrayList("operationalcity", operationalcity);
         bundle.putString("group", "Group " + group);
+
 
 
         Intent intent = new Intent(this, TerminalHandling.class);

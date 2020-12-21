@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageButton;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,11 +37,19 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.naqelexpress.naqelpointer.Activity.Login.LoginActivity;
+import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Classes.ConsingeeMobileSpinnerDialog;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.JSON.Request.CongisneeUpdatedNoRequest;
+import com.naqelexpress.naqelpointer.JSON.Results.CongisneeUpdatedNoResult;
+import com.naqelexpress.naqelpointer.JSON.Results.GetUserMEDataResult;
 import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONException;
@@ -63,14 +72,14 @@ public class WaybillPlanActivity extends AppCompatActivity
     TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount, txtPODType, txtPhoneNo;
     TextView lbPODType;
     ConsingeeMobileSpinnerDialog spinnerDialog;
-    //Button btnDelivered, btnNotDeliverd, btnCall;
+    SupportMapFragment mapFragment;
+
     private Bundle bundle;
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
-    SupportMapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
-
+    int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
+//            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             mapFragment.getMapAsync(this);
 
@@ -192,7 +202,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
             if (bundle != null) {
 
-                int position = bundle.getInt("position");
+                position = bundle.getInt("position");
 
                 myRouteShipments = GlobalVar.GV().myRouteShipmentList.get(position);
 
@@ -207,6 +217,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 txtPhoneNo.setTag(myRouteShipments.ConsigneePhoneNumber);
                 ConsigneeLatitude = myRouteShipments.Latitude;
                 ConsigneeLongitude = myRouteShipments.Longitude;
+
 
                 if (myRouteShipments.PODNeeded)
                     txtPODType.setText(myRouteShipments.PODTypeCode);
@@ -295,9 +306,10 @@ public class WaybillPlanActivity extends AppCompatActivity
                 Delivered();
                 return true;
             case R.id.NotDelivered:
-
                 NotDelivered();
                 return true;
+            case R.id.UpdatedConsigneeNo :
+                PrepareGetConsigneeUpdatedNo(GlobalVar.GV().EmployID , Integer.parseInt(myRouteShipments.ItemNo));
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -316,7 +328,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
     public void Delivered() {
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (GetDivision()) {
             if (ConsigneeLatitude.length() == 0) {
                 ConsigneeLatitude = "0.0";
@@ -338,6 +350,8 @@ public class WaybillPlanActivity extends AppCompatActivity
     public void NotDelivered() {
 
         if (GetDivision()) {
+
+
             if (ConsigneeLatitude.length() == 0) {
                 ConsigneeLatitude = "0.0";
                 ConsigneeLongitude = "0.0";
@@ -595,6 +609,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         p.y = location[1];
     }
 
+
     private class ResendOtpNo extends AsyncTask<String, Void, String> {
         String result = "";
         StringBuffer buffer;
@@ -701,6 +716,169 @@ public class WaybillPlanActivity extends AppCompatActivity
         }
     }
 
+
+    public void PrepareGetConsigneeUpdatedNo(int employID , int waybillNo) {
+       try {
+           CongisneeUpdatedNoRequest request = new CongisneeUpdatedNoRequest();
+           request.EmployeeID = employID;
+           request.WaybillNo = waybillNo;
+           String jsonData = JsonSerializerDeserializer.serialize(request, true);
+           new GetCongisneeUpdatedNo().execute(jsonData);
+       } catch (Exception e) {
+           Log.d("test", e.toString());
+       }
+    }
+
+    private class GetCongisneeUpdatedNo extends AsyncTask<String, Void, String> {
+
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(WaybillPlanActivity.this, "Please wait.", "Checking for updates ..", true);
+            // todo riyam
+            DomainURL = GlobalVar.NaqelAPIUAT +"GetUpdatedConsigneeNo";
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+            try {
+
+                URL url = new URL(DomainURL);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                try {
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                } catch (java.net.NoRouteToHostException se) {
+                    System.out.println(se);
+                }
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+                if (finalJson != null) {
+
+                    CongisneeUpdatedNoResult result = new CongisneeUpdatedNoResult(finalJson);
+
+                    if (result.HasError) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),  result.ErrorMessage, GlobalVar.AlertType.Error);
+                    } else {
+
+                        //check they are not null not empty .. etc then update
+                        if (!result.MobileNo.equals("null") && result.MobileNo != null && ! result.MobileNo.equals("0")
+                                &&  result.MobileNo.length() > 0 && !result.PhoneNo.equals("null") && result.PhoneNo != null &&
+                                !result.PhoneNo.equals("0") && result.PhoneNo.length() > 0) {
+
+                            //Get emp country
+                            DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
+                            int countryID = 0;
+                            String countryCode ="";
+
+                            Cursor cursor = dbConnections.getStationID(GlobalVar.GV().EmployID, getApplicationContext());
+                            if (cursor.getCount() > 0) {
+                                cursor.moveToFirst();
+                                countryID = cursor.getInt(cursor.getColumnIndex("CountryID"));
+                                countryCode = cursor.getString(cursor.getColumnIndex("CountryCode"));
+                            }
+
+                            if (countryID == 1)
+                                    result.MobileNo = GlobalVar.ValidateMobileNo(result.MobileNo);
+                            else
+                                    result.MobileNo =GlobalVar.ValidateMobileNoOtherCountry(result.MobileNo , countryCode);
+
+                            if (countryID == 1)
+                                     result.PhoneNo = GlobalVar.ValidateMobileNo(result.PhoneNo);
+                            else
+                                     result.PhoneNo = GlobalVar.ValidateMobileNoOtherCountry(result.PhoneNo, countryCode);
+
+                            updateConsigneeMobileView(result.PhoneNo , result.MobileNo);
+                            updateConsigneeMobileLocalDB(result.PhoneNo , result.MobileNo);
+                        }
+
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Consignee number is updated" + result.ErrorMessage, GlobalVar.AlertType.Info);
+                    }
+                }
+                else {
+                    if (isInternetAvailable.contains("No address associated with hostname")) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                    } else {
+                        GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                        if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                            GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                        }
+
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
+                    }
+
+                }
+
+                progressDialog.dismiss();
+                super.onPostExecute(String.valueOf(finalJson));
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+
+    public void updateConsigneeMobileView (String phoneNo , String mobileNo) {
+        txtPhoneNo.setText(phoneNo);
+        txtMobileNo.setText(mobileNo);
+    }
+
+    public void updateConsigneeMobileLocalDB (String phoneNo , String mobileNo) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(),null);
+        dbConnections.UpdateConsigneeNo(myRouteShipments.ItemNo,phoneNo, mobileNo);
+    }
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -720,4 +898,5 @@ public class WaybillPlanActivity extends AppCompatActivity
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
 }

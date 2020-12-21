@@ -83,7 +83,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
+    //MapFragment mapFragment;
     private GoogleMap mMap;
+
     private ArrayList<MyRouteShipments> myRouteShipmentList;
     //static ArrayList<Places> places; // = new ArrayList<>();
     ArrayList<Integer> colors_marker_route = new ArrayList<>();
@@ -104,6 +106,8 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         myRouteShipmentList = extras.getParcelableArrayList("myroute");
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        //mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         //myRouteShipmentList = new ArrayList<>();
         //Bundle bundle = getIntent().getExtras();
@@ -459,7 +463,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     wno = myRouteShipmentList.get((int) places.get(i).getSpeed() + 1).ItemNo;
 
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                dbConnections.InsertPlannedLocation(getApplicationContext(), result, Integer.parseInt(position));
+                dbConnections.InsertPlannedLocation(getApplicationContext(), result, Integer.parseInt(position), Integer.parseInt(wno));
                 dbConnections.close();
 
                 ParserTask parserTask = new ParserTask();

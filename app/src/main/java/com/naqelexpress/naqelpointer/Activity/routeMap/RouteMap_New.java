@@ -37,6 +37,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -78,6 +79,7 @@ public class RouteMap_New extends AppCompatActivity implements OnMapReadyCallbac
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
+//    MapFragment mapFragment;
     private GoogleMap mMap;
     private ArrayList<MyRouteShipments> myRouteShipmentList;
     //static ArrayList<Places> places; // = new ArrayList<>();
@@ -96,6 +98,7 @@ public class RouteMap_New extends AppCompatActivity implements OnMapReadyCallbac
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+      //  mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         myRouteShipmentList = new ArrayList<>();
         //Bundle bundle = getIntent().getExtras();

@@ -44,6 +44,7 @@ public class NclServiceBulk extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.d("test" , "NclServiceBulk Started");
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -127,6 +128,7 @@ public class NclServiceBulk extends Service {
 
 
     public void SaveNcl(final DBConnections db, final String input, final int id) {
+        Log.d("test" , "NclServiceBulk SaveNcl");
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);

@@ -171,6 +171,13 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
 //            return;
 //        }
 
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
 
         try {
             double convert = Double.parseDouble(txtBarCode.getText().toString());

@@ -173,6 +173,14 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
     }
 
     private void AddNewPiece() {
+
+        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            return;
+        }
+
         //if (trips.get("AdHoc").equals("0"))
         if (!isncl.contains(txtBarCode.getText().toString())) {
             ErrorAlert("This Ncl(" + txtBarCode.getText().toString() + ") not in this Trip(" + trips.get("TripCode") + ")");

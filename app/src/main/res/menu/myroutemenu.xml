@@ -13,9 +13,9 @@
 
     <item
         android:id="@+id/camera"
-        android:title="Camera"
         android:icon="@android:drawable/ic_menu_camera"
         android:orderInCategory="100"
+        android:title="Camera"
         app:showAsAction="always" />
 
 
@@ -23,8 +23,8 @@
         android:id="@+id/deleteall"
         android:icon="@android:drawable/ic_menu_delete"
         android:iconTint="@color/NaqelRed"
-        android:title="Delete"
         android:orderInCategory="100"
+        android:title="Delete"
         app:showAsAction="always"
         tools:ignore="HardcodedText" />
 
@@ -64,6 +64,7 @@
         android:id="@+id/groupmap"
         android:orderInCategory="100"
         android:title="Route Map"
+        android:visible="false"
         app:showAsAction="never" />
     <item
         android:id="@+id/movingmap"

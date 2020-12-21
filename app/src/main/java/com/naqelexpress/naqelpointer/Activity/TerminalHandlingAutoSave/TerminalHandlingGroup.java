@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,10 +16,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,6 +56,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
 
         //countDownTimer = new MyCountDownTimer(startTime, interval);
+
 
         setContentView(R.layout.terminalgroup);
         ImageView group1 = (ImageView) findViewById(R.id.group1);
@@ -222,10 +224,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.group1:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("1");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                //if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                fetchgroup("1");
+//                else
+//                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.group2:
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))

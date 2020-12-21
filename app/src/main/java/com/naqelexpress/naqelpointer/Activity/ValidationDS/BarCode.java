@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.ValidationDS;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -101,6 +102,7 @@ public class BarCode
             imageViewReference = new WeakReference<TextView>(imageView);
         }
 
+       // @SuppressLint("WrongThread")
         @Override
         protected TextView doInBackground(String... params) {
 

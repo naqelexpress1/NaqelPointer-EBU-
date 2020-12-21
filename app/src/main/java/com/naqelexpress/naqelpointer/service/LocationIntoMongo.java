@@ -164,7 +164,7 @@ public class LocationIntoMongo extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerLivetrackingLocation + "InsertLocation";
+        String URL = GlobalVar.GV().NaqelPointerLivetrackingPusher;
 
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {

@@ -1,13 +1,10 @@
 <component name="libraryTable">
   <library name="Gradle: me.anwarshahriar:calligrapher:1.0@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/31b55facaeb2edbea7dec44a54c4fb1d/calligrapher-1.0/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/31b55facaeb2edbea7dec44a54c4fb1d/calligrapher-1.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/31b55facaeb2edbea7dec44a54c4fb1d/calligrapher-1.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8859370d27bf8b5326e0bc8a6b12b8b9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8859370d27bf8b5326e0bc8a6b12b8b9/res" />
     </CLASSES>
-    <JAVADOC>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.anwarshahriar/calligrapher/1.0/96d075f4a94bee00e6f20987b957e3f580285f8a/calligrapher-1.0-javadoc.jar!/" />
-    </JAVADOC>
+    <JAVADOC />
     <SOURCES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/me.anwarshahriar/calligrapher/1.0/92715b820148d3d75201fa314ed8a3b20b750005/calligrapher-1.0-sources.jar!/" />
     </SOURCES>

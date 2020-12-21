@@ -68,12 +68,14 @@ public class MyRouteActivity
     static int progressflag = 0;
 
     private SearchView searchView;
+    TextView lastseqstoptime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.myroutenew);
+
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -85,6 +87,7 @@ public class MyRouteActivity
 
         progressflag = 0;
         GlobalVar.GV().haslocation.clear();
+        lastseqstoptime = (TextView) findViewById(R.id.laststopseqtime);
         mapListview = (RecyclerView) findViewById(R.id.myRouteListView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mapListview.setLayoutManager(mLayoutManager);
@@ -250,6 +253,7 @@ public class MyRouteActivity
 
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
+        GetPlannedLocation();
     }
 
     private void ValidateDatas() {
@@ -1056,7 +1060,7 @@ public class MyRouteActivity
     }
 
     @Override
-    public void onItemSelected(MyRouteShipments item , int pos) {
+    public void onItemSelected(MyRouteShipments item, int pos) {
         // Toast.makeText(getApplicationContext(), "Selected: " + item.Position, Toast.LENGTH_LONG).show();
 
         if (GlobalVar.GV().CourierDailyRouteID > 0) {
@@ -1086,4 +1090,41 @@ public class MyRouteActivity
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to start a new trip before", GlobalVar.AlertType.Warning);
 
     }
+
+    public void GetPlannedLocation() {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
+                " and EmpID = " + GlobalVar.GV().EmployID + " order by position desc Limit 1", getApplicationContext());
+
+
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+
+
+            String data = result.getString(result.getColumnIndex("StringData"));
+
+            if (data.contains("ZERO_RESULTS")) {
+                System.out.println("true");
+            }
+
+            try {
+                JSONObject jsonObject = new JSONObject(data);
+                JSONArray jRoutes = jsonObject.getJSONArray("routes");
+                for (int i = 0; i < jRoutes.length(); i++) {
+                    JSONArray jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+                    lastseqstoptime.setText((String) ((JSONObject) ((JSONObject) jLegs.get(i)).get("duration")).get("text"));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        result.close();
+        dbConnections.close();
+
+    }
+
 }

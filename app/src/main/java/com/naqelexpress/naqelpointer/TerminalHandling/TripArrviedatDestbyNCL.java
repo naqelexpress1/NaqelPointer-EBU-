@@ -799,7 +799,7 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (6, String.valueOf(Latitude),
                         String.valueOf(Longitude), 0, status
-                        , "", 0);
+                        , "", 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext()))
             ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

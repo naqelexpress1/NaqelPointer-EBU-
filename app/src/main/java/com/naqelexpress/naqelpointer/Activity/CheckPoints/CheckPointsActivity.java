@@ -59,6 +59,8 @@ public class CheckPointsActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        firstFragment.txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
+
 
         TimeIn = DateTime.now();
 
@@ -110,7 +112,10 @@ public class CheckPointsActivity extends AppCompatActivity {
             boolean IsSaved = true;
 
             CheckPoint checkPoint = new CheckPoint(firstFragment.CheckPointTypeID, String.valueOf(Latitude),
-                    String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.CheckPointTypeDDetailID,"");
+                    String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.CheckPointTypeDDetailID,
+                    //mohammed // add the new column
+
+                    "");
 
             if (dbConnections.InsertCheckPoint(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -163,10 +168,24 @@ public class CheckPointsActivity extends AppCompatActivity {
                 firstFragment.CheckPointTypeDetailID == 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
+            firstFragment.txtCheckPointType_TripID.setVisibility(View.VISIBLE);
             return false;
-        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE &&
+        }
+        else if (firstFragment.txtCheckPointType_TripID.getVisibility() == View.VISIBLE) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter Trip ID",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
+        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE &&
                 firstFragment.CheckPointTypeDDetailID == 0) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
+
+        //mohammed
+        if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
                     GlobalVar.AlertType.Error);
             return false;
         }

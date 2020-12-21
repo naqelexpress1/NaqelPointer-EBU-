@@ -62,6 +62,9 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
     FirstFragment firstFragment;
     ThirdFragment thirdFragment;
+
+    com.naqelexpress.naqelpointer.Activity.TerminalHandling.FirstFragment firstFragment2;
+
     DateTime TimeIn;
     public static double Latitude = 0;
     public static double Longitude = 0;
@@ -126,6 +129,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+
 
 
         TimeIn = DateTime.now();
@@ -232,10 +237,12 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             }
 
 
+            // added -- , Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()) --
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
-                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "", thirdFragment.Barcodes.size());
+                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
+
+                            "", thirdFragment.Barcodes.size(), Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -283,7 +290,18 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
-        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
+        }
+
+       else if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0 && TerminalHandling.group.equals("Group 8")) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
+
+
+
+
+        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
             if (firstFragment.CheckPointTypeDDetailID == 1 && firstFragment.txtCheckPointTypeDDetail.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);
@@ -293,6 +311,11 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                         GlobalVar.AlertType.Error);
                 return false;
             }
+//            if (firstFragment2.txtCheckPointType_TripID.getText().toString().length() == 0) {
+//                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
+//                        GlobalVar.AlertType.Error);
+//                return false;
+//            }
 
         }
 
@@ -483,6 +506,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         outState.putSerializable("reason", reason);
         outState.putSerializable("city", city);
         outState.putSerializable("operationalcity", operationalcity);
+        //added
+        //outState.putInt("TripID", GlobalVar.GV().TripID);
 
     }
 
@@ -825,6 +850,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 checkPoint.Longitude = result.getString(result.getColumnIndex("Longitude"));
                 checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                 checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
+                //added
+                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
 
 
                 Cursor resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
@@ -848,7 +875,11 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+
+                    //the url here
+            //      URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+                    URL url = new URL("http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"); //LoadtoDestination
+
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");

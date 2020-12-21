@@ -47,14 +47,15 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         ImageView group3 = (ImageView) findViewById(R.id.group3);
         group3.setOnClickListener(this);
 
-        LinearLayout shipmentarrrivedatdest = (LinearLayout) findViewById(R.id.shipmentarrrivedatdest);
-        shipmentarrrivedatdest.setOnClickListener(this);
+//        this one
+//        LinearLayout shipmentarrrivedatdest = (LinearLayout) findViewById(R.id.shipmentarrrivedatdest);
+//        shipmentarrrivedatdest.setOnClickListener(this);
 
         LinearLayout llgroup4 = (LinearLayout) findViewById(R.id.llgroup4);
-        llgroup4.setOnClickListener(this);
+        llgroup4.setOnClickListener(this); // Transist
 
         LinearLayout llgroup5 = (LinearLayout) findViewById(R.id.llgroup5);
-        llgroup5.setOnClickListener(this);
+        llgroup5.setOnClickListener(this); // Transport Delay
 
         ImageView ncl = (ImageView) findViewById(R.id.ncl);
         ncl.setOnClickListener(this);
@@ -219,11 +220,11 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.arrivedatdest:
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
-                    Intent arrivedat = new Intent(LinehaulGroup.this, BringTripDetails.class);
-                    arrivedat.putExtra("Function", 1);
-                    startActivity(arrivedat);
-                } else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                Intent arrivedat = new Intent(LinehaulGroup.this, BringTripDetails.class);
+                arrivedat.putExtra("Function", 1);
+                startActivity(arrivedat);
+            } else
+                Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.undoncl:
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {

@@ -1,10 +1,13 @@
 <component name="libraryTable">
   <library name="Gradle: com.pusher:pusher-platform-android:1.0.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/17b8718a716cb4a69926a824c55fe8f8/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/17b8718a716cb4a69926a824c55fe8f8/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/caff1d77ce511c72d1d7157a4a2f93e7/pusher-platform-android-1.0.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/caff1d77ce511c72d1d7157a4a2f93e7/pusher-platform-android-1.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/caff1d77ce511c72d1d7157a4a2f93e7/pusher-platform-android-1.0.0/res" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/pusher-platform-android/1.0.0/f9285422abe5f7b5508b91c74100fdc0fd36a383/pusher-platform-android-1.0.0-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/pusher-platform-android/1.0.0/ee9eb4cc28ca439e378c4feadce4276ca4e716d2/pusher-platform-android-1.0.0-sources.jar!/" />
     </SOURCES>

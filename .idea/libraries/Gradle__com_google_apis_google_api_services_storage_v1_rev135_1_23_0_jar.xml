@@ -3,7 +3,9 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.apis/google-api-services-storage/v1-rev135-1.23.0/220a3a791dfb2af0edc466cce0b5a18a27c4425/google-api-services-storage-v1-rev135-1.23.0.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.apis/google-api-services-storage/v1-rev135-1.23.0/b649908da4f9c217897b0da23c274a1ea9f95abb/google-api-services-storage-v1-rev135-1.23.0-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.apis/google-api-services-storage/v1-rev135-1.23.0/f7cd4d6007aaee69673b7e619660f2d6f48f8d63/google-api-services-storage-v1-rev135-1.23.0-sources.jar!/" />
     </SOURCES>

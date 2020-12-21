@@ -1,10 +1,13 @@
 <component name="libraryTable">
   <library name="Gradle: com.pusher:chatkit-android:1.0.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f64888bc8eed3c7529f3dde07a24524d/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f64888bc8eed3c7529f3dde07a24524d/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d5694b8f4ed6b2489af5ddf8c64569f6/chatkit-android-1.0.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d5694b8f4ed6b2489af5ddf8c64569f6/chatkit-android-1.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d5694b8f4ed6b2489af5ddf8c64569f6/chatkit-android-1.0.0/res" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/chatkit-android/1.0.0/fc5c9d1aaaabcd3fa75e5b04dac9020202512b59/chatkit-android-1.0.0-javadoc.jar!/" />
+    </JAVADOC>
     <SOURCES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/chatkit-android/1.0.0/a3e90e9efbc9d7a13948a7e546353af36f8bfa1c/chatkit-android-1.0.0-sources.jar!/" />
     </SOURCES>

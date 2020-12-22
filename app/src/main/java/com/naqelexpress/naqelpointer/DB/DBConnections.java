@@ -178,7 +178,7 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
                 "\"CheckPointTypeDetailID\" INTEGER  , \"CheckPointTypeDDetailID\" INTEGER  , \"Latitude\" TEXT, " +
-                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0 , \"TripID\" INTEGER NOT NULL )");
+                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0 , \"TripID\" INTEGER Default 0 )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointBarCodeDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
@@ -839,7 +839,7 @@ public class DBConnections
             if (!isColumnExist("CheckPoint", "Comments"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Comments TEXT");
             if (!isColumnExist("CheckPoint", "TripID"))
-                db.execSQL("ALTER TABLE CheckPoint ADD COLUMN TripID INTEGER");
+                db.execSQL("ALTER TABLE CheckPoint ADD COLUMN TripID INTEGER DEFAULT 0");
             if (!isColumnExist("CheckPoint", "Ref"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Ref TEXT ");
             if (!isColumnExist("BarCode", "IsDelivered"))

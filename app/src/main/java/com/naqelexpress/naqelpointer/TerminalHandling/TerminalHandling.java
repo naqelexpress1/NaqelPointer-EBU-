@@ -260,7 +260,7 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
 
                 if (IsSaved) {
-//
+
                     if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
                         startService(
                                 new Intent(TerminalHandling.this,

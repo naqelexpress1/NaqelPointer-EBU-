@@ -115,8 +115,10 @@ public class RouteListAdapterGroupbyPNo
 //                ImageDownloaderTask updatemessages = new ImageDownloaderTask(holder.cl);
 //                StartAsyncTaskInParallel(updatemessages, "0");
             }
-
-            if (!itemListFiltered.get(position).BGColor.equals("0")) {
+            if (itemListFiltered.get(position).BGColor.equals("CurrentOne")) {
+                ImageDownloaderTask updatemessages = new ImageDownloaderTask(holder.cl);
+                StartAsyncTaskInParallel(updatemessages, itemListFiltered.get(position).BGColor);
+            } else if (!itemListFiltered.get(position).BGColor.equals("0")) {
                 ImageDownloaderTask updatemessages = new ImageDownloaderTask(holder.cl);
                 StartAsyncTaskInParallel(updatemessages, itemListFiltered.get(position).BGColor);
             } else if (itemListFiltered.get(position).HasDeliveryRequest) {
@@ -262,7 +264,9 @@ public class RouteListAdapterGroupbyPNo
 
             @SuppressLint("WrongThread") ConstraintLayout textView = new ConstraintLayout(context);
 
-            if (params[0].equals("1"))
+            if (params[0].equals("CurrentOne"))
+                textView.setBackgroundColor(Color.parseColor("#64D179"));
+            else if (params[0].equals("1"))
                 textView.setBackgroundColor(Color.parseColor("#F6F600"));
             else if (params[0].equals("0"))
                 textView.setBackgroundColor(Color.parseColor("#FFdbdcdd"));

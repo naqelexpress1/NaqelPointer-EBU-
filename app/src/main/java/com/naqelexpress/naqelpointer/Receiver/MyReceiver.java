@@ -94,7 +94,7 @@ public class MyReceiver extends BroadcastReceiver {
 
             onCallStateChanged(context, state, number);
 
-            //Toast.makeText(context.getApplicationContext(), "test by is " + number, Toast.LENGTH_LONG).show();
+//            Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + number, Toast.LENGTH_LONG).show();
 
         } else if (intent.getAction().equalsIgnoreCase("android.intent.action.NEW_OUTGOING_CALL")) {
             savedNumber = intent.getExtras().getString("android.intent.extra.PHONE_NUMBER");
@@ -113,6 +113,7 @@ public class MyReceiver extends BroadcastReceiver {
                     .equalsIgnoreCase(intent.getAction())) {
                 // some operation
             }
+
             Toast.makeText(context.getApplicationContext(), "test by is " + intent.getAction(), Toast.LENGTH_LONG).show();
 
             dbConnections.close();

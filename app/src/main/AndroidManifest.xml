@@ -5,6 +5,7 @@
     package="com.naqelexpress.naqelpointer">
 
 
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <permission-group
         android:name="android.permission-group.PHONE"
         android:description="@string/permgrouprequest_calllog"

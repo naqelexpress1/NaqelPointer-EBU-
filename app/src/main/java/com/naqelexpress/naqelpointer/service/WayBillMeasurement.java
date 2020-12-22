@@ -211,8 +211,9 @@ public class WayBillMeasurement extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteWayBillMeasurement(id, getApplicationContext());
-                        db.deleteWayBillMeasurementDetails(id, getApplicationContext());
+//                        db.deleteWayBillMeasurement(id, getApplicationContext());
+//                        db.deleteWayBillMeasurementDetails(id, getApplicationContext());
+                        db.updateWaybillMeasurementID(id, getApplicationContext());
                         flag_thread = false;
 
 

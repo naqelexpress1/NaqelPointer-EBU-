@@ -314,6 +314,16 @@ public class History extends Activity {
                 GetConsolidationList();
 
             }
+            if (parent.getItemAtPosition(pos).toString().equals("Waybill Measurement")) {
+
+                ManualFunction = "Waybill Measurement";
+                //insertManual();
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetWaybillMeasurementList();
+
+            }
 
 
         }
@@ -354,6 +364,19 @@ public class History extends Activity {
         } else
             nodata.setVisibility(View.VISIBLE);
 
+
+    }
+
+    private void GetWaybillMeasurementList() {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        mydeliverylist.addAll(dbConnections.getWaybillMeasurementListHistory(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+        dbConnections.close();
 
     }
 

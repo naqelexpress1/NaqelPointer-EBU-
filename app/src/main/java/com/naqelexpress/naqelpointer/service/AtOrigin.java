@@ -120,7 +120,8 @@ public class AtOrigin extends Service {
 
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
-            Cursor result = db.Fill("select * from AtOrigin Limit 1 ", getApplicationContext());
+            //Cursor result = db.Fill("select * from AtOrigin Limit 1 ", getApplicationContext());
+            Cursor result = db.Fill("select * from AtOrigin where IsSync = 0 Limit 1 ", getApplicationContext());
 
 
             if (result.getCount() > 0) {
@@ -219,7 +220,8 @@ public class AtOrigin extends Service {
             if (finalJson != null) {
                 if (finalJson.contains("201 - Created Successfully")) {
                     DBConnections db = new DBConnections(getApplicationContext(), null);
-                    db.deleteAtOrigin(id, getApplicationContext());
+//                    db.deleteAtOrigin(id, getApplicationContext());
+                    db.UpdateAtOriginID(id, getApplicationContext());
                     flag_thread = false;
                     db.close();
                 }

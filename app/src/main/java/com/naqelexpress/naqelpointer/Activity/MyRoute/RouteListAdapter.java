@@ -192,7 +192,20 @@ public class RouteListAdapter
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (item.TypeID != 0) {
+            if (item.TypeID == 123)//WaybillMeasurement
+            {
+                holder.txtType.setVisibility(View.VISIBLE);
+                holder.txtWaybill.setText(String.valueOf(item.ItemNo)
+                        + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
+               // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
+
+            }else if (item.TypeID == 124)//AtOrigin
+            {
+                holder.txtType.setVisibility(View.VISIBLE);
+                holder.txtWaybill.setText(String.valueOf(item.ItemNo));
+                // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
+
+            } else if (item.TypeID != 0) {
                 holder.txtType.setVisibility(View.VISIBLE);
                 holder.txtWaybill.setText("Waybillcount " + String.valueOf(item.TypeID) + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
                 holder.txtType.setText("Pieces Count " + String.valueOf(item.PiecesCount));

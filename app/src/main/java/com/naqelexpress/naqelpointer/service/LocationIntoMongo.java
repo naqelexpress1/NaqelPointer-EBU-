@@ -96,15 +96,15 @@ public class LocationIntoMongo extends Service {
                         updatefile();
 
                     }
-                    handler.postDelayed(this, 20000);
+                    handler.postDelayed(this, 120000);
                 } catch (Exception e) {
                     flag_thread = false;
-                    handler.postDelayed(this, 20000);
+                    handler.postDelayed(this, 120000);
                     Log.e("Dashboard thread", e.toString());
                 }
 
             }
-        }, 20000);
+        }, 120000);
 
         return START_STICKY;
     }
@@ -131,7 +131,7 @@ public class LocationIntoMongo extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from LocationintoMongo Limit 30 ", getApplicationContext());
+            Cursor result = db.Fill("select * from LocationintoMongo Limit 100 ", getApplicationContext());
 
             JSONArray jsonArray = new JSONArray();
             //JSONObject header = new JSONObject();

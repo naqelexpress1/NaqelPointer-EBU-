@@ -16,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -46,6 +48,10 @@ public class SplashScreenActivity
     int redirctcalss = 0;
 
     // static final Uri CallLog_URI = CallLog.Calls.CONTENT_URI;
+    FirebaseAuth mAuth;
+    FirebaseAnalytics firebaseAnalytics;
+    String key = "-MORKAgIlD5uuqZWtgCT";
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,43 +59,93 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
-        //Write a message to the database
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        try {
+        //  mAuth = FirebaseAuth.getInstance();
+        //mAuth.signOut();
+////
+//            String uid = FirebaseAuth.getInstance().getUid();
+////            if (uid == null || uid.length() == 0)
 //
-//        final DatabaseReference myRef = database.getReference("LiveTracking");
 //
-//        final CourierDetailsFirebase user = new CourierDetailsFirebase("19127", "24.428261,39.606400");
+//            //  Write a message to the database
+//
+//            FirebaseDatabase database = FirebaseDatabase.getInstance();
+//
+//            final DatabaseReference myRef = database.getReference("LiveTracking");
+//
+//            final CourierDetailsFirebase user = new CourierDetailsFirebase("19128", "24.428261,39.606400", "", "", "", "", "", 0, "", "", "");
+//
+//          //  String
+////            myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+////                @Override
+////                public void onDataChange(DataSnapshot snapshot) {
+////                    if (snapshot.hasChild("EmpID")) {
+////                        System.out.println(snapshot);
+////                    }
+////                }
+////
+////                @Override
+////                public void onCancelled(DatabaseError databaseError) {
+////
+////                }
+////            });
 //
 //
-//        myRef.orderByChild("EmpID").equalTo("19127").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.getValue() == null) {
-//                    String userid = myRef.push().getKey();
-//                    myRef.child(userid).setValue(user);
-//                    return;
+//
+//            myRef.orderByChild("EmpID").equalTo("19128").addListenerForSingleValueEvent(new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    if (dataSnapshot.getValue() == null) {
+//                        String userid = myRef.push().getKey();
+//                        System.out.println(userid);
+//                        myRef.child(userid).setValue(user);
+//                        return;
+//                    }else
+//                    {
+//
+//                        String asd = dataSnapshot.getKey();
+//                        key = dataSnapshot.getChildren().iterator().next().getKey();
+//                        System.out.println(asd);
+//                    }
+//
+//                    Map newUserData = new HashMap();
+//                    newUserData.put("LatLng", "0,0");
+//                    newUserData.put("NextWaybillNo", "123");
+//                    newUserData.put("EmpID", "19128");
+//                    newUserData.put("MobileNo", "Mno");
+//                    newUserData.put("ConsLocation", "ConsLocation");
+//                    newUserData.put("ConsigneeName", "ConsigneeName");
+//                    newUserData.put("Speed","12");
+//                    newUserData.put("isnotify", "1");
+//                    newUserData.put("BillingType", "BillingType");
+//                    newUserData.put("CollectedAmount", "CollectedAmount");
+//                    //  newUserData.put("ConsLocation", ConsLocation);
+//                    myRef.child(key).updateChildren(newUserData);
+//
+//
+////                    CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
+////                    if (fetchuser.EmpID != null)
+////                        fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
+////
+////                    if (fetchuser.ID != null) {
+////                        myRef.child(fetchuser.ID).child("LatLng").setValue("24.428261,39.606400");
+////                    } else {
+////                        String userid = myRef.push().getKey();
+////                        myRef.child(userid).setValue(user);
+////                    }
+//                    //  Log.d("User", "");
 //                }
-//                CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
-//                if (fetchuser.EmpID != null)
-//                    fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
 //
-//                if (fetchuser.ID != null) {
-//                    myRef.child(fetchuser.ID).child("LatLng").setValue("24.428261,39.606400");
-//                } else {
-//                    String userid = myRef.push().getKey();
-//                    myRef.child(userid).setValue(user);
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//                    Log.d("User", "");
 //                }
-//                //  Log.d("User", "");
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d("User", "");
-//            }
 //
 //
-//        });
-
+//            });
+//        } catch (Exception e) {
+//            System.out.println(e.toString());
+//        }
 
 //        Query queryRef = myRef
 //                .orderByChild("EmpID")

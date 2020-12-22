@@ -70,7 +70,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 138; // Duplicate Customer , MobileNo Verified
+    private static final int Version = 140; // AuthKey , Duplicate Customer , MobileNo Verified
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -229,7 +229,7 @@ public class DBConnections
                 "\"Request\"  INTEGER NOT NULL DEFAULT 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"AtOrigin\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"Json\"  TEXT NOT NULL )");
+                "\"Json\"  TEXT NOT NULL , IsSync BOOL , CTime DATETIME   )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Palletize\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"Json\"  TEXT NOT NULL )");
@@ -442,6 +442,9 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DuplicateCustomer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "Data TEXT  NOT NULL , isComplete Integer DEFAULT 0 , SeqNo Integer , ParentWaybillNo Integer)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"FBNode\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                " Node TEXT  NOT NULL , EmpID Integer Not Null)");
+
 
     }
 
@@ -495,7 +498,7 @@ public class DBConnections
                     "\"Name\" INTEGER NOT NULL , \"MobileNo\" TEXT, \"RawID\" INTEGER)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"AtOrigin\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"Json\"  TEXT NOT NULL )");
+                    "\"Json\"  TEXT NOT NULL , IsSync BOOL ,  CTime DATETIME   )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"Productivity\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"OFD\"  INTEGER NOT NULL DEFAULT 0 , \"Attempted\"  INTEGER NOT NULL DEFAULT 0," +
@@ -736,6 +739,8 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DuplicateCustomer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "Data TEXT  NOT NULL , isComplete Integer DEFAULT 0 , SeqNo Integer , ParentWaybillNo Integer)");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"FBNode\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    " Node TEXT  NOT NULL , EmpID Integer Not Null)");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -963,6 +968,12 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteShipments", "IsNotDelivered"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsNotDelivered INTEGER Default 0 ");
+
+            if (!isColumnExist("AtOrigin", "IsSync"))
+                db.execSQL("ALTER TABLE AtOrigin ADD COLUMN IsSync BOOL ");
+
+            if (!isColumnExist("AtOrigin", "IsSync"))
+                db.execSQL("ALTER TABLE AtOrigin ADD COLUMN CTime DATETIME  ");
 
 //            if (!isColumnExist("MyRouteShipments", "isCourierApproach"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN isCourierApproach  INTEGER ");
@@ -3183,6 +3194,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("Json", instance);
+            contentValues.put("CTime", DateTime.now().toString());
 
             result = db.insert("AtOrigin", null, contentValues);
             db.close();
@@ -3791,6 +3803,13 @@ public class DBConnections
             db.delete("NightStock", "date(CTime) <? And IsSync  =?", args);
 
             db.delete("NCL", "date(Date) <? And IsSync  =?", args);
+
+            db.delete("AtOrigin", "date(CTime) <? And IsSync  =?", args);
+
+            db.execSQL("delete  from WaybillMeasurementDetail where WaybillMeasurementID in  (select ID from WaybillMeasurement " +
+                    "where issync = 1 and date(CTime) < date())");
+
+            db.delete("WaybillMeasurement", "date(CTime) <? And IsSync  =?", args);
 
 
             db.close();
@@ -6566,8 +6585,8 @@ public class DBConnections
 
     public boolean isMyRouteComplaince(Context context) {
         try {
-            Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
-
+           // Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+            Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where EmpID = " + GlobalVar.GV().EmployID, context);
 
             if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
                 isMyRteCmp.moveToFirst();
@@ -7460,7 +7479,7 @@ public class DBConnections
             if (findWaybillalreadyscannedorNot(String.valueOf(NextActivityWaybillNo), context)) {
                 db.close();
                 dbConnections.close();
-                UpdateMyRouteActionActivitySeqNo(context, " ", String.valueOf(NextActivityWaybillNo), 0 , true);
+                UpdateMyRouteActionActivitySeqNo(context, " ", String.valueOf(NextActivityWaybillNo), 0, true);
             }
         result.close();
         dbConnections.close();
@@ -7807,7 +7826,7 @@ public class DBConnections
             mnocursor.moveToFirst();
             ParentWaybillNo = mnocursor.getInt(mnocursor.getColumnIndex("ParentWaybillNo"));
             int SeqNo = mnocursor.getInt(mnocursor.getColumnIndex("SeqNo"));
-            UpdateMyRouteActionActivitySeqNo(context, "", String.valueOf(ParentWaybillNo), SeqNo , true);
+            UpdateMyRouteActionActivitySeqNo(context, "", String.valueOf(ParentWaybillNo), SeqNo, true);
         }
         mnocursor.close();
         return ParentWaybillNo;
@@ -7895,6 +7914,116 @@ public class DBConnections
 
         }
         return result != -1;
+    }
+
+    public void updateWaybillMeasurementID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("WaybillMeasurement", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
+    public void UpdateAtOriginID(Integer id, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(id)};
+                db.update("AtOrigin", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+
+
+    }
+
+
+    public static ArrayList<MyRouteShipments> getWaybillMeasurementListHistory(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from WaybillMeasurement order by CTime desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                onDeliveryRequest.TypeID = 123;
+                onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("TotalPieces"));
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
+    }
+
+
+    public boolean InsertFBAuthKey(Context context, String data , int EmpID) {
+        long result = 0;
+        try {
+
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("EmpID", EmpID);
+            contentValues.put("Node", data);
+
+            result = db.insert("FBNode", null, contentValues);
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetFBNode(Context context , int EmpId ) {
+        String Node = "0";
+        try {
+            Cursor mnocursor = Fill("select * from FBNode where EmpID = "+ EmpId + " Limit 1", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    Node = mnocursor.getString(mnocursor.getColumnIndex("Node"));
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return Node;
     }
 
 }

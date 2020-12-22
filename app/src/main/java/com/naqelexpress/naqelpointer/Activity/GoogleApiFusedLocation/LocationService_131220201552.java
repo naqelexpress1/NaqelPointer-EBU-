@@ -1,7 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -17,7 +16,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -34,12 +32,7 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -65,7 +58,7 @@ import java.util.Map;
  * Created by Hasna on 1/19/19.
  */
 
-public class LocationService extends Service {
+public class LocationService_131220201552 extends Service {
 
     private GoogleLocationService googleLocationService;
     protected boolean flag_thread = false;
@@ -77,7 +70,7 @@ public class LocationService extends Service {
     ArrayList<LatLng> location = new ArrayList<>();
     ArrayList<String> phnos = new ArrayList<>();
     DateTime timein;
-    FirebaseAuth mAuth;
+
 
     @Override
     public void onCreate() {
@@ -172,7 +165,7 @@ public class LocationService extends Service {
                         return;
                     }
 
-                    final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                     int lastlogin = GlobalVar.getlastlogin(getApplicationContext());
                     String devision = "";
 
@@ -267,122 +260,60 @@ public class LocationService extends Service {
 
 
                         if (devision.equals("Courier")) {
+                            FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-                            mAuth = FirebaseAuth.getInstance();
-                            if (mAuth.getUid() == null) {
-                                mAuth.signInWithEmailAndPassword("966593793637@naqel.com.sa", "M@d237467")
-                                        .addOnCompleteListener((Activity) getApplicationContext(), new OnCompleteListener<AuthResult>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                                if (task.isSuccessful()) {
-                                                    FirebaseUser user = mAuth.getCurrentUser();
-                                                    //  updateUI(user);
-                                                }
-                                            }
-                                        });
-                            }
-                            if (mAuth.getUid() != null) { // && mAuth.getUid().length() > 0
+                            final DatabaseReference myRef = database.getReference("LiveTracking");
 
-                                final String Node = dbConnections.GetFBNode(getApplicationContext(), Integer.parseInt(EID));
-
-                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                final DatabaseReference myRef = database.getReference("LiveTracking");
-                                if (Node == "0") {
-                                    myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            if (dataSnapshot.getValue() == null) {
-                                                String userid = myRef.push().getKey();
-
-                                                System.out.println(userid);
-                                                Map newUserData = new HashMap();
-                                                newUserData.put("LatLng", String.valueOf(location.getLatitude() + "," + location.getLongitude()));
-                                                newUserData.put("NextWaybillNo", NWNo);
-                                                newUserData.put("EmpID", EID);
-                                                newUserData.put("MobileNo", Mno);
-                                                newUserData.put("ConsLocation", ConsLocation);
-                                                newUserData.put("ConsigneeName", ConsigneeName);
-                                                newUserData.put("Speed", location.getSpeed());
-                                                newUserData.put("isnotify", isnotify);
-                                                newUserData.put("BillingType", BillingType);
-                                                newUserData.put("CollectedAmount", CollectedAmount);
-                                                newUserData.put("EmpName", EmpName);
-                                                myRef.child(userid).setValue(newUserData);
-                                                dbConnections.InsertFBAuthKey(getApplicationContext(), userid, Integer.parseInt(EID));
-
-                                                return;
-                                            } else {
+                            //String EmpID, String LatLng, String EmpName, String WaybillNo, String MobileNo, String ConsLocation
+                            final CourierDetailsFirebase user = new CourierDetailsFirebase(EID, String.valueOf(location.getLatitude() + "," + location.getLongitude()),
+                                    EmpName, WaybillNo, Mno, ConsLocation, NWNo, location.getSpeed(), isnotify, BillingType, CollectedAmount);
 
 
-                                                String key = dataSnapshot.getChildren().iterator().next().getKey();
-                                                dbConnections.InsertFBAuthKey(getApplicationContext(), key, Integer.parseInt(EID));
-//                                                System.out.println(asd);
-                                                return;
-                                            }
-                                        }
+                            myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.getValue() == null) {
+                                        String userid = myRef.push().getKey();
+                                        myRef.child(userid).setValue(user);
+                                        return;
+                                    }
+                                    CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
+                                    if (fetchuser.EmpID != null)
+                                        fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-
-                                }
-
-                                if (Node != "0") {
-                                    //String EmpID, String LatLng, String EmpName, String WaybillNo, String MobileNo, String ConsLocation
-                                    final CourierDetailsFirebase user = new CourierDetailsFirebase(EID, String.valueOf(location.getLatitude() + "," + location.getLongitude()),
-                                            EmpName, WaybillNo, Mno, ConsLocation, NWNo, location.getSpeed(), isnotify, BillingType, CollectedAmount);
-
-
-                                    myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-//                                            if (dataSnapshot.getValue() == null) {
-//                                                String userid = myRef.push().getKey();
-//                                                myRef.child(userid).setValue(user);
-//                                                return;
-//                                            }
-//                                            CourierDetailsFirebase fetchuser = dataSnapshot.getChildren().iterator().next().getValue(CourierDetailsFirebase.class);
-//                                            if (fetchuser.EmpID != null)
-//                                                fetchuser.ID = dataSnapshot.getChildren().iterator().next().getKey();
-
-//                                                if (fetchuser.ID != null) {
-                                            //Firebase userRef = ref.child("user");
-                                            Map newUserData = new HashMap();
-                                            newUserData.put("LatLng", String.valueOf(location.getLatitude() + "," + location.getLongitude()));
-                                            newUserData.put("NextWaybillNo", NWNo);
-                                            newUserData.put("EmpID", EID);
-                                            newUserData.put("MobileNo", Mno);
-                                            newUserData.put("ConsLocation", ConsLocation);
-                                            newUserData.put("ConsigneeName", ConsigneeName);
-                                            newUserData.put("Speed", location.getSpeed());
-                                            newUserData.put("isnotify", isnotify);
-                                            newUserData.put("BillingType", BillingType);
-                                            newUserData.put("CollectedAmount", CollectedAmount);
-                                            newUserData.put("EmpName", EmpName);
-                                            //  newUserData.put("ConsLocation", ConsLocation);
-                                            myRef.child(Node).updateChildren(newUserData);
-                                            // myRef.updateChildren(newUserData);
+                                    if (fetchuser.ID != null) {
+                                        //Firebase userRef = ref.child("user");
+                                        Map newUserData = new HashMap();
+                                        newUserData.put("LatLng", String.valueOf(location.getLatitude() + "," + location.getLongitude()));
+                                        newUserData.put("NextWaybillNo", NWNo);
+                                        newUserData.put("EmpID", EID);
+                                        newUserData.put("MobileNo", Mno);
+                                        newUserData.put("ConsLocation", ConsLocation);
+                                        newUserData.put("ConsigneeName", ConsigneeName);
+                                        newUserData.put("Speed", location.getSpeed());
+                                        newUserData.put("isnotify", isnotify);
+                                        newUserData.put("BillingType", BillingType);
+                                        newUserData.put("CollectedAmount", CollectedAmount);
+                                        //  newUserData.put("ConsLocation", ConsLocation);
+                                        myRef.child(fetchuser.ID).updateChildren(newUserData);
+                                        // myRef.updateChildren(newUserData);
 
 
-//                                                }
+                                    }
 //                                    else {
 //                                        String userid = myRef.push().getKey();
 //                                        myRef.child(userid).setValue(user);
 //                                    }
-                                            //  Log.d("User", "");
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            Log.d("User", "");
-                                        }
-
-
-                                    });
+                                    //  Log.d("User", "");
                                 }
-                            }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Log.d("User", "");
+                                }
+
+
+                            });
                         }
 
                         //Commented below for testing
@@ -424,8 +355,8 @@ public class LocationService extends Service {
 
 
     public class LocalBinder extends Binder {
-        public LocationService getServerInstance() {
-            return LocationService.this;
+        public LocationService_131220201552 getServerInstance() {
+            return LocationService_131220201552.this;
         }
     }
 

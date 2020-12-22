@@ -266,6 +266,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             ;
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarcode.setText("");
+            return;
         }
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
 

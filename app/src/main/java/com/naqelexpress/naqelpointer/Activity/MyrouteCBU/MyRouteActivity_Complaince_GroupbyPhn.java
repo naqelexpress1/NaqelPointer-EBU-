@@ -368,8 +368,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (dbConnections.isMyRouteComplainceselect(getApplicationContext())) {
 
-            Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
-                    " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+//            Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
+//                    " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+
+            Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+
             GetSeqWaybillNo();
 
             if (result.getCount() == 1) {
@@ -512,7 +515,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 eDialog.setTitleText("Are you sure?");
                 eDialog.setContentText("Are you follow to Deliver by Google Map");
                 eDialog.setConfirmText("Yes");
-                eDialog.setCancelText("No");
+                eDialog.setCancelText("Yes");
 
                 eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
@@ -553,9 +556,20 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
                     @Override
                     public void onClick(SweetAlertDialog sDialog) {
-                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
+//                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
                         sDialog.dismissWithAnimation();
                         //sDialog.dismissWithAnimation();
+                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
+                        sDialog.dismissWithAnimation();
+
+                        try {
+                            Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                            startActivityForResult(intent, 1);
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+
                     }
                 });
                 eDialog.show();
@@ -681,14 +695,24 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //                    }
 //                } else
 
-                GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
-                        , getWindow().getDecorView().getRootView());
+                //delete below
+                try {
+                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                    startActivityForResult(intent, 1);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
 
-                adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                        "CourierKpi", this);
-                mapListview.setAdapter(adapter);
-
-                hideenableListview();
+                //uncomment for Live
+//                GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
+//                        , getWindow().getDecorView().getRootView());
+//
+//                adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+//                        "CourierKpi", this);
+//                mapListview.setAdapter(adapter);
+//
+//                hideenableListview();
 
                 return true;
 //            case R.id.DeleteAll:
@@ -870,7 +894,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
             try {
                 String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
-                function = "BringDeliverySheetbyOFDPiece_PlanAll"; //BringDeliverySheetbyOFDPiece_PlanAll
+//                function = "BringDeliverySheetbyOFDPiece_PlanAll"; //BringDeliverySheetbyOFDPiece_PlanAll
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
                     function = "BringMyRouteShipments"; //EBU Divison
@@ -1630,6 +1654,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                                 t1.IsDuplicateCustomer = true;
                                 t1.ParentLatitude = t.Latitude;
                                 t1.ParentLongitude = t.Longitude;
+                                t1.BGColor = "CurrentOne";
 //                                if (j == 0) {
 //                                    //t1.DsOrderNo = t.DsOrderNo;
 //                                    t1.IsDuplicateCustomer = true;
@@ -1896,8 +1921,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
         String sd = dbConnections.isMyRouteComplainceDate(getApplicationContext());
         String addtime = sd;
-        Cursor result = dbConnections.Fill("select * from plannedLocation where   Date ='" + GlobalVar.getDate()
-                + "' and  EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
+//        Cursor result = dbConnections.Fill("select * from plannedLocation where   Date ='" + GlobalVar.getDate()
+//                + "' and  EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
+
+        Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
+
 
         int seconds = 0;
         int count = result.getCount();

@@ -79,7 +79,7 @@ import static com.itextpdf.awt.geom.Point2D.distance;
  * Created by Hasna on 7/21/18.
  */
 
-public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+public class RouteMap201220201348 extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
@@ -95,7 +95,6 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     boolean Issuggest = false;
     public static ArrayList<HashMap<String, String>> distance_time = new ArrayList<>();
     SweetAlertDialog pDialog;
-    List<Location> isSortbyRadiusLocation = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,104 +116,15 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         GetSeqWaybillNo();
 
-        ArrayList<Location> temp = places;
-        //ll = temp.get(0).latlng;
-        List<Location> sortpath = sortLocations(temp, temp.get(0).getLatitude(), temp.get(0).getLongitude());
-//        tempLocation = new ArrayList<>();
-        int Locationsize = sortpath.size();
-//        for (int i = 0; i < Locationsize - 1; i++) {
-//
-//            if (i == 0) {
-//                tempLocation.add(sortpath.get(0));
-//                sortpath.remove(0);
-//            }
-//
-//            Location loc = GlobalVar.GV().sortLocationbyDistance(sortpath, tempLocation.get(i));
-//            tempLocation.add(loc);
-//
-//            sortpath.remove((int)loc.getAccuracy());
-//        }
-
-        for (int i = 0; i < 1; i++) {
-
-            if (i == 0) {
-                isSortbyRadiusLocation.add(sortpath.get(0));
-                sortpath.remove(0);
-            }
-
-            Location loc = GlobalVar.GV().sortLocationbyDistance(sortpath, isSortbyRadiusLocation.get(i));
-            isSortbyRadiusLocation.add(loc);
-
-            sortpath.remove((int) loc.getAccuracy());
-        }
-
-        boolean isComplete = true;
-        int radius = 100;
-
-        nonComplaincewithinRadius.addAll(sortpath);
-        int loopposition = 1;
-//        while (isComplete) {
-//
-//            List<Location> tlocations = new ArrayList<>();
-//            tlocations.addAll(nonComplaincewithinRadius);
-//            isRadiusFindNextAttemptWaybill(isSortbyRadiusLocation.get(1), tlocations, radius);
-//
-//            radius = radius + 100;
-//
-//            if (nonComplaincewithinRadius.size() == 0){
-//
-//                isComplete = false;}
-//        }
-
-        List<Location> tsortlocations = new ArrayList<>();
-        tsortlocations.addAll(isSortbyRadiusLocation);
-
-        boolean isresetFirsttime = false;
-        while (isComplete) {
-
-            List<Location> tlocations = new ArrayList<>();
-            tlocations.addAll(nonComplaincewithinRadius);
-            // if (isSortbyRadiusLocation.size() != 0)
-            //       isRadiusFindNextAttemptWaybill(isSortbyRadiusLocation.get(loopposition), tlocations, radius);
-            //   else
-            isRadiusFindNextAttemptWaybill(tsortlocations.get(loopposition), tlocations, radius);
-
-
-            radius = radius + 100;
-
-            if (nonComplaincewithinRadius.size() == 0) {
-                tlocations.clear();
-                loopposition = loopposition + 1;
-                //tlocations.addAll(isSortbyRadiusLocation);
-                if (isSortbyRadiusLocation.size() == 0)
-                    break;
-//                tsortlocations.addAll(isSortbyRadiusLocation.subList(0, 0 + 1));
-                if (!isresetFirsttime) {
-                    tsortlocations.addAll(isSortbyRadiusLocation.subList(tsortlocations.size(), tsortlocations.size() + 1));
-                    tlocations.addAll(isSortbyRadiusLocation.subList(tsortlocations.size(), isSortbyRadiusLocation.size()));
-                } else {
-                    tsortlocations.addAll(isSortbyRadiusLocation.subList(0, 0 + 1));
-                    tlocations.addAll(isSortbyRadiusLocation.subList(0 + 1, isSortbyRadiusLocation.size()));
-                }
-                isresetFirsttime = true;
-                isSortbyRadiusLocation.clear();
-                nonComplaincewithinRadius.addAll(tlocations);
-                radius = 100;
-
-            }
-
-            if (loopposition == tsortlocations.size())
-                isComplete = false;
-        }
 
         //ArrayList<String> test = getIntent().getStringArrayListExtra("test");
-        RouteMap.distance_time.clear();
+        RouteMap201220201348.distance_time.clear();
 
         ImageButton distance = (ImageButton) findViewById(R.id.viewmore);
         distance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intetn = new Intent(RouteMap.this, RouteMap_Distance.class);
+                Intent intetn = new Intent(RouteMap201220201348.this, RouteMap_Distance.class);
                 startActivity(intetn);
             }
         });
@@ -265,57 +175,16 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
     }
 
-    List<Location> nonComplaincewithinRadius = new ArrayList<>();
-
-    public void isRadiusFindNextAttemptWaybill(Location Origin, List<Location> locationList, int radius) {
-//        boolean isradius = false;
-        List<Location> withinradiuslist = new ArrayList<>();
-        nonComplaincewithinRadius.clear();
-        for (int i = 0; i < locationList.size(); i++) {
-
-            double lat = locationList.get(i).getLatitude();
-            double lon = locationList.get(i).getLongitude();
-
-            if (lat == 0.0) {
-                return;
-            }
-
-            if (GlobalVar.GV().isFortesting)
-                radius = 400000;
-
-            float[] results = new float[1];
-            Location.distanceBetween(lat, lon, Origin.getLatitude(), Origin.getLongitude(), results);
-            float distanceInMeters = results[0];
-            boolean isWithinradius = distanceInMeters < radius;
-
-            if (isWithinradius) {
-                locationList.get(i).setAccuracy(radius);
-                isSortbyRadiusLocation.add(locationList.get(i));
-            } else {
-                locationList.get(i).setAccuracy(radius);
-                nonComplaincewithinRadius.add(locationList.get(i));
-            }
-
-
-        }
-
-        //return new LatLng(foundLatitude, foundLongitude);
-        return;
-
-
-    }
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        GlobalVar.GV().ChangeMapSettings(mMap, RouteMap.this, getWindow().getDecorView().getRootView());
+        GlobalVar.GV().ChangeMapSettings(mMap, RouteMap201220201348.this, getWindow().getDecorView().getRootView());
 
 
         LatLng ll = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 8));
-        mMap.setOnInfoWindowClickListener(RouteMap.this);
+        mMap.setOnInfoWindowClickListener(RouteMap201220201348.this);
 
         myMarker = new Marker[places.size()];
 
@@ -355,9 +224,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 // if (distance_time.size() > 0) {
 
                 // LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ActivityCompat.checkSelfPermission(RouteMap201220201348.this, Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        ActivityCompat.checkSelfPermission(RouteMap201220201348.this, Manifest.permission.ACCESS_COARSE_LOCATION)
                                 == PackageManager.PERMISSION_GRANTED) {
                     //  Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -497,17 +366,16 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
     }
 
-
     public static List<Location> sortLocations(List<Location> locations, final double myLatitude, final double myLongitude) {
         Comparator comp = new Comparator<Location>() {
             @Override
             public int compare(Location o, Location o2) {
                 float[] result1 = new float[3];
-                android.location.Location.distanceBetween(myLatitude, myLongitude, o.getLatitude(), o.getLongitude(), result1);
+                Location.distanceBetween(myLatitude, myLongitude, o.getLatitude(), o.getLongitude(), result1);
                 Float distance1 = result1[0];
 
                 float[] result2 = new float[3];
-                android.location.Location.distanceBetween(myLatitude, myLongitude, o2.getLatitude(), o2.getLongitude(), result2);
+                Location.distanceBetween(myLatitude, myLongitude, o2.getLatitude(), o2.getLongitude(), result2);
                 Float distance2 = result2[0];
 
                 return distance1.compareTo(distance2);
@@ -943,13 +811,13 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             mobileno.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap201220201348.this);
                 }
             });
             mobileno1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap201220201348.this);
                 }
             });
 

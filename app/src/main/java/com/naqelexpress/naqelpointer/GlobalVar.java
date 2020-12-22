@@ -88,7 +88,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "GTW - BI Resolved (29-11-2020)"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "RouteLineSeq - 16-12-2020"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -109,20 +109,21 @@ public class GlobalVar {
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
     public String NaqelPointerAPILink_For5_1 = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8084/Api/Pointer/"; // http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/
     public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink_UploadImage = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink_UploadImage = "http://35.188.10.142:8084/Api/Pointer/";
     // public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/"; NaqelWay IP
     // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
     // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
     public String NaqelPointerAPILink1_ForDomain = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink2_ForDomain = "http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/";
+    public String NaqelPointerAPILink2_ForDomain = "http://35.188.10.142:8084/Api/Pointer/";
     public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
     //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
     public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
     public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
-    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
+    //    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
+    public String NaqelPointerLivetrackingPusher = "http://212.12.186.108:8080/api/CourierLocation/InsertCourierLocation";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
@@ -2126,7 +2127,7 @@ public class GlobalVar {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from AtOrigin", context);
+        Cursor result = dbConnections.Fill("select * from AtOrigin order by id desc", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
@@ -2134,12 +2135,21 @@ public class GlobalVar {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
 
                     JSONArray jsonArray = jsonObject.getJSONArray("AtOriginWaybillDetails");
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        JSONObject obj = jsonArray.getJSONObject(i);
-                        MyRouteShipments onDeliveryRequest = new MyRouteShipments();
-                        onDeliveryRequest.ItemNo = obj.getString("WaybillNo");
 
-                        DeliverySheetFromLocal.add(onDeliveryRequest);
+                    if (jsonArray.length() > 0) {
+                        DateTime ExpectedTime = DateTime.parse(jsonObject.getString("CTime"));
+                        boolean IsSync = jsonObject.getBoolean("IsSync");
+//                       String PiecesCount =jsonObject.getString("CTime");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                            onDeliveryRequest.ItemNo = obj.getString("WaybillNo");
+                            onDeliveryRequest.IsDelivered = IsSync;
+                            onDeliveryRequest.ExpectedTime = ExpectedTime;
+                            onDeliveryRequest.TypeID = 124;
+//                        onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PieceCount"));
+                            DeliverySheetFromLocal.add(onDeliveryRequest);
+                        }
                     }
 
 
@@ -2967,6 +2977,9 @@ public class GlobalVar {
         }
         Location location = GlobalVar.getLastKnownLocation(context);
         int radius = 400;
+        if (GlobalVar.GV().isFortesting)
+            radius = 400000;
+
         double foundLongitude = 0.0, foundLatitude = 0.0;
 
         if (location != null) {
@@ -3492,4 +3505,43 @@ public class GlobalVar {
     public int isPermissionEnabled(String permissions, Activity activity) {
         return ContextCompat.checkSelfPermission(activity, permissions);
     }
+
+    public static float FindDistancewithinLocation(double Slat, double Slon, double dLat, double dLon) {
+        boolean isradius = false;
+
+        if (Slat == 0.0) {
+            return 0;
+        }
+
+        float[] results = new float[1];
+        Location.distanceBetween(Slat, Slon, dLat, dLon, results);
+
+        float distanceInMeters = results[0];
+
+        return distanceInMeters;
+    }
+
+    public Location sortLocationbyDistance(List<Location> tLocation, Location origin) {
+        List<Location> temp = new ArrayList<>();
+        //Location origin = tLocation.get(0);
+        //temp.add(origin);
+        float distancebyMeter = (float) 500000.0;
+        int position = 0;
+        for (int i = 0; i < tLocation.size(); i++) {
+
+            float dist = FindDistancewithinLocation(origin.getLatitude(), origin.getLongitude(), tLocation.get(i).getLatitude(), tLocation.get(i).getLongitude());
+            if (dist <= distancebyMeter) {
+                position = i;
+                distancebyMeter = dist;
+            }
+            tLocation.get(i).setSpeed(dist);
+            temp.add(tLocation.get(i));
+        }
+
+        Location loc = temp.get(position);
+        loc.setAccuracy(position);
+        return loc;
+    }
+
+
 }

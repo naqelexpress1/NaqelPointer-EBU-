@@ -438,7 +438,7 @@ public class ThirdFragment extends Fragment {
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
                         FirstFragment.txtCheckPointTypeDDetail.getText().toString()
-                        , "", Barcodes.size(), Integer.parseInt(""));
+                        , "", Barcodes.size());
 
         int ID = 0;
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
@@ -608,7 +608,7 @@ public class ThirdFragment extends Fragment {
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "" , 0, Integer.parseInt(""));
+                        , "" , 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());

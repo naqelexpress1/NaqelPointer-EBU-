@@ -625,7 +625,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 0, lbTotal.getText().toString()
-                            , "", 0, Integer.parseInt(""));
+                            , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -699,7 +699,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, refno
-                        , "", 0, Integer.parseInt(""));
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -1159,7 +1159,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, req
-                        , "", 0, Integer.parseInt(""));
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

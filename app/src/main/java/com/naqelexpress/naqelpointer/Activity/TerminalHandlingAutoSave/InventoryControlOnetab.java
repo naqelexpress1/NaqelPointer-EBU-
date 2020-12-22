@@ -460,30 +460,34 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
 
     private void SaveData(String piece) { //43 heldin , 44 heldout
 
-        //mohammed add this
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        if (IsValid()) {
-            requestLocation();
-            com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
-                    (20, String.valueOf(Latitude),
-                            String.valueOf(Longitude), 0, lbTotal.getText().toString()
-                            , "" , 0, Integer.parseInt(""));
+        try {
+            //mohammed add this
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            if (IsValid()) {
+                requestLocation();
+                com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                        (20, String.valueOf(Latitude),
+                                String.valueOf(Longitude), 0, lbTotal.getText().toString()
+                                , "", 0);
 
-            if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
-                int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
+                if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
+                    int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
 
 
-                CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(piece, ID);
-                dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
+                    CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(piece, ID);
+                    dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
 
 //                if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
 //                    startService(
 //                            new Intent(InventoryControlOnetab.this,
 //                                    com.naqelexpress.naqelpointer.service.TerminalHandling.class));
 //                }
+                }
             }
+            dbConnections.close();
+        } catch (Exception e) {
+
         }
-        dbConnections.close();
     }
 
 
@@ -542,7 +546,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, refno
-                        , "" , 0, Integer.parseInt(""));
+                        , "" , 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -867,7 +871,7 @@ public class InventoryControlOnetab extends AppCompatActivity implements View.On
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (20, String.valueOf(Latitude),
                         String.valueOf(Longitude), 44, req
-                        , "" , 0, Integer.parseInt(""));
+                        , "" , 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

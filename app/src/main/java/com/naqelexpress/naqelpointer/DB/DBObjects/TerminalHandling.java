@@ -37,9 +37,22 @@ public class TerminalHandling {
         TerminalHandlingBarCodeDetails = new ArrayList<>();
     }
 
+
+    public TerminalHandling(int checkPointTypeID, String latitude, String longitude, int checkPointTypeDetailID, String reference,
+                            String Comments, int Count ) {
+        CheckPointTypeID = checkPointTypeID;
+        CheckPointTypeDetailID = checkPointTypeDetailID;
+        Reference = reference;
+        Latitude = latitude;
+        Longitude = longitude;
+        this.Comments = Comments;
+        this.Count = Count;
+
+    }
+
     //mohammed
     public TerminalHandling(int checkPointTypeID, String latitude, String longitude, int checkPointTypeDetailID, String reference,
-                            String Comments, int Count, int tripID ) {
+                            String Comments, int Count ,int tripID) {
         CheckPointTypeID = checkPointTypeID;
         CheckPointTypeDetailID = checkPointTypeDetailID;
         Reference = reference;
@@ -49,4 +62,5 @@ public class TerminalHandling {
         this.Count = Count;
         TripID = tripID;
     }
+
 }

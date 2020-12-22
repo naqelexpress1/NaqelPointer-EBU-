@@ -2,7 +2,6 @@ package com.naqelexpress.naqelpointer.Activity.OFDPiecebyNCL;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;

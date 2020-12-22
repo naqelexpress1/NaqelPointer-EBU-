@@ -74,8 +74,12 @@ public class MyRouteActivity
 
         setContentView(R.layout.myroutenew);
 
+
+
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

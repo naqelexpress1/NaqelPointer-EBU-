@@ -29,6 +29,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -60,6 +61,7 @@ import com.naqelexpress.naqelpointer.JSON.Results.CheckPendingCODResult;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
+import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -78,8 +80,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.content.Context.LOCATION_SERVICE;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -87,6 +93,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class GlobalVar {
 
     public UserSettings currentSettings;
+    public boolean autoLogout = false;
 
     public String AppVersion = "RouteLineSeq - 16-12-2020"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
@@ -98,12 +105,12 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
+
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
-    //
-    //
+
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -125,6 +132,13 @@ public class GlobalVar {
     //    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
     public String NaqelPointerLivetrackingPusher = "http://212.12.186.108:8080/api/CourierLocation/InsertCourierLocation";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
+    private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
+    public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
+    public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
+    static IPointerAPI iPointerAPI;
+
+
+
     public ArrayList<Integer> haslocation = new ArrayList<>();
     public int ConnandReadtimeout = 60000;
     public int Connandtimeout30000 = 30000;
@@ -171,6 +185,11 @@ public class GlobalVar {
     private static GlobalVar gv;
     public static boolean gs = false, dsl = false, cptl = false, cptdl = false, cptddl = false, nnvdl = false;
 //    private ArrayList<String> DataTypeList = new ArrayList<>();
+
+    public static final int NclAndArrival = 1;
+    public static final int DsAndInventory = 2;
+    public static final int DsValidation = 3;
+
 
     public static GlobalVar GV() {
         if (GlobalVar.gv == null) {
@@ -758,6 +777,43 @@ public class GlobalVar {
         dbConnections.close();
         return isvalid;
     }
+
+    public static boolean isEmpty (EditText editText ) {
+
+        if (editText.getText().toString().trim().length() == 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isCourier(Context context) {
+        String division = GlobalVar.GV().getDivisionID(context, GlobalVar.GV().EmployID);
+        if (division.equals("Courier"))
+            return true;
+        else
+            return false;
+    }
+
+
+    public static int getBinMasterCount(Context context) {
+        try {
+            DBConnections dbConnections = new DBConnections(context, null);
+            return dbConnections.getCount("BINMaster", "", context);
+        } catch (Exception ex) {
+        }
+        return 0;
+    }
+
+
+    public static boolean isBinMasterValueExists(String value , Context context) {
+        try {
+            DBConnections dbConnections = new DBConnections(context, null);
+            return dbConnections.isValueExist("BINMaster" , "BINNumber" , value , context);
+        } catch (Exception ex) {
+            return true;
+        }
+    }
+
 
 //    public static void updateApp(final Activity activity) {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -2624,24 +2680,29 @@ public class GlobalVar {
 //    }
 
     public static int getlastlogin(Context context) {
-//        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
+      try {
+          //        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
 //        return pref.getInt("EmpID", 0); // Storing integer
-        DBConnections dbConnections = new DBConnections(context, null);
-        Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
+          DBConnections dbConnections = new DBConnections(context, null);
+          Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
 
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
-            cursor.close();
-            dbConnections.close();
-            return empid;
+          if (cursor != null && cursor.getCount() > 0) {
+              cursor.moveToFirst();
+              int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
+              cursor.close();
+              dbConnections.close();
+              return empid;
 
-        } else {
-            dbConnections.close();
-            cursor.close();
-            return 0;
-        }
+          } else {
+              dbConnections.close();
+              cursor.close();
+              return 0;
+          }
 
+      } catch (Exception e) {
+          Log.d("test" , "getlastlogin " + e.toString());
+      }
+      return 0;
     }
 
 
@@ -2682,6 +2743,13 @@ public class GlobalVar {
         return datetime;
     }
 
+
+    public static String getCurrentDate() {
+        Calendar calander = Calendar.getInstance();
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+        String test = simpledateformat.format(calander.getTime());
+        return simpledateformat.format(calander.getTime());
+    }
 
     public static String getDateMinus2Days() {
         Calendar calander = Calendar.getInstance();
@@ -2747,7 +2815,6 @@ public class GlobalVar {
             devision = result.getString(result.getColumnIndex("Division"));
             if (devision.equals("0")) {
                 devision = "Courier";
-
             }
         }
         return devision;
@@ -3158,7 +3225,6 @@ public class GlobalVar {
             return false;
         else
             return true;
-
     }
 
     public String getDeviceName() {
@@ -3228,6 +3294,38 @@ public class GlobalVar {
         DBConnections dbConnections = new DBConnections(context, null);
         return dbConnections.GetPrimaryDomain(context);
 
+    }
+
+    public static IPointerAPI getIPointerAPI(String url , int readTimeOut , int connectTimeOut) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getClient(readTimeOut , connectTimeOut ))
+                .build();
+
+        iPointerAPI = retrofit.create(IPointerAPI.class);
+        return iPointerAPI;
+    }
+
+    private static OkHttpClient getClient(int readTimeOut , int connectTimeOut) {
+
+
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .readTimeout(readTimeOut, TimeUnit.SECONDS)
+                .connectTimeout(connectTimeOut, TimeUnit.SECONDS)
+                 .build();
+
+        return okHttpClient;
+    }
+
+
+    public static String getTestAPIURL (Context context) {
+        return NaqelAPITest_V10;
+    }
+
+    public static String getUATUrl (Context context) {
+        return NaqelAPIUAT;
     }
 
     public String GetDomainURLforService(Context context, String ServiceName) {

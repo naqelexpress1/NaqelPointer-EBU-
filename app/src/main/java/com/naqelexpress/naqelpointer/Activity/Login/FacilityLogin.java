@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
@@ -17,6 +18,7 @@ import android.widget.Spinner;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserFacility;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.GetUserMEDataRequest;
@@ -235,6 +237,7 @@ public class FacilityLogin
         StringBuffer buffer;
         String DomainURL = "";
         String isInternetAvailable = "";
+        JSONObject GetUserMEDataRequest;
 
         @Override
         protected void onPreExecute() {
@@ -250,8 +253,13 @@ public class FacilityLogin
 
         protected String doInBackground(String... params) {
 
-            //GetFacilityStatusRequest getDeliveryStatusRequest = new GetFacilityStatusRequest();
             String jsonData = params[0];
+
+            try {
+                GetUserMEDataRequest = new JSONObject(jsonData);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
@@ -315,8 +323,14 @@ public class FacilityLogin
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.getBoolean("HasError")) {
 
+                        //Update user facility
+                        UserFacility userFacility = new UserFacility();
+                        userFacility.setEmployID(GlobalVar.GV().EmployID);
+                        userFacility.setFacilityID(GetUserMEDataRequest.getInt("FacilityID"));
+
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        dbConnections.FacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID);
+                        dbConnections.FacilityLoggedIn(getApplicationContext(), userFacility);
+
                         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
                         if (GlobalVar.GV().IsTerminalApp || division.equals("IRS")) {
                             Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);

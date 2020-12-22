@@ -14,6 +14,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/UpdatedConsigneeNo"
+        android:title="@string/UpdatedConsigneeNo"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/Delivered"
         android:title="@string/delivered"
         app:showAsAction="never" />

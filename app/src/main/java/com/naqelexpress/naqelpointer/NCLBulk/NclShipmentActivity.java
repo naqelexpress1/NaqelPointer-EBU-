@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -30,9 +31,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -49,6 +53,7 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Activity.Print.PdfDocumentAdapter;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
@@ -57,7 +62,14 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.RetrofitCallResponse;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
@@ -82,26 +94,50 @@ import java.util.List;
 import java.util.Locale;
 
 import Error.ErrorReporter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
-public class NclShipmentActivity extends AppCompatActivity {
+//Used By TH - Courier
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener { //AsyncTaskCompleteListener
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
+
     private Bundle bundle;
-    DateTime TimeIn;
+    private DateTime TimeIn;
     public static String NclNo = "0";
     public boolean IsMixed;
     public List<Integer> destList = new ArrayList<>();
+
+    private static final String TAG = "NclShipmentActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
+
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
         bundle = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+       try {
+           String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
+                   getOnlineValidation();
+               }
+           }
+
+       } catch (Exception e) {
+
+       }
+
+
+        setSupportActionBar(toolbar);
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
@@ -146,19 +182,17 @@ public class NclShipmentActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.finish:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                    ErrorAlert("Info", "Are yo sure want to Finish the Job?", 0);
+                    ErrorAlert("Info", "Are you sure want to Finish the Job?", 0);
                 } else
                     GlobalVar.RedirectSettings(NclShipmentActivity.this);
                 return true;
             case R.id.manual:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                    UploadManul("Info", "Are yo sure want to upload Manual?");
+                    UploadManul("Info", "Are you sure want to upload Manual?");
                 } else
                     GlobalVar.RedirectSettings(NclShipmentActivity.this);
                 return true;
-//            case R.id.mnuSave:
-//                SaveData();
-//                return true;
+
             case R.id.print:
                 if (IsValid())
                     askPermission();
@@ -418,12 +452,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             // Add Cell into Table
             myTable.addCell(myCell);
 
-//            slicetable = new PdfPCell(myTable);
-//            slicedata.addCell(slicetable);
-//            slicedata.addCell(slicetable);
-
-            //document.add(slicedata);
-
 
             myCell = new PdfPCell();
             parse = new Phrase("Orgin", smallBold);
@@ -438,10 +466,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             // Add Cell into Table
             myTable.addCell(myCell);
 
-//            slicetable = new PdfPCell(myTable);
-//            slicedata.addCell(slicetable);
-//            slicedata.addCell(slicetable);
-            //document.add(slicedata);
 
             String mix = "";
             if (IsMixed) {
@@ -462,11 +486,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             myTable.addCell(myCell);
 
 
-//            slicetable = new PdfPCell(myTable);
-//            slicedata.addCell(slicetable);
-//            slicedata.addCell(slicetable);
-            //document.add(slicedata);
-
             myCell = new PdfPCell();
             parse = new Phrase("Total Waybills", smallBold);
             myCell.addElement(parse);
@@ -479,11 +498,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             myCell.setBorder(PdfPCell.NO_BORDER);
             // Add Cell into Table
             myTable.addCell(myCell);
-
-//            slicetable = new PdfPCell(myTable);
-//            slicedata.addCell(slicetable);
-//            slicedata.addCell(slicetable);
-            //document.add(slicedata);
 
 
             myCell = new PdfPCell();
@@ -499,10 +513,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             // Add Cell into Table
             myTable.addCell(myCell);
 
-//            slicetable = new PdfPCell(myTable);
-//            slicedata.addCell(slicetable);
-//            slicedata.addCell(slicetable);
-            //document.add(slicedata);
 
             myCell = new PdfPCell();
             parse = new Phrase("Total Waybill Weight", smallBold);
@@ -510,14 +520,6 @@ public class NclShipmentActivity extends AppCompatActivity {
             myCell.setBorder(PdfPCell.NO_BORDER);
             myTable.addCell(myCell);
 
-//            double totalweight = 0.0;
-//            for (int i = 0; i < secondFragment.PieceCodeList.size(); i++) {
-//                if (i == 0)
-//                    totalweight = Math.round(secondFragment.PieceCodeList.get(i).Weight * 100.0) / 100.0;
-//                else
-//                    totalweight = totalweight + Math.round(secondFragment.PieceCodeList.get(i).Weight * 100.0) / 100.0;
-//
-//            }
 
             myCell = new PdfPCell();
             parse = new Phrase(String.valueOf(Math.round(ScanNclWaybillFragment.waybillweight * 100.0) / 100.0), smallBold);
@@ -532,21 +534,12 @@ public class NclShipmentActivity extends AppCompatActivity {
             slicedata.addCell(slicetable);
             slicedata.addCell(slicetable);
 
-            //document.add(slicedata);
-
-
-            // Add all above details into Document
-            //document.add(prHead);
-            //document.add(myTable);
-
-            // document.add(myTable);
 
             PdfContentByte pdfContentByte = pdfWriter.getDirectContent();
             Barcode128 barcode = new Barcode128();
             barcode.setCodeType(Barcode128.CODE128);
             barcode.setCode(NclNo);
             Image code128Image = barcode.createImageWithBarcode(pdfContentByte, null, null);
-            //code128Image.setAbsolutePosition(10, 10);
             code128Image.scalePercent(200);
 
             slicetable = new PdfPCell(code128Image);
@@ -554,24 +547,11 @@ public class NclShipmentActivity extends AppCompatActivity {
             slicetable.setBorder(PdfPCell.NO_BORDER);
             slicedata.addCell(slicetable);
             slicedata.addCell(slicetable);
-            //document.add(slicedata);
-
-            //document.add(code128Image);
 
 
             // Now Start another New Paragraph
             Paragraph prPersinalInfo = new Paragraph();
             prPersinalInfo.setFont(catFont);
-
-//        for (int i = 0; i < ScannedASNOList.size(); i++) {
-//            prPersinalInfo.add(String.valueOf(i + 1) + " . " + ScannedASNOList.get(i) + "\n\n");
-//
-//        }
-
-            //prPersinalInfo.setAlignment(Element.ALIGN_LEFT);
-
-            //document.add(prPersinalInfo);
-
 
             Paragraph prProfile = new Paragraph();
             prProfile.setFont(smallBold);
@@ -583,25 +563,15 @@ public class NclShipmentActivity extends AppCompatActivity {
             prProfile.setFont(smallBold);
 
 
-            // document.add(prProfile);
-
             slicetable = new PdfPCell(prProfile);
             slicetable.setHorizontalAlignment(Element.ALIGN_LEFT);
             slicetable.setBorder(PdfPCell.NO_BORDER);
             slicedata.addCell(slicetable);
             slicedata.addCell(slicetable);
 
-
             document.add(slicedata);
 
-
-            //i++;
-            // if ( i == 1)
-            //     addTitlePage(document, pdfWriter);
         }
-
-        // Create new Page in PDF
-        //document.newPage();
     }
 
 
@@ -619,6 +589,29 @@ public class NclShipmentActivity extends AppCompatActivity {
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+    private void ErrorAlertOnlineValidation(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        getOnlineValidation();
+                    }
+                });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -654,7 +647,6 @@ public class NclShipmentActivity extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-//                        SaveDataCompleteJob(0);
                     }
                 });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Exit without Save",
@@ -662,7 +654,6 @@ public class NclShipmentActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         StartService();
                         dialog.dismiss();
-
 
                     }
                 });
@@ -678,20 +669,6 @@ public class NclShipmentActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void StartService() {
-        DBConnections db = new DBConnections(getApplicationContext(), null);
-        Cursor result = db.Fill("select * from Ncl where IsSync = 0 Limit 1 ", getApplicationContext());
-        if (result.getCount() > 0) {
-            if (!isMyServiceRunning(NclService.class)) {
-                startService(
-                        new Intent(this, NclService.class));
-
-            }
-        }
-        finish();
-        db.close();
-        result.close();
-    }
 
     private void UploadManul(final String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
@@ -699,6 +676,7 @@ public class NclShipmentActivity extends AppCompatActivity {
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
 
+        //Save locally and call api
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save & Upload",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -707,6 +685,8 @@ public class NclShipmentActivity extends AppCompatActivity {
 
                     }
                 });
+
+        //Call api within activity
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Without Save & Upload",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -715,12 +695,11 @@ public class NclShipmentActivity extends AppCompatActivity {
 
                     }
                 });
+
         alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Continue",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
                         dialog.dismiss();
-
                     }
                 });
 
@@ -732,8 +711,10 @@ public class NclShipmentActivity extends AppCompatActivity {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
 
+            requestLocation();
+
+
             DateTime TimeIn = DateTime.now();
-            // Ncl ncl = new Ncl(WaybillList.size(), PieceCodeList.size(), TimeIn, NclShipmentActivity.NclNo);
             ArrayList<String> waybill = new ArrayList<String>();
 
             Ncl ncl = new Ncl();
@@ -744,6 +725,10 @@ public class NclShipmentActivity extends AppCompatActivity {
 
             ncl.EmployID = GlobalVar.GV().EmployID;
             ncl.StationID = GlobalVar.GV().StationID;
+            ncl.AppVersion = GlobalVar.GV().AppVersion;
+            ncl.Latitude = String.valueOf(Latitude);
+            ncl.Longitude = String.valueOf(Longitude) ;
+
 
             String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
             String Dest[] = ScanNclNoFragment.txtDestination.getText().toString().split(":");
@@ -755,15 +740,11 @@ public class NclShipmentActivity extends AppCompatActivity {
             ncl.IsSync = false;
 
             for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.size(); i++) {
-//                if (!waybill.contains(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill)) {
-//
-//                    waybill.add(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill);
-//                    ncl.nclwaybilldetails.add(i,
-//                            new NclWaybillDetail(ScanNclWaybillFragment.PieceCodeList.get(i).Waybill, 0));
-//
-//                }
+                ScanNclWaybillFragmentRemoveValidation_CITC.PieceDetail pieceDetail =  ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i);
                 ncl.ncldetails.add(i,
-                        new NclDetail(ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i).Barcode, 0));
+                        new NclDetail(pieceDetail.Barcode, 0));
+//                ncl.ncldetails.add(i,
+//                        new NclDetail(ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i).Barcode, 0));
             }
             ncl.WaybillCount = waybill.size();
 
@@ -792,6 +773,21 @@ public class NclShipmentActivity extends AppCompatActivity {
 
     }
 
+    private void StartService() {
+        DBConnections db = new DBConnections(getApplicationContext(), null);
+        Cursor result = db.Fill("select * from Ncl where IsSync = 0 Limit 1 ", getApplicationContext());
+        if (result.getCount() > 0) {
+            if (!isMyServiceRunning(NclService.class)) {
+                startService(
+                        new Intent(this, NclService.class));
+
+            }
+        }
+        finish();
+        db.close();
+        result.close();
+    }
+
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getApplication()
                 .getSystemService(Context.ACTIVITY_SERVICE);
@@ -804,6 +800,361 @@ public class NclShipmentActivity extends AppCompatActivity {
         return false;
     }
 
+
+    private boolean IsValid() {
+        boolean isValid = true;
+        if (NclNo == "0") {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Please generate Ncl No", GlobalVar.AlertType.Error);
+            isValid = false;
+        }
+        if (secondFragment != null && secondFragment.PieceCodeList.size() <= 0) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
+            isValid = false;
+        }
+        return isValid;
+    }
+
+
+
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int pos) {
+            switch (pos) {
+                case 0:
+                    if (firstFragment == null) {
+                        firstFragment = new ScanNclNoFragment();
+                        firstFragment.setArguments(bundle);
+                        //return firstFragment;
+                    }
+                    return firstFragment;
+                case 1:
+                    if (secondFragment == null) {
+                        secondFragment = new ScanNclWaybillFragmentRemoveValidation_CITC();
+                        secondFragment.setArguments(bundle);
+                    }
+                    return secondFragment;
+
+            }
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return getResources().getString(R.string.ncl_No);
+                case 1:
+                    return getResources().getString(R.string.ncl_Piece);
+            }
+            return null;
+        }
+    }
+
+    ProgressDialog progressDialog;
+
+    private class NCLBulkbyManual extends AsyncTask<String, Integer, String> {
+        String returnresult = "";
+        StringBuffer buffer;
+        int moveddata = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            uploaddatacount = 0;
+            if (progressDialog == null) {
+
+                progressDialog = new ProgressDialog(NclShipmentActivity.this);
+                progressDialog.setTitle("Request is being process,please wait...");
+                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
+                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+                progressDialog.setMax(100);
+                progressDialog.setCancelable(false);
+                progressDialog.setProgress(1);
+                progressDialog.show();
+
+            }
+
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            super.onProgressUpdate(values[0]);
+            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
+            progressDialog.setProgress(values[0]);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            totalsize = Integer.parseInt(params[0]);
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+            Cursor result = db.Fill("select * from Ncl where IsSync = 0 order by ID Limit 20", getApplicationContext());
+            if (result.getCount() == 0) {
+                result.close();
+                return null;
+            }
+            result.moveToFirst();
+            int id = 0, piececount = 0;
+
+            do {
+                returnresult = "";
+                buffer = new StringBuffer();
+                buffer.setLength(0);
+
+                String jsonData = "";
+                // if (result.moveToFirst()) {
+                id = result.getInt(result.getColumnIndex("ID"));
+                piececount = result.getInt(result.getColumnIndex("PieceCount"));
+                jsonData = result.getString(result.getColumnIndex("JsonData"));
+                // }
+
+                jsonData = jsonData.replace("Date(-", "Date(");
+
+
+                HttpURLConnection httpURLConnection = null;
+                OutputStream dos = null;
+                InputStream ist = null;
+
+                try {
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"); //LoadtoDestination
+                    httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                    dos = httpURLConnection.getOutputStream();
+                    httpURLConnection.getOutputStream();
+                    dos.write(jsonData.getBytes());
+
+                    ist = httpURLConnection.getInputStream();
+                    String line;
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+
+                    while ((line = reader.readLine()) != null) {
+                        buffer.append(line);
+                    }
+                    returnresult = String.valueOf(buffer);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (ist != null)
+                            ist.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    try {
+                        if (dos != null)
+                            dos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (httpURLConnection != null)
+                        httpURLConnection.disconnect();
+                    returnresult = String.valueOf(buffer);
+                }
+
+
+                if (returnresult.contains("Created")) {
+
+                    boolean isupdate = db.updateNCL(id, getApplicationContext());
+                    if (isupdate)
+                        moveddata = moveddata + piececount;
+                    //db.deleteNcl(id, getApplicationContext());
+                    //db.deleteNclWayBill(ncl.ID, getApplicationContext());
+                    //db.deleteNclBarcode(id, getApplicationContext());
+                }
+                try {
+                    uploaddatacount = uploaddatacount + piececount;
+                } catch (Exception e) {
+
+                }
+                publishProgress((int) ((uploaddatacount * 100) / totalsize));
+
+            } while (result.moveToNext());
+
+            result.close();
+            db.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                    progressDialog = null;
+                }
+
+                DBConnections db = new DBConnections(getApplicationContext(), null);
+                Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
+                ts.moveToFirst();
+                //int totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+                int tls = 0;
+                try {
+                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
+                } catch (Exception e) {
+                    tls = 0;
+                }
+
+                if (tls > 0) {
+                    ErrorAlert("Something went wrong",
+                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
+                    );
+                    startService(
+                            new Intent(NclShipmentActivity.this,
+                                    NclServiceBulk.class));
+                } else {
+
+                    SavedSucessfully("No Data",
+                            "All Data Synchronized Successfully");
+                }
+                ts.close();
+                db.close();
+
+                super.onPostExecute(String.valueOf(finalJson));
+
+
+            } catch (Exception e) {
+                System.out.println(e);
+                //  insertManual();
+            }
+        }
+    }
+
+    int totalsize = 0, uploaddatacount = 0;
+
+    private void NCLbyManual() {
+
+        totalsize = 0;
+        stopService(
+                new Intent(NclShipmentActivity.this,
+                        NclServiceBulk.class));
+
+        try {
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+            Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
+            ts.moveToFirst();
+            try {
+                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
+            } catch (Exception e) {
+                totalsize = 0;
+            }
+            ts.close();
+
+            if (totalsize > 0) {
+                new NCLBulkbyManual().execute(String.valueOf(totalsize));
+            } else {
+                ErrorAlert("No Data",
+                        "All Data Synchronized Successfully"
+                );
+            }
+            db.close();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , TAG + "" + ex.toString());
+        }
+        return false;
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Exit NCL ")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        NclShipmentActivity.super.onBackPressed();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+   @Override
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+        try {
+            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
+        } catch (Exception ex) {}
+     }
+
+
+ /*   @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Server Issue" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlertOnlineValidation("Server Issue" , "Kindly Try Again \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }
+
+    public double Latitude = 0;
+    public double Longitude = 0;
+
+    private void requestLocation() {
+        try {
+            Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
+            if (location != null) {
+                Latitude = location.getLatitude();
+                Longitude = location.getLongitude();
+            }
+        } catch (Exception ex) {
+            Log.d("test" , TAG + "" + ex.toString());
+        }
+    }
+
+    private void getOnlineValidation (){
+        APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+
+        /*if (!isValidOnlineValidationFile()) {
+                OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , NclShipmentActivity.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));
+       }*/
+    }
+
+
+    /*
     private void SaveData() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
@@ -851,79 +1202,6 @@ public class NclShipmentActivity extends AppCompatActivity {
 
 
     }
-
-    private boolean IsValid() {
-        boolean isValid = true;
-        if (NclNo == "0") {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Please generate Ncl No", GlobalVar.AlertType.Error);
-            isValid = false;
-        }
-        if (secondFragment != null && secondFragment.PieceCodeList.size() <= 0) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
-            isValid = false;
-        }
-        return isValid;
-    }
-
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-        private SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int pos) {
-            switch (pos) {
-                case 0:
-                    if (firstFragment == null) {
-                        firstFragment = new ScanNclNoFragment();
-                        firstFragment.setArguments(bundle);
-                        //return firstFragment;
-                    }
-                    return firstFragment;
-                case 1:
-                    if (secondFragment == null) {
-                        secondFragment = new ScanNclWaybillFragmentRemoveValidation_CITC();
-                        secondFragment.setArguments(bundle);
-                    }
-                    return secondFragment;
-
-            }
-            return null;
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return getResources().getString(R.string.ncl_No);
-                case 1:
-                    return getResources().getString(R.string.ncl_Piece);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Exit NCL ")
-                .setMessage("Are you sure you want to exit without saving?")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int which) {
-                        NclShipmentActivity.super.onBackPressed();
-                    }
-                }).setNegativeButton("Cancel", null).setCancelable(false);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
-
-    ProgressDialog progressDialog;
 
     private class NCLbyManual extends AsyncTask<String, Integer, String> {
         String returnresult = "";
@@ -1121,219 +1399,6 @@ public class NclShipmentActivity extends AppCompatActivity {
                 //  insertManual();
             }
         }
-    }
+    } */
 
-
-    private class NCLBulkbyManual extends AsyncTask<String, Integer, String> {
-        String returnresult = "";
-        StringBuffer buffer;
-        int moveddata = 0;
-
-        @Override
-        protected void onPreExecute() {
-
-            uploaddatacount = 0;
-            if (progressDialog == null) {
-
-                progressDialog = new ProgressDialog(NclShipmentActivity.this);
-                progressDialog.setTitle("Request is being process,please wait...");
-                progressDialog.setMessage("Remaining " + String.valueOf(totalsize) + " / " + String.valueOf(totalsize));
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                progressDialog.setMax(100);
-                progressDialog.setCancelable(false);
-                progressDialog.setProgress(1);
-                progressDialog.show();
-
-            }
-
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values[0]);
-            progressDialog.setMessage("Remaining  " + String.valueOf(totalsize - moveddata) + " / " + String.valueOf(totalsize));
-            progressDialog.setProgress(values[0]);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            totalsize = Integer.parseInt(params[0]);
-            DBConnections db = new DBConnections(getApplicationContext(), null);
-            Cursor result = db.Fill("select * from Ncl where IsSync = 0 order by ID Limit 20", getApplicationContext());
-            if (result.getCount() == 0) {
-                result.close();
-                return null;
-            }
-            result.moveToFirst();
-            int id = 0, piececount = 0;
-
-            do {
-                returnresult = "";
-                buffer = new StringBuffer();
-                buffer.setLength(0);
-
-                String jsonData = "";
-                // if (result.moveToFirst()) {
-                id = result.getInt(result.getColumnIndex("ID"));
-                piececount = result.getInt(result.getColumnIndex("PieceCount"));
-                jsonData = result.getString(result.getColumnIndex("JsonData"));
-                // }
-
-                jsonData = jsonData.replace("Date(-", "Date(");
-
-
-                HttpURLConnection httpURLConnection = null;
-                OutputStream dos = null;
-                InputStream ist = null;
-
-                try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "NclSubmitInsertWaybillManual"); //LoadtoDestination
-                    httpURLConnection = (HttpURLConnection) url.openConnection();
-
-                    httpURLConnection.setRequestMethod("POST");
-                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    httpURLConnection.setDoInput(true);
-                    httpURLConnection.setDoOutput(true);
-                    httpURLConnection.connect();
-                    dos = httpURLConnection.getOutputStream();
-                    httpURLConnection.getOutputStream();
-                    dos.write(jsonData.getBytes());
-
-                    ist = httpURLConnection.getInputStream();
-                    String line;
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
-
-                    while ((line = reader.readLine()) != null) {
-                        buffer.append(line);
-                    }
-                    returnresult = String.valueOf(buffer);
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        if (ist != null)
-                            ist.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        if (dos != null)
-                            dos.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (httpURLConnection != null)
-                        httpURLConnection.disconnect();
-                    returnresult = String.valueOf(buffer);
-                }
-
-
-                if (returnresult.contains("Created")) {
-
-                    boolean isupdate = db.updateNCL(id, getApplicationContext());
-                    if (isupdate)
-                        moveddata = moveddata + piececount;
-                    //db.deleteNcl(id, getApplicationContext());
-                    //db.deleteNclWayBill(ncl.ID, getApplicationContext());
-                    //db.deleteNclBarcode(id, getApplicationContext());
-                }
-                try {
-                    uploaddatacount = uploaddatacount + piececount;
-                } catch (Exception e) {
-
-                }
-                publishProgress((int) ((uploaddatacount * 100) / totalsize));
-
-            } while (result.moveToNext());
-
-            result.close();
-            db.close();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String finalJson) {
-            try {
-
-                if (progressDialog != null && progressDialog.isShowing()) {
-                    progressDialog.dismiss();
-                    progressDialog = null;
-                }
-
-                DBConnections db = new DBConnections(getApplicationContext(), null);
-                Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
-                ts.moveToFirst();
-                //int totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
-                int tls = 0;
-                try {
-                    tls = ts.getInt(ts.getColumnIndex("totalRecord"));
-                } catch (Exception e) {
-                    tls = 0;
-                }
-
-                if (tls > 0) {
-                    ErrorAlert("Something went wrong",
-                            "Pending Data :- " + String.valueOf(tls) + " Check your internet connection,and try again"
-                    );
-                    startService(
-                            new Intent(NclShipmentActivity.this,
-                                    NclServiceBulk.class));
-                } else {
-
-                    SavedSucessfully("No Data",
-                            "All Data Synchronized Successfully");
-                }
-                ts.close();
-                db.close();
-
-                super.onPostExecute(String.valueOf(finalJson));
-
-
-            } catch (Exception e) {
-                System.out.println(e);
-                //  insertManual();
-            }
-        }
-    }
-
-    int totalsize = 0, uploaddatacount = 0;
-
-    private void NCLbyManual() {
-
-        totalsize = 0;
-        stopService(
-                new Intent(NclShipmentActivity.this,
-                        NclServiceBulk.class));
-
-        try {
-            DBConnections db = new DBConnections(getApplicationContext(), null);
-
-
-            Cursor ts = db.Fill("select SUM(PieceCount) As totalRecord  from Ncl where IsSync = 0 ", getApplicationContext());
-            ts.moveToFirst();
-            try {
-                totalsize = ts.getInt(ts.getColumnIndex("totalRecord"));
-            } catch (Exception e) {
-                totalsize = 0;
-            }
-            ts.close();
-
-            if (totalsize > 0) {
-                // new NCLbyManual().execute(String.valueOf(totalsize));
-                new NCLBulkbyManual().execute(String.valueOf(totalsize));
-            } else {
-                ErrorAlert("No Data",
-                        "All Data Synchronized Successfully"
-                );
-            }
-            db.close();
-
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-
-    }
 }

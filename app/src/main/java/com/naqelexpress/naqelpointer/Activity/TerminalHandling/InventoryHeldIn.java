@@ -336,7 +336,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 43, txtbinlocation.getText().toString()
-                            , "" , 0);
+                            , "" , 0, Integer.parseInt(""));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -406,6 +406,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         adapter.notifyDataSetChanged();
     }
 
+    //mohammed add this  Integer.parseInt("")
     private void SaveHeldOutData(int close) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -413,7 +414,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 44, temp.get("Ref").toString()
-                            , "" , 0);
+                            , "" , 0,  Integer.parseInt(""));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

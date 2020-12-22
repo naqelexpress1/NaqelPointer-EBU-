@@ -6,11 +6,17 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
@@ -26,6 +32,7 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 public class NewBarCodeScannerForVS extends AppCompatActivity
         implements ZBarScannerView.ResultHandler {
+
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
     private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
@@ -39,16 +46,22 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
-
+    private DBConnections dbConnections ;
+    private List<OnLineValidation> onLineValidationList;
+    private String division;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.newbarcodescanner);
 
-//        scannedBarCode.clear();
-//        ScanbyDevice.clear();
-//        ConflictBarcode.clear();
+        try {
+            division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+            dbConnections = new DBConnections(getApplicationContext() , null);
+            onLineValidationList = new ArrayList<>();
+        } catch (Exception e ) {
+            Log.d("test" , "Scanner " + e.toString());
+        }
 
         if (state != null) {
             mFlash = state.getBoolean(FLASH_STATE, false);
@@ -66,6 +79,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                 scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
                 ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
                 ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+
             }
         }
 
@@ -132,6 +146,13 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     public void handleResult(Result rawResult) {
 
         String result = rawResult.getContents();
+
+        // To show onlineValidation warning if any
+        boolean isConflict = !scannedBarCode.contains(result);
+        if (division.equals("Courier")) {
+            onlineValidation(result ,isConflict );
+        }
+
         if (scannedBarCode.contains(result)) {
             GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
             if (!ScanbyDevice.contains(result))
@@ -142,9 +163,14 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             if (!ConflictBarcode.contains(result))
                 ConflictBarcode.add(result);
-            conflict(result);
+
+            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                conflict(result);
 
         }
+
+        mScannerView.resumeCameraPreview(this);
+
 
     }
 
@@ -207,19 +233,133 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-//        Bundle bundle = new Bundle();
         Intent intent = new Intent();
         intent.putExtra("test", "test");
         intent.putExtra("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("ScanbyDevice", ScanbyDevice);
         intent.putExtra("ScanbyDevice", ScanbyDevice);
-//        bundle.putSerializable("ConflictBarcode", ConflictBarcode);
         intent.putExtra("ConflictBarcode", ConflictBarcode);
-        //intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
-
-//        finish();//finishing activity
         super.onBackPressed();
+    }
+
+    private void onlineValidation(String pieceBarcode , boolean isConflict) {
+        boolean isShowWarning = false;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isShowWarning = true;
+                }
+
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
+                    isShowWarning = true;
+                }
+            }
+
+            if (isConflict) {
+                onLineValidation.setIsConflict(1);
+                isShowWarning = true;
+            }
+
+            if (isShowWarning) {
+                onLineValidation.setBarcode(pieceBarcode);
+                onLineValidationList.add(onLineValidation);
+                showDialog(getOnLineValidationPiece(pieceBarcode));
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
+    public void showDialog(OnLineValidation pieceDetails) {
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(NewBarCodeScannerForVS.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please check pieces.");
+                }
+
+                if (pieceDetails.getIsStopped() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
+                }
+
+                if (pieceDetails.getIsConflict() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_ds_validation);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_ds_validation_header);
+                    tvStopShipmentHeader.setText("DS Validation");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_ds_validation_body);
+                    tvStopShipmentBody.setText("Shipment is not belong to employee.");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
     }
 }

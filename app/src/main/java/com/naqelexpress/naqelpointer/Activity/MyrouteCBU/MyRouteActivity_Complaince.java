@@ -67,6 +67,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MyRouteActivity_Complaince
         extends AppCompatActivity implements RouteListAdapterNew.RouteAdapterListener {
+
     private RecyclerView mapListview;
     private RouteListAdapterNew adapter;
     Button btnStartTrip, btnCloseTrip;
@@ -81,6 +82,8 @@ public class MyRouteActivity_Complaince
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
 
         setContentView(R.layout.myroutenew);
 

@@ -46,12 +46,13 @@ public class TerminalHandling extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
+
         return null;
     }
 
     @Override
     public void onCreate() {
+        Log.d("test", "Service Created");
         super.onCreate();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             startMyOwnForeground();
@@ -84,6 +85,7 @@ public class TerminalHandling extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        Log.d("test", "Service Started");
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -125,10 +127,14 @@ public class TerminalHandling extends Service {
         super.onDestroy();
     }
 
+    // updated by mohammed / TripID Inserted
 
     protected void updatefile() {
 
         try {
+
+            Log.d("test", "Service updatefile");
+
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
             Cursor result = db.Fill("select * from CheckPoint where IsSync = 0 Limit 1 ", getApplicationContext());
@@ -146,6 +152,8 @@ public class TerminalHandling extends Service {
                     checkPoint.Longitude = result.getString(result.getColumnIndex("Longitude"));
                     checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                     checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
+                    //mohammed
+                    checkPoint.TripID = Integer.parseInt( result.getString(result.getColumnIndex("TripID")));
 
                     Cursor resultDetail = db.Fill("select * from CheckPointWaybillDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
                     if (resultDetail.getCount() > 0) {
@@ -196,8 +204,9 @@ public class TerminalHandling extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece";//InsertTerminalHandling
-
+        //the url here
+      //    String URL = GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece";//InsertTerminalHandling
+        String URL = " http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"; //45455
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
             @Override

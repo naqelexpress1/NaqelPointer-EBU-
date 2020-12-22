@@ -20,27 +20,32 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ThirdFragment
-        extends Fragment {
+public class ThirdFragment extends Fragment {
+
     View rootView;
     TextView lbTotal;
     public static EditText txtBarCode;
@@ -49,14 +54,14 @@ public class ThirdFragment
     private DataAdapter adapter;
     private RecyclerView recyclerView;
     private Paint p = new Paint();
-
-    //    private AlertDialog.Builder alertDialog;
-//    private EditText txtBarCodePiece;
-//    private int edit_position;
-//    private View view;
-//    private boolean add = false;
     private Intent intent;
+    private Context mContext;
+    private String division;
+
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
+
+    private DBConnections dbConnections = new DBConnections(getContext(), null);
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
 
 
     @Override
@@ -66,6 +71,10 @@ public class ThirdFragment
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.checkpointsthirdfragment, container, false);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
+
+
+            division = GlobalVar.GV().getDivisionID(getContext(), GlobalVar.GV().EmployID);
+
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
@@ -100,7 +109,17 @@ public class ThirdFragment
                                 return;
                             }
                             if (IsValid()) {
-                                AddNewPiece();
+                                String barcode = txtBarCode.getText().toString();
+                                if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
+                                   if (isValidPieceBarcode(barcode)) {
+                                        AddNewPiece();
+                                    } else {
+                                        showDialog(getOnLineValidationPiece(barcode));
+                                    }
+                                } else {
+                                    AddNewPiece();
+                                }
+
                             } else {
                                 requestfocus();
                             }
@@ -110,6 +129,7 @@ public class ThirdFragment
                 }
             });
 
+            // this one
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +151,20 @@ public class ThirdFragment
         return rootView;
     }
 
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mContext = null;
+    }
+
+
     private void requestfocus() {
         txtBarCode.setText("");
         txtBarCode.requestFocus();
@@ -147,6 +181,7 @@ public class ThirdFragment
         initSwipe();
     }
 
+    //this one
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
@@ -286,6 +321,7 @@ public class ThirdFragment
 //            return;
 //        }
 
+
         if (TerminalHandling.group.equals("Group 1")) {
             boolean rtoreq = false;
 
@@ -397,11 +433,12 @@ public class ThirdFragment
 
         }
 
+        //mohammed add this Integer.parseInt("")
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), FirstFragment.CheckPointTypeDetailID,
                         FirstFragment.txtCheckPointTypeDDetail.getText().toString()
-                        , "", Barcodes.size());
+                        , "", Barcodes.size(), Integer.parseInt(""));
 
         int ID = 0;
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
@@ -563,6 +600,7 @@ public class ThirdFragment
 
     }*/
 
+   //mohammed add this Integer.parseInt("")
     private void SaveData(String PieceCode, String req) {
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
@@ -570,7 +608,7 @@ public class ThirdFragment
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "", 0);
+                        , "" , 0, Integer.parseInt(""));
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());
@@ -653,4 +691,192 @@ public class ThirdFragment
 
         return isValid;
     }
+
+    private boolean isValidPieceBarcode(String pieceBarcode) {
+        boolean isValid = true;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+           /* if (onLineValidationLocal == null) {
+                onLineValidation.setNotInFile(true);
+                isValid = false;
+            }  else {*/
+
+             /*   int isManifested = onLineValidationLocal.getIsManifested();
+
+                if (isManifested == 0) {
+                    Log.d("test" , "Not manifested");
+                    onLineValidation.setIsManifested(0);
+                    isValid = false;
+                }
+
+
+                if (isManifested == 0 && onLineValidationLocal.getCustomerWaybillDestID() != GlobalVar.GV().StationID) {
+                    onLineValidation.setIsWrongDest(1);
+                    onLineValidation.setCustomerWaybillDestID(onLineValidationLocal.getCustomerWaybillDestID());
+                    isValid = false;
+                } */
+
+                if (onLineValidationLocal != null) {
+                    if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+                        onLineValidation.setIsWrongDest(1);
+                        onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                        onLineValidation.setIsMultiPiece(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsStopped() == 1) {
+                        onLineValidation.setIsStopped(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsRelabel() == 1) {
+                        onLineValidation.setIsRelabel(1);
+                        isValid = false;
+                    }
+                }
+
+           // }
+
+            if (!isValid) {
+                onLineValidation.setBarcode(pieceBarcode);
+                onLineValidationList.add(onLineValidation);
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+        return isValid;
+    }
+
+
+    public void showDialog(final OnLineValidation pieceDetails) {
+        DBConnections dbConnections = new DBConnections(mContext , null);
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(mContext);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
+
+               //Uncomment once script is changed.
+                /*if (pieceDetails.isNotInFile()) {
+
+                    LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_not_manifested);
+                    llWrongDest.setVisibility(View.VISIBLE);
+
+                    TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_not_manifested_header);
+                    tvWrongDestHeader.setText("Manifest");
+
+                    TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_not_manifested_body);
+                    tvWrongDestBody.setText("Shipment is not manifested yet. ");
+                }*/
+
+
+                if (pieceDetails.getIsWrongDest() == 1) {
+                    String stationName = "";
+                    try {
+                        Station station = null;
+
+                     /*   if (pieceDetails.getIsManifested() == 0)
+                            station = dbConnections.getStationByID(pieceDetails.getCustomerWaybillDestID() , mContext);
+                        else
+                            station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext);*/
+
+                        station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext);
+
+                        if (station != null)
+                            stationName = station.Name;
+                        else
+                            Log.d("test" , "Station is null");
+                    } catch (Exception e) {}
+
+                    LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
+                    llWrongDest.setVisibility(View.VISIBLE);
+
+                    TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_wrong_dest_header);
+                    tvWrongDestHeader.setText("Wrong Destination");
+
+                    TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
+                    tvWrongDestBody.setText("Shipment destination : " + stationName + "."
+                           );
+                }
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please check pieces.");
+                }
+
+                if (pieceDetails.getIsStopped() == 1) {
+
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
+                }
+
+                /*if (pieceDetails.getIsRelabel() == 1) {
+                    LinearLayout llRelabel = dialogView.findViewById(R.id.ll_is_relabel);
+                    llRelabel.setVisibility(View.VISIBLE);
+                } */
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                                AddNewPiece();
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
+
+
 }

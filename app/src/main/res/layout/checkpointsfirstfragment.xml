@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
@@ -23,10 +22,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="22dp"
             android:layout_marginLeft="8dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="7dp"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
             android:ems="10"
@@ -34,10 +31,9 @@
             android:inputType="none"
             android:maxLength="40"
             android:text=""
-            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tripID_Linear"
             tools:ignore="HardcodedText,LabelFor,ObsoleteLayoutParam,RtlHardcoded" />
 
         <EditText
@@ -63,6 +59,9 @@
             app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
             tools:ignore="HardcodedText,LabelFor,ObsoleteLayoutParam,RtlHardcoded" />
 
+
+
+
         <EditText
             android:id="@+id/txtCheckPointTypeDDetail"
             android:layout_width="0dp"
@@ -85,6 +84,47 @@
             app:layout_constraintTop_toBottomOf="@+id/txtCheckPointTypeDetail"
             tools:ignore="HardcodedText,LabelFor,ObsoleteLayoutParam,RtlHardcoded" />
 
+
+        <LinearLayout
+            android:id="@+id/tripID_Linear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+
+        <EditText
+            android:id="@+id/txtCheckPointType_TripID"
+            android:layout_width="750dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Trip ID"
+            android:maxLength="40"
+            android:text=""
+
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:ignore="HardcodedText,LabelFor,ObsoleteLayoutParam,RtlHardcoded"
+            tools:layout_editor_absoluteY="41dp" />
+
+
+        <Button
+            android:id="@+id/btnOpenCamera"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignTop="@id/txtCheckPointType_TripID"
+            android:layout_alignBottom="@id/txtCheckPointType_TripID"
+            android:layout_alignRight="@id/txtCheckPointType_TripID"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/camera"
+            android:onClick="DeliveryScanClick"
+            tools:ignore="HardcodedText" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/txtNotes"
@@ -200,6 +240,8 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txtheight"
             tools:ignore="HardcodedText,LabelFor,ObsoleteLayoutParam,RtlHardcoded" />
+
+
 
     </android.support.constraint.ConstraintLayout>
 

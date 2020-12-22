@@ -1,9 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.journeyapps:zxing-android-embedded:3.4.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/868d3d93290d6c66bceb32a4c0208aa6/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/868d3d93290d6c66bceb32a4c0208aa6/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/868d3d93290d6c66bceb32a4c0208aa6/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e1e308ed1d27ab2c342196ff60f99157/zxing-android-embedded-3.4.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/e1e308ed1d27ab2c342196ff60f99157/zxing-android-embedded-3.4.0/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

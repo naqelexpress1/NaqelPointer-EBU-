@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.constraint.BuildConfig;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -72,7 +73,6 @@ import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
 import com.naqelexpress.naqelpointer.Activity.WaybillMeasurments.WaybillMeasurementActivity;
-import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.ContactNo.Contact;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -1811,7 +1811,7 @@ public class MainPageActivity
         switch (requestCode) {
             case 1: {
                 if (resultCode == Activity.RESULT_OK) {
-                    // TODO Extract the data returned from the child Activity.
+
                     String returnValue = data.getStringExtra("result");
                     if (returnValue.equals("done"))
                         finish();

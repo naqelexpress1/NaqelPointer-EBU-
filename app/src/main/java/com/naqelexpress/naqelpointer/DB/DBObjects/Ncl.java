@@ -19,6 +19,9 @@ public class Ncl {
     public int EmployID = GlobalVar.GV().EmployID;
     public String OrgDest = "";
     public int StationID = 0;
+    public String AppVersion;
+    public String Latitude;
+    public String Longitude;
 
     public List<NclDetail> ncldetails;
     public List<NclWaybillDetail> nclwaybilldetails;

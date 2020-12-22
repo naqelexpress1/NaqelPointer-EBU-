@@ -20,6 +20,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,7 +32,12 @@ import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -51,12 +57,14 @@ import java.util.HashMap;
 import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
-
-public class TerminalHandling extends AppCompatActivity {
+//Shared between Arrived At Dest + Shipment processing
+public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
     FirstFragment firstFragment;
-    // SecondFragment secondFragment;
     ThirdFragment thirdFragment;
+
+    com.naqelexpress.naqelpointer.Activity.TerminalHandling.FirstFragment firstFragment2;
+
     DateTime TimeIn;
     public static double Latitude = 0;
     public static double Longitude = 0;
@@ -70,7 +78,6 @@ public class TerminalHandling extends AppCompatActivity {
     static ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
     static ArrayList<String> city = new ArrayList<>();
     static ArrayList<String> operationalcity = new ArrayList<>();
-    //MyCountDownTimer countDownTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +85,25 @@ public class TerminalHandling extends AppCompatActivity {
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.checkpoints);
 
+
+
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
+        group = bundle.getString("group"); // In case of Arrival --> Group 8  In case of shipment processing --> Group 3
+
+        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+       try {
+           if (division.equals("Courier") && group.equals("Group 8")) { //Only in Arrival Module
+               if (!isValidOnlineValidationFile()) {
+                 getOnlineValidation();
+               }
+           }
+       } catch (Exception e) {
+
+       }
+
+
 
         status.clear();
         reason.clear();
@@ -94,7 +118,6 @@ public class TerminalHandling extends AppCompatActivity {
         city = bundle.getStringArrayList("city");
         operationalcity = bundle.getStringArrayList("operationalcity");
 
-        group = bundle.getString("group");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -106,6 +129,8 @@ public class TerminalHandling extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+
 
 
         TimeIn = DateTime.now();
@@ -185,7 +210,6 @@ public class TerminalHandling extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
                         if (clear == 2)
                             SaveData();
                         else if (clear == 3)
@@ -213,10 +237,12 @@ public class TerminalHandling extends AppCompatActivity {
             }
 
 
+            // added -- , Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()) --
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
-                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "", thirdFragment.Barcodes.size());
+                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
+
+                            "", thirdFragment.Barcodes.size(), Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()));
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -264,7 +290,18 @@ public class TerminalHandling extends AppCompatActivity {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
-        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
+        }
+
+       else if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0 && TerminalHandling.group.equals("Group 8")) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
+
+
+
+
+        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
             if (firstFragment.CheckPointTypeDDetailID == 1 && firstFragment.txtCheckPointTypeDDetail.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);
@@ -274,6 +311,11 @@ public class TerminalHandling extends AppCompatActivity {
                         GlobalVar.AlertType.Error);
                 return false;
             }
+//            if (firstFragment2.txtCheckPointType_TripID.getText().toString().length() == 0) {
+//                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
+//                        GlobalVar.AlertType.Error);
+//                return false;
+//            }
 
         }
 
@@ -327,6 +369,10 @@ public class TerminalHandling extends AppCompatActivity {
 
         return isValid;
     }
+
+
+
+
 
    /* private void SaveHeldOutData(int close) {
 
@@ -460,6 +506,8 @@ public class TerminalHandling extends AppCompatActivity {
         outState.putSerializable("reason", reason);
         outState.putSerializable("city", city);
         outState.putSerializable("operationalcity", operationalcity);
+        //added
+        //outState.putInt("TripID", GlobalVar.GV().TripID);
 
     }
 
@@ -802,6 +850,8 @@ public class TerminalHandling extends AppCompatActivity {
                 checkPoint.Longitude = result.getString(result.getColumnIndex("Longitude"));
                 checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                 checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
+                //added
+                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
 
 
                 Cursor resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
@@ -825,7 +875,11 @@ public class TerminalHandling extends AppCompatActivity {
                 InputStream ist = null;
 
                 try {
-                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+
+                    //the url here
+            //      URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+                    URL url = new URL("http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"); //LoadtoDestination
+
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");
@@ -950,4 +1004,70 @@ public class TerminalHandling extends AppCompatActivity {
 
         alertDialog.show();
     }
+
+    private void ErrorAlertOnlineValidation(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(TerminalHandling.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                      getOnlineValidation();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            if (isValid)
+                return true;
+        } catch (Exception ex) {
+            Log.d("test" , "TerminalHandling Activity - isValidOnlineValidationFile() " + ex.toString());
+        }
+        return false;
+    }
+
+  /*  @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }
+
+    private void getOnlineValidation () {
+
+        APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
+        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
+        onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+    }
 }
+

@@ -422,14 +422,20 @@
             android:label="Pending COD"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.NewBarCodeScanner"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.NewBarCodeScannerForVS"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+
+
         <activity
             android:name=".Classes.BarcodeScan"
             android:screenOrientation="portrait"
@@ -966,6 +972,14 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+<!--        related to mohammed-->
+        <activity android:name=".TerminalHandling.TerminalHandlingGroup"
+            android:label=""
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
+
 
         <activity
             android:name=".Activity.InCabNew.IncCabChecklist"
@@ -1015,6 +1029,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
+
+        <activity android:name=".Activity.Login.UpdatePasswordActivity"/>
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

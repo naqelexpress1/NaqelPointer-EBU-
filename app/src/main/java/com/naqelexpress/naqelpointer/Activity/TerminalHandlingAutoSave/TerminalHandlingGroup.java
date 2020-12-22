@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -15,10 +16,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,11 +44,19 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
     ArrayList<String> city = new ArrayList<>();
     ArrayList<String> operationalcity = new ArrayList<>();
 
+
+    // related to mohammed
+    ArrayList<HashMap<String, String>> status = new ArrayList<>();
+    String group;
+    // mohammed
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         //countDownTimer = new MyCountDownTimer(startTime, interval);
+
 
         setContentView(R.layout.terminalgroup);
         ImageView group1 = (ImageView) findViewById(R.id.group1);
@@ -55,13 +64,24 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         ImageView group2 = (ImageView) findViewById(R.id.group2);
         group2.setOnClickListener(this);
         ImageView group3 = (ImageView) findViewById(R.id.group3);
-        group3.setOnClickListener(this);
+        group3.setOnClickListener(this); //Shipment Processing
         ImageView group4 = (ImageView) findViewById(R.id.group4);
         group4.setOnClickListener(this); //Linehaul
         ImageView group5 = (ImageView) findViewById(R.id.group5);
         group5.setOnClickListener(this);
         ImageView ncl = (ImageView) findViewById(R.id.ncl);
         ncl.setOnClickListener(this);
+
+
+        // mohammed
+        ImageView truckarrival = (ImageView) findViewById(R.id.truckarrival);
+        truckarrival.setOnClickListener(this); //shipment Arrival
+
+//        ImageView arrivedatdest = (ImageView) findViewById(R.id.arrivedatdest);
+//        arrivedatdest.setVisibility(View.VISIBLE);
+//        arrivedatdest.setOnClickListener(this);
+        // mohammed end
+
 
         //ImageView loadtotrip = (ImageView) findViewById(R.id.loadtrotrip);
         //loadtotrip.setOnClickListener(this);
@@ -81,6 +101,24 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
+        // related  to mohammed
+//        Intent intent = this.getIntent();
+//        Bundle bundle = intent.getExtras();
+//        status.clear();
+//        //reason.clear();
+//        city.clear();
+//
+//
+//        status = (ArrayList<HashMap<String, String>>) bundle.getSerializable("status");
+//        reason = (ArrayList<HashMap<String, String>>) bundle.getSerializable("reason");
+//        city = bundle.getStringArrayList("city");
+//        operationalcity = bundle.getStringArrayList("operationalcity");
+//
+//        group = bundle.getString("group");
+        //mohammed end
+
     }
 
     private int usertypeid() {
@@ -130,7 +168,15 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
             GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
             data = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("data");
-            reason = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("reason");
+
+
+            // related to mohammed
+            status = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("status");
+            // reason = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("reason");
+            group = savedInstanceState.getString("group");
+            city = savedInstanceState.getStringArrayList("city");
+            operationalcity = savedInstanceState.getStringArrayList("operationalcity");
+            // end mohammed
 
         }
     }
@@ -146,6 +192,12 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         outState.putString("EmployStation", GlobalVar.GV().EmployStation);
         outState.putSerializable("data", data);
         outState.putSerializable("reason", reason);
+
+        //related to  mohammed
+        outState.putSerializable("status", status);
+        outState.putSerializable("city", city);
+        outState.putSerializable("operationalcity", operationalcity);
+        // end mohammed
     }
 
 
@@ -183,13 +235,13 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
                 else
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.group3:
+            case R.id.group3: //Shipment Processing
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
                     fetchgroup("3");
                 else
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.group4:
+            case R.id.group4: //Linehul
 
                 fetchgroup("4");
                 break;
@@ -217,6 +269,26 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
                 break;
 
 
+            //related to Mohammed
+            case R.id.truckarrival:
+                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+                    fetchgroup("8");
+                else
+                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                break;
+
+
+//            case R.id.arrivedatdest:
+//                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
+//                    Intent arrivedat = new Intent(this, com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.BringTripDetails.class);
+//                    arrivedat.putExtra("Function", 1);
+//                    startActivity(arrivedat);
+//                } else
+//                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+//                break;
+            // mohammed end
+
+
         }
     }
 
@@ -231,6 +303,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             }
         }
 
+        // Shipment processing - Group 3
         Bundle bundle = new Bundle();
         bundle.putSerializable("status", fetchdata);
         bundle.putSerializable("reason", reason);
@@ -248,7 +321,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 //            intent.putExtras(bundle);
 //            startActivity(intent);
 //        }
-        else if (group.equals("4")) {
+        else if (group.equals("4")) { //Inventory
             Intent intent = new Intent(this, com.naqelexpress.naqelpointer.TerminalHandling.LinehaulGroup.class);
             bundle.putSerializable("status", data);
             intent.putExtras(bundle);

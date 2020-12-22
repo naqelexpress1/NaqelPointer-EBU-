@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -59,6 +58,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         group5.setOnClickListener(this);
         ImageView ncl = (ImageView) findViewById(R.id.ncl);
         ncl.setOnClickListener(this);
+
+//        ImageView arrivedatdest = (ImageView) findViewById(R.id.arrivedatdest);
+//        arrivedatdest.setVisibility(View.VISIBLE);
+//        arrivedatdest.setOnClickListener(this);
 
         //ImageView loadtotrip = (ImageView) findViewById(R.id.loadtrotrip);
         //loadtotrip.setOnClickListener(this);
@@ -197,9 +200,12 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
                 Intent heldin = new Intent(TerminalHandlingGroup.this, InventoryHeldIn.class);
                 startActivity(heldin);
 
-                break;
-
-
+                // after moving the Shipment Arrived at Dest to here
+//            case R.id.arrivedatdest:
+//                Intent arrivedatdest = new Intent(TerminalHandlingGroup.this, BringTripDetails.class);
+//              //  arrivedatdest.putExtra("Function", 1);
+//                startActivity(arrivedatdest);
+//                break;
         }
     }
 

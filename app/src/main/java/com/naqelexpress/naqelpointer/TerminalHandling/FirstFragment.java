@@ -12,8 +12,10 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -26,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by Ismail on 21/03/2018.
  */
@@ -33,10 +37,16 @@ import java.util.HashMap;
 public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
     View rootView;
-    public static EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtweight, txtheight, txtlength, txtwidth;
+    public static EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtweight, txtheight, txtlength, txtwidth, txtCheckPointType_TripID;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
     public static int CheckPointTypeID = 0;
     public static int CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
+    public static Button btnOpenCamera;
+    private Intent intent;
+
+
+
+
 
     public ArrayList<Integer> CheckPointTypeList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeNameList = new ArrayList<>();
@@ -63,6 +73,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
 
+            txtCheckPointType_TripID = (EditText)  rootView.findViewById(R.id.txtCheckPointType_TripID) ;
+            btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+
             txtweight = (EditText) rootView.findViewById(R.id.txtweight);
             txtwidth = (EditText) rootView.findViewById(R.id.txtwidth);
 //            txtweight.setVisibility(View.VISIBLE);
@@ -74,6 +87,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointType.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
+
+            //added
+            txtCheckPointType_TripID.setInputType(InputType.TYPE_CLASS_NUMBER);
 
             txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
             txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
@@ -283,9 +299,50 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                     // CheckPointTypeDDetailID = CheckPointTypeDDetailList.get(position);
                 }
             });
+
+
+            // Hide TripID from other groups.
+            txtCheckPointType_TripID.setVisibility(View.GONE);
+            btnOpenCamera.setVisibility(View.GONE);
+
+            if (TerminalHandling.group.equals("Group 8")) {
+            txtCheckPointType_TripID.setVisibility(View.VISIBLE);
+            btnOpenCamera.setVisibility(View.VISIBLE);
+            }
+
+            // camera btn
+            intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+            btnOpenCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
+                        GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                        GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                    } else
+                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                }
+            });
+
+
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    if (extras.containsKey("barcode")) {
+                        String barcode = extras.getString("barcode");
+                        if (barcode.length() <= 8)
+                            txtCheckPointType_TripID.setText(barcode);
+                    }
+                }
+            }
+        }
     }
 
     private void clearAll() {
@@ -530,6 +587,10 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
         outState.putString("txtCheckPointType", txtCheckPointType.getText().toString());
         outState.putString("txtCheckPointTypeDetail", txtCheckPointTypeDetail.getText().toString());
         outState.putString("txtCheckPointTypeDDetail", txtCheckPointTypeDDetail.getText().toString());
+
+        //added
+        outState.putInt("txtCheckPointType_TripID", txtCheckPointType_TripID.getInputType());
+
         outState.putInt("CheckPointTypeID", CheckPointTypeID);
         outState.putIntegerArrayList("CheckPointTypeList", CheckPointTypeList);
         outState.putStringArrayList("CheckPointTypeNameList", CheckPointTypeNameList);
@@ -555,6 +616,10 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointType.setText(savedInstanceState.getString("txtCheckPointType"));
             txtCheckPointTypeDetail.setText(savedInstanceState.getString("txtCheckPointTypeDetail"));
             txtCheckPointTypeDDetail.setText(savedInstanceState.getString("txtCheckPointTypeDDetail"));
+
+            //added
+            txtCheckPointType_TripID.setInputType(savedInstanceState.getInt("txtCheckPointType_TripID"));
+
 
 
             if (CheckPointTypeDetailList.size() > 0) {

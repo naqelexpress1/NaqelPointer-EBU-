@@ -227,7 +227,7 @@
     <string name="ncl_GenerateNclNo">NclNo generated </string>
     <string name="ncl_Notgenerate">NclNo not generated. Please try again  </string>
     <string name="ncl_SelectDestination">Please select Destination</string>
-
+    <string name="UpdatedConsigneeNo">Updated Consignee No</string>
     <!--<string-array name="outlet">-->
     <!--<item>Malaz</item>-->
     <!--<item>Azizih</item>-->

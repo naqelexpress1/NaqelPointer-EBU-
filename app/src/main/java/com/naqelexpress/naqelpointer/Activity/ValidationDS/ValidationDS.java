@@ -10,10 +10,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +25,10 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
 import org.joda.time.DateTime;
@@ -39,12 +45,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Hasna on 11/11/18.
  */
 
-public class ValidationDS extends AppCompatActivity {
+public class ValidationDS extends AppCompatActivity implements IAPICallListener {
 
     ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
@@ -52,13 +59,17 @@ public class ValidationDS extends AppCompatActivity {
     ArrayList<HashMap<String, String>> ScannedBarCode = new ArrayList<>();
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
+    private List<OnLineValidation> onLineValidationList = new ArrayList<>();
+    private DBConnections dbConnections;
+    private String division;
 
     private GridView waybilgrid;
     BarCode adapter;
     EditText txtBarcode;
     TextView count;
-
     EditText employid;
+
+    private static final String TAG = "ValidationDS";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +77,20 @@ public class ValidationDS extends AppCompatActivity {
 
         setContentView(R.layout.validationds);
 
+        dbConnections = new DBConnections(getApplicationContext(), null);
+        division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+
+       try {
+           // Get shipment info for Courier || TH
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
+                   getOnlineValidationFile();
+               }
+           }
+       } catch (Exception e) {
+           Log.d("test" , TAG + " " + e.toString());
+       }
 
         conflict.clear();
         scannedBarCode.clear();
@@ -137,6 +162,22 @@ public class ValidationDS extends AppCompatActivity {
                     }
 
 
+
+                    // To show onlineValidation warning if any
+                    boolean isConflict = !scannedBarCode.contains(result);
+                    if (division.equals("Courier")) {
+                        onlineValidation(result ,isConflict );
+                    }
+
+
+                    if (!GlobalVar.GV().isValidBarcode(result)) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                        txtBarcode.setText("");
+                        return;
+                    }
+
+
                     if (scannedBarCode.contains(result)) {
                         GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
                         if (!ScanbyDevice.contains(result))
@@ -146,6 +187,8 @@ public class ValidationDS extends AppCompatActivity {
                         GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                         if (!ConflictBarcode.contains(result))
                             ConflictBarcode.add(result);
+
+                        if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
                         conflict(result);
                     }
                     txtBarcode.setText("");
@@ -243,6 +286,45 @@ public class ValidationDS extends AppCompatActivity {
         }
     }
 
+   /* @Override
+    public void onTaskComplete(boolean hasError, String errorMessage) {
+        if (hasError)
+            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+        else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+    }*/
+
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlert("File Not Loaded" , "Kindly check your internet connection & Try Again \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception ex) {}
+    }
+
+    private void ErrorAlert(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(ValidationDS.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       getOnlineValidationFile();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        alertDialog.show();
+    }
 
     private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
         private ProgressDialog progressDialog;
@@ -645,4 +727,146 @@ public class ValidationDS extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.DsValidation , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
+    private void onlineValidation(String pieceBarcode , boolean isConflict) {
+        boolean isShowWarning = false;
+        try {
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getApplicationContext());
+            OnLineValidation onLineValidation = new OnLineValidation();
+
+            if (onLineValidationLocal != null) {
+
+
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isShowWarning = true;
+                }
+
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
+                    isShowWarning = true;
+                }
+            }
+
+            if (isConflict) {
+                onLineValidation.setIsConflict(1);
+                isShowWarning = true;
+            }
+
+            if (isShowWarning) {
+                onLineValidation.setBarcode(pieceBarcode);
+                onLineValidationList.add(onLineValidation);
+                showDialog(getOnLineValidationPiece(pieceBarcode));
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "isValidPieceBarcode " + e.toString());
+        }
+    }
+
+    private OnLineValidation getOnLineValidationPiece (String barcode) {
+        try {
+            for (OnLineValidation pieceDetail : onLineValidationList) {
+                if (pieceDetail.getBarcode().equals(barcode))
+                    return pieceDetail;
+            }
+
+        } catch (Exception e) {
+            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+        }
+        return null;
+    }
+
+    public void showDialog(OnLineValidation pieceDetails) {
+        try {
+            if (pieceDetails != null) {
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(ValidationDS.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+
+                if (pieceDetails.getIsMultiPiece() == 1) {
+                    LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
+                    llMultiPiece.setVisibility(View.VISIBLE);
+
+                    TextView tvMultiPieceHeader = dialogView.findViewById(R.id.tv_multiPiece_header);
+                    tvMultiPieceHeader.setText("Multi Piece");
+
+                    TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_multiPiece_body);
+                    tvMultiPieceBody.setText("Please check pieces.");
+                }
+
+                if (pieceDetails.getIsStopped() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_stop_shipment_header);
+                    tvStopShipmentHeader.setText("Stop Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_stop_shipment_body);
+                    tvStopShipmentBody.setText("Stop shipment.Please Hold.");
+                }
+
+                if (pieceDetails.getIsConflict() == 1) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_ds_validation);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_ds_validation_header);
+                    tvStopShipmentHeader.setText("DS Validation");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_ds_validation_body);
+                    tvStopShipmentBody.setText("Shipment is not belong to employee.");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+
+
+            }
+        } catch (Exception e) {
+            Log.d("test" , "showDialog " + e.toString());
+        }
+    }
+
+    public void getOnlineValidationFile () {
+
+        APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsValidation);
+
+        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
+           onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
+    }
+
+
 }

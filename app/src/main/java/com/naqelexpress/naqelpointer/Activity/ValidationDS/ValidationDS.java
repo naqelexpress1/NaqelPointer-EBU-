@@ -25,14 +25,10 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
-import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
-import com.naqelexpress.naqelpointer.TerminalHandling.TerminalHandling;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
 import org.joda.time.DateTime;
@@ -73,6 +69,8 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     TextView count;
     EditText employid;
 
+    private static final String TAG = "ValidationDS";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,17 +81,16 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
 
-        // Get shipment info for Courier || TH
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
-
-                APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsValidation);
-
-               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
-            }
-        }
+       try {
+           // Get shipment info for Courier || TH
+           if (division.equals("Courier")) {
+               if (!isValidOnlineValidationFile()) {
+                   getOnlineValidationFile();
+               }
+           }
+       } catch (Exception e) {
+           Log.d("test" , TAG + " " + e.toString());
+       }
 
         conflict.clear();
         scannedBarCode.clear();
@@ -301,7 +298,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlert("Server Issue" , "Kindly contact your supervisor \n \n " + errorMessage);
+                ErrorAlert("File Not Loaded" , "Kindly check your internet connection & Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
         } catch (Exception ex) {}
@@ -312,11 +309,17 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                       getOnlineValidationFile();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-
                     }
                 });
 
@@ -749,8 +752,8 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     isShowWarning = true;
                 }
 
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                     isShowWarning = true;
                 }
             }
@@ -813,7 +816,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     tvMultiPieceBody.setText("Please check pieces.");
                 }
 
-                if (pieceDetails.getIsStopShipment() == 1) {
+                if (pieceDetails.getIsStopped() == 1) {
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
 
@@ -854,6 +857,15 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         } catch (Exception e) {
             Log.d("test" , "showDialog " + e.toString());
         }
+    }
+
+    public void getOnlineValidationFile () {
+
+        APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsValidation);
+
+        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , ValidationDS.this , this);
+           onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsValidation));*/
     }
 
 

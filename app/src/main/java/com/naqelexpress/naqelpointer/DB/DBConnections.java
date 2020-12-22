@@ -64,7 +64,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -6313,7 +6312,7 @@ public class DBConnections
                     stmt.bindString(2, onLineValidation.getBarcode());
                     stmt.bindString(3, String.valueOf(onLineValidation.getWaybillDestID()));
                     stmt.bindString(4, String.valueOf(onLineValidation.getIsMultiPiece()));
-                    stmt.bindString(5, String.valueOf(onLineValidation.getIsStopShipment()));
+                    stmt.bindString(5, String.valueOf(onLineValidation.getIsStopped()));
                     stmt.bindString(6, String.valueOf(onLineValidation.getIsDeliveryRequest()));
                     stmt.bindString(7, String.valueOf(onLineValidation.getIsRTORequest()));
                     stmt.bindString(8, String.valueOf(onLineValidation.getNoOfAttempts()));
@@ -6372,7 +6371,7 @@ public class DBConnections
                 onLineValidation.setBarcode(cursor.getString(cursor.getColumnIndex("Barcode")));
                 onLineValidation.setWaybillDestID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("WaybillDestID"))));
                 onLineValidation.setIsMultiPiece(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsMultiPiece"))));
-                onLineValidation.setIsStopShipment(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
+                onLineValidation.setIsStopped(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
                 onLineValidation.setIsDeliveryRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsDeliveryRequest"))));
                 onLineValidation.setIsRTORequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRTORequest"))));
                 onLineValidation.setNoOfAttempts(Integer.parseInt(cursor.getString(cursor.getColumnIndex("NoOfAttempts"))));
@@ -6412,9 +6411,10 @@ public class DBConnections
         if (isOnlineValidationFileEmpty( context)) {
             return false;
         }
-        if (getOnlineValidationProcess(context) != process) {
+        //todo Riyam remove this validation it
+       /* if (getOnlineValidationProcess(context) != process) {
             return false;
-        }
+        }*/
 
         if (isOnlineValidationFileOutDated(process , context)) {
             return false;

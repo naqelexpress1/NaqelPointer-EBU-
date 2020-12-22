@@ -14,8 +14,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.KeyEvent;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Classes.BarcodeValidation;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
@@ -37,17 +34,13 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.NclNoRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.UpdateWaybillRequest;
-import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
-import com.naqelexpress.naqelpointer.JSON.Results.NclNoResult;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.toptoche.searchablespinnerlibrary.SearchableSpinner;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -503,8 +496,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     onLineValidation.setIsDestNotBelongToNcl(1);
                     hasFlag = true;
                 }
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                     hasFlag = true;
                 }
 
@@ -514,10 +507,13 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     hasFlag = true;
                 }*/
 
-            } else {
+            }
+
+            //Uncomment once script is changed.
+            /*else {
                 onLineValidation.setNotInFile(true);
                 hasFlag = true;
-            }
+            }*/
 
                 onLineValidation.setBarcode(barcode);
                 onLineValidationList.add(onLineValidation);
@@ -554,7 +550,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                 btnConfirm.setText("OK & Quit");
 
                 //If barcode is not in onlineValidation table
-                if (onLineValidation.isNotInFile()) {
+                //Uncomment when changing script
+              /*  if (onLineValidation.isNotInFile()) {
                     LinearLayout llDifDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llDifDest.setVisibility(View.VISIBLE);
 
@@ -562,8 +559,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     tvNclHeader.setText("Manifest");
 
                     TextView tvNclBody = dialogView.findViewById(R.id.tv_not_manifested_body);
-                    tvNclBody.setText("Shipment is not manifested yet.Scan will not be recorded");
-                } else {
+                    tvNclBody.setText("Shipment is not manifested yet.");
+
+
+                } */
+
+             // else {
 
                     if (onLineValidation.getIsDestNotBelongToNcl() == 1) {
 
@@ -594,7 +595,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                     }
 
 
-                    if (onLineValidation.getIsStopShipment() == 1) {
+                    if (onLineValidation.getIsStopped() == 1) {
 
                         LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                         llStopShipment.setVisibility(View.VISIBLE);
@@ -620,7 +621,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                         tvStopShipmentBody.setText("The Shipment has a CITC Complaint.");
 
                     }
-                }
+              //  }
 
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
@@ -634,13 +635,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment  {
                             alertDialog.dismiss();
 
                             //don't record if not manifested or shipment dest not belong to ncl and user didn't change the dest
-                            if (onLineValidation.isNotInFile() ){
+                            /*if (onLineValidation.isNotInFile() ){
                                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 txtBarcode.getText().clear();
                                 txtBarcode.requestFocus();
-                            }
-
-                            else if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged){
+                            }*///else if
+                                if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged){
                                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 GlobalVar.GV().ShowSnackbar(rootView, "Shipment destination not belong to NCL.Scan won't be recorded", GlobalVar.AlertType.Warning);                                txtBarcode.getText().clear();
                             }

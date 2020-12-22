@@ -578,8 +578,8 @@ public class DeliverySheetThirdFragment extends Fragment {
                     isValid = false;
                 }
 
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                     isValid = false;
                 }
 
@@ -678,7 +678,7 @@ public class DeliverySheetThirdFragment extends Fragment {
                     radioGroupCheckListener(dialogView);
                 }
 
-                if (pieceDetails.getIsStopShipment() == 1) {
+                if (pieceDetails.getIsStopped() == 1) {
 
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);

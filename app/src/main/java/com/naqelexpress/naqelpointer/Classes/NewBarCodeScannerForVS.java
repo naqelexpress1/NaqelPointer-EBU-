@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
@@ -257,8 +256,8 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                     isShowWarning = true;
                 }
 
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                     isShowWarning = true;
                 }
             }
@@ -321,7 +320,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                     tvMultiPieceBody.setText("Please check pieces.");
                 }
 
-                if (pieceDetails.getIsStopShipment() == 1) {
+                if (pieceDetails.getIsStopped() == 1) {
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
 

@@ -1,7 +1,6 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
 import android.app.ActivityManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,7 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,19 +35,9 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.NCLBulk.ScanNclWaybillFragmentRemoveValidation_CITC;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +110,7 @@ public class ThirdFragment extends Fragment {
                             }
                             if (IsValid()) {
                                 String barcode = txtBarCode.getText().toString();
-                                if (division.equals("Courier")) {
+                                if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
                                    if (isValidPieceBarcode(barcode)) {
                                         AddNewPiece();
                                     } else {
@@ -332,8 +320,6 @@ public class ThirdFragment extends Fragment {
 //            ErrorAlert("Info", "Kindly save Scanned Data and Scan again...", 1, "");
 //            return;
 //        }
-
-        Log.d("test" , "Group " + TerminalHandling.group);
 
 
         if (TerminalHandling.group.equals("Group 1")) {
@@ -712,10 +698,10 @@ public class ThirdFragment extends Fragment {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
             OnLineValidation onLineValidation = new OnLineValidation();
 
-            if (onLineValidationLocal == null) {
+           /* if (onLineValidationLocal == null) {
                 onLineValidation.setNotInFile(true);
                 isValid = false;
-            }  else {
+            }  else {*/
 
              /*   int isManifested = onLineValidationLocal.getIsManifested();
 
@@ -732,28 +718,30 @@ public class ThirdFragment extends Fragment {
                     isValid = false;
                 } */
 
+                if (onLineValidationLocal != null) {
+                    if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+                        onLineValidation.setIsWrongDest(1);
+                        onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
+                        isValid = false;
+                    }
 
-                if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
-                    onLineValidation.setIsWrongDest(1);
-                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
-                    isValid = false;
+                    if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                        onLineValidation.setIsMultiPiece(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsStopped() == 1) {
+                        onLineValidation.setIsStopped(1);
+                        isValid = false;
+                    }
+
+                    if (onLineValidationLocal.getIsRelabel() == 1) {
+                        onLineValidation.setIsRelabel(1);
+                        isValid = false;
+                    }
                 }
 
-                if (onLineValidationLocal.getIsMultiPiece() == 1) {
-                    onLineValidation.setIsMultiPiece(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
-                    isValid = false;
-                }
-
-                if (onLineValidationLocal.getIsRelabel() == 1) {
-                    onLineValidation.setIsRelabel(1);
-                    isValid = false;
-                }
-            }
+           // }
 
             if (!isValid) {
                 onLineValidation.setBarcode(pieceBarcode);
@@ -781,8 +769,8 @@ public class ThirdFragment extends Fragment {
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
                 tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
 
-
-                if (pieceDetails.isNotInFile()) {
+               //Uncomment once script is changed.
+                /*if (pieceDetails.isNotInFile()) {
 
                     LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_not_manifested);
                     llWrongDest.setVisibility(View.VISIBLE);
@@ -792,7 +780,7 @@ public class ThirdFragment extends Fragment {
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_not_manifested_body);
                     tvWrongDestBody.setText("Shipment is not manifested yet. ");
-                }
+                }*/
 
 
                 if (pieceDetails.getIsWrongDest() == 1) {
@@ -821,7 +809,7 @@ public class ThirdFragment extends Fragment {
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
                     tvWrongDestBody.setText("Shipment destination : " + stationName + "."
-                           + '\n' + "Scan won't be recorded.");
+                           );
                 }
 
                 if (pieceDetails.getIsMultiPiece() == 1) {
@@ -836,7 +824,7 @@ public class ThirdFragment extends Fragment {
                     tvMultiPieceBody.setText("Please check pieces.");
                 }
 
-                if (pieceDetails.getIsStopShipment() == 1) {
+                if (pieceDetails.getIsStopped() == 1) {
 
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);

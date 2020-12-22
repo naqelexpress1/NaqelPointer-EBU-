@@ -59,26 +59,24 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
     DateTime TimeIn;
     TabLayout tabLayout;
 
+    private static final String TAG =  "DeliverySheetActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.deliverysheet);
-
-
-
-
-        String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
-
-                APICall apiCall = new APICall(getApplicationContext() , DeliverySheetActivity.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
-
-                /*OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+        try {
+            String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+            if (division.equals("Courier")) {
+                if (!isValidOnlineValidationFile()) {
+                    getOnlineValidation();
+                }
             }
+        } catch (Exception e) {
+            Log.d("test" , TAG + " " + e.toString());
         }
+
 
 
 
@@ -494,10 +492,14 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
 
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
-        if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
-        else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        try {
+            if (hasError)
+                ErrorAlert("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception e) {
+
+        }
     }
 
 
@@ -518,7 +520,14 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        getOnlineValidation();
+                    }
+                });
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -539,6 +548,16 @@ public class DeliverySheetActivity extends AppCompatActivity implements IAPICall
             Log.d("test" , "isValidOnlineValidationFile() e " + ex.toString());
         }
         return false;
+    }
+
+
+    public void getOnlineValidation () {
+
+        APICall apiCall = new APICall(getApplicationContext() , DeliverySheetActivity.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+
+        /*OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , DeliverySheetActivity.this , this);
+         onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
     }
 
 }

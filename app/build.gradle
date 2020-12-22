@@ -1,6 +1,9 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
+
+
+
 android {
     signingConfigs {
         config {
@@ -123,10 +126,12 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
 
 
+
 }
 
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android-extensions'
+
 repositories {
     mavenCentral()
 

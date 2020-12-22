@@ -1,30 +1,21 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.StrictMode;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
@@ -41,18 +32,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
-import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
 import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
@@ -114,14 +99,14 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         dbConnections = new DBConnections(getApplicationContext(), null);
         division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-        if (division.equals("Courier")) {
-            if (!isValidOnlineValidationFile()) {
-
-                APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
-               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+        try {
+            if (division.equals("Courier")) {
+                if (!isValidOnlineValidationFile()) {
+                    getOnlineValidation();
+                }
             }
+        } catch (Exception e) {
+
         }
 
 
@@ -156,7 +141,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     onBackPressed();
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    Log.d("test" , "Divison " + division);
                     if (!division.equals("Courier"))
                          AddNewPiece();
                     else {
@@ -296,6 +280,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
             }
+
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
             txtBarCode.setText("");
@@ -518,7 +503,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     }
 
-    // Group all warnings + onlineValidation in one pop-up
+    // Group flags from ismail + onlineValidation flags in one pop-up
     private void THAddNewPiece() {
 
         Log.d("test" , "TH");
@@ -544,6 +529,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
                 return;
             }
+
             lbTotal.setText(txtBarCode.getText().toString());
             txtBarCode.requestFocus();
             txtBarCode.setText("");
@@ -717,8 +703,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 txtBarCode.setText("");
                 txtBarCode.requestFocus();
                 initViews();
-                // if (inventorycontrol.size() > 5)
-                //     inventorycontrol.remove(5);
+
             } else {
 
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -1445,6 +1430,30 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         alertDialog.show();
     }
 
+    private void ErrorAlertOnlineValidation(final String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(InventoryControl_LocalValidation_oneByOne.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                     getOnlineValidation();
+                    }
+                });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
     private void SaveData(String PieceCode, String req) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
@@ -1815,8 +1824,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     onLineValidation.setIsMultiPiece(1);
                 }
 
-                if (onLineValidationLocal.getIsStopShipment() == 1) {
-                    onLineValidation.setIsStopShipment(1);
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
                 }
 
                 if (onLineValidationLocal.getIsRTORequest() == 1) {
@@ -1897,7 +1906,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     tvWrongDestBody.setText("Shipment destination station : " + stationName);
                 }
 
-                if (pieceDetails.getIsStopShipment() == 1) {
+                if (pieceDetails.getIsStopped() == 1) {
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
 
@@ -1947,13 +1956,21 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                         Log.d("test" , "IsRelabel");
                     }*/
 
+                OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceDetails.getBarcode(), getApplicationContext());
+
+                String noOfAttempts = "";
+                if (onLineValidationLocal != null || !WaybillAttempt.equals("No Data")) {
+                    noOfAttempts = String.valueOf(pieceDetails.getNoOfAttempts());
+                } else {
+                    noOfAttempts = "No Data";
+                }
+
                 LinearLayout llNoOfAttempts = dialogView.findViewById(R.id.ll_no_attempts);
                 llNoOfAttempts.setVisibility(View.VISIBLE);
                 TextView tvNoOfAttemptsHeader = dialogView.findViewById(R.id.tv_no_attempts_header);
                 tvNoOfAttemptsHeader.setText("Number of attempts");
                 TextView tvNoOfAttemptsBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
-                tvNoOfAttemptsBody.setText("Number of attempts : " + pieceDetails.getNoOfAttempts());
-
+                tvNoOfAttemptsBody.setText("Number of attempts : " + noOfAttempts);
 
 
 
@@ -2002,11 +2019,18 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
         if (hasError)
-            ErrorAlert("Failed Loading File" , "Kindly contact your supervisor \n \n " + errorMessage);
+            ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
 
+
+    private void getOnlineValidation () {
+        APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+        apiCall.getOnlineValidationData(GlobalVar.DsAndInventory);
+               /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
+                onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.DsAndInventory));*/
+    }
 
 
 

@@ -14,9 +14,6 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
-import com.naqelexpress.naqelpointer.DB.DBObjects.FacilityStatus;
-import com.naqelexpress.naqelpointer.DB.DBObjects.UserFacility;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Booking;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -26,6 +23,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointTypeDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointWaybillDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CourierDailyRoute;
 import com.naqelexpress.naqelpointer.DB.DBObjects.DeliveryStatus;
+import com.naqelexpress.naqelpointer.DB.DBObjects.FacilityStatus;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MultiDelivery;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MultiDeliveryDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MultiDeliveryWaybillDetail;
@@ -56,6 +54,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurement;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurementDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -92,6 +91,7 @@ public class DBConnections
 
     public DBConnections(Context context, View view) {
         super(context, DBName, null, Version);
+        //this.context = context;
         this.rootView = view;
     }
 
@@ -121,8 +121,7 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
 
-        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL)");
-
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"Station\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT, \"CountryID\" INTEGER NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliveryStatus\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , " +
                 "\"Code\" TEXT, \"Name\" TEXT NOT NULL , \"FName\" TEXT , SeqOrder INTEGER )");
 
@@ -178,7 +177,7 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
                 "\"CheckPointTypeDetailID\" INTEGER  , \"CheckPointTypeDDetailID\" INTEGER  , \"Latitude\" TEXT, " +
-                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0 , \"TripID\" INTEGER Default 0 )");
+                "\"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL ,\"Comments\" TEXT , \"Ref\" TEXT,\"Count\" INTEGER Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointBarCodeDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
@@ -286,7 +285,7 @@ public class DBConnections
                 "  \"ImageName\"  TEXT NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
+                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -464,13 +463,35 @@ public class DBConnections
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+//        if (oldVersion < 2)
+//        {
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , \"Latitude\" TEXT, \"Longitude\" TEXT, \"IsSync\" BOOL NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointWaybillDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"WaybillNo\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointBarCodeDetails\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"CheckPointID\" INTEGER NOT NULL , \"IsSync\" BOOL NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPointType\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"MultiDelivery\"  ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"ReceiverName\" TEXT NOT NULL, \"PiecesCount\" INTEGER NOT NULL, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , \"UserID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL, \"StationID\" INTEGER NOT NULL, \"WaybillsCount\" INTEGER NOT NULL, \"Latitude\" TEXT, \"Longitude\" TEXT, \"ReceivedAmt\" DOUBLE, \"ReceiptNo\" TEXT, \"StopPointsID\" INTEGER )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"MultiDeliveryDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"BarCode\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"MultiDeliveryID\" INTEGER NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"MultiDeliveryWaybillDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"WaybillNo\" TEXT NOT NULL, \"IsSync\" BOOL NOT NULL, \"MultiDeliveryID\" INTEGER NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillMeasurement\"  ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"WaybillNo\" INTEGER NOT NULL, \"TotalPieces\" INTEGER NOT NULL, \"EmployID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"CTime\" DATETIME NOT NULL, \"IsSync\" BOOL NOT NULL, \"HHD\" TEXT, \"Weight\" DOUBLE NOT NULL, \"NoNeedVolume\" BOOL NOT NULL , \"NoNeedVolumeReasonID\" INTEGER )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"WaybillMeasurementDetail\" ( \"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE, \"PiecesCount\" INTEGER NOT NULL, \"Width\" DOUBLE NOT NULL, \"Length\" DOUBLE NOT NULL, \"Height\" DOUBLE NOT NULL, \"IsSync\" BOOL NOT NULL, \"WaybillMeasurementID\" INTEGER NOT NULL )");
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"NoNeedVolumeReason\" (\"ID\" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , \"Name\" TEXT NOT NULL , \"FName\" TEXT )");
+//        }
 
         if (oldVersion < newVersion) {
 
             db.execSQL("delete from UserMELogin");
             db.execSQL("delete from UserME");
+            // db.execSQL("delete from LocationintoMongo");
+            //db.execSQL("delete from NotDelivered");
+            //db.execSQL("delete from NotDeliveredDetail");
+            //db.execSQL("delete from OnDelivery");
+            //db.execSQL("delete from OnDeliveryDetail");
             db.execSQL("delete from DeliveryStatus");
+            // db.execSQL("delete from LocationintoMongo");
+//            db.execSQL("delete from MyRouteCompliance");
+//            db.execSQL("delete from SuggestLocations");
+//            db.execSQL("delete from plannedLocation");
+
 
             //Added by ismail
             this.mDefaultWritableDatabase = db;
@@ -515,6 +536,8 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"AtDestination\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"Json\"  TEXT NOT NULL )");
 
+//            db.execSQL("CREATE TABLE IF NOT EXISTS \"AtDestination\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
+//                    "\"Json\"  TEXT NOT NULL )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"BarCode\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"BarCode\"  TEXT NOT NULL, \"WayBillNo\"  TEXT NOT NULL,\"Date\" TEXT NOT NULL ,\"IsDelivered\" INTEGER Default 0,\"WayBillID\" INTEGER Default 0 )");
@@ -556,9 +579,8 @@ public class DBConnections
                     " \"MobileNo\"  TEXT NOT NULL , \"StationID\"  INTEGER NOT NULL," +
                     "  \"ImageName\"  TEXT NOT NULL )");
 
-
             db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
+                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
 
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -799,17 +821,12 @@ public class DBConnections
                 db.execSQL("ALTER TABLE OnCLoadingForDDetail ADD COLUMN WaybillNo TEXT ");
             if (!isColumnExist("CheckPoint", "Comments"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Comments TEXT");
-            if (!isColumnExist("CheckPoint", "TripID"))
-                db.execSQL("ALTER TABLE CheckPoint ADD COLUMN TripID INTEGER DEFAULT 0");
             if (!isColumnExist("CheckPoint", "Ref"))
                 db.execSQL("ALTER TABLE CheckPoint ADD COLUMN Ref TEXT ");
             if (!isColumnExist("BarCode", "IsDelivered"))
                 db.execSQL("ALTER TABLE BarCode ADD COLUMN IsDelivered INTEGER ");
             if (!isColumnExist("BarCode", "WayBillID"))
                 db.execSQL("ALTER TABLE BarCode ADD COLUMN WayBillID INTEGER ");
-
-
-
 
             if (!isColumnExist("TripPlanDDetails", "TripPlanNo"))
                 db.execSQL("ALTER TABLE TripPlanDDetails ADD COLUMN TripPlanNo INTEGER ");
@@ -993,14 +1010,14 @@ public class DBConnections
         return cursor;
     }
 
-    public Station getStationByID (int stationID , Context context) {
+    public Station getStationByID(int stationID, Context context) {
         Station station = null;
         try {
             String selectQuery = "SELECT * FROM Station WHERE ID = " + stationID + " LIMIT 1";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
-            if (cursor != null && cursor.getCount() > 0 ) {
+            if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 station = new Station();
                 station.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
@@ -1052,22 +1069,32 @@ public class DBConnections
     Cursor toplevelcursor = null;
 
     public Cursor Fill(String Query, Context context) {
-
         SQLiteDatabase db = getReadableDatabase();
 
         if (toplevelcursor != null)
             toplevelcursor.close();
         try {
 
+
             synchronized ("dblock") {
+
+                // Cursor oldCursor = yourAdapter.swapCursor(cursor);
                 toplevelcursor = db.rawQuery(Query, null);
+
+                //  db.close();
+
                 return toplevelcursor;
+
             }
 
         } catch (SQLiteException e) {
             System.out.println(e);
 
         } finally {
+            // cursor.close();
+
+//            if (db != null && db.isOpen())
+//                db.close();
         }
 
         return null;
@@ -1170,26 +1197,23 @@ public class DBConnections
         return ID;
     }
 
-    public boolean isValueExist(String tableName,String column ,String value,Context context)
-    {
+    public boolean isValueExist(String tableName, String column, String value, Context context) {
         try {
             String query = "SELECT " + column + " FROM " + tableName +
                     " Where " + column + " = '" + value + "'";
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(query, null);
-            if (cursor.getCount() > 0)
-            {
+            if (cursor.getCount() > 0) {
                 cursor.close();
                 return true;
-            }
-            else {
+            } else {
                 cursor.close();
                 return false;
             }
 
         } catch (Exception ex) {
-            Log.d("test" , "ex " + ex.toString());
+            Log.d("test", "ex " + ex.toString());
         }
         return true;
     }
@@ -1275,21 +1299,20 @@ public class DBConnections
         return result != -1;
     }
 
-    public boolean FacilityLoggedIn(Context context, UserFacility userFacility) {
+    public boolean FacilityLoggedIn(Context context, int EmpID) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             ContentValues contentValues = new ContentValues();
             contentValues.put("IsDate", GlobalVar.getDate());
-            contentValues.put("EmpID", userFacility.getEmployID());
-            contentValues.put("FacilityID" , userFacility.getFacilityID());
+            contentValues.put("EmpID", EmpID);
 
             result = db.insert("FacilityLoggedIn", null, contentValues);
             db.close();
 
         } catch (SQLiteException e) {
-          Log.d("test" , "FacilityLoggedIn " + e.toString());
+
         }
         return result != -1;
     }
@@ -1329,7 +1352,7 @@ public class DBConnections
         return result != -1;
     }
 
-    public int getUserFacilityID(Context context , int empID) {
+    public int getUserFacilityID(Context context, int empID) {
         int facilityID = -1;
         Cursor cursor;
         try {
@@ -1337,24 +1360,24 @@ public class DBConnections
             String args[] = {String.valueOf(empID)};
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select FacilityID from FacilityLoggedIn Where EmpID=?" , args, null);
+            cursor = db.rawQuery("select FacilityID from FacilityLoggedIn Where EmpID=?", args, null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 facilityID = cursor.getInt(cursor.getColumnIndex("FacilityID"));
             }
             db.close();
         } catch (SQLiteException e) {
-            Log.d("test" , "getFacilityID " + e.toString());
+            Log.d("test", "getFacilityID " + e.toString());
         }
         return facilityID;
     }
 
-    public FacilityStatus getFacility(Context context , int facilityID) {
+    public FacilityStatus getFacility(Context context, int facilityID) {
         FacilityStatus facilityStatus = new FacilityStatus();
         Cursor cursor;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select * from Facility where FacilityID = " + facilityID, null);
+            cursor = db.rawQuery("select * from Facility where FacilityID = " + facilityID, null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 facilityStatus.ID = cursor.getInt(cursor.getColumnIndex("FacilityID"));
@@ -1365,20 +1388,16 @@ public class DBConnections
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "getFacility " + e.toString());
+            Log.d("test", "getFacility " + e.toString());
         }
         return facilityStatus;
     }
 
     public boolean DeleteExsistingLogin(Context context) {
         long result = 0;
-        Cursor cursor;
-        UserME userME = new UserME();
-
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String args[] = {GlobalVar.getDate()};
-
             db.delete("UserMELogin", "Date!=?", args);
             result = db.delete("UserME", "Date!=?", args);
 
@@ -1390,60 +1409,6 @@ public class DBConnections
         return result != -1;
     }
 
-    public int getUpdateLoginStatus(Context context) {
-        int empID = 0;
-        Cursor cursor;
-        try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select EmployID from UpdateLoginStatus", null);
-            if (cursor != null && cursor.getCount() >= 1) {
-                cursor.moveToFirst();
-                empID = cursor.getInt(cursor.getColumnIndex("EmployID"));
-            }
-
-            db.close();
-
-        } catch (SQLiteException e) {
-            Log.d("test" , "getUpdateLoginStatus " + e.toString());
-        }
-        return empID;
-    }
-
-    public int UpdateLoginStatusCount(Context context) {
-        int count = 0;
-        Cursor cursor;
-        try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select EmployID from UpdateLoginStatus", null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                count = cursor.getCount();
-            }
-            db.close();
-
-        } catch (SQLiteException e) {
-            Log.d("test" , "UpdateLoginStatusCount " + e.toString());
-        }
-        return count;
-    }
-
-    public int UpdateLoginStatusErrorCount(int employID , Context context) {
-        int count = 0;
-        Cursor cursor;
-        try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select ID from UpdateLoginStatusError where EmployID = " + employID, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                count = cursor.getCount();
-            }
-            db.close();
-
-        } catch (SQLiteException e) {
-            Log.d("test" , "UpdateLoginStatusErrorCount " + e.toString());
-        }
-        return count;
-    }
 
     public boolean UpdateUserDivision(String division, View view, int UpdateMenu) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -1498,9 +1463,6 @@ public class DBConnections
     }
 
     public boolean UpdateUserMeLogout(UserMeLogin instance, Context context) {
-        long result = 0;
-        Cursor cursor;
-        UserME userME = new UserME();
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
@@ -1514,11 +1476,8 @@ public class DBConnections
                 //db.update("UserMELogin", contentValues, "ID=?", args);
                 // db.delete("UserMELogin", "ID=?", args);
                 db.execSQL("delete from UserMELogin");
-                result = db.delete("UserME", null, null);// added new
-                //result = db.execSQL("delete from UserME"); // added new
+                db.execSQL("delete from UserME"); // added new
                 db.execSQL("delete from FacilityLoggedIn ");
-
-
 
             } catch (Exception e) {
                 GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error);
@@ -1540,35 +1499,6 @@ public class DBConnections
             GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error);
         }
     }
-
-
-    public boolean DeleteUpdateLoginStatus(Context context) {
-        long result = 0;
-        try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            db.delete("UpdateLoginStatus", null,null );
-            db.close();
-
-        } catch (SQLiteException e) {
-            Log.d("test" , "DeleteUpdateLoginStatus " + e.toString());
-        }
-        return result != -1;
-    }
-
-
-    public boolean DeleteUpdateLoginStatusError(Context context) {
-        long result = 0;
-        try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            db.delete("UpdateLoginStatusError", null,null );
-            db.close();
-
-        } catch (SQLiteException e) {
-            Log.d("test" , "DeleteUpdateLoginStatusError " + e.toString());
-        }
-        return result != -1;
-    }
-
 
     //--------------------------------------User Logs Table--------------------------
 //    public boolean InsertUserLogs(UserLogs instance)
@@ -1724,22 +1654,6 @@ public class DBConnections
         }
         db.close();
         return true;
-    }
-
-    public void UpdateConsigneeNo (String waybillNo , String phoneNo , String mobileNo) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-
-        contentValues.put("ConsigneePhoneNumber", phoneNo);
-        contentValues.put("ConsigneeMobile", mobileNo);
-        try {
-            String args[] = {waybillNo};
-            db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
-        } catch (Exception e) {
-            Log.d("test" , "DBConnection - Failed updating CNE");
-        }
-        db.close();
     }
 
     //---------------------------------PickUp Table-------------------------------
@@ -3985,6 +3899,15 @@ public class DBConnections
 
             db.delete("WaybillMeasurement", "date(CTime) <? And IsSync  =?", args);
 
+            db.execSQL("delete  from OnCLoadingForDDetail where OnCLoadingForDID in  (select ID from OnCloadingForD " +
+                    "where issync = 1 and date(CTime) < date())");
+
+            db.execSQL("delete  from OnCLoadingForDWaybill where OnCLoadingID in  (select ID from OnCloadingForD " +
+                    "where issync = 1 and date(CTime) < date())");
+
+            db.delete("OnCloadingForD", "date(CTime) <? And IsSync  =?", args);
+
+
 
             db.close();
 
@@ -4117,6 +4040,28 @@ public class DBConnections
         }
     }
 
+    public void UpdateOnLoadingID(int ID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(ID)};
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+                db.update("OnCloadingForD", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+            // db.delete("OnCloadingForD", "ID=?", args);
+
+            //db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+
     public void deleteOnLoadingWayBill(int onLoadingID, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4130,6 +4075,27 @@ public class DBConnections
         }
     }
 
+    public void UpdateOnLoadingWayBill(int onLoadingID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(onLoadingID)};
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+                db.update("OnCLoadingForDWaybill", contentValues, "OnCLoadingID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+            // db.delete("OnCLoadingForDWaybill", "OnCLoadingID=?", args);
+
+            // db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
     public void deleteOnLoadingBarcode(int onLoadingID, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4138,6 +4104,26 @@ public class DBConnections
             db.delete("OnCLoadingForDDetail", "OnCLoadingForDID=?", args);
 
             db.close();
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    public void UpdateOnLoadingBarcode(int onLoadingID, Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            String args[] = {String.valueOf(onLoadingID)};
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+                db.update("OnCLoadingForDDetail", contentValues, "OnCLoadingForDID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+//            db.delete("OnCLoadingForDDetail", "OnCLoadingForDID=?", args);
+
+//            db.close();
         } catch (SQLiteException e) {
 
         }
@@ -5146,8 +5132,6 @@ public class DBConnections
             contentValues.put("Longitude", instance.Longitude);
             contentValues.put("CheckPointTypeDetailID", instance.CheckPointTypeDetailID);
             contentValues.put("Ref", instance.Reference);
-            //mohammed
-            contentValues.put("TripID", instance.TripID);
 //            contentValues.put("Comments", instance.Comments);
             result = db.insertOrThrow("CheckPoint", null, contentValues);
             db.close();
@@ -6161,7 +6145,6 @@ public class DBConnections
     }
 
 
-
     public void insertBinMasterBulk(JSONArray binMasterList, Context context) {
         try {
             String sql = "insert into BINMaster (ID,BINNumber) values (?, ?);";
@@ -6186,13 +6169,13 @@ public class DBConnections
             db.endTransaction();
             db.close();
         } catch (Exception ex) {
-            Log.d("test" , "ex " + ex.toString());
+            Log.d("test", "ex " + ex.toString());
         }
     }
 
     /********* Online Validation *********/
 
-    public boolean insertOnLineValidation(JSONArray onLineValidation, int processType ,Context context) {
+    public boolean insertOnLineValidation(JSONArray onLineValidation, int processType, Context context) {
         boolean hasError = false;
 
         try {
@@ -6207,7 +6190,7 @@ public class DBConnections
             SQLiteStatement stmt = db.compileStatement(sql);
 
 
-            if (!isOnlineValidationFileEmpty(db , context))
+            if (!isOnlineValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidation");
 
 
@@ -6236,14 +6219,12 @@ public class DBConnections
 
                 } catch (Exception ex) {
                     hasError = true;
-                    Log.d("test" , TAG + "" + ex.toString());
+                    Log.d("test", TAG + "" + ex.toString());
                 }
             }
 
 
-
-
-            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+            boolean isFileDetailsInserted = insertOnLineValidationFileDetails(db, processType, GlobalVar.getCurrentDateTime(), context);
 
             if (!isFileDetailsInserted) {
                 return false;
@@ -6257,11 +6238,12 @@ public class DBConnections
 
         } catch (Exception ex) {
             hasError = true;
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
         return !hasError;
     }
-    public boolean insertOnLineValidation(List<OnLineValidation> onLineValidationList, int processType ,Context context) {
+
+    public boolean insertOnLineValidation(List<OnLineValidation> onLineValidationList, int processType, Context context) {
         boolean hasError = false;
 
         try {
@@ -6276,7 +6258,7 @@ public class DBConnections
             SQLiteStatement stmt = db.compileStatement(sql);
 
 
-            if (!isOnlineValidationFileEmpty(db , context))
+            if (!isOnlineValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidation");
 
 
@@ -6306,14 +6288,12 @@ public class DBConnections
 
                 } catch (Exception ex) {
                     hasError = true;
-                    Log.d("test" , TAG + "" + ex.toString());
+                    Log.d("test", TAG + "" + ex.toString());
                 }
             }
 
 
-
-
-            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+            boolean isFileDetailsInserted = insertOnLineValidationFileDetails(db, processType, GlobalVar.getCurrentDateTime(), context);
 
             if (!isFileDetailsInserted) {
                 return false;
@@ -6327,17 +6307,16 @@ public class DBConnections
 
         } catch (Exception ex) {
             hasError = true;
-            Log.d("test" , TAG + "" + ex.toString());
+//            Log.d("test" , TAG + "" + ex.toString());
         }
         return !hasError;
     }
 
 
-
-    public OnLineValidation getPieceInformationByBarcode (String barcode , Context context) {
+    public OnLineValidation getPieceInformationByBarcode(String barcode, Context context) {
         OnLineValidation onLineValidation = null;
         try {
-            String selectQuery = "SELECT * FROM OnLineValidation WHERE Barcode = " + barcode ;
+            String selectQuery = "SELECT * FROM OnLineValidation WHERE Barcode = " + barcode;
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -6361,13 +6340,13 @@ public class DBConnections
         return onLineValidation;
     }
 
-    public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
+    public boolean insertOnLineValidationFileDetails(SQLiteDatabase db, int Process, String todayDatetime, Context context) {
         long result = 0;
         try {
 
-             if (db == null) {
-                 db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-             }
+            if (db == null) {
+                db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            }
 
             db.execSQL("delete from OnLineValidationFileDetails");
 
@@ -6377,15 +6356,15 @@ public class DBConnections
 
             result = db.insert("OnLineValidationFileDetails", null, contentValues);
         } catch (Exception e) {
-            Log.d("test" , TAG + "" + e.toString());
+//            Log.d("test" , TAG + "" + e.toString());
         }
         return result != -1;
     }
 
-    public boolean isValidOnlineValidationFile(int process , Context context) {
+    public boolean isValidOnlineValidationFile(int process, Context context) {
 
 
-        if (isOnlineValidationFileEmpty( context)) {
+        if (isOnlineValidationFileEmpty(context)) {
             return false;
         }
         //todo Riyam remove this validation it
@@ -6393,14 +6372,14 @@ public class DBConnections
             return false;
         }*/
 
-        if (isOnlineValidationFileOutDated(process , context)) {
+        if (isOnlineValidationFileOutDated(process, context)) {
             return false;
         }
 
         return true;
     }
 
-    public boolean isOnlineValidationFileOutDated(int process , Context context){
+    public boolean isOnlineValidationFileOutDated(int process, Context context) {
         try {
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -6445,44 +6424,44 @@ public class DBConnections
 
             db.close();
         } catch (Exception e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return false;
     }
 
     public boolean isOnlineValidationFileEmpty(Context context) {
         try {
-           SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
             db.close();
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+//            Log.d("test" , TAG + "" + e.toString());
         }
         return true;
     }
 
-    public boolean isOnlineValidationFileEmpty(SQLiteDatabase db , Context context) {
+    public boolean isOnlineValidationFileEmpty(SQLiteDatabase db, Context context) {
         try {
 
             if (db == null)
-                 db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+                db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
 
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
 
-                Log.d("test" , TAG +" File count " + cur.getCount());
+                Log.d("test", TAG + " File count " + cur.getCount());
 
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return true;
     }
@@ -6492,7 +6471,7 @@ public class DBConnections
         Cursor cursor = null;
         try {
 
-            String selectQuery = "select UploadDate  from OnLineValidationFileDetails" ;
+            String selectQuery = "select UploadDate  from OnLineValidationFileDetails";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             cursor = db.rawQuery(selectQuery, null);
 
@@ -6500,10 +6479,8 @@ public class DBConnections
                 date = cursor.getString(cursor.getColumnIndex("UploadDate"));
 
             cursor.close();
-        }
-
-        catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+        } catch (SQLiteException e) {
+            Log.d("test", TAG + "" + e.toString());
         }
         return date;
     }
@@ -6513,7 +6490,7 @@ public class DBConnections
         Cursor cursor = null;
         try {
 
-            String selectQuery = "select Process  from OnLineValidationFileDetails" ;
+            String selectQuery = "select Process  from OnLineValidationFileDetails";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             cursor = db.rawQuery(selectQuery, null);
 
@@ -6521,15 +6498,13 @@ public class DBConnections
                 process = cursor.getInt(cursor.getColumnIndex("Process"));
 
             cursor.close();
-        }
-
-        catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+        } catch (SQLiteException e) {
+            Log.d("test", TAG + "" + e.toString());
         }
         return process;
     }
 
-    public boolean updateWaybillDestID (Context context , String waybillNo , int newDestID) {
+    public boolean updateWaybillDestID(Context context, String waybillNo, int newDestID) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -7148,7 +7123,7 @@ public class DBConnections
 
     public boolean isMyRouteComplaince(Context context) {
         try {
-           // Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
+            // Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where Date = '" + GlobalVar.getDate() + "' and EmpID = " + GlobalVar.GV().EmployID, context);
             Cursor isMyRteCmp = Fill("select *  from MyRouteCompliance Where EmpID = " + GlobalVar.GV().EmployID, context);
 
             if (isMyRteCmp != null && isMyRteCmp.getCount() > 0) {
@@ -8547,7 +8522,7 @@ public class DBConnections
     }
 
 
-    public boolean InsertFBAuthKey(Context context, String data , int EmpID) {
+    public boolean InsertFBAuthKey(Context context, String data, int EmpID) {
         long result = 0;
         try {
 
@@ -8569,10 +8544,10 @@ public class DBConnections
         return result != -1;
     }
 
-    public String GetFBNode(Context context , int EmpId ) {
+    public String GetFBNode(Context context, int EmpId) {
         String Node = "0";
         try {
-            Cursor mnocursor = Fill("select * from FBNode where EmpID = "+ EmpId + " Limit 1", context);
+            Cursor mnocursor = Fill("select * from FBNode where EmpID = " + EmpId + " Limit 1", context);
 
             if (mnocursor.getCount() > 0) {
                 mnocursor.moveToFirst();

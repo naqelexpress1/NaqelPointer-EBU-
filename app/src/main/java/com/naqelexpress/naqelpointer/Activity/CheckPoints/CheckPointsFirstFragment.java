@@ -28,7 +28,7 @@ import java.util.ArrayList;
 public class CheckPointsFirstFragment
         extends Fragment {
     View rootView;
-    public EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtCheckPointType_TripID;
+    public EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
     public int CheckPointTypeID = 0, CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
 
@@ -54,20 +54,12 @@ public class CheckPointsFirstFragment
             txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
 
-            // mohammed
-            txtCheckPointType_TripID = (EditText) rootView.findViewById(R.id.txtCheckPointType_TripID);
-
             txtCheckPointType.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
-            //mohammed
-            txtCheckPointType_TripID.setInputType(InputType.TYPE_NULL);
 
             txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
             txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
-
-            //mohammed
-            txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
 
             txtCheckPointType.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -339,10 +331,6 @@ public class CheckPointsFirstFragment
         outState.putString("txtCheckPointType", txtCheckPointType.getText().toString());
         outState.putString("txtCheckPointTypeDetail", txtCheckPointTypeDetail.getText().toString());
         outState.putString("txtCheckPointTypeDDetail", txtCheckPointTypeDDetail.getText().toString());
-
-        // mohammed
-        outState.putString("txtCheckPointType_TripID", txtCheckPointType.getText().toString());
-
         outState.putInt("CheckPointTypeID", CheckPointTypeID);
         outState.putIntegerArrayList("CheckPointTypeList", CheckPointTypeList);
         outState.putStringArrayList("CheckPointTypeNameList", CheckPointTypeNameList);
@@ -368,9 +356,6 @@ public class CheckPointsFirstFragment
             txtCheckPointType.setText(savedInstanceState.getString("txtCheckPointType"));
             txtCheckPointTypeDetail.setText(savedInstanceState.getString("txtCheckPointTypeDetail"));
             txtCheckPointTypeDDetail.setText(savedInstanceState.getString("txtCheckPointTypeDDetail"));
-
-            //mohammed
-            txtCheckPointType_TripID.setText(savedInstanceState.getString("txtCheckPointType_TripID"));
 
 
             if (CheckPointTypeDetailList.size() > 0) {

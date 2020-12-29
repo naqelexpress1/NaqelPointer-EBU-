@@ -6,6 +6,8 @@
 
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
+        tools:ignore="ProtectedPermissions" />
     <permission-group
         android:name="android.permission-group.PHONE"
         android:description="@string/permgrouprequest_calllog"
@@ -95,7 +97,8 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:appComponentFactory,android:icon">
+        tools:replace="android:appComponentFactory,android:icon"
+        >
 
         <uses-library
             android:name="org.apache.http.legacy"

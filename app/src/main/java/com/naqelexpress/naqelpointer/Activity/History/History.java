@@ -584,7 +584,10 @@ public class History extends Activity {
 
     private void GetDeliverySheet() {
         try {
-            mydeliverylist.addAll(GlobalVar.getDeliverySheet(getApplicationContext()));
+            if (!GetDivision())
+                mydeliverylist.addAll(GlobalVar.getDeliverySheetforEBU(getApplicationContext()));
+            else
+                mydeliverylist.addAll(GlobalVar.getDeliverySheet(getApplicationContext()));
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -166,11 +166,10 @@ public class InventoryControl extends AppCompatActivity {
 //                firstFragment.txtCheckPointTypeDDetail.setText(Comments);
 //            }
 
-            //mohammed add this --  ,Integer.parseInt(""),--
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                             String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "",0);
+                            , "", 0);
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());

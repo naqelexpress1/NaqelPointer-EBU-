@@ -204,7 +204,7 @@ public class OnLoading extends Service {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-       // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnCLoadingForDeliverySheet";
+        // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnCLoadingForDeliverySheet";
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU"); //For EBU
         String URL = DomainURL + "SendOnCLoadingForDeliverySheet";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -216,9 +216,12 @@ public class OnLoading extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteOnLoadingID(id, getApplicationContext());
-                        db.deleteOnLoadingWayBill(id, getApplicationContext());
-                        db.deleteOnLoadingBarcode(id, getApplicationContext());
+//                        db.deleteOnLoadingID(id, getApplicationContext());
+                        db.UpdateOnLoadingID(id, getApplicationContext());
+                        //db.deleteOnLoadingWayBill(id, getApplicationContext());
+                        db.UpdateOnLoadingWayBill(id, getApplicationContext());
+//                        db.deleteOnLoadingBarcode(id, getApplicationContext());
+                        db.UpdateOnLoadingBarcode(id, getApplicationContext());
                         flag_thread = false;
 
 

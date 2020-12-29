@@ -273,7 +273,6 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
             requestLocation();
             boolean IsSaved = true;
 
-            //mohammed add this Integer.parseInt("")
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (20, String.valueOf(Latitude),
                             String.valueOf(Longitude), 44, ""

@@ -451,7 +451,6 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 
     private void SaveData(String piece) { //43 heldin , 44 heldout
 
-        //mohammed add this Integer.parseInt("")
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
             requestLocation();
@@ -525,7 +524,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 
     }*/
 
-//mohammed ad this Integer.parseInt("")
+
     private void SaveHeldOutData(String piece, String refno) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

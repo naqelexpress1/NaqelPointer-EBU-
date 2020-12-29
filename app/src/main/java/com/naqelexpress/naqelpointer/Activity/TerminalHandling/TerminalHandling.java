@@ -19,7 +19,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,8 +73,6 @@ public class TerminalHandling extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.checkpoints);
-
-      //  Log.d("test", "in");
 
 
         Intent intent = this.getIntent();
@@ -188,7 +185,6 @@ public class TerminalHandling extends AppCompatActivity {
 //                firstFragment.txtCheckPointTypeDDetail.setText(Comments);
 //            }
 
-            //mohammed add Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString())
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                             String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
@@ -261,12 +257,6 @@ public class TerminalHandling extends AppCompatActivity {
                 return false;
             }
 
-        }
-        //mohammed
-         if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter Trip ID",
-                    GlobalVar.AlertType.Error);
-            return false;
         }
 
 //        if (secondFragment == null) {

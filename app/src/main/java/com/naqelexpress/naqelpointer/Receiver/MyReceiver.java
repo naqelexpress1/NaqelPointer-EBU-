@@ -14,29 +14,42 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.AudioManager;
+import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.CallLog;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.History.CallRecordTrigger;
+import com.naqelexpress.naqelpointer.CallRecording.RecorderService;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 
 import org.joda.time.DateTime;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
+
+import static android.content.Context.AUDIO_SERVICE;
 import static android.content.Context.TELEPHONY_SERVICE;
 
 public class MyReceiver extends BroadcastReceiver {
 
     boolean isbooton = false;
+    String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelVoiceRecording/", audiofilename = "", fileName = "";
+    Context context;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        this.context = context;
         // assumes WordService is a registered service
         if (Intent.ACTION_BOOT_COMPLETED.equalsIgnoreCase(intent.getAction()) ||
                 intent.getAction().equalsIgnoreCase("android.intent.action.LOCKED_BOOT_COMPLETED")) {
@@ -91,7 +104,8 @@ public class MyReceiver extends BroadcastReceiver {
             } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                 state = TelephonyManager.CALL_STATE_RINGING;
             }
-
+            //Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + number, Toast.LENGTH_LONG).show();
+            startRecording(number);
             onCallStateChanged(context, state, number);
 
 //            Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + number, Toast.LENGTH_LONG).show();
@@ -181,6 +195,7 @@ public class MyReceiver extends BroadcastReceiver {
                 isIncoming = true;
                 callStartTime = new DateTime();
                 savedNumber = number;
+
                 //onIncomingCallStarted(context, number, callStartTime);
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
@@ -246,6 +261,7 @@ public class MyReceiver extends BroadcastReceiver {
 //    }
 
     private void getCallDetails(Context context, final DateTime CallStarttime, final DateTime Endtime) {
+        stopRecording();
         StringBuffer sb = new StringBuffer();
         Uri contacts = CallLog.Calls.CONTENT_URI;
 
@@ -350,6 +366,92 @@ public class MyReceiver extends BroadcastReceiver {
             }
         }
         return false;
+    }
+
+    private MediaRecorder recorder;
+    private AudioManager audiomanager;
+
+    private void startRecording(String phNumber) {
+        if (phNumber == null || recorder != null)
+            return;
+        recorder = new MediaRecorder();
+
+//        String CustNo =
+//                (phNumber.length() >= 9) ? phNumber.substring(phNumber.length() - 9) : "Not";
+//        Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + phNumber, Toast.LENGTH_LONG).show();
+
+
+        String uuid = UUID.randomUUID().toString();
+
+//        DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelVoiceRecording/";
+
+        File file = new File(DIRECTORY);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+
+        String CustNo =
+                (phNumber.length() >= 9) ? phNumber.substring(phNumber.length() - 9) : "Not";
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        String WayBillNo = "0";
+        int EmpID = 0;
+        try {
+            WayBillNo = dbConnections.getWaybillByMobileNo(CustNo, context);
+            EmpID = dbConnections.getEmpId(context);
+        } catch (Exception e) {
+            System.out.println();
+        }
+        audiofilename = phNumber + "_" + WayBillNo + "_" + String.valueOf(EmpID) + "_" + String.valueOf(DateTime.now().getMillis()) + ".3gp";
+        fileName = DIRECTORY + "/" + audiofilename;
+        File audiofile = null;
+        try {
+            audiofile = File.createTempFile(phNumber + "_" + WayBillNo + "_" + String.valueOf(EmpID) + "_" + System.currentTimeMillis(), ".3gp", new File(DIRECTORY));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+
+        recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+        recorder.setOutputFormat(MediaRecorder.OutputFormat.AMR_NB);
+        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        recorder.setOutputFile(audiofile.getAbsolutePath());
+        audiomanager =
+                (AudioManager) context.getSystemService(AUDIO_SERVICE);
+        audiomanager.setMode(AudioManager.MODE_IN_CALL);
+        audiomanager.setStreamVolume(AudioManager.STREAM_VOICE_CALL, audiomanager.getStreamMaxVolume(AudioManager.STREAM_VOICE_CALL), 0);
+        try {
+            recorder.prepare();
+        } catch (IOException e) {
+//            Log.e(MainActivity.class.getSimpleName() + ":startRecording()", "prepare() failed");
+        }
+
+        recorder.start();
+
+//        startRecorderService();
+    }
+
+    private void startRecorderService() {
+        Intent serviceIntent = new Intent(context, RecorderService.class);
+        serviceIntent.putExtra("inputExtra", "Recording in progress");
+        ContextCompat.startForegroundService(context, serviceIntent);
+    }
+
+    private void stopRecorderService() {
+        Intent serviceIntent = new Intent(context, RecorderService.class);
+        context.stopService(serviceIntent);
+    }
+
+    private void stopRecording() {
+        if (recorder != null) {
+            recorder.release();
+            recorder = null;
+            audiomanager.setMode(AudioManager.MODE_NORMAL);
+            audiomanager = null;
+
+//            stopRecorderService();
+        }
     }
 
 }

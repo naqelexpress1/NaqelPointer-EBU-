@@ -32,7 +32,6 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
 
     View rootView;
     public EditText txtCheckPointType, txtCheckPointTypeDetail, txtCheckPointTypeDDetail, txtweight, txtheight, txtlength, txtwidth;
-    public  EditText txtCheckPointType_TripID;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
     public static int CheckPointTypeID = 0;
     public int CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
@@ -62,9 +61,6 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
 
-            //mohammed
-            txtCheckPointType_TripID = (EditText) rootView.findViewById(R.id.txtCheckPointType_TripID);
-
             txtweight = (EditText) rootView.findViewById(R.id.txtweight);
             txtwidth = (EditText) rootView.findViewById(R.id.txtwidth);
 //            txtweight.setVisibility(View.VISIBLE);
@@ -77,14 +73,8 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
 
-            //mohammed
-            txtCheckPointType_TripID.setInputType(InputType.TYPE_NULL);
-
             txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
             txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
-
-            //mohammed
-           txtCheckPointType_TripID.setVisibility(View.VISIBLE);
 
             txtCheckPointType.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -158,16 +148,11 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
 
                     if (CheckPointTypeDetailList.size() > 0) {
                         txtCheckPointTypeDetail.setVisibility(View.VISIBLE);
-
-                        //mohammed
-                      //  txtCheckPointType_TripID.setVisibility(View.VISIBLE);
                     } else {
                         txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
                         txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
                         CheckPointTypeDetailID = 0;
                         CheckPointTypeDDetailID = 0;
-                        //mohammed
-                //          txtCheckPointType_TripID.setVisibility(View.VISIBLE);
                     }
                     if (CheckPointTypeID == 18) {
                         txtweight.setVisibility(View.VISIBLE);
@@ -528,10 +513,6 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
         outState.putString("txtCheckPointType", txtCheckPointType.getText().toString());
         outState.putString("txtCheckPointTypeDetail", txtCheckPointTypeDetail.getText().toString());
         outState.putString("txtCheckPointTypeDDetail", txtCheckPointTypeDDetail.getText().toString());
-
-        //mohammed
-        outState.putString("txtCheckPointType_TripID", txtCheckPointType_TripID.getText().toString());
-
         outState.putInt("CheckPointTypeID", CheckPointTypeID);
         outState.putIntegerArrayList("CheckPointTypeList", CheckPointTypeList);
         outState.putStringArrayList("CheckPointTypeNameList", CheckPointTypeNameList);
@@ -558,15 +539,9 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
             txtCheckPointTypeDetail.setText(savedInstanceState.getString("txtCheckPointTypeDetail"));
             txtCheckPointTypeDDetail.setText(savedInstanceState.getString("txtCheckPointTypeDDetail"));
 
-            //mohammed
-            txtCheckPointType_TripID.setText(savedInstanceState.getString("txtCheckPointType_TripID"));
-
 
             if (CheckPointTypeDetailList.size() > 0) {
                 txtCheckPointTypeDetail.setVisibility(View.VISIBLE);
-
-                //mohammed
-        //        txtCheckPointType_TripID.setVisibility(View.VISIBLE);
             } else {
                 txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
                 txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);

@@ -35,8 +35,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -53,23 +51,16 @@ import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Activity.Print.PdfDocumentAdapter;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
-import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.RetrofitCallResponse;
-import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
-import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
@@ -94,12 +85,9 @@ import java.util.List;
 import java.util.Locale;
 
 import Error.ErrorReporter;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 //Used By TH - Courier
-public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener { //AsyncTaskCompleteListener
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity, IAPICallListener { //AsyncTaskCompleteListener
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -123,18 +111,18 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         bundle = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-       try {
-           String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+        try {
+            String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-           if (division.equals("Courier")) {
-               if (!isValidOnlineValidationFile()) {
-                   getOnlineValidation();
-               }
-           }
+            if (division.equals("Courier")) {
+                if (!isValidOnlineValidationFile()) {
+                    getOnlineValidation();
+                }
+            }
 
-       } catch (Exception e) {
+        } catch (Exception e) {
 
-       }
+        }
 
 
         setSupportActionBar(toolbar);
@@ -727,7 +715,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             ncl.StationID = GlobalVar.GV().StationID;
             ncl.AppVersion = GlobalVar.GV().AppVersion;
             ncl.Latitude = String.valueOf(Latitude);
-            ncl.Longitude = String.valueOf(Longitude) ;
+            ncl.Longitude = String.valueOf(Longitude);
 
 
             String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
@@ -740,7 +728,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             ncl.IsSync = false;
 
             for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.size(); i++) {
-                ScanNclWaybillFragmentRemoveValidation_CITC.PieceDetail pieceDetail =  ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i);
+                ScanNclWaybillFragmentRemoveValidation_CITC.PieceDetail pieceDetail = ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i);
                 ncl.ncldetails.add(i,
                         new NclDetail(pieceDetail.Barcode, 0));
 //                ncl.ncldetails.add(i,
@@ -813,7 +801,6 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         }
         return isValid;
     }
-
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -1073,14 +1060,14 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     }
 
     private boolean isValidOnlineValidationFile() {
-        boolean isValid;
+        boolean isValid = true;
         try {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+//            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
             if (isValid)
                 return true;
         } catch (Exception ex) {
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
         return false;
     }
@@ -1100,12 +1087,13 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         alertDialog.show();
     }
 
-   @Override
-    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+    @Override
+    public void onNCLGenerated(String NCLNo, int NCLDestStationID, List<Integer> allowedDestStations) {
         try {
-            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
-        } catch (Exception ex) {}
-     }
+            secondFragment.onNCLGenerated(NCLNo, NCLDestStationID, allowedDestStations);
+        } catch (Exception ex) {
+        }
+    }
 
 
  /*   @Override
@@ -1122,10 +1110,11 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlertOnlineValidation("Server Issue" , "Kindly Try Again \n \n " + errorMessage);
+                ErrorAlertOnlineValidation("Server Issue", "Kindly Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     public double Latitude = 0;
@@ -1139,7 +1128,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
                 Longitude = location.getLongitude();
             }
         } catch (Exception ex) {
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
     }
 

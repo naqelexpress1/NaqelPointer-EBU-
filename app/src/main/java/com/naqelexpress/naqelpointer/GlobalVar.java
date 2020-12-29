@@ -29,7 +29,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -57,6 +56,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.JSON.DataSync;
 import com.naqelexpress.naqelpointer.JSON.ProjectAsyncTask;
 import com.naqelexpress.naqelpointer.JSON.Request.DataTableParameters;
+import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPendingCODResult;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
@@ -93,9 +93,8 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class GlobalVar {
 
     public UserSettings currentSettings;
-    public boolean autoLogout = false;
 
-    public String AppVersion = "RouteLineSeq - 16-12-2020"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "EBU - History Module 27-12-2020"; //"CBU : Test - Planned 20-07-2020";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -105,12 +104,12 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
-
+    //
+    //
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -136,7 +135,6 @@ public class GlobalVar {
     public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
     public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
     static IPointerAPI iPointerAPI;
-
 
 
     public ArrayList<Integer> haslocation = new ArrayList<>();
@@ -190,6 +188,7 @@ public class GlobalVar {
     public static final int DsAndInventory = 2;
     public static final int DsValidation = 3;
 
+    public final String NotificationID_RecordVoice = "151";
 
     public static GlobalVar GV() {
         if (GlobalVar.gv == null) {
@@ -778,7 +777,7 @@ public class GlobalVar {
         return isvalid;
     }
 
-    public static boolean isEmpty (EditText editText ) {
+    public static boolean isEmpty(EditText editText) {
 
         if (editText.getText().toString().trim().length() == 0) {
             return true;
@@ -805,10 +804,10 @@ public class GlobalVar {
     }
 
 
-    public static boolean isBinMasterValueExists(String value , Context context) {
+    public static boolean isBinMasterValueExists(String value, Context context) {
         try {
             DBConnections dbConnections = new DBConnections(context, null);
-            return dbConnections.isValueExist("BINMaster" , "BINNumber" , value , context);
+            return dbConnections.isValueExist("BINMaster", "BINNumber", value, context);
         } catch (Exception ex) {
             return true;
         }
@@ -2064,6 +2063,35 @@ public class GlobalVar {
         return DeliverySheetFromLocal;
     }
 
+    public static ArrayList<MyRouteShipments> getDeliverySheetforEBU(Context context) throws ParseException {
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select ocw.WaybillNo , oc.CTime , ocw.IsSync from OnCLoadingForDWaybill ocw inner join OnCloadingForD oc " +
+                "on oc.ID = ocw.OnCLoadingID order by CTime asc ", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                //onDeliveryRequest.
+                //Date dt = formatter.parse();
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
+                DeliverySheetFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
     public static ArrayList<MyRouteShipments> getArrivedatDest(Context context) {
 
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
@@ -2680,29 +2708,24 @@ public class GlobalVar {
 //    }
 
     public static int getlastlogin(Context context) {
-      try {
-          //        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
+//        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
 //        return pref.getInt("EmpID", 0); // Storing integer
-          DBConnections dbConnections = new DBConnections(context, null);
-          Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor cursor = dbConnections.Fill("select * from LastLogin ", context); //order by ID desc
 
-          if (cursor != null && cursor.getCount() > 0) {
-              cursor.moveToFirst();
-              int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
-              cursor.close();
-              dbConnections.close();
-              return empid;
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            int empid = cursor.getInt(cursor.getColumnIndex("EmpID"));
+            cursor.close();
+            dbConnections.close();
+            return empid;
 
-          } else {
-              dbConnections.close();
-              cursor.close();
-              return 0;
-          }
+        } else {
+            dbConnections.close();
+            cursor.close();
+            return 0;
+        }
 
-      } catch (Exception e) {
-          Log.d("test" , "getlastlogin " + e.toString());
-      }
-      return 0;
     }
 
 
@@ -2815,6 +2838,7 @@ public class GlobalVar {
             devision = result.getString(result.getColumnIndex("Division"));
             if (devision.equals("0")) {
                 devision = "Courier";
+
             }
         }
         return devision;
@@ -3225,6 +3249,7 @@ public class GlobalVar {
             return false;
         else
             return true;
+
     }
 
     public String getDeviceName() {
@@ -3296,35 +3321,35 @@ public class GlobalVar {
 
     }
 
-    public static IPointerAPI getIPointerAPI(String url , int readTimeOut , int connectTimeOut) {
+    public static IPointerAPI getIPointerAPI(String url, int readTimeOut, int connectTimeOut) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(getClient(readTimeOut , connectTimeOut ))
+                .client(getClient(readTimeOut, connectTimeOut))
                 .build();
 
         iPointerAPI = retrofit.create(IPointerAPI.class);
         return iPointerAPI;
     }
 
-    private static OkHttpClient getClient(int readTimeOut , int connectTimeOut) {
+    private static OkHttpClient getClient(int readTimeOut, int connectTimeOut) {
 
 
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .readTimeout(readTimeOut, TimeUnit.SECONDS)
                 .connectTimeout(connectTimeOut, TimeUnit.SECONDS)
-                 .build();
+                .build();
 
         return okHttpClient;
     }
 
 
-    public static String getTestAPIURL (Context context) {
+    public static String getTestAPIURL(Context context) {
         return NaqelAPITest_V10;
     }
 
-    public static String getUATUrl (Context context) {
+    public static String getUATUrl(Context context) {
         return NaqelAPIUAT;
     }
 

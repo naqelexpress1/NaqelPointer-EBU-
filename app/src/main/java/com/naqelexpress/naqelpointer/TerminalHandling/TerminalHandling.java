@@ -240,9 +240,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             // added -- , Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()) --
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
-                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
-
-                            "", thirdFragment.Barcodes.size(), Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()));
+                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
+                            , "", thirdFragment.Barcodes.size());
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -851,7 +850,7 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                 checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
                 //added
-                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
+//                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
 
 
                 Cursor resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());

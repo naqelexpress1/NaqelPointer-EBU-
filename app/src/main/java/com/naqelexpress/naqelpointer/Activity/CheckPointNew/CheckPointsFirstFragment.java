@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandling;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -29,9 +28,10 @@ import java.util.ArrayList;
  * Created by sofan on 21/03/2018.
  */
 
-public class CheckPointsFirstFragment extends Fragment {
+public class CheckPointsFirstFragment
+        extends Fragment {
     View rootView;
-    public EditText txtCheckPointType, txtCheckPointTypeDDetail, txtCheckPointType_TripID;
+    public EditText txtCheckPointType, txtCheckPointTypeDDetail;
     public static EditText txtCheckPointTypeDetail;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
     public int CheckPointTypeID = 0, CheckPointTypeDetailID = 0, CheckPointTypeDDetailID = 0;
@@ -49,8 +49,6 @@ public class CheckPointsFirstFragment extends Fragment {
     public ArrayList<String> CheckPointTypeDDetailFNameList = new ArrayList<>();
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -60,23 +58,12 @@ public class CheckPointsFirstFragment extends Fragment {
             txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
 
-            // mohammed
-            txtCheckPointType_TripID = (EditText) rootView.findViewById(R.id.txtCheckPointType_TripID);
-
             txtCheckPointType.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);
 
-            //mohammed
-//            txtCheckPointType_TripID.setInputType(InputType.TYPE_NULL);
-
             txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);
             txtCheckPointTypeDDetail.setVisibility(View.INVISIBLE);
-
-           //mohammed
-            txtCheckPointType_TripID.setVisibility(View.INVISIBLE);
-
-
 
             txtCheckPointType.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -413,9 +400,6 @@ public class CheckPointsFirstFragment extends Fragment {
         outState.putStringArrayList("CheckPointTypeNameList", CheckPointTypeNameList);
         outState.putStringArrayList("CheckPointTypeFNameList", CheckPointTypeFNameList);
 
-        // mohammed
-        outState.putString("txtCheckPointType_TripID", txtCheckPointType.getText().toString());
-
         outState.putInt("CheckPointTypeDetailID", CheckPointTypeDetailID);
         outState.putIntegerArrayList("CheckPointTypeDetailList", CheckPointTypeDetailList);
         outState.putStringArrayList("CheckPointTypeDetailNameList", CheckPointTypeDetailNameList);
@@ -436,9 +420,6 @@ public class CheckPointsFirstFragment extends Fragment {
             txtCheckPointType.setText(savedInstanceState.getString("txtCheckPointType"));
             txtCheckPointTypeDetail.setText(savedInstanceState.getString("txtCheckPointTypeDetail"));
             txtCheckPointTypeDDetail.setText(savedInstanceState.getString("txtCheckPointTypeDDetail"));
-
-            //mohammed
-            txtCheckPointType_TripID.setText(savedInstanceState.getString("txtCheckPointType_TripID"));
 
 
             if (CheckPointTypeDetailList.size() > 0) {

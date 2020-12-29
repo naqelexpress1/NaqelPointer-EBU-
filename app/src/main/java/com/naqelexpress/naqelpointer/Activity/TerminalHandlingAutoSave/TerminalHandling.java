@@ -19,7 +19,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -72,7 +71,6 @@ public class TerminalHandling extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         setContentView(R.layout.checkpoints);
 
@@ -188,7 +186,6 @@ public class TerminalHandling extends AppCompatActivity {
 //                firstFragment.txtCheckPointTypeDDetail.setText(Comments);
 //            }
 
-            //mohammed add this Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString())
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                     (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                             String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
@@ -250,14 +247,7 @@ public class TerminalHandling extends AppCompatActivity {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
-        }
-        //mohammed
-        if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
-                    GlobalVar.AlertType.Error);
-            return false;
-        }
-        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
+        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
             if (firstFragment.CheckPointTypeDDetailID == 1 && firstFragment.txtCheckPointTypeDDetail.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);

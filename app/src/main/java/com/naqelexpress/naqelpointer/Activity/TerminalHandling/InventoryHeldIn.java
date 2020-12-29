@@ -406,7 +406,6 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         adapter.notifyDataSetChanged();
     }
 
-    //mohammed add this  Integer.parseInt("")
     private void SaveHeldOutData(int close) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

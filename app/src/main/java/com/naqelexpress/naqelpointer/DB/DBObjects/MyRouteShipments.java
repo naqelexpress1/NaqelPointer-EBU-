@@ -20,6 +20,7 @@ import android.view.View;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity;
+import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -94,8 +95,8 @@ public class MyRouteShipments implements Parcelable {
     public String ParentLongitude = "0";
     public String BGColor = "0";
     public boolean isupdate = true;
-
-
+    public int isArea = 0;
+    public String AreaData = "";
 
     public MyRouteShipments() {
 
@@ -122,6 +123,8 @@ public class MyRouteShipments implements Parcelable {
 
         try {
             JSONObject jsonObjectHeader = new JSONObject(finalJson);
+            MyRouteActivity_Complaince_GroupbyPhn.AreaData = "";
+            MyRouteActivity_Complaince_GroupbyPhn.AreaData = jsonObjectHeader.getString("ErrorMessage");
             jsonObjectDeliverySheet = jsonObjectHeader.getJSONArray("DeliverySheet");
             Complaint = jsonObjectHeader.getJSONArray("Complaint");
             BarCode = jsonObjectHeader.getJSONArray("BarCode");
@@ -150,6 +153,7 @@ public class MyRouteShipments implements Parcelable {
         }
 
         MyRouteActivity.places.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.places.clear();
         LatLng ll = null;
         //Places place = new Places();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -160,10 +164,10 @@ public class MyRouteShipments implements Parcelable {
 
             Location location = GlobalVar.getLastKnownLocation(context);
             // ll = new LatLng(location.getLatitude(), location.getLongitude());
-            if (location != null)
-
+            if (location != null) {
                 MyRouteActivity.places.add(location);
-
+                MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+            }
 
         }
 
@@ -243,8 +247,10 @@ public class MyRouteShipments implements Parcelable {
                     sp.setLongitude(Double.parseDouble(instance.Longitude));
 
                     //Places places = new Places(position, latlong);
-                    if (sp.getLatitude() != 0.0)
+                    if (sp.getLatitude() != 0.0) {
                         MyRouteActivity.places.add(sp);
+                        MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
+                    }
                 }
 
                 instance.Origin = jsonObject.getString("Origin");
@@ -355,6 +361,8 @@ public class MyRouteShipments implements Parcelable {
                 String waybillno = temp.getString("WayBillNo");
                 int IsDelivered = temp.getInt("IsDelivered");
                 int WayBillID = temp.getInt("WayBillID");
+                if (GlobalVar.GV().isFortesting)
+                    IsDelivered = 0;
                 dbConnections.InsertBarCode(waybillno, barcode, context, IsDelivered, WayBillID);
             }
 

@@ -29,7 +29,6 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -55,6 +54,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import Error.ErrorReporter;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class WaybillPlanActivity extends AppCompatActivity
@@ -69,7 +69,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
     SupportMapFragment mapFragment;
-//    MapFragment mapFragment;
+    //    MapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
 
@@ -77,6 +77,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
         setContentView(R.layout.waybillplan);
         try {
@@ -325,6 +326,10 @@ public class WaybillPlanActivity extends AppCompatActivity
                 ConsigneeLatitude = "0.0";
                 ConsigneeLongitude = "0.0";
             }
+            if (GlobalVar.GV().isSeqComplete(getApplicationContext())) {
+                ConsigneeLatitude = "0.0";
+                ConsigneeLongitude = "0.0";
+            }
             if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude))) {
                 Intent intent = new Intent(this, com.naqelexpress.naqelpointer.Activity.DeliveryOFD.DeliveryActivity.class);
                 intent.putExtras(bundle);
@@ -344,6 +349,10 @@ public class WaybillPlanActivity extends AppCompatActivity
 
 
             if (ConsigneeLatitude.length() == 0) {
+                ConsigneeLatitude = "0.0";
+                ConsigneeLongitude = "0.0";
+            }
+            if (GlobalVar.GV().isSeqComplete(getApplicationContext())) {
                 ConsigneeLatitude = "0.0";
                 ConsigneeLongitude = "0.0";
             }

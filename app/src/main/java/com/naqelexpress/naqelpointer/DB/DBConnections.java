@@ -48,6 +48,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.PickUp;
 import com.naqelexpress.naqelpointer.DB.DBObjects.PickUpDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserFacility;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
@@ -75,7 +76,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 140; // AuthKey , Duplicate Customer , MobileNo Verified
+    private static final int Version = 145; // AuthKey , Duplicate Customer , MobileNo Verified
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -241,13 +242,13 @@ public class DBConnections
                 "\"Json\"  TEXT NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"TripPlanDetails\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"Json\"  TEXT NOT NULL )");
+                "\"Json\"  TEXT NOT NULL , IsSync BOOL , CTime DATETIME )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"TripPlanDDetails\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"Json\"  TEXT NOT NULL,\"TripPlanNo\" Integer , \"IsSync\" Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"AtDestination\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"Json\"  TEXT NOT NULL )");
+                "\"Json\"  TEXT NOT NULL ,  IsSync BOOL , CTime DATETIME)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BarCode\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"BarCode\"  TEXT NOT NULL, \"WayBillNo\"  TEXT NOT NULL,\"Date\" TEXT NOT NULL , \"IsDelivered\" INTEGER Default 0 , \"WayBillID\" INTEGER Default 0 )");
@@ -285,7 +286,7 @@ public class DBConnections
                 "  \"ImageName\"  TEXT NOT NULL )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
+                "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -451,6 +452,9 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"FBNode\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 " Node TEXT  NOT NULL , EmpID Integer Not Null)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"OptimizeLastSeqStopTime\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                " EndSeqtime TEXT  NOT NULL , \"CTime\" DATETIME NOT NULL , GooglePlannedLocationCount int  )");
+
 
     }
 
@@ -527,14 +531,14 @@ public class DBConnections
                     "\"Json\"  TEXT NOT NULL )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"TripPlanDetails\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"Json\"  TEXT NOT NULL )");
+                    "\"Json\"  TEXT NOT NULL ,  IsSync BOOL , CTime DATETIME )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"TripPlanDDetails\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"Json\"  TEXT NOT NULL ,\"TripPlanNo\" Integer ,\"IsSync\" Integer )");
 
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"AtDestination\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"Json\"  TEXT NOT NULL )");
+                    "\"Json\"  TEXT NOT NULL ,  IsSync BOOL , CTime DATETIME )");
 
 //            db.execSQL("CREATE TABLE IF NOT EXISTS \"AtDestination\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
 //                    "\"Json\"  TEXT NOT NULL )");
@@ -580,7 +584,7 @@ public class DBConnections
                     "  \"ImageName\"  TEXT NOT NULL )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"FacilityLoggedIn\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
-                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL)");
+                    "\"IsDate\"  TEXT NOT NULL , \"EmpID\"  INTEGER NOT NULL , \"FacilityID\" INTEGER)");
 
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"Facility\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
@@ -747,6 +751,12 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"FBNode\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     " Node TEXT  NOT NULL , EmpID Integer Not Null)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"LastSeqStopTime\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    " EndSeqtime TEXT  NOT NULL , \"CTime\" DATETIME NOT NULL)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"OptimizeLastSeqStopTime\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    " EndSeqtime TEXT  NOT NULL , \"CTime\" DATETIME NOT NULL , GooglePlannedLocationCount int  )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -978,8 +988,25 @@ public class DBConnections
             if (!isColumnExist("AtOrigin", "IsSync"))
                 db.execSQL("ALTER TABLE AtOrigin ADD COLUMN IsSync BOOL ");
 
-            if (!isColumnExist("AtOrigin", "IsSync"))
+            if (!isColumnExist("AtOrigin", "CTime"))
                 db.execSQL("ALTER TABLE AtOrigin ADD COLUMN CTime DATETIME  ");
+
+
+            if (!isColumnExist("FacilityLoggedIn", "FacilityID"))
+                db.execSQL("ALTER TABLE FacilityLoggedIn ADD COLUMN FacilityID INTEGER  ");
+
+            if (!isColumnExist("TripPlanDetails", "IsSync"))
+                db.execSQL("ALTER TABLE TripPlanDetails ADD COLUMN IsSync BOOL ");
+
+            if (!isColumnExist("TripPlanDetails", "CTime"))
+                db.execSQL("ALTER TABLE TripPlanDetails ADD COLUMN CTime DATETIME ");
+
+            if (!isColumnExist("AtDestination", "IsSync"))
+                db.execSQL("ALTER TABLE AtDestination ADD COLUMN IsSync BOOL ");
+
+            if (!isColumnExist("AtDestination", "CTime"))
+                db.execSQL("ALTER TABLE AtDestination ADD COLUMN CTime DATETIME ");
+
 
 //            if (!isColumnExist("MyRouteShipments", "isCourierApproach"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN isCourierApproach  INTEGER ");
@@ -1299,14 +1326,15 @@ public class DBConnections
         return result != -1;
     }
 
-    public boolean FacilityLoggedIn(Context context, int EmpID) {
+    public boolean FacilityLoggedIn(Context context, UserFacility userFacility) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             ContentValues contentValues = new ContentValues();
             contentValues.put("IsDate", GlobalVar.getDate());
-            contentValues.put("EmpID", EmpID);
+            contentValues.put("EmpID", userFacility.getEmployID());
+            contentValues.put("FacilityID", userFacility.getFacilityID());
 
             result = db.insert("FacilityLoggedIn", null, contentValues);
             db.close();
@@ -3282,6 +3310,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("Json", instance);
+            contentValues.put("IsSync", false);
             contentValues.put("CTime", DateTime.now().toString());
 
             result = db.insert("AtOrigin", null, contentValues);
@@ -3338,6 +3367,8 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("Json", instance);
+            contentValues.put("IsSync", false);
+            contentValues.put("CTime", DateTime.now().toString());
 
             result = db.insert("TripPlanDetails", null, contentValues);
             db.close();
@@ -3358,6 +3389,26 @@ public class DBConnections
         }
         return result;
     }
+
+    public void updateTripPlanDetails(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("TripPlanDetails", contentValues, "id=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
 
     public void deleteAllTrip(Context context) {
         try {
@@ -3421,6 +3472,8 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("Json", instance);
+            contentValues.put("IsSync", false);
+            contentValues.put("CTime", DateTime.now().toString());
 
             result = db.insert("AtDestination", null, contentValues);
             db.close();
@@ -3443,6 +3496,26 @@ public class DBConnections
             System.out.println(e);
         }
         return result != -1;
+    }
+
+
+    public void updateArrivedAtDest(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("AtDestination", contentValues, "id=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
     }
 
 
@@ -3857,7 +3930,8 @@ public class DBConnections
         try {
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            String args[] = {GlobalVar.getDateMinus2Days(), "1"};
+            // String args[] = {GlobalVar.getDateMinus2Days(), "1"};
+            String args[] = {GlobalVar.getDateMinusDays(2), "1"};
 
             //Pickup
             db.delete("PickUpAuto", "date(timein) <? And IsSync  =?", args);
@@ -3907,6 +3981,8 @@ public class DBConnections
 
             db.delete("OnCloadingForD", "date(CTime) <? And IsSync  =?", args);
 
+            db.delete("TripPlanDetails", "date(CTime) <? And IsSync  =?", args);
+            db.delete("AtDestination", "date(CTime) <? And IsSync  =?", args);
 
 
             db.close();
@@ -7051,6 +7127,21 @@ public class DBConnections
         return result != -1;
     }
 
+    public boolean DeleteAllSuggestPlannedLocation(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            String args[] = {GlobalVar.getDate()};
+            db.execSQL("delete from SuggestLocations");
+            db.execSQL("delete from plannedLocation");
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
     public boolean InsertPlannedLocation(Context context, String location, int pos, int WaybillNo) {
         long result = 0;
         try {
@@ -7062,11 +7153,39 @@ public class DBConnections
             contentValues.put("EmpID", GlobalVar.GV().EmployID);
             contentValues.put("IsSync", 0);
             contentValues.put("WaybillNo", WaybillNo);
+
+
             result = db.insert("plannedLocation", null, contentValues);
 
             db.close();
         } catch (SQLiteException e) {
 
+        }
+        return result != -1;
+    }
+
+    public boolean InsertPlannedLocationWayPoints(Context context, String location, int pos, int WaybillNo, String PKM, String PETA,
+                                                  String OriginAddress, String DestAddress, int value) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("StringData", location);
+            contentValues.put("position", pos);
+            contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("EmpID", GlobalVar.GV().EmployID);
+            contentValues.put("IsSync", 0);
+            contentValues.put("WaybillNo", WaybillNo);
+            contentValues.put("PKM", PKM);
+            contentValues.put("PETA", PETA);
+            contentValues.put("OriginAdress", OriginAddress);
+            contentValues.put("DestAdres", DestAddress);
+            contentValues.put("PETA_Value", value);
+            result = db.insert("plannedLocation", null, contentValues);
+
+            db.close();
+        } catch (SQLiteException e) {
+            System.out.println(e);
         }
         return result != -1;
     }
@@ -8564,4 +8683,93 @@ public class DBConnections
         return Node;
     }
 
+    public boolean InsertSeqtime(Context context, int plannedcount) {
+
+
+        long result = 0;
+        try {
+
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from OptimizeLastSeqStopTime");
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("EndSeqtime", "");
+            contentValues.put("CTime", DateTime.now().toString());
+            contentValues.put("GooglePlannedLocationCount", plannedcount);
+            result = db.insertOrThrow("OptimizeLastSeqStopTime", null, contentValues);
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean updateSeqtime(Context context, int plannedcount) {
+        long result = 0;
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            //contentValues.put("EndSeqtime", EmpID);
+            contentValues.put("CTime", DateTime.now().toString());
+            contentValues.put("GooglePlannedLocationCount", plannedcount);
+            result = db.insert("OptimizeLastSeqStopTime", null, contentValues);
+
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public String GetSeqtime(Context context, int EmpId) {
+        String Node = "0";
+        try {
+            Cursor mnocursor = Fill("select * from FBNode where EmpID = " + EmpId + " Limit 1", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    Node = mnocursor.getString(mnocursor.getColumnIndex("Node"));
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return Node;
+    }
+
+    public boolean UpdateMyRouteActionActivitySeqNo_Critical(Context context) {
+
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+
+
+        if (result != null && result.getCount() > 0) {
+            result.moveToFirst();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("isComplete", 1);
+            db.update("MyRouteActionActivity", contentValues, null, null);
+        }
+
+
+        result.close();
+        dbConnections.close();
+        db.close();
+        return true;
+    }
 }

@@ -1,7 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.routeMap;
 
 import android.Manifest;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -78,7 +77,7 @@ import static com.itextpdf.awt.geom.Point2D.distance;
  * Created by Hasna on 7/21/18.
  */
 
-public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+public class OptimiseMap extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
         GoogleMap.OnInfoWindowClickListener {
 
     SupportMapFragment mapFragment;
@@ -89,14 +88,11 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     //static ArrayList<Places> places; // = new ArrayList<>();
     ArrayList<Integer> colors_marker_route = new ArrayList<>();
     public static ArrayList<Location> places = new ArrayList<>();
-    public static ArrayList<Location> tplaces = new ArrayList<>();
+
     private Marker myMarker[];
     boolean Issuggest = false;
     public static ArrayList<HashMap<String, String>> distance_time = new ArrayList<>();
     SweetAlertDialog pDialog;
-    String AreaData = "";
-    ArrayList<HashMap<String, String>> AreaListAll = new ArrayList<>();
-    ArrayList<HashMap<String, String>> AreaListSortbyRadiusandArea = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +102,6 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         Bundle extras = getIntent().getExtras();
         myRouteShipmentList = extras.getParcelableArrayList("myroute");
-        tplaces = extras.getParcelableArrayList("places");
-        AreaData = extras.getString("AreaData");
-
         mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
@@ -119,32 +112,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         //places = MyRouteActivity.places;
 
-        places.clear();
+//        places.clear();
+        GetSeqWaybillNo();
 
-        AreaData = ";5_1_20417935_24.76102871253295,46.73156904898857:18_1_43284645_24.7627335,46.7373066:33_1_43288577_24.7559552,46.7229471#3;13_2_43283004_24.7777627,46.720235:14_2_44510712_24.7785946008538,46.7155426912959:26_2_43286380_24.784099725696,46.7071777582168:30_2_44518284_24.7806482474526,46.72260826581356:39_2_43288017_24.7837332,46.7176702:43_2_43288611_24.7756421231557,46.727195084095#6;10_3_45026996_24.754835,46.703971:17_3_20417116_24.750306279962093,46.7074371005755:27_3_44520088_24.758311250739865,46.71442552600693:31_3_20415453_24.74919548045091,46.707603572194415:34_3_20417732_24.75716506293476,46.70747649724769:41_3_43287693_24.7626492,46.70989240000001#6;1_4_20417706_24.777090968504226,46.697947621336006:3_4_20418331_24.776356749575545,46.69904996524906:7_4_44527673_24.778094706414276,46.70601388516883:12_4_43287504_24.7709394176369,46.6918033361434:15_4_44515847_24.769742,46.703479:37_4_43288561_24.7700688,46.6919613:42_4_43287771_24.7700688,46.6919613#7";
-
-        String[] splitarea = AreaData.split(";");
-
-        for (int i = 1; i < splitarea.length; i++) {
-            String[] splitdata = splitarea[i].split("#");
-            String[] fetchdata = splitdata[0].split(":");
-            for (int j = 0; j < fetchdata.length; j++) {
-                String[] fd = fetchdata[j].split("_");
-                HashMap<String, String> tlist = new HashMap<>();
-                tlist.put("position", fd[0]);
-                tlist.put("Area", fd[1]);
-                tlist.put("WaybillNo", fd[2]);
-                tlist.put("LatLong", fd[3]);
-
-                tlist.put("AreaLength", splitdata[1]);
-                AreaListAll.add(tlist);
-            }
-        }
-        sortbyGeoCordinatesbyRadius(0);
-
-//        //#startRegion
-//        GetSeqWaybillNo();
-//        //#EndRegion
 
         //places.addAll(sp);
 
@@ -156,7 +126,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         distance.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intetn = new Intent(RouteMap.this, RouteMap_Distance.class);
+                Intent intetn = new Intent(OptimiseMap.this, RouteMap_Distance.class);
                 startActivity(intetn);
             }
         });
@@ -206,14 +176,10 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
         myMarker = new Marker[places.size()];
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        dbConnections.DeleteAllSuggestPlannedLocation(getApplicationContext());
-        Issuggest = false;
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        dbConnections.DeleteAllSuggestPlannedLocation(getApplicationContext());
 
         GetPlannedLocation();
-
-        if (!IsPlanned)
-            OptimizeLocation();
 
     }
 
@@ -222,13 +188,13 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        GlobalVar.GV().ChangeMapSettings(mMap, RouteMap.this, getWindow().getDecorView().getRootView());
+        GlobalVar.GV().ChangeMapSettings(mMap, OptimiseMap.this, getWindow().getDecorView().getRootView());
 
 
         LatLng ll = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 8));
-        mMap.setOnInfoWindowClickListener(RouteMap.this);
+        mMap.setOnInfoWindowClickListener(OptimiseMap.this);
         isMapReady = true;
 
 //        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -260,6 +226,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 //            }
 //        });
 
+        //#startOrigin
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -267,9 +234,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 // if (distance_time.size() > 0) {
 
                 // LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                if (ActivityCompat.checkSelfPermission(OptimiseMap.this, Manifest.permission.ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(RouteMap.this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        ActivityCompat.checkSelfPermission(OptimiseMap.this, Manifest.permission.ACCESS_COARSE_LOCATION)
                                 == PackageManager.PERMISSION_GRANTED) {
                     //  Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -300,7 +267,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 return false;
             }
         });
-
+        //#endOrigin
 //        double lat = places.get(0).latlng.latitude;
 //        double lng = places.get(0).latlng.longitude;
 //        LatLng latLng = new LatLng(lat, lng);
@@ -347,44 +314,44 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             places.addAll(sp);
         }
         //EndRegion*/
-        if (isoptimise)
-            ShowShipmentMarker();
+//        if (isoptimise)
+        ShowShipmentMarker();
 
-        GetPlannedLocation();
+//        GetPlannedLocation();
 
-        if (!IsPlanned) {
-            if (places.size() > 1) {
-                for (int i = 0; i < places.size(); i++) {
-
-                    LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
-                    LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
-                    // Getting URL to the Google Directions API
-                    String url = getDirectionsUrl(origin, dest);
-
-
-                    DownloadTask downloadTask = new DownloadTask();
-                    // Start downloading json data from Google Directions API
-//                    downloadTask.execute(url, String.valueOf(i));
-
-                    if ((i == places.size() - 2) && (places.size() != 2)) {
-                        origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
-                        dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
-                        url = getDirectionsUrl(origin, dest);
-                        downloadTask = new DownloadTask();
-//                        downloadTask.execute(url, String.valueOf(places.size() - 1));
-
-                        break;
-                    }
-                    if (i == places.size() - 2) {
-                        if (pDialog != null && pDialog.isShowing())
-                            pDialog.dismissWithAnimation();
-                        break;
-                    }
-
-
-                }
-            }
-        }
+//        if (!IsPlanned) {
+//            if (places.size() > 1) {
+//                for (int i = 0; i < places.size(); i++) {
+//
+//                    LatLng origin = new LatLng(places.get(i).getLatitude(), places.get(i).getLongitude());
+//                    LatLng dest = new LatLng(places.get(i + 1).getLatitude(), places.get(i + 1).getLongitude());
+//                    // Getting URL to the Google Directions API
+//                    String url = getDirectionsUrl(origin, dest);
+//
+//
+//                    DownloadTask downloadTask = new DownloadTask();
+//                    // Start downloading json data from Google Directions API
+////                    downloadTask.execute(url, String.valueOf(i));
+//
+//                    if ((i == places.size() - 2) && (places.size() != 2)) {
+//                        origin = new LatLng(places.get(i - 1).getLatitude(), places.get(i - 1).getLongitude());
+//                        dest = new LatLng(places.get(0).getLatitude(), places.get(0).getLongitude());
+//                        url = getDirectionsUrl(origin, dest);
+//                        downloadTask = new DownloadTask();
+////                        downloadTask.execute(url, String.valueOf(places.size() - 1));
+//
+//                        break;
+//                    }
+//                    if (i == places.size() - 2) {
+//                        if (pDialog != null && pDialog.isShowing())
+//                            pDialog.dismissWithAnimation();
+//                        break;
+//                    }
+//
+//
+//                }
+//            }
+//        }
         // }
 
 //        else {
@@ -544,9 +511,9 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 jObject = new JSONObject(jsonData[0]);
                 position = jsonData[1];
                 limitLocation = jsonData[2];
-                DirectionsJSONParserWayPoints parser = new DirectionsJSONParserWayPoints();
+                DirectionsJSONParser parser = new DirectionsJSONParser();
 
-                routes = parser.parse(jObject, position, getBaseContext(), 0, Integer.parseInt(limitLocation), myRouteShipmentList, places);
+                routes = parser.parse(jObject, position, getBaseContext(), 0);
                 jsonroute.add(jObject.toString());
 
             } catch (Exception e) {
@@ -608,7 +575,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
 // Drawing polyline in the Google Map for the i-th route
         try {
-            System.out.println(distance_time);
+//            System.out.println(distance_time);
             mMap.addPolyline(lineOptions);
             //  ShowShipmentMarker_byone(color,position);
         } catch (Exception e) {
@@ -627,13 +594,14 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     new Intent(this,
                             com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
         }
-        if (!IsPlanned) {
-            Intent returnIntent = new Intent();
-            //returnIntent.putExtra("result", "refreshdata");
-            returnIntent.putExtra("result", "finish");
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
-        }
+
+//        if (!IsPlanned) {
+//            Intent returnIntent = new Intent();
+//            //returnIntent.putExtra("result", "refreshdata");
+//            returnIntent.putExtra("result", "finish");
+//            setResult(Activity.RESULT_OK, returnIntent);
+//            finish();
+//        }
 //        }
     }
 
@@ -761,7 +729,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         mMap.addMarker(new MarkerOptions()
                 .position(latLng)
                 .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-                .title(distance_time.get(Integer.parseInt(position)).get("address")));
+                .title(RouteMap.distance_time.get(Integer.parseInt(position)).get("address")));
 
 
     }
@@ -904,13 +872,13 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             mobileno.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno.getText().toString(), getWindow().getDecorView().getRootView(), OptimiseMap.this);
                 }
             });
             mobileno1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), RouteMap.this);
+                    GlobalVar.GV().makeCall(mobileno1.getText().toString(), getWindow().getDecorView().getRootView(), OptimiseMap.this);
                 }
             });
 
@@ -933,15 +901,36 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             deliver.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Delivered(myRouteShipmentList.get(position - 1));
+                    String ConsigneeLatitude = myRouteShipmentList.get(position - 1).Latitude, ConsigneeLongitude = myRouteShipmentList.get(position - 1).Longitude;
+                    if (GetDivision()) {
+
+                        if (GlobalVar.GV().isSeqComplete(getApplicationContext())) {
+                            ConsigneeLatitude = "0.0";
+                            ConsigneeLongitude = "0.0";
+                        }
+                        if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude)))
+                            Delivered(myRouteShipmentList.get(position - 1));
+                        else
+                            ErrorAlert("Info", "Kindly Reach Consignee Location before start Delivery Scan");
+                    }
                 }
             });
 
             notdeliver.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String ConsigneeLatitude = myRouteShipmentList.get(position - 1).Latitude, ConsigneeLongitude = myRouteShipmentList.get(position - 1).Longitude;
+                    if (GetDivision()) {
 
-                    NotDelivered(myRouteShipmentList.get(position - 1));
+                        if (GlobalVar.GV().isSeqComplete(getApplicationContext())) {
+                            ConsigneeLatitude = "0.0";
+                            ConsigneeLongitude = "0.0";
+                        }
+                        if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude)))
+                            NotDelivered(myRouteShipmentList.get(position - 1));
+                        else
+                            ErrorAlert("Info", "Kindly Reach Consignee Location before start Delivery Scan");
+                    }
                 }
             });
 
@@ -976,7 +965,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                 }
             });
 
-//            alert.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            //            alert.setPositiveButton("Done", new DialogInterface.OnClickListener() {
 //
 //                @Override
 //                public void onClick(DialogInterface dialog, int which) {
@@ -988,11 +977,19 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
             AlertDialog dialog = alert.create();
             dialog.show();
             DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+            getWindowManager().
+
+                    getDefaultDisplay().
+
+                    getMetrics(displayMetrics);
+
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
 
-            dialog.getWindow().setLayout(width - 50, height - 50);
+            dialog.getWindow().
+
+                    setLayout(width - 50, height - 50);
 //            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
 //
 //            lp.copyFrom(dialog.getWindow().getAttributes());
@@ -1004,6 +1001,16 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    private void ErrorAlert(String title, String msg) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(true);
+        eDialog.setTitleText(title);
+        eDialog.setContentText(msg);
+        eDialog.show();
+
     }
 
     public void NotDelivered(MyRouteShipments myRouteShipments) {
@@ -1091,7 +1098,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            distance_time = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("distance_time");
+            RouteMap.distance_time = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("distance_time");
             places = (ArrayList<Location>) savedInstanceState.getSerializable("places");
             colors_marker_route = savedInstanceState.getIntegerArrayList("colors_marker_route");
             jsonroute = savedInstanceState.getStringArrayList("jsonroute");
@@ -1105,7 +1112,7 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         super.onSaveInstanceState(outState);
         outState.putSerializable("places", places);
         outState.putIntegerArrayList("colors_marker_route", colors_marker_route);
-        outState.putSerializable("distance_time", distance_time);
+        outState.putSerializable("distance_time", RouteMap.distance_time);
         //outState.putStringArrayList("jsonroute", jsonroute);
         outState.putSerializable("haslocation", GlobalVar.GV().haslocation);
     }
@@ -1149,16 +1156,11 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
             }
             while (result.moveToNext());
-        } else
-            places = tplaces;
+        }
 
 
         result.close();
         dbConnections.close();
-
-        if (places.size() == 0) {
-            android.os.Process.killProcess(android.os.Process.myPid());
-        }
 
     }
 
@@ -1184,15 +1186,15 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
 
                     if (data.contains("ZERO_RESULTS")) {
                         System.out.println("true");
+                        continue;
                     }
                     ParserTask parserTask = new ParserTask();
-                    parserTask.execute(data, String.valueOf(position));
+                    parserTask.execute(data, String.valueOf(position), "0");
 
                 }
                 while (result.moveToNext());
             }
-        } else
-            dbConnections.deletePlannedRoute(getApplicationContext());
+        }
         result.close();
         dbConnections.close();
 
@@ -1263,23 +1265,21 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
     }
 
     int limitlocation = 0;
-    int waypointslimits = 5;
 
     private String getDirectionsUrlbyWayPoints(LatLng origin, LatLng dest) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
-//        str_origin = "origin=24.681553,46.778211";
+        str_origin = "origin=24.852181,46.776634";
 
         String waypoints = "waypoints=optimize:true|";
         String departure = "departure_time=now";
 
         // Destination of route
         String str_dest = "destination=" + places.get(places.size() - 1).getLatitude() + "," + places.get(places.size() - 1).getLongitude();
-//        str_dest = "destination=" + origin.latitude + "," + origin.longitude;
 
         limitlocation = 0;
-        for (int i = 0; i < places.size() - 1; i++) {
+        for (int i = 0; i < places.size() - 2; i++) {
             Location location = places.get(i + 1);
             waypoints = waypoints + location.getLatitude() + "," + location.getLongitude() + "|";
         }
@@ -1302,232 +1302,4 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
         return url;
     }
 
-    int nearestRadius = 0;
-
-
-    ArrayList<HashMap<String, String>> AreaListtemp = new ArrayList<>();
-
-    private void sortbyGeoCordinatesbyRadius(int position) {
-        Location location = new Location("");
-        int radius = 100;
-        int areaN = 0, areaLength = 0;
-        if (position == 0) {
-            location = GlobalVar.getLastKnownLocation(getApplicationContext());
-            nearestRadius = 100;
-        }
-        /*else {
-            String[] clatlng = String.valueOf(firstnearstLocation.get("LatLong")).split(",");
-            location.setLatitude(Double.parseDouble(clatlng[0]));
-            location.setLongitude(Double.parseDouble(clatlng[1]));
-            areaN = Integer.parseInt(firstnearstLocation.get("Area"));
-            areaLength = Integer.parseInt(firstnearstLocation.get("AreaLength"));
-
-            AreaListSortbyRadiusandArea.add(firstnearstLocation);
-            if (areaLength == 1)
-                return;
-            radius = 10;
-        }*/
-
-
-        if (AreaListtemp.size() == 0)
-            AreaListtemp.addAll(AreaListAll);
-
-        boolean isNear = false;
-
-        boolean isArea = false;
-        while (!isNear) {
-
-            for (int i = 0; i < AreaListtemp.size(); i++) {
-                if (position == 0) {
-                    isArea = true;
-                    if (AreaListtemp.size() == 1) {
-                        AreaListSortbyRadiusandArea.add(AreaListtemp.get(AreaListtemp.size() - 1));
-                        AreaListtemp.clear();
-                        break;
-                    }
-
-                    String[] clatlng = String.valueOf(AreaListtemp.get(i).get("LatLong")).split(",");
-
-                    boolean isN = GlobalVar.GV().findNearestOnebyRadius(location.getLatitude(), location.getLongitude(), Double.parseDouble(clatlng[0])
-                            , Double.parseDouble(clatlng[1]), nearestRadius);
-
-                    if (isN) {
-                        HashMap<String, String> firstnearstLocation = new HashMap<>();
-                        //location.setLatitude(Double.parseDouble(clatlng[0]));
-                        //location.setLongitude(Double.parseDouble(clatlng[1]));
-
-                        radius = 10;
-                        position = 1;
-                        firstnearstLocation.putAll(AreaListtemp.get(i));
-                        areaN = Integer.parseInt(firstnearstLocation.get("Area"));
-                        areaLength = Integer.parseInt(firstnearstLocation.get("AreaLength"));
-                        nearestRadius = 0;
-                        AreaListSortbyRadiusandArea.add(firstnearstLocation);
-                        AreaListtemp.remove(i);
-                        if (AreaListtemp.size() == 1) {
-                            AreaListSortbyRadiusandArea.add(AreaListtemp.get(AreaListtemp.size() - 1));
-                            AreaListtemp.clear();
-                        }
-                        break;
-                    }
-
-                } else if (areaN == Integer.parseInt(AreaListtemp.get(i).get("Area"))) {
-                    isArea = true;
-                    if (AreaListtemp.size() == 1) {
-                        AreaListSortbyRadiusandArea.add(AreaListtemp.get(AreaListtemp.size() - 1));
-                        AreaListtemp.clear();
-                        break;
-                    }
-
-                    String[] clatlng = String.valueOf(AreaListtemp.get(i).get("LatLong")).split(",");
-                    Location consLocation = new Location("");
-                    consLocation.setLatitude(Double.parseDouble(clatlng[0]));
-                    consLocation.setLongitude(Double.parseDouble(clatlng[1]));
-
-                    boolean isN = GlobalVar.GV().findNearestOnebyRadius(location.getLatitude(), location.getLongitude(), Double.parseDouble(clatlng[0])
-                            , Double.parseDouble(clatlng[1]), nearestRadius);
-
-                    if (isN) {
-                        HashMap<String, String> firstnearstLocation = new HashMap<>();
-                        //location.setLatitude(Double.parseDouble(clatlng[0]));
-                        // location.setLongitude(Double.parseDouble(clatlng[1]));
-                        firstnearstLocation.putAll(AreaListtemp.get(i));
-                        nearestRadius = 0;
-                        AreaListtemp.remove(i);
-                        AreaListSortbyRadiusandArea.add(firstnearstLocation);
-                        if (AreaListtemp.size() == 1) {
-                            AreaListSortbyRadiusandArea.add(AreaListtemp.get(AreaListtemp.size() - 1));
-                            AreaListtemp.clear();
-
-                        }
-
-                        break;
-                    }
-                }
-            }
-
-            if (!isArea) {
-                String[] clatlng = String.valueOf(AreaListSortbyRadiusandArea.get(AreaListSortbyRadiusandArea.size() - 1).get("LatLong")).split(",");
-                location.setLatitude(Double.parseDouble(clatlng[0]));
-                location.setLongitude(Double.parseDouble(clatlng[1]));
-                position = 0;
-
-            }
-            isArea = false;
-            if (AreaListtemp.size() == 0)
-                isNear = true;
-
-            nearestRadius = nearestRadius + radius;
-        }
-
-        location = GlobalVar.getLastKnownLocation(getApplicationContext());
-        HashMap<String, String> tlist = new HashMap<>();
-        tlist.put("position", "No");
-        tlist.put("Area", "No");
-        tlist.put("WaybillNo", "No");
-        tlist.put("LatLong", (String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude())));
-        tlist.put("AreaLength", "No");
-        AreaListSortbyRadiusandArea.add(0, tlist);
-
-        getDirectionsUrlbyWayPointswithLimit();
-    }
-
-    private String isLessthanorEqual23waypoints(ArrayList<HashMap<String, String>> AreaListSortbyRadiusandAreat) {
-//        ArrayList<HashMap<String, String>> AreaListSortbyRadiusandAreat = new ArrayList<>();
-//        AreaListSortbyRadiusandAreat.addAll(AreaListSortbyRadiusandArea);
-
-        String str_origin = "", str_dest = "", waypoints = "waypoints=optimize:true";
-        for (int i = 0; i < AreaListSortbyRadiusandAreat.size(); i++) {
-            if (i == 0)
-                str_origin = "origin=" + AreaListSortbyRadiusandAreat.get(i).get("LatLong");
-            else if (i == AreaListSortbyRadiusandAreat.size() - 1) {
-                waypoints = waypoints + "|" + AreaListSortbyRadiusandAreat.get(i).get("LatLong");
-                str_dest = "destination=" + AreaListSortbyRadiusandAreat.get(AreaListSortbyRadiusandAreat.size() - 1).get("LatLong");
-
-            } else {
-                waypoints = waypoints + "|" + AreaListSortbyRadiusandAreat.get(i).get("LatLong");
-            }
-        }
-        return str_origin + "&" + str_dest + "&" + waypoints;
-    }
-
-    ArrayList<String> Url = new ArrayList<>();
-
-    private String getDirectionsUrlbyWayPointswithLimit() {
-
-
-        ArrayList<HashMap<String, String>> AreaListSortbyRadiusandAreat = new ArrayList<>();
-        AreaListSortbyRadiusandAreat.addAll(AreaListSortbyRadiusandArea);
-
-        String str_origin = "", str_dest = "", waypoints = "waypoints=optimize:true";
-        String departure = "departure_time=now";
-        String key = "key=" + getString(R.string.google_maps_key_forrute);
-        String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?";
-        boolean isWaypointsCompleted = false;
-        while (isWaypointsCompleted) {
-
-            if (AreaListSortbyRadiusandAreat.size() <= waypointslimits) ;
-            {
-                String pm = isLessthanorEqual23waypoints(AreaListSortbyRadiusandAreat);
-                Url.add(url + pm);
-                isWaypointsCompleted = true;
-            }
-
-            for (int i = 0; i < waypointslimits + 2; i++) {
-
-                if (i == 0)
-                    str_origin = "origin=" + AreaListSortbyRadiusandAreat.get(i).get("LatLong");
-                else if (i == waypointslimits + 1) {
-                    if (AreaListSortbyRadiusandAreat.size() > waypointslimits)
-                        str_dest = "destination=" + AreaListSortbyRadiusandAreat.get(waypointslimits + 1).get("LatLong");
-                    else {
-                        str_dest = "destination=" + AreaListSortbyRadiusandAreat.get(waypointslimits - 1).get("LatLong");
-                    }
-                    String parameters = str_origin + "&" + str_dest + "&" + waypoints + "&" + departure + "&" + key;
-                    Url.add(url + parameters);
-                    ArrayList<HashMap<String, String>> relement = removeElement(AreaListSortbyRadiusandAreat, waypointslimits);
-                    AreaListSortbyRadiusandAreat.clear();
-                    AreaListSortbyRadiusandAreat.addAll(relement);
-                    if (AreaListSortbyRadiusandAreat.size() <= waypointslimits) ;
-                    {
-                        String pm = isLessthanorEqual23waypoints(AreaListSortbyRadiusandAreat);
-                        Url.add(url + pm);
-                        isWaypointsCompleted = true;
-                    }
-                } else {
-                    waypoints = waypoints + "|" + AreaListSortbyRadiusandAreat.get(i).get("LatLong");
-                }
-            }
-
-        }
-
-
-        //
-        for (int i = 0; i < places.size() - 1; i++) {
-            Location location = places.get(i + 1);
-            waypoints = waypoints + location.getLatitude() + "," + location.getLongitude() + "|";
-        }
-        // Sensor enabled
-        String sensor = "sensor=false";
-        String mode = "mode=driving";
-
-        // Building the parameters to the web service
-//        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + key;
-
-        String parameters = str_origin + "&" + str_dest + "&" + waypoints + "&" + departure + "&" + key;
-        // Output format
-
-
-        return url;
-    }
-
-    private ArrayList<HashMap<String, String>> removeElement(ArrayList<HashMap<String, String>> AreaListSortbyRadiusandAreat, int removeUpto) {
-        int removeindex = removeUpto;
-        for (int i = 0; i < removeUpto; i++) {
-            AreaListSortbyRadiusandAreat.remove(removeindex - 1);
-            removeindex = removeindex - 1;
-        }
-        return AreaListSortbyRadiusandAreat;
-    }
 }

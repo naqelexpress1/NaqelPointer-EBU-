@@ -40,6 +40,7 @@
         android:id="@+id/mnuShowDeliverySheetOrder"
         android:orderInCategory="100"
         android:title="Optimize my Shipments"
+        android:visible="false"
         app:showAsAction="never" />
 
     <!--<item-->
@@ -64,7 +65,7 @@
         android:id="@+id/groupmap"
         android:orderInCategory="100"
         android:title="Route Map"
-        android:visible="false"
+        android:visible="true"
         app:showAsAction="never" />
     <item
         android:id="@+id/movingmap"

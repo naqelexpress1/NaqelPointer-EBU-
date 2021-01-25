@@ -208,7 +208,7 @@ public class OnLoading extends Service {
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU"); //For EBU
         String URL = DomainURL + "SendOnCLoadingForDeliverySheet";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                DomainURL, null, new Response.Listener<JSONObject>() {
+                URL, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 

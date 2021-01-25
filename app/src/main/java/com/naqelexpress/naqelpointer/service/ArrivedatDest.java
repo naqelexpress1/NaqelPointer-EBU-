@@ -131,7 +131,7 @@ public class ArrivedatDest extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from AtDestination Limit 1 ", getApplicationContext());
+            Cursor result = db.Fill("select * from AtDestination where IsSync = 0 Limit 1 ", getApplicationContext());
 
 
             if (result.getCount() > 0) {
@@ -176,7 +176,8 @@ public class ArrivedatDest extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteArrivedAtDest(id, getApplicationContext());
+//                        db.deleteArrivedAtDest(id, getApplicationContext());
+                        db.updateArrivedAtDest(id, getApplicationContext());
                         flag_thread = false;
 
 

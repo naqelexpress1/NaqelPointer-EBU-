@@ -276,8 +276,8 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetAtOrigin();
-            } else if (parent.getItemAtPosition(pos).toString().equals("Loat to Dest")) {
-                ManualFunction = "Loat to Dest";
+            } else if (parent.getItemAtPosition(pos).toString().equals("Load to Dest")) {
+                ManualFunction = "Load to Dest";
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);

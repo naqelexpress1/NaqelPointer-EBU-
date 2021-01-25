@@ -38,7 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
-import com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity;
+import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.Languages;
 import com.naqelexpress.naqelpointer.Classes.OnUpdateListener;
@@ -56,7 +56,6 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.JSON.DataSync;
 import com.naqelexpress.naqelpointer.JSON.ProjectAsyncTask;
 import com.naqelexpress.naqelpointer.JSON.Request.DataTableParameters;
-import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPendingCODResult;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
@@ -94,7 +93,7 @@ public class GlobalVar {
 
     public UserSettings currentSettings;
 
-    public String AppVersion = "EBU - History Module 27-12-2020"; //"CBU : Test - Planned 20-07-2020";
+    public String AppVersion = "RouteLineSeq-2 16-01-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -1268,7 +1267,8 @@ public class GlobalVar {
                                      boolean CheckComplaintandDeliveryRequest, Context context, View view) {
 
         haslocation.clear();
-        MyRouteActivity.places.clear();
+//        MyRouteActivity.places.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.places.clear();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED &&
@@ -1280,8 +1280,8 @@ public class GlobalVar {
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
             if (location != null)
 
-                MyRouteActivity.places.add(location);
-
+//                MyRouteActivity.places.add(location);
+                MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
         }
 
         DBConnections dbConnections = new DBConnections(context, null);
@@ -1332,7 +1332,9 @@ public class GlobalVar {
 
                         //Places places = new Places(position, latlong);
                         if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
-                            MyRouteActivity.places.add(sp);
+//                            MyRouteActivity.places.add(sp);
+                            MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
+
                     }
 
                     myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -1437,7 +1439,8 @@ public class GlobalVar {
 
 
         haslocation.clear();
-        MyRouteActivity.places.clear();
+//        MyRouteActivity.places.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.places.clear();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED &&
@@ -1449,7 +1452,8 @@ public class GlobalVar {
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
             if (location != null)
 
-                MyRouteActivity.places.add(location);
+//                MyRouteActivity.places.add(location);
+                MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
 
         }
 
@@ -1506,7 +1510,8 @@ public class GlobalVar {
 
                         //Places places = new Places(position, latlong);
                         if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
-                            MyRouteActivity.places.add(sp);
+//                            MyRouteActivity.places.add(sp);
+                            MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
                     }
 
                     myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -2097,19 +2102,20 @@ public class GlobalVar {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from AtDestination", context);
+        Cursor result = dbConnections.Fill("select * from AtDestination order by id desc", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
                 try {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
 
                     JSONArray jsonArray = jsonObject.getJSONArray("WayBills");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                         onDeliveryRequest.ItemNo = obj.getString("WayBillNo");
-
+                        onDeliveryRequest.IsDelivered = issync;
                         DeliverySheetFromLocal.add(onDeliveryRequest);
                     }
 
@@ -2135,19 +2141,20 @@ public class GlobalVar {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from LoadtoDestination", context);
+        Cursor result = dbConnections.Fill("select * from TripPlanDetails order by id desc", context);
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
                 try {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
 
                     JSONArray jsonArray = jsonObject.getJSONArray("WayBill");
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                         onDeliveryRequest.ItemNo = obj.getString("WaybillNo");
-
+                        onDeliveryRequest.IsDelivered = issync;
                         DeliverySheetFromLocal.add(onDeliveryRequest);
                     }
 
@@ -2217,12 +2224,13 @@ public class GlobalVar {
             do {
                 try {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean IsSync = result.getInt(result.getColumnIndex("IsSync")) > 0;
 
                     JSONArray jsonArray = jsonObject.getJSONArray("AtOriginWaybillDetails");
 
                     if (jsonArray.length() > 0) {
                         DateTime ExpectedTime = DateTime.parse(jsonObject.getString("CTime"));
-                        boolean IsSync = jsonObject.getBoolean("IsSync");
+
 //                       String PiecesCount =jsonObject.getString("CTime");
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
@@ -2777,6 +2785,13 @@ public class GlobalVar {
     public static String getDateMinus2Days() {
         Calendar calander = Calendar.getInstance();
         calander.add(Calendar.DATE, -2);
+        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
+        return simpledateformat.format(calander.getTime());
+    }
+
+    public static String getDateMinusDays(int dateminus) {
+        Calendar calander = Calendar.getInstance();
+        calander.add(Calendar.DATE, -dateminus);
         SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
         return simpledateformat.format(calander.getTime());
     }
@@ -3513,7 +3528,8 @@ public class GlobalVar {
 
                 //Places places = new Places(position, latlong);
                 if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
-                    MyRouteActivity.places.add(sp);
+//                    MyRouteActivity.places.add(sp);
+                    MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
             }
 
             myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -3580,6 +3596,7 @@ public class GlobalVar {
             public void onClick(SweetAlertDialog sDialog) {
 
                 sDialog.dismissWithAnimation();
+//                activity.finish();
 
             }
         });
@@ -3607,7 +3624,12 @@ public class GlobalVar {
         eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
             @Override
             public void onClick(SweetAlertDialog sDialog) {
-
+                try {
+                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                    activity.startActivityForResult(i, 15);
+                } catch (Exception e) {
+                    GlobalVar.ShowDialog(activity, "Contacts Permission necessary", "Kindly please contact our Admin", true);
+                }
                 sDialog.dismissWithAnimation();
 
             }
@@ -3666,5 +3688,193 @@ public class GlobalVar {
         return loc;
     }
 
+    public boolean isSeqComplete(Context context) {
+
+        boolean returnvalue = true;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from MyRouteActionActivity", context);
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+            int isComplete = result.getInt(result.getColumnIndex("isComplete"));
+            if (isComplete == 0)
+                returnvalue = false;
+
+        }
+        result.close();
+        dbConnections.close();
+        return returnvalue;
+
+    }
+
+
+    public int GetMyRouteShipmentsCount(Context context) {
+
+        boolean returnvalue = true;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from MyRouteShipments  ", context);
+        if (result != null && result.getCount() > 0) {
+            return result.getCount();
+
+        }
+
+        return 0;
+
+    }
+
+    public ArrayList<MyRouteShipments> LoadMyRouteShipmentsOptimizeMap(String orderBy,
+                                                                       boolean CheckComplaintandDeliveryRequest, Context context, View view) {
+
+
+        MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.places.clear();
+
+        ArrayList<MyRouteShipments> myRouteShipmentList = new ArrayList<>();
+
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+
+            Location location = GlobalVar.getLastKnownLocation(context);
+            location.setSpeed(0);
+
+            //ll = new LatLng(location.getLatitude(), location.getLongitude());
+            if (location != null)
+
+//                MyRouteActivity.places.add(location);
+                MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(location);
+            MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+        }
+
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        int position = 1;
+
+        if (GlobalVar.GV().CourierDailyRouteID > 0) {
+            Cursor result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
+                    GlobalVar.GV().CourierDailyRouteID + " order by " + orderBy, context);
+            if (result.getCount() > 0) {
+
+                dbConnections.InsertOFD(result.getCount(), GlobalVar.getDate(), context);
+
+                myRouteShipmentList = new ArrayList<>();
+
+                result.moveToFirst();
+                do {
+                    MyRouteShipments myRouteShipments = new MyRouteShipments();
+                    myRouteShipments.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                    myRouteShipments.BillingType = result.getString(result.getColumnIndex("BillingType"));
+                    myRouteShipments.OrderNo = Integer.parseInt(result.getString(result.getColumnIndex("OrderNo")));
+                    myRouteShipments.DsOrderNo = Integer.parseInt(result.getString(result.getColumnIndex("DsOrderNo")));
+                    myRouteShipments.ItemNo = result.getString(result.getColumnIndex("ItemNo"));
+
+                    myRouteShipments.TypeID = Integer.parseInt(result.getString(result.getColumnIndex("TypeID")));
+                    myRouteShipments.CODAmount = getDoubleFromString(result.getString(result.getColumnIndex("CODAmount")));
+                    myRouteShipments.DeliverySheetID = Integer.parseInt(result.getString(result.getColumnIndex("DeliverySheetID")));
+                    myRouteShipments.Date = DateTime.parse(result.getString(result.getColumnIndex("Date")));
+                    myRouteShipments.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("ExpectedTime")));
+
+                    myRouteShipments.Latitude = result.getString(result.getColumnIndex("Latitude"));
+                    myRouteShipments.Longitude = result.getString(result.getColumnIndex("Longitude"));
+                    if ((myRouteShipments.Latitude.length() > 0 && myRouteShipments.Longitude.length() > 0) &&
+                            !myRouteShipments.Latitude.equals("null") && !myRouteShipments.Longitude.equals("null")) {
+                        Location sp = new Location("");
+                        try {
+
+                            sp.setLatitude(Double.parseDouble(myRouteShipments.Latitude));
+                            sp.setLongitude(Double.parseDouble(myRouteShipments.Longitude));
+                            if (Double.parseDouble(myRouteShipments.Longitude) != 0.0) {
+//                                haslocation.add(position);
+                                sp.setSpeed(position);
+                            }
+                        } catch (Exception e) {
+                            sp.setLatitude(0);
+                            sp.setLongitude(0);
+                        }
+
+                        //Places places = new Places(position, latlong);
+                        if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
+//                            MyRouteActivity.places.add(sp);
+                            MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(sp);
+                        MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
+
+                    }
+
+                    myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
+                    myRouteShipments.ClientName = result.getString(result.getColumnIndex("ClientName"));
+                    myRouteShipments.ClientFName = result.getString(result.getColumnIndex("ClientFName"));
+                    myRouteShipments.ClientAddressPhoneNumber = result.getString(result.getColumnIndex("ClientAddressPhoneNumber"));
+                    myRouteShipments.ClientAddressFirstAddress = result.getString(result.getColumnIndex("ClientAddressFirstAddress"));
+                    myRouteShipments.ClientAddressSecondAddress = result.getString(result.getColumnIndex("ClientAddressSecondAddress"));
+                    myRouteShipments.ClientContactName = result.getString(result.getColumnIndex("ClientContactName"));
+                    myRouteShipments.ClientContactFName = result.getString(result.getColumnIndex("ClientContactFName"));
+                    myRouteShipments.ClientContactPhoneNumber = result.getString(result.getColumnIndex("ClientContactPhoneNumber"));
+                    myRouteShipments.ClientContactMobileNo = result.getString(result.getColumnIndex("ClientContactMobileNo"));
+                    myRouteShipments.ConsigneeName = result.getString(result.getColumnIndex("ConsigneeName"));
+                    myRouteShipments.ConsigneeFName = result.getString(result.getColumnIndex("ConsigneeFName"));
+                    myRouteShipments.ConsigneePhoneNumber = result.getString(result.getColumnIndex("ConsigneePhoneNumber"));
+                    myRouteShipments.ConsigneeFirstAddress = result.getString(result.getColumnIndex("ConsigneeFirstAddress"));
+                    myRouteShipments.ConsigneeSecondAddress = result.getString(result.getColumnIndex("ConsigneeSecondAddress"));
+                    myRouteShipments.ConsigneeNear = result.getString(result.getColumnIndex("ConsigneeNear"));
+                    myRouteShipments.ConsigneeMobile = result.getString(result.getColumnIndex("ConsigneeMobile"));
+                    myRouteShipments.Origin = result.getString(result.getColumnIndex("Origin"));
+                    myRouteShipments.Destination = result.getString(result.getColumnIndex("Destination"));
+                    myRouteShipments.PODNeeded = Boolean.parseBoolean(result.getString(result.getColumnIndex("PODNeeded")));
+                    myRouteShipments.PODDetail = result.getString(result.getColumnIndex("PODDetail"));
+                    myRouteShipments.PODTypeCode = result.getString(result.getColumnIndex("PODTypeCode"));
+                    myRouteShipments.PODTypeName = result.getString(result.getColumnIndex("PODTypeName"));
+                    myRouteShipments.IsDelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+                    myRouteShipments.IsPartialDelivered = result.getInt(result.getColumnIndex("PartialDelivered")) > 0;
+                    myRouteShipments.NotDelivered = result.getInt(result.getColumnIndex("NotDelivered")) > 0;
+                    myRouteShipments.CourierDailyRouteID = Integer.parseInt(result.getString(result.getColumnIndex("CourierDailyRouteID")));
+                    myRouteShipments.OptimzeSerialNo = Integer.parseInt(result.getString(result.getColumnIndex("OptimzeSerialNo")));
+                    myRouteShipments.HasComplaint = result.getInt(result.getColumnIndex("HasComplaint")) > 0;
+                    myRouteShipments.HasDeliveryRequest = result.getInt(result.getColumnIndex("HasDeliveryRequest")) > 0;
+                    myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
+                    myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
+                    myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
+                    myRouteShipments.Position = position - 1;
+
+                    myRouteShipmentList.add(myRouteShipments);
+
+                    // radios += 800;
+                    position += 1;
+                }
+                while (result.moveToNext());
+                result.close();
+                // ReOrderMyRouteShipments(CheckComplaintandDeliveryRequest, view, context);
+            }
+        }
+
+        dbConnections.close();
+        return myRouteShipmentList;
+    }
+
+
+    public boolean findNearestOnebyRadius(double lat, double lon, double destlat, double destlong, int radius) {
+        boolean isradius = false;
+        if (lat == 0.0) {
+            return true;
+        }
+
+        if (GlobalVar.GV().isFortesting)
+            radius = 400000;
+
+        float[] results = new float[1];
+        Location.distanceBetween(lat, lon, destlat, destlong, results);
+        float distanceInMeters = results[0];
+        boolean isWithinradius = distanceInMeters < radius;
+
+        if (isWithinradius)
+            isradius = true;
+        else
+            isradius = false;
+
+        return isradius;
+
+
+    }
 
 }

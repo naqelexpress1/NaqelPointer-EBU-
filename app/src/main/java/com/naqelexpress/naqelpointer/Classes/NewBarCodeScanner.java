@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Classes;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -13,10 +14,10 @@ import com.naqelexpress.naqelpointer.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import Error.ErrorReporter;
 import me.dm7.barcodescanner.zbar.BarcodeFormat;
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
-
 //import android.media.Ringtone;
 //import android.media.RingtoneManager;
 //import android.net.Uri;
@@ -36,6 +37,7 @@ public class NewBarCodeScanner extends AppCompatActivity
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.newbarcodescannerlands);
 
         try {
@@ -60,7 +62,16 @@ public class NewBarCodeScanner extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
                     mFlash = !mFlash;
-                    mScannerView.setFlash(mFlash);
+                    mScannerView.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                mScannerView.setFlash(mFlash);
+                            } catch (Exception e) {
+                            }
+                        }
+                    }, 5000);
+
                 }
             });
             setRequestedOrientation(getResources().getConfiguration().orientation);
@@ -72,10 +83,22 @@ public class NewBarCodeScanner extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera(mCameraId);
-        mScannerView.setFlash(mFlash);
-        mScannerView.setAutoFocus(mAutoFocus);
+        try {
+            mScannerView.setResultHandler(this);
+        } catch (Exception e) {
+        }
+        try {
+            mScannerView.startCamera(mCameraId);
+        } catch (Exception e) {
+        }
+        try {
+            mScannerView.setFlash(mFlash);
+        } catch (Exception e) {
+        }
+        try {
+            mScannerView.setAutoFocus(mAutoFocus);
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -87,12 +110,23 @@ public class NewBarCodeScanner extends AppCompatActivity
         outState.putInt(CAMERA_ID, mCameraId);
     }
 
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            mFlash = savedInstanceState.getBoolean(FLASH_STATE);
+            mAutoFocus = savedInstanceState.getBoolean(AUTO_FOCUS_STATE);
+            mSelectedIndices = savedInstanceState.getIntegerArrayList(SELECTED_FORMATS);
+            mCameraId = savedInstanceState.getInt(CAMERA_ID);
+        }
+    }
 
     @Override
     public void handleResult(Result rawResult) {
         Intent intent = new Intent();
         String result = rawResult.getContents();
-        Log.d("test" , "result " + result);
+        Log.d("test", "result " + result);
         intent.putExtra("barcode", result);
         setResult(RESULT_OK, intent);
         finish();
@@ -116,5 +150,6 @@ public class NewBarCodeScanner extends AppCompatActivity
     public void onPause() {
         super.onPause();
         mScannerView.stopCamera();
+
     }
 }

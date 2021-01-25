@@ -174,6 +174,8 @@ public class LocationService extends Service {
 
                     final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                     int lastlogin = GlobalVar.getlastlogin(getApplicationContext());
+                    if (lastlogin == 0)
+                        return;
                     String devision = "";
 
 
@@ -186,7 +188,8 @@ public class LocationService extends Service {
                         EmpName = result.getString(result.getColumnIndex("EmployName"));
                         Mno = result.getString(result.getColumnIndex("MobileNo"));
                     }
-
+                    result.close();
+                    
                     if (!devision.equals("Courier"))
                         return;
 
@@ -266,7 +269,7 @@ public class LocationService extends Service {
                         }
 
 
-                        if (devision.equals("Courier")) {
+                        if (devision.equals("Courier") && !GlobalVar.GV().isSeqComplete(getApplicationContext())) {
 
                             mAuth = FirebaseAuth.getInstance();
                             if (mAuth.getUid() == null) {

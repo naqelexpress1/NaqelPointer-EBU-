@@ -84,6 +84,7 @@ public class LoginActivity
     EditText truck, odometer;
     ArrayList<FindVehilceObject> vehicles;
     int truckID = 0;
+    String division;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -729,9 +730,9 @@ public class LoginActivity
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-
-                    if (!dbConnections.isFacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID) && GetDivision()) {
+                    if (!dbConnections.isFacilityLoggedIn(getApplicationContext(), GlobalVar.GV().EmployID) && !division.equals("Express")) {
                         Intent intent = new Intent(getApplicationContext(), FacilityLogin.class);
                         intent.putExtra("usertype", usertype);
                         intent.putExtra("getMaster", getMaster);
@@ -1533,6 +1534,15 @@ public class LoginActivity
                         if (CityLists.length() > 0)
                             dbConnections.insertCityBulk(CityLists, getApplicationContext());
 
+                        if (GlobalVar.GV().IsTerminalApp) {
+                            try {
+
+                                JSONArray binMasterList = jsonObject.getJSONArray("BinMastersList");
+                                if (binMasterList.length() > 0)
+                                    dbConnections.insertBinMasterBulk(binMasterList, getApplicationContext());
+                            } catch (Exception ex) {
+                            }
+                        }
                         updateUserDetails();
                         LoginIntoOpenMainPage();
 

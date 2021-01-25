@@ -412,7 +412,7 @@ public class DeliverySheetActivity
 
                 if (IsSaved) {
 
-                    if (!isMyServiceRunning(DeliverySheetActivity.class)) {
+                    if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.OnLoading.class)) {
                         startService(
                                 new Intent(DeliverySheetActivity.this,
                                         com.naqelexpress.naqelpointer.service.OnLoading.class));

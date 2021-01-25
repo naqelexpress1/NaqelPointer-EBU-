@@ -174,6 +174,9 @@ public class MainPageActivity
         //  GlobalVar.GV().MainContext = this;
         GlobalVar.GV().SignedIn = true;
 
+//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+//        dbConnections1.DeleteAllSuggestPlannedLocation(getApplicationContext());
+
         try {
             setContentView(R.layout.mainpage);
 
@@ -440,7 +443,7 @@ public class MainPageActivity
 
         if (android.os.Build.VERSION.SDK_INT >= 29)
             if (GlobalVar.GV().isPermissionEnabled(Manifest.permission.ACCESS_BACKGROUND_LOCATION, MainPageActivity.this) == PackageManager.PERMISSION_DENIED) {
-                GlobalVar.GV().PermissionAlert(MainPageActivity.this);
+//                GlobalVar.GV().PermissionAlert(MainPageActivity.this);
                 ActivityCompat.requestPermissions(
                         MainPageActivity.this,
                         new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -926,7 +929,7 @@ public class MainPageActivity
                                             Intent mapList = new Intent(getApplicationContext(), MyRouteActivity.class);
                                             startActivity(mapList);
                                         } else {
-                                            //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
+//                                            Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity.class);
                                             //Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince.class);
                                             Intent mapList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn.class);
                                             startActivity(mapList);
@@ -1788,18 +1791,20 @@ public class MainPageActivity
                 break;
             case 15:
 
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                    if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
-                        GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
-                        try {
-                            Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
-                            startActivity(i);
-                        } catch (Exception e) {
-                            GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);
-                        }
+//                int backgroundLocationPermissionApproved = ActivityCompat.checkSelfPermission(MainPageActivity.this,
+//                        Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+                boolean background = ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                if (!background) {
+//                    GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
+                    try {
+                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                        startActivityForResult(i, 15);
+                    } catch (Exception e) {
+                        GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);
                     }
                 }
+
                 break;
         }
 
@@ -1818,6 +1823,20 @@ public class MainPageActivity
                 }
                 break;
             }
+            case 15:
+                boolean background = ActivityCompat.checkSelfPermission(this,
+                        Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                if (!background) {
+//                    GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
+                    try {
+                        Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                        startActivityForResult(i, 15);
+                    } catch (Exception e) {
+                        GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);
+                    }
+
+                }
+                break;
         }
     }
 

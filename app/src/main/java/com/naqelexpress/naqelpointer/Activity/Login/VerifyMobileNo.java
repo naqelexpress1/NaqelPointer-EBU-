@@ -127,8 +127,10 @@ public class VerifyMobileNo extends AppCompatActivity {
             new ValidateMobileNo().execute(jsonObject.toString());
         } else if (validatefunction == 1) {
             String otno = otpno.getText().toString().replace(" ", "");
-            if (otno.length() == 0)
+            if (otno.length() == 0) {
                 GlobalVar.ShowDialog(VerifyMobileNo.this, "Error", "Kindly enter Valid OtpNo", true);
+                return;
+            }
 
 
             JSONObject jsonObject = new JSONObject();

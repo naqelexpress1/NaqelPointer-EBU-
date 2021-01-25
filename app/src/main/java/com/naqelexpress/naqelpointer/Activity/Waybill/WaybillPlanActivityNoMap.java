@@ -28,14 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Classes.ConsingeeMobileSpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -57,7 +51,7 @@ import java.net.URL;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class WaybillPlanActivityNoMap extends AppCompatActivity {
-   //private GoogleMap mMap;
+    //private GoogleMap mMap;
     Marker now;
     TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount, txtPODType, txtPhoneNo;
     TextView lbPODType;
@@ -66,7 +60,7 @@ public class WaybillPlanActivityNoMap extends AppCompatActivity {
     private Bundle bundle;
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
-   // SupportMapFragment mapFragment;
+    // SupportMapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
 
@@ -373,9 +367,6 @@ public class WaybillPlanActivityNoMap extends AppCompatActivity {
     }
 
 
-
-
-
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -633,6 +624,7 @@ public class WaybillPlanActivityNoMap extends AppCompatActivity {
             progressDialog.dismiss();
         }
     }
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -642,6 +634,8 @@ public class WaybillPlanActivityNoMap extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         //countDownTimer.cancel();
+                        //String refresh_finish = "refreshdata";
+                        //if(GlobalVar.GV().isSeqComplete(getApplicationContext()))
                         Intent returnIntent = new Intent();
                         returnIntent.putExtra("result", "refreshdata");
                         setResult(Activity.RESULT_OK, returnIntent);

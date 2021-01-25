@@ -51,6 +51,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
+import Error.ErrorReporter;
+
 import static com.naqelexpress.naqelpointer.R.id.container;
 
 public class DeliveryActivity extends AppCompatActivity {
@@ -66,6 +68,8 @@ public class DeliveryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
         setContentView(R.layout.delivery);
 

@@ -131,7 +131,7 @@ public class TripPlanDetails extends Service {
         try {
             DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from TripPlanDetails Limit 1 ", getApplicationContext());
+            Cursor result = db.Fill("select * from TripPlanDetails where IsSync = 0 Limit 1 ", getApplicationContext());
 
 
             if (result.getCount() > 0) {
@@ -163,7 +163,7 @@ public class TripPlanDetails extends Service {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "DeliverySheetCBU");
-       // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendtoTripPlanDetails";
+        // String URL = GlobalVar.GV().NaqelPointerAPILink + "SendtoTripPlanDetails";
         String URL = DomainURL + "SendtoTripPlanDetails";
 
 
@@ -176,7 +176,8 @@ public class TripPlanDetails extends Service {
                     boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (IsSync && !HasError) {
-                        db.deleteTripPlanDetails(id, getApplicationContext());
+//                        db.deleteTripPlanDetails(id, getApplicationContext());
+                        db.updateTripPlanDetails(id, getApplicationContext());
                         flag_thread = false;
 
 

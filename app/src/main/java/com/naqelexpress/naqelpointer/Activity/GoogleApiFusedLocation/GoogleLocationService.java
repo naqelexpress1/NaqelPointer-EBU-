@@ -32,8 +32,9 @@ public class GoogleLocationService {
     protected GoogleApiClient mGoogleApiClient;
     protected LocationRequest mLocationRequest;
 
-   //public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
-   public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
+    //public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 20000;
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 5000;
+    public static final long UPDATE_FASTINTERVAL_IN_MILLISECONDS = 5000;
 
 
     public GoogleLocationService(Context activity, LocationUpdateListener locationUpdateListener) {
@@ -57,7 +58,7 @@ public class GoogleLocationService {
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
         //mLocationRequest.setFastestInterval(15000);
-        mLocationRequest.setFastestInterval(1000);
+        mLocationRequest.setFastestInterval(UPDATE_FASTINTERVAL_IN_MILLISECONDS);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
@@ -96,7 +97,7 @@ public class GoogleLocationService {
 //                }
                 }
             } catch (Exception e) {
-                Log.d("test" , "onLocationChanged " + e.toString());
+                Log.d("test", "onLocationChanged " + e.toString());
             }
         }
     }
@@ -129,10 +130,10 @@ public class GoogleLocationService {
 
 
     public void startUpdates() {
-    /*
-     * Connect the client. Don't re-start any requests here; instead, wait
-     * for onResume()
-     */
+        /*
+         * Connect the client. Don't re-start any requests here; instead, wait
+         * for onResume()
+         */
         if (servicesConnected(activity)) {
             if (locationEnabled(activity)) {
                 locationUpdateListener.canReceiveLocationUpdates();

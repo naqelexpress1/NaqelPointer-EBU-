@@ -34,7 +34,7 @@ import com.naqelexpress.naqelpointer.service.UpdateLocation;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import Error.ErrorReporter;
 public class NotDeliveredActivity
         extends AppCompatActivity {
 
@@ -51,7 +51,7 @@ public class NotDeliveredActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
         setContentView(R.layout.notdeliveredsingle);
         bundle = getIntent().getExtras();
         TimeIn = DateTime.now();

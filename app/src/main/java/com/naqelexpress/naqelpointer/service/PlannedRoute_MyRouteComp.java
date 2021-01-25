@@ -134,6 +134,7 @@ public class PlannedRoute_MyRouteComp extends Service {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     protected void updatefile() {
 
         try {
@@ -177,6 +178,14 @@ public class PlannedRoute_MyRouteComp extends Service {
                     } catch (Exception e) {
                         myroutecomp.put("Sdkversion", 0);
                     }
+
+                    if (android.os.Build.VERSION.SDK_INT >= 29) {
+                        boolean background = ActivityCompat.checkSelfPermission(this,
+                                Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
+                        myroutecomp.put("BGLocation", background);
+                    } else
+                        myroutecomp.put("BGLocation", true);
+
                     try {
 
                         TelephonyManager telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
@@ -250,8 +259,8 @@ public class PlannedRoute_MyRouteComp extends Service {
                         sl_obj.put("position", result.getInt(result.getColumnIndex("position")));
                         String encodedString = java.util.Base64.getEncoder().encodeToString(b);
                         sl_obj.put("PLByte", encodedString);
-                       // sl_obj.put("Date", encodedString);
-                       // sl_obj.put("PLByte", encodedString);
+                        // sl_obj.put("Date", encodedString);
+                        // sl_obj.put("PLByte", encodedString);
                         pl_array.put(sl_obj);
 //                            for (int i = 0; i < split.length; i++) {
 //                                JSONObject sl_obj = new JSONObject();

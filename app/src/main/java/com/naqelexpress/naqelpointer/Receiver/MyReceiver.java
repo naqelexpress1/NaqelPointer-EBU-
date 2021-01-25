@@ -104,8 +104,7 @@ public class MyReceiver extends BroadcastReceiver {
             } else if (stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
                 state = TelephonyManager.CALL_STATE_RINGING;
             }
-            //Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + number, Toast.LENGTH_LONG).show();
-            startRecording(number);
+//            startRecording(number);
             onCallStateChanged(context, state, number);
 
 //            Toast.makeText(context.getApplicationContext(), "PHONE_STATE " + number, Toast.LENGTH_LONG).show();
@@ -195,7 +194,6 @@ public class MyReceiver extends BroadcastReceiver {
                 isIncoming = true;
                 callStartTime = new DateTime();
                 savedNumber = number;
-
                 //onIncomingCallStarted(context, number, callStartTime);
                 break;
             case TelephonyManager.CALL_STATE_OFFHOOK:
@@ -271,7 +269,7 @@ public class MyReceiver extends BroadcastReceiver {
         }
 
         Cursor managedCursor = context.getContentResolver().query(contacts, null,
-                null, null, android.provider.CallLog.Calls.DATE + " DESC limit 1;"); //android.provider.CallLog.Calls.DATE + " DESC limit 1;"
+                null, null, CallLog.Calls.DATE + " DESC limit 1;"); //android.provider.CallLog.Calls.DATE + " DESC limit 1;"
 
 
         int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);

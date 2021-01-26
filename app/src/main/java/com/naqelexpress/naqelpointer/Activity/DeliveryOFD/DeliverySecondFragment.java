@@ -72,9 +72,8 @@ import static android.app.Activity.RESULT_OK;
 public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
     View rootView;
-    EditText txtPOS;
-    EditText txtCash;
-    TextView lbTotal;
+    EditText txtPOS , txtCash;
+    TextView lbTotal , tvPaymentStatusHeader ,tvPaymentStatusBody ;
     public EditText txtReceiverName, txtotpno;
 
     //Added by Ismail
@@ -106,6 +105,11 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             txtCash = (EditText) rootView.findViewById(R.id.txtCashAmount);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtReceiverName = (EditText) rootView.findViewById(R.id.txtCheckPointType);
+            tvPaymentStatusBody = (TextView) rootView.findViewById(R.id.tv_payment_status_body);
+            tvPaymentStatusHeader = (TextView) rootView.findViewById(R.id.tv_payment_status_header);
+
+            tvPaymentStatusHeader.setVisibility(View.VISIBLE);
+            tvPaymentStatusBody.setVisibility(View.VISIBLE);
 
             txtPOS.addTextChangedListener(this);
             if (DeliveryFirstFragment.IsCODtextboxEnable == 1) {
@@ -113,7 +117,10 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             }
             txtCash.addTextChangedListener(this);
 
-            Button validatepayment = (Button) rootView.findViewById(R.id.validatepayament);
+
+            getPaymentStatus();
+
+           Button validatepayment = (Button) rootView.findViewById(R.id.validatepayament);
             validatepayment.setVisibility(View.VISIBLE);
             validatepayment.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -734,6 +741,21 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 //        alertDialog.show();
     }
 
+
+
+    public void getPaymentStatus () {
+        final JSONObject jsonObject = new JSONObject();
+
+        try {
+            jsonObject.put("WaybillNo", Integer.parseInt(DeliveryFirstFragment.txtWaybillNo.getText().toString()));
+            new ValidatePayment().execute(jsonObject.toString(), "1");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     private class ValidatePayment extends AsyncTask<String, Void, String> {
         String result = "";
         StringBuffer buffer;
@@ -818,15 +840,20 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
                     if (jsonObject.getBoolean("HasError")) {
 
-                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                        /*new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("ErrorMessage"))
-                                .show();
+                                .show();*/
+                        tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
+
                     } else {
-                        new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
+                       /* new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("ErrorMessage"))
-                                .show();
+                                .show();*/
+
+                        tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
+
                     }
 
 

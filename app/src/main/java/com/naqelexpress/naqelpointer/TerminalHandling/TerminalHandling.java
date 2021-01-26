@@ -33,8 +33,6 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
-import com.naqelexpress.naqelpointer.OnlineValidation.AsyncTaskCompleteListener;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnlineValidationAsyncTask;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
@@ -56,7 +54,7 @@ import java.util.HashMap;
 
 import Error.ErrorReporter;
 
-// Created by Ismail on 21/03/2018.
+//Created by Ismail on 21/03/2018.
 //Shared between Arrived At Dest + Shipment processing
 public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
@@ -79,6 +77,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     static ArrayList<String> city = new ArrayList<>();
     static ArrayList<String> operationalcity = new ArrayList<>();
 
+    private static final String TAG = "TerminalHandling";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,13 +94,13 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
        try {
-           if (division.equals("Courier") && group.equals("Group 8")) { //Only in Arrival Module
-               if (!isValidOnlineValidationFile()) {
+           if (division.equals("Courier") && group.equals("Group 8")) { //Courier includes TH && Only in Arrival Module
+               if (!isValidValidationFile()) {
                  getOnlineValidation();
                }
            }
        } catch (Exception e) {
-
+           Log.d(TAG , e.toString());
        }
 
 
@@ -225,6 +225,9 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         if (IsValid()) {
+
+            int CheckPointTypeDetailID;
+
             boolean IsSaved = true;
             String Comments = "";
             if (firstFragment.CheckPointTypeID == 18) {
@@ -237,11 +240,27 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             }
 
 
-            // added -- , Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()) --
-            com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
-                    (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
-                            String.valueOf(Longitude), firstFragment.CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString()
-                            , "", thirdFragment.Barcodes.size());
+            /* Riyam
+            - if check point arrival --> hardcode CheckPointTypeDetailID (reason drop-down list is removed for arrival)
+            - Add TripID  */
+            com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint;
+            if (firstFragment.CheckPointTypeID == 7 ) {
+                CheckPointTypeDetailID = 40;
+                checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                        (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
+                                String.valueOf(Longitude), CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
+                                "", thirdFragment.Barcodes.size(), Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()));
+            } else  {
+                CheckPointTypeDetailID = firstFragment.CheckPointTypeDetailID;
+                checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
+                        (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
+                                String.valueOf(Longitude), CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
+                                "", thirdFragment.Barcodes.size());
+            }
+
+
+
+
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
                 int ID = dbConnections.getMaxID("CheckPoint", getApplicationContext());
@@ -850,7 +869,7 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                 checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
                 //added
-//                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
+                checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
 
 
                 Cursor resultDetail = db.Fill("select * from CheckPointBarCodeDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
@@ -876,8 +895,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 try {
 
                     //the url here
-            //      URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
-                    URL url = new URL("http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"); //LoadtoDestination
+                  URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+                    //URL url = new URL("http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"); //LoadtoDestination
 
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -1012,7 +1031,7 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                      getOnlineValidation();
+                        getOnlineValidation();
                     }
                 });
 
@@ -1028,11 +1047,11 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     }
 
 
-    private boolean isValidOnlineValidationFile() {
+    private boolean isValidValidationFile() {
         boolean isValid;
         try {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclAndArrival , getApplicationContext());
+            isValid = dbConnections.isValidValidationFile(GlobalVar.NclArrivalTH , getApplicationContext());
             if (isValid)
                 return true;
         } catch (Exception ex) {
@@ -1062,11 +1081,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     }
 
     private void getOnlineValidation () {
-
         APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
-        apiCall.getOnlineValidationData(GlobalVar.NclAndArrival);
-        /* OnlineValidationAsyncTask onlineValidationAsyncTask = new OnlineValidationAsyncTask(getApplicationContext() , TerminalHandling.this , this);
-        onlineValidationAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR , String.valueOf(GlobalVar.NclAndArrival));*/
+        apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH,0 , 1);
     }
 }
 

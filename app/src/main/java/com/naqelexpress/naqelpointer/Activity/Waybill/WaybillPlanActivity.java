@@ -38,9 +38,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Classes.ConsingeeMobileSpinnerDialog;
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.CongisneeUpdatedNoRequest;
+import com.naqelexpress.naqelpointer.JSON.Results.CongisneeUpdatedNoResult;
 import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONException;
@@ -61,7 +64,8 @@ public class WaybillPlanActivity extends AppCompatActivity
         implements OnMapReadyCallback {
     private GoogleMap mMap;
     Marker now;
-    TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount, txtPODType, txtPhoneNo;
+    TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount,
+            txtPODType, txtPhoneNo, txtCDAmount, txtTotalAmount;
     TextView lbPODType;
     ConsingeeMobileSpinnerDialog spinnerDialog;
     //Button btnDelivered, btnNotDeliverd, btnCall;
@@ -72,7 +76,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     //    MapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
-
+    int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,10 +100,15 @@ public class WaybillPlanActivity extends AppCompatActivity
             txtConsigneeName = (TextView) findViewById(R.id.txtConsigneeName);
             txtMobileNo = (TextView) findViewById(R.id.txtMobileNo);
             txtBillingType = (TextView) findViewById(R.id.txtBillingType);
-            txtCODAmount = (TextView) findViewById(R.id.txtCODAmount);
+            //txtCODAmount = (TextView) findViewById(R.id.txtCODAmount);
+            txtCODAmount = (TextView) findViewById(R.id.tv_cod_body);
             txtPODType = (TextView) findViewById(R.id.txtPODType);
             lbPODType = (TextView) findViewById(R.id.lbPODType);
             txtPhoneNo = (TextView) findViewById(R.id.txtPhoneNo);
+            //Added by Riyam
+            //txtShipmentAmount = findViewById(R.id.txtShipmentAmount);
+            txtCDAmount = findViewById(R.id.tv_cd_body);
+            txtTotalAmount = findViewById(R.id.tv_total_amount_body);
 
             AppCompatImageButton btnCallMobile, btnCallMobile1, btnWhatsApp, btnWhatsApp1, sms, sms1;
             btnCallMobile = (AppCompatImageButton) findViewById(R.id.btnCall);
@@ -200,17 +209,26 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                 myRouteShipments = GlobalVar.GV().myRouteShipmentList.get(position);
 
+                double totalAmount = myRouteShipments.CODAmount;  // This is cod + custom duty
+                double cdAmount = myRouteShipments.CustomDuty;  // cd
+                double actualCodAmount = Math.abs(totalAmount - cdAmount);
+
+
                 txtWaybillNo.setText(myRouteShipments.ItemNo);
                 txtShipperName.setText(myRouteShipments.ClientName);
                 txtConsigneeName.setText(myRouteShipments.ConsigneeName);
                 txtMobileNo.setText(myRouteShipments.ConsigneeMobile);
                 txtMobileNo.setTag(myRouteShipments.ConsigneeMobile);
                 txtBillingType.setText(myRouteShipments.BillingType);
-                txtCODAmount.setText(String.valueOf(myRouteShipments.CODAmount));
+                txtCODAmount.setText(String.valueOf(actualCodAmount)); //Riyam
                 txtPhoneNo.setText(myRouteShipments.ConsigneePhoneNumber);
                 txtPhoneNo.setTag(myRouteShipments.ConsigneePhoneNumber);
                 ConsigneeLatitude = myRouteShipments.Latitude;
                 ConsigneeLongitude = myRouteShipments.Longitude;
+                //Added by Riyam
+                txtCDAmount.setText(String.valueOf(cdAmount));
+                txtTotalAmount.setText(String.valueOf(totalAmount));
+
 
                 if (myRouteShipments.PODNeeded)
                     txtPODType.setText(myRouteShipments.PODTypeCode);
@@ -302,6 +320,8 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                 NotDelivered();
                 return true;
+            case R.id.UpdatedConsigneeNo:
+                PrepareGetConsigneeUpdatedNo(GlobalVar.GV().EmployID, Integer.parseInt(myRouteShipments.ItemNo));
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -490,10 +510,11 @@ public class WaybillPlanActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 if (ConsigneeLatitude != null && ConsigneeLatitude.length() == 0)
-                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
-                            + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
-                            + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
-                            + txtWaybillNo.getText().toString(), getApplicationContext());
+//                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
+//                            + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
+//                            + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
+//                            + txtWaybillNo.getText().toString(), getApplicationContext());
+                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getLocationMsg(), getApplicationContext());
                 else
                     alertforcommon();
 
@@ -504,10 +525,11 @@ public class WaybillPlanActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
-                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.doorPredefinedMsg)
-                        + " " + txtWaybillNo.getText().toString() + getString(R.string.doorPredefinedMsg1)
-                        + txtShipperName.getText().toString() + getString(R.string.doorPredefinedMsg2)
-                        + txtWaybillNo.getText().toString() + "\n\n\n" + arabic, getApplicationContext());
+//                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.doorPredefinedMsg)
+//                        + " " + txtWaybillNo.getText().toString() + getString(R.string.doorPredefinedMsg1)
+//                        + txtShipperName.getText().toString() + getString(R.string.doorPredefinedMsg2)
+//                        + txtWaybillNo.getText().toString() + "\n\n\n" + arabic, getApplicationContext());
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getFrontDoorMsg(), getApplicationContext());
                 popup.dismiss();
             }
         });
@@ -515,7 +537,8 @@ public class WaybillPlanActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
 
-                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) + "\n\n\n" + arabic, getApplicationContext());
+//                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) + "\n\n\n" + arabic, getApplicationContext());
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getCsSupportMsg(), getApplicationContext());
                 popup.dismiss();
             }
         });
@@ -715,6 +738,168 @@ public class WaybillPlanActivity extends AppCompatActivity
         }
     }
 
+
+    public void PrepareGetConsigneeUpdatedNo(int employID, int waybillNo) {
+        try {
+            CongisneeUpdatedNoRequest request = new CongisneeUpdatedNoRequest();
+            request.EmployeeID = employID;
+            request.WaybillNo = waybillNo;
+            String jsonData = JsonSerializerDeserializer.serialize(request, true);
+            new GetCongisneeUpdatedNo().execute(jsonData);
+        } catch (Exception e) {
+//           eog.d("test", e.toString());
+        }
+    }
+
+    private class GetCongisneeUpdatedNo extends AsyncTask<String, Void, String> {
+
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+        String DomainURL = "";
+        String isInternetAvailable = "";
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog = ProgressDialog.show(WaybillPlanActivity.this, "Please wait.", "Checking for updates ..", true);
+            // TODO : Update to production link
+            DomainURL = GlobalVar.GV().NaqelPointerAPILink + "GetUpdatedConsigneeNo";
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+            try {
+
+                URL url = new URL(DomainURL);
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                try {
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                    httpURLConnection.setDoInput(true);
+                    httpURLConnection.setDoOutput(true);
+                    httpURLConnection.connect();
+                } catch (java.net.NoRouteToHostException se) {
+                    System.out.println(se);
+                }
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+                isInternetAvailable = ignored.toString();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            try {
+                if (finalJson != null) {
+
+                    CongisneeUpdatedNoResult result = new CongisneeUpdatedNoResult(finalJson);
+
+                    if (result.HasError) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), result.ErrorMessage, GlobalVar.AlertType.Error);
+                    } else {
+
+                        //check they are not null not empty .. etc then update
+                        if (!result.MobileNo.equals("null") && result.MobileNo != null && !result.MobileNo.equals("0")
+                                && result.MobileNo.length() > 0 && !result.PhoneNo.equals("null") && result.PhoneNo != null &&
+                                !result.PhoneNo.equals("0") && result.PhoneNo.length() > 0) {
+
+                            //Get emp country
+                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                            int countryID = 0;
+                            String countryCode = "";
+
+                            Cursor cursor = dbConnections.getStationID(GlobalVar.GV().EmployID, getApplicationContext());
+                            if (cursor.getCount() > 0) {
+                                cursor.moveToFirst();
+                                countryID = cursor.getInt(cursor.getColumnIndex("CountryID"));
+                                countryCode = cursor.getString(cursor.getColumnIndex("CountryCode"));
+                            }
+
+                            if (countryID == 1)
+                                result.MobileNo = GlobalVar.ValidateMobileNo(result.MobileNo);
+                            else
+                                result.MobileNo = GlobalVar.ValidateMobileNoOtherCountry(result.MobileNo, countryCode);
+
+                            if (countryID == 1)
+                                result.PhoneNo = GlobalVar.ValidateMobileNo(result.PhoneNo);
+                            else
+                                result.PhoneNo = GlobalVar.ValidateMobileNoOtherCountry(result.PhoneNo, countryCode);
+
+                            updateConsigneeMobileView(result.PhoneNo, result.MobileNo);
+                            updateConsigneeMobileLocalDB(result.PhoneNo, result.MobileNo);
+                        }
+
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Consignee number is updated" + result.ErrorMessage, GlobalVar.AlertType.Info);
+                    }
+                } else {
+                    if (isInternetAvailable.contains("No address associated with hostname")) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                    } else {
+                        GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
+                        if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                            GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
+                        }
+
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.servererror), GlobalVar.AlertType.Error);
+                    }
+
+                }
+
+                progressDialog.dismiss();
+                super.onPostExecute(String.valueOf(finalJson));
+            } catch (Exception e) {
+
+            }
+        }
+    }
+
+
+    public void updateConsigneeMobileView(String phoneNo, String mobileNo) {
+        txtPhoneNo.setText(phoneNo);
+        txtMobileNo.setText(mobileNo);
+    }
+
+    public void updateConsigneeMobileLocalDB(String phoneNo, String mobileNo) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.UpdateConsigneeNo(myRouteShipments.ItemNo, phoneNo, mobileNo);
+    }
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -733,5 +918,52 @@ public class WaybillPlanActivity extends AppCompatActivity
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private String getWaybillNo() {
+        return txtWaybillNo.getText().toString();
+    }
+
+    private String getClientName() {
+        return txtShipperName.getText().toString();
+    }
+
+    private String getLocationMsg() {
+        final String locationMsgAr = getString(R.string.customerLocationMsg1Ar) + "\n" +
+                getString(R.string.customerLocationMsg2Ar) + " " +
+                getWaybillNo() + " " +
+                getString(R.string.customerLocationMsg3Ar) + " " +
+                getClientName();
+        final String locationMsgEn = getString(R.string.customerLocationMsg1En) + "\n" +
+                getString(R.string.customerLocationMsg2En) + " " +
+                getWaybillNo() + " " +
+                getString(R.string.customerLocationMsg3En) + " " +
+                getClientName();
+        final String infoTrackLink = getString(R.string.infotrackLocationLink);
+        return locationMsgAr + "\n\n" + locationMsgEn + "\n\n" + infoTrackLink;
+    }
+
+    private String getFrontDoorMsg() {
+        final String frontDoorMsgAr = getString(R.string.frontDoorMsg1Ar) + "\n" +
+                getString(R.string.frontDoorMsg2Ar) + " " +
+                getWaybillNo() + " " +
+                getString(R.string.frontDoorMsg3Ar) + " " +
+                getClientName();
+        final String frontDoorMsgEn = getString(R.string.frontDoorMsg1En) + "\n" +
+                getString(R.string.frontDoorMsg2En) + " " +
+                getWaybillNo() + " " +
+                getString(R.string.frontDoorMsg3Ar) + " " +
+                getClientName();
+        return frontDoorMsgAr + "\n\n" + frontDoorMsgEn;
+    }
+
+    private String getCsSupportMsg() {
+        final String csSupportMsgAr = getString(R.string.csSupportMsg1Ar) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        final String csSupportMsgMsgEn = getString(R.string.csSupportMsg1En) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        return csSupportMsgAr + "\n\n" + csSupportMsgMsgEn;
     }
 }

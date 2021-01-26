@@ -61,12 +61,24 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
     public ArrayList<String> CheckPointTypeDDetailNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDDetailFNameList = new ArrayList<>();
 
+    private final String Group = "Group 8";
+    private boolean arrivalScreen = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         if (rootView == null) {
             rootView = inflater.inflate(R.layout.checkpointsfirstfragment, container, false);
+
+
+            // Check if group = 8 (Arrival)
+            try {
+                Bundle bundle = getActivity().getIntent().getExtras();
+                if (bundle.getString("group").equals(Group))
+                    arrivalScreen = true;
+            } catch (Exception e) {
+
+            }
 
 
             txtCheckPointType = (EditText) rootView.findViewById(R.id.txtCheckPointType);
@@ -168,7 +180,7 @@ public class FirstFragment extends Fragment implements DatePickerDialog.OnDateSe
                     CheckPointTypeDetailID = 0;
                     CheckPointTypeDDetailID = 0;
 
-                    if (CheckPointTypeDetailList.size() > 0) {
+                    if (CheckPointTypeDetailList.size() > 0 && !arrivalScreen) {
                         txtCheckPointTypeDetail.setVisibility(View.VISIBLE);
                     } else {
                         txtCheckPointTypeDetail.setVisibility(View.INVISIBLE);

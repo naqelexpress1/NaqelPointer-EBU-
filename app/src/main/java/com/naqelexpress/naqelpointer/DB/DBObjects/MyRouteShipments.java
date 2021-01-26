@@ -95,6 +95,7 @@ public class MyRouteShipments implements Parcelable {
     public String ParentLongitude = "0";
     public String BGColor = "0";
     public boolean isupdate = true;
+    public double CustomDuty; //Added by Riyam
     public int isArea = 0;
     public String AreaData = "";
 
@@ -283,7 +284,7 @@ public class MyRouteShipments implements Parcelable {
                     instance.Sign = 0;
 
                 instance.Header = "";
-
+                instance.CustomDuty =  Double.parseDouble(jsonObject.getString("CDAmount"));; //Added by Riyam
 
                 if (GlobalVar.GV().CourierDailyRouteID == 0) {
                     CourierDailyRoute courierDailyRoute = new CourierDailyRoute();
@@ -422,7 +423,7 @@ public class MyRouteShipments implements Parcelable {
         HasDeliveryRequest = in.readByte() != 0;
         Position = in.readInt();
         DsOrderNo = in.readInt();
-
+        CustomDuty = in.readDouble();
     }
 
     public static final Creator<MyRouteShipments> CREATOR = new Creator<MyRouteShipments>() {
@@ -663,6 +664,7 @@ public class MyRouteShipments implements Parcelable {
         parcel.writeByte((byte) (HasDeliveryRequest ? 1 : 0));
         parcel.writeInt(Position);
         parcel.writeInt(DsOrderNo);
+        parcel.writeDouble(CustomDuty);
     }
 
     public enum UpdateType {

@@ -161,10 +161,12 @@ public class MainPageActivity
     FloatingActionButton btnSignOut;
     public DataSync dataSync;
     int progressBarStatus = 0;
-    TextView ofd, attempted, delivered, exceptions, productivity, complaint, compDelvrd, ComRemain;
+    TextView ofd, attempted, delivered, exceptions, productivity, complaint, compDelvrd, ComRemain,
+            tvValidationHeader,tvValidationDate,tvValidationCountHeader ,tvValidationCountBody ;
 
     TableLayout tl, tl1;
     TextView user, version, devicestatus;
+    LinearLayout llValidation;
 
     //TextView out
     @Override
@@ -184,6 +186,11 @@ public class MainPageActivity
             user = (TextView) findViewById(R.id.user);
             version = (TextView) findViewById(R.id.version);
             devicestatus = (TextView) findViewById(R.id.devicestatus);
+            tvValidationDate = findViewById(R.id.tv_validation_file_Date);
+            tvValidationHeader = findViewById(R.id.tv_validation_file_Date_header);
+            tvValidationCountHeader = findViewById(R.id.tv_validation_file_count_header);
+            tvValidationCountBody = findViewById(R.id.tv_validation_file_count_body);
+            llValidation = findViewById(R.id.ll_validation);
 
             tl = (TableLayout) findViewById(R.id.tl);
             tl1 = (TableLayout) findViewById(R.id.tl1);
@@ -307,6 +314,8 @@ public class MainPageActivity
 
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        setValidationText();
 
         if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
             dbConnections.DeleteFacilityLoggedIn(getApplicationContext());
@@ -819,6 +828,35 @@ public class MainPageActivity
         complaint.setText("Req and Complaints : " + String.valueOf(comp) + " / " + excep1);
         ComRemain.setText(String.valueOf(remain));
         compDelvrd.setText(String.valueOf(delivrd1));
+    }
+
+    private void setValidationText () {
+        //Riyam
+        DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
+        if (devision.equals("Courier") || devision.equals("IRS")) { //TH , Courier & GWT app
+
+            try {
+                llValidation.setVisibility(View.VISIBLE);
+                String uploadDate = "Not Downloaded";
+                String count = "0";
+
+                if (devision.equals("Courier") && !dbConnections.isValidationFileEmpty(getApplicationContext())) {
+                    uploadDate = dbConnections.getOnlineValidationUploadDate(getApplicationContext());
+                    count = String.valueOf(dbConnections.getValidationFileCount(false , getApplicationContext()));
+                } else if (devision.equals("IRS") && !dbConnections.isOnlineValidationFileEmpty(getApplicationContext())){
+                    uploadDate = dbConnections.getOnlineValidationUploadDate(getApplicationContext());
+                    count = String.valueOf(dbConnections.getValidationFileCount(true , getApplicationContext()));
+                }
+                tvValidationDate.setText(uploadDate);
+                tvValidationCountBody.setText(count);
+
+                dbConnections.close();
+            } catch (Exception e) {
+
+            }
+        }
+
+        dbConnections.close();
     }
 
 
@@ -2545,6 +2583,7 @@ public class MainPageActivity
 
     @Override
     protected void onResume() {
+        setValidationText();
         deleteExsistinguser();
         setProductivitytext();
         isDeviceonline();

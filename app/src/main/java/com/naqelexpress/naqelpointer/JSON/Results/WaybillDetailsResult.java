@@ -27,6 +27,7 @@ public class WaybillDetailsResult
     public boolean signrequired = false;
     public String ClientName = "";
     public int BlockClient = 0;
+    public double CustomDuty;
 
     public ArrayList<String> BarCodeList = new ArrayList<String>();
 
@@ -67,6 +68,10 @@ public class WaybillDetailsResult
             //if (jsonObject.getInt("ClientID") == 9018270)
             if (jsonObject.getInt("Sign") == 1)
                 signrequired = true;
+
+            if (jsonObject.has("CustomDuty")) {
+                CustomDuty = jsonObject.getDouble("CustomDuty");
+            }
 
             locationCoordinate = new LocationCoordinate();
             BarCodeList = new ArrayList<>();

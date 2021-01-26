@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.OnlineValidation;
+package com.naqelexpress.naqelpointer.Retrofit.Models;
 
 
 import com.naqelexpress.naqelpointer.JSON.Results.DefaultResult;
@@ -25,6 +25,8 @@ public class OnLineValidation extends DefaultResult {
     private int IsNoBayanNo;
     private boolean IsNotInFile;
     private boolean IsDestChanged;
+
+
 
 
     public void setID(int ID) {
@@ -60,7 +62,7 @@ public class OnLineValidation extends DefaultResult {
     }
 
     public void setIsCITCComplaint(int IsCITCComplaint) {
-        IsCITCComplaint = IsCITCComplaint;
+        this.IsCITCComplaint = IsCITCComplaint;
     }
 
     public void setIsNoBayanNo(int isNoBayanNo) {
@@ -178,6 +180,7 @@ public class OnLineValidation extends DefaultResult {
     public int getIsNoBayanNo() {
         return IsNoBayanNo;
     }
+
 
     public boolean isDestChanged() {
         return IsDestChanged;

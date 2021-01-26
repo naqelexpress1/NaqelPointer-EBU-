@@ -30,9 +30,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -57,7 +59,11 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.NCLBulk.INclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.APICall;
+import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
@@ -82,8 +88,9 @@ import java.util.List;
 import java.util.Locale;
 
 import Error.ErrorReporter;
-//used by GTW / IRS
-public class NclShipmentActivity extends AppCompatActivity {
+
+//Used By GWT (IRS)
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener {
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -99,6 +106,11 @@ public class NclShipmentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
+
+
+         if (!isValidOnlineValidationFile()) {
+             getOnlineValidation();
+          }
 
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
@@ -629,6 +641,31 @@ public class NclShipmentActivity extends AppCompatActivity {
 
         alertDialog.show();
     }
+
+    private void ErrorAlertOnlineValidation(String title, String message) {
+        AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle(title);
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        getOnlineValidation();
+                    }
+                });
+
+
+        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+        alertDialog.show();
+    }
+
 
     private void SavedSucessfully(String title, String message) {
         AlertDialog alertDialog = new AlertDialog.Builder(NclShipmentActivity.this).create();
@@ -1364,4 +1401,40 @@ public class NclShipmentActivity extends AppCompatActivity {
             }
         }
     }
+
+    /********* Riyam *********/
+    private boolean isValidOnlineValidationFile() {
+        boolean isValid;
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclGWT , getApplicationContext());
+        if (isValid)
+            return true;
+        return false;
+    }
+
+    @Override
+    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+        try {
+            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
+        } catch (Exception ex) {}
+    }
+
+   @Override
+   public void onCallComplete(boolean hasError, String errorMessage) {
+         try {
+             if (hasError)
+                 ErrorAlertOnlineValidation("Failed Loading Validation File" ,  errorMessage);
+             else
+                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+         } catch (Exception e) {}
+   }
+
+   public void getOnlineValidation () {
+       APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
+       apiCall.getOnlineValidationDataGWT(GlobalVar.NclGWT);
+   }
+
+    /********* Riyam - END  *********/
+
 }

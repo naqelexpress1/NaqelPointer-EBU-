@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -749,40 +750,44 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
 
     private void SaveData() {
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        boolean IsSaved = true;
+        try {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            boolean IsSaved = true;
 
-        int reachedsize = 0;
-        int ID = 0;
-        for (String nclno : ncl) {
+            int reachedsize = 0;
+            int ID = 0;
+            for (String nclno : ncl) {
 
-            if (reachedsize == 1)
-                reachedsize = 0;
-            if (reachedsize == 0) {
-                ID = insertHeader();
+                if (reachedsize == 1)
+                    reachedsize = 0;
+                if (reachedsize == 0) {
+                    ID = insertHeader();
+                }
+                CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(nclno, ID);
+                do {
+                    IsSaved = dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
+                } while (!IsSaved);
+
+                reachedsize++;
             }
-            CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(nclno, ID);
-            do {
-                IsSaved = dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
-            } while (!IsSaved);
 
-            reachedsize++;
+
+            if (IsSaved) {
+                if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+                    startService(
+                            new Intent(TripArrviedatDestbyNCL.this,
+                                    com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+                }
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+                finish();
+            } else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
+                        GlobalVar.AlertType.Error);
+
+            dbConnections.close();
+        } catch (Exception e) {
+            Log.d("test" , e.toString());
         }
-
-
-        if (IsSaved) {
-            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
-                startService(
-                        new Intent(TripArrviedatDestbyNCL.this,
-                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
-            }
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
-            finish();
-        } else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
-                    GlobalVar.AlertType.Error);
-
-        dbConnections.close();
     }
 
     private int insertHeader() {

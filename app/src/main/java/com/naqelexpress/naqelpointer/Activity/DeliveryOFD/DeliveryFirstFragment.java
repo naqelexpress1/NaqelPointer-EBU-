@@ -468,6 +468,7 @@ public class DeliveryFirstFragment
                 coordinates.put("Latitude", result.getString(result.getColumnIndex("Latitude")));
                 coordinates.put("Longitude", result.getString(result.getColumnIndex("Longitude")));
                 jsonObject.put("locationCoordinate", coordinates);
+                jsonObject.put("CustomDuty", result.getString(result.getColumnIndex("CustomDuty")));
 
                 Lat = result.getString(result.getColumnIndex("Latitude"));
                 Longi = result.getString(result.getColumnIndex("Longitude"));

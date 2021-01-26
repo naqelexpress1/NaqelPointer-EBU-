@@ -1,6 +1,5 @@
 package com.naqelexpress.naqelpointer.NCLBulk;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -311,7 +310,7 @@ public class ScanNclNoFragment extends Fragment {
 
             try {
 
-                URL url = new URL(GlobalVar.GV().getUATUrl(getContext())+ "GenerateNclNo_v2");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink+ "GenerateNclNo_v2");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");

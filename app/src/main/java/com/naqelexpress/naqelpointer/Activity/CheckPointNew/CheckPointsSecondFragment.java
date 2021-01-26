@@ -58,6 +58,7 @@ public class CheckPointsSecondFragment extends Fragment {
                              Bundle savedInstanceState) {
         final Intent intent;
         if (rootView == null) {
+
             rootView = inflater.inflate(R.layout.checkpointssecondfragment, container, false);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 

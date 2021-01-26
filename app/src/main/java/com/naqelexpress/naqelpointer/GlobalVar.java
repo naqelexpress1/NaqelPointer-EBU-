@@ -92,6 +92,7 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class GlobalVar {
 
     public UserSettings currentSettings;
+    public boolean autoLogout = false;
 
     public String AppVersion = "RouteLineSeq-2 16-01-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
@@ -130,9 +131,9 @@ public class GlobalVar {
     //    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
     public String NaqelPointerLivetrackingPusher = "http://212.12.186.108:8080/api/CourierLocation/InsertCourierLocation";
     public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
-    private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
-    public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
-    public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
+    //private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
+    //public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
+    // public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
     static IPointerAPI iPointerAPI;
 
 
@@ -183,9 +184,11 @@ public class GlobalVar {
     public static boolean gs = false, dsl = false, cptl = false, cptdl = false, cptddl = false, nnvdl = false;
 //    private ArrayList<String> DataTypeList = new ArrayList<>();
 
-    public static final int NclAndArrival = 1;
-    public static final int DsAndInventory = 2;
-    public static final int DsValidation = 3;
+    //Riyam
+    public static final int NclArrivalTH = 1;
+    public static final int DsAndInventoryTHCourier = 2;
+    public static final int DsValidationCourier = 3;
+    public static final int NclGWT = 4;
 
     public final String NotificationID_RecordVoice = "151";
 
@@ -1370,6 +1373,7 @@ public class GlobalVar {
                     myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
                     myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
+                    myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
                     myRouteShipments.Position = position - 1;
 
                     myRouteShipmentList.add(myRouteShipments);
@@ -1547,6 +1551,7 @@ public class GlobalVar {
                     myRouteShipments.POS = result.getInt(result.getColumnIndex("POS"));
                     myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
+                    myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
                     myRouteShipments.Position = position - 1;
 
                     myRouteShipmentList.add(myRouteShipments);
@@ -3360,13 +3365,13 @@ public class GlobalVar {
     }
 
 
-    public static String getTestAPIURL(Context context) {
-        return NaqelAPITest_V10;
-    }
-
-    public static String getUATUrl(Context context) {
-        return NaqelAPIUAT;
-    }
+//    public static String getTestAPIURL(Context context) {
+//        return NaqelAPITest_V10;
+//    }
+//
+//    public static String getUATUrl(Context context) {
+//        return NaqelAPIUAT;
+//    }
 
     public String GetDomainURLforService(Context context, String ServiceName) {
         DBConnections dbConnections = new DBConnections(context, null);
@@ -3877,4 +3882,69 @@ public class GlobalVar {
 
     }
 
+    //Added by : Riyam
+    public static String ValidateMobileNo(String mobileno) {
+
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0 && !mobileno.equals("0")) {
+            if (mobileno.length() == 10) {
+                String validate = mobileno.substring(0, 1);
+                if (validate.equals("0"))
+                    mobileno = mobileno.replaceFirst("0", "+966");
+            } else {
+                if (mobileno.length() > 10) {
+                    //String validate = mobileno.substring(0, 2);
+                    if (mobileno.contains("00966"))
+                        mobileno = mobileno.replaceFirst("00966", "+966");
+                    else if (mobileno.contains("+966"))
+                        mobileno = mobileno.replaceFirst("\\+966", "+966");
+                    else if (mobileno.contains("966"))
+                        mobileno = mobileno.replaceFirst("966", "+966");
+
+                } else if (mobileno.length() == 9) {
+                    mobileno = "+966" + mobileno;
+                }
+                //else
+//                    mobileno = mobileno;
+            }
+
+        }
+
+        return mobileno;
+    }
+
+    //Added by : Riyam
+    public static String ValidateMobileNoOtherCountry(String mobileno, String CountryCode) {
+
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0 && !mobileno.equals("0")) {
+            if (mobileno.length() >= 9) {
+                String mno = mobileno.substring(mobileno.length() - 9, mobileno.length());
+
+                mobileno = "+" + CountryCode + mno;
+
+
+            }
+
+        }
+
+        return mobileno;
+    }
+
+
+    //Riyam
+    public static String getWaybillFromBarcode(String barcode) {
+        try {
+            return barcode.substring(0, 8);
+        } catch (Exception e) {
+            //  Log.d(TAG, e.toString());
+        }
+        return "";
+    }
+
+    public static String getCSPhoneNumber() {
+        return "920020505";
+    }
+
+    public static String getCSEmail() {
+        return "cs@NAQEL.com.sa";
+    }
 }

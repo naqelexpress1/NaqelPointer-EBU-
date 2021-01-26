@@ -247,7 +247,14 @@ public class TerminalHandling extends AppCompatActivity {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
-        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
+        }
+        //mohammed
+        if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
+        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
             if (firstFragment.CheckPointTypeDDetailID == 1 && firstFragment.txtCheckPointTypeDDetail.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);

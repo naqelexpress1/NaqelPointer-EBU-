@@ -55,6 +55,8 @@
     <string name="txtWeight">Weight : </string>
     <string name="txtBillingType">Billing Type : </string>
     <string name="txtCODAmount">COD Amount : </string>
+    <string name="txtCDAmount">CD Amount : </string>
+    <string name="TotalAmount">Total Amount : </string>
     <string name="txtPiecesCount">Pieces Count : </string>
     <string name="WaybillNo">Waybill No</string>
     <string name="txtConsigneeName">Consignee Name : </string>
@@ -242,4 +244,25 @@
 
     <string name="incabheader"><u>DAILY  PRE &amp; POST  TRIP TRUCK  CHECK LIST</u>.</string>
     <string name="servererror">Something went wrong,kindly try again</string>
+
+    <!-- Riyam New whatsapp messages 25/1/2021 -->
+    <!-- Location msg -->
+    <string name="infotrackLocationLink">https://infotrack.naqelexpress.com/GPS/4.0/Home/FirstPage/</string>
+    <string name="customerLocationMsg1En">Hi,</string>
+    <string name="customerLocationMsg2En">This is Naqel courier, Please share your location through below link to deliver your shipment</string>
+    <string name="customerLocationMsg3En">from</string>
+    <string name="customerLocationMsg1Ar">هلا , أنا مندوب شركة ناقل</string>
+    <string name="customerLocationMsg2Ar">الرجاء مشاركة الموقع عبر الرابط أدناه لتوصيل شحنتكم</string>
+    <string name="customerLocationMsg3Ar">من</string>
+    <!-- Front door msg -->
+    <string name="frontDoorMsg1En">Hi,</string>
+    <string name="frontDoorMsg2En">Naqel courier is arrived to your front door to deliver your shipment</string>
+    <string name="frontDoorMsg3En">from</string>
+    <string name="frontDoorMsg1Ar">هلا,</string>
+    <string name="frontDoorMsg2Ar">مندوب ناقل وصل لموقعكم لتسليم شحنتكم</string>
+    <string name="frontDoorMsg3Ar">من</string>
+    <!-- CS Support -->
+    <string name="csSupportMsg1En">For customer service support, please contact us on:</string>
+    <string name="csSupportMsg1Ar">عزيزي العميل، للمساعدة وطلب الدعم الرجاء التواصل معنا على:</string>
+    <!-- End Riyam New whatsapp messages 25/1/2021 -->
 </resources>

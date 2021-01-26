@@ -26,6 +26,9 @@ public class TerminalHandling {
     public String Comments = "";
     public int Count = 0;
 
+    //mohammed
+    public int TripID = 0;
+
     public List<CheckPointWaybillDetails> TerminalHandlingWaybillDetails;
     public List<CheckPointBarCodeDetails> TerminalHandlingBarCodeDetails;
 
@@ -44,4 +47,18 @@ public class TerminalHandling {
         this.Comments = Comments;
         this.Count = Count;
     }
+
+    //mohammed
+    public TerminalHandling(int checkPointTypeID, String latitude, String longitude, int checkPointTypeDetailID, String reference,
+                            String Comments, int Count ,int tripID) {
+        CheckPointTypeID = checkPointTypeID;
+        CheckPointTypeDetailID = checkPointTypeDetailID;
+        Reference = reference;
+        Latitude = latitude;
+        Longitude = longitude;
+        this.Comments = Comments;
+        this.Count = Count;
+        TripID = tripID;
+    }
+
 }

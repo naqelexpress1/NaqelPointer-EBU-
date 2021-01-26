@@ -1,3 +1,4 @@
+
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
 import android.app.ActivityManager;
@@ -35,7 +36,7 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.OnlineValidation.OnLineValidation;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class ThirdFragment extends Fragment {
 
     private DBConnections dbConnections = new DBConnections(getContext(), null);
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
+    private final String TAG = "ThirdFragment";
 
 
     @Override
@@ -111,7 +113,7 @@ public class ThirdFragment extends Fragment {
                             if (IsValid()) {
                                 String barcode = txtBarCode.getText().toString();
                                 if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
-                                   if (isValidPieceBarcode(barcode)) {
+                                    if (isValidPieceBarcode(barcode)) {
                                         AddNewPiece();
                                     } else {
                                         showDialog(getOnLineValidationPiece(barcode));
@@ -600,7 +602,7 @@ public class ThirdFragment extends Fragment {
 
     }*/
 
-   //mohammed add this Integer.parseInt("")
+    //mohammed add this Integer.parseInt("")
     private void SaveData(String PieceCode, String req) {
 
         DBConnections dbConnections = new DBConnections(getContext(), null);
@@ -692,73 +694,58 @@ public class ThirdFragment extends Fragment {
         return isValid;
     }
 
-    private boolean isValidPieceBarcode(String pieceBarcode) {
+    private boolean isValidPieceBarcode(String barcode) {
         boolean isValid = true;
         try {
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByBarcode(pieceBarcode, getContext());
+
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
+                    , barcode , getContext());
+
             OnLineValidation onLineValidation = new OnLineValidation();
 
-           /* if (onLineValidationLocal == null) {
-                onLineValidation.setNotInFile(true);
-                isValid = false;
-            }  else {*/
 
-             /*   int isManifested = onLineValidationLocal.getIsManifested();
-
-                if (isManifested == 0) {
-                    Log.d("test" , "Not manifested");
-                    onLineValidation.setIsManifested(0);
-                    isValid = false;
-                }
+            if (onLineValidationLocal != null) {
 
 
-                if (isManifested == 0 && onLineValidationLocal.getCustomerWaybillDestID() != GlobalVar.GV().StationID) {
+                if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
                     onLineValidation.setIsWrongDest(1);
-                    onLineValidation.setCustomerWaybillDestID(onLineValidationLocal.getCustomerWaybillDestID());
+                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
                     isValid = false;
-                } */
-
-                if (onLineValidationLocal != null) {
-                    if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
-                        onLineValidation.setIsWrongDest(1);
-                        onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
-                        isValid = false;
-                    }
-
-                    if (onLineValidationLocal.getIsMultiPiece() == 1) {
-                        onLineValidation.setIsMultiPiece(1);
-                        isValid = false;
-                    }
-
-                    if (onLineValidationLocal.getIsStopped() == 1) {
-                        onLineValidation.setIsStopped(1);
-                        isValid = false;
-                    }
-
-                    if (onLineValidationLocal.getIsRelabel() == 1) {
-                        onLineValidation.setIsRelabel(1);
-                        isValid = false;
-                    }
                 }
 
-           // }
+                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+                    onLineValidation.setIsMultiPiece(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsStopped() == 1) {
+                    onLineValidation.setIsStopped(1);
+                    isValid = false;
+                }
+
+                if (onLineValidationLocal.getIsRelabel() == 1) {
+                    onLineValidation.setIsRelabel(1);
+                    isValid = false;
+                }
+            }
+
 
             if (!isValid) {
-                onLineValidation.setBarcode(pieceBarcode);
+                onLineValidation.setBarcode(barcode);
                 onLineValidationList.add(onLineValidation);
             }
 
         } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
+            Log.d("test" , TAG + e.toString());
         }
         return isValid;
     }
 
 
-    public void showDialog(final OnLineValidation pieceDetails) {
+    public void showDialog(final OnLineValidation onLineValidation) {
         DBConnections dbConnections = new DBConnections(mContext , null);
         try {
-            if (pieceDetails != null) {
+            if (onLineValidation != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(mContext);
                 LayoutInflater inflater = this.getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
@@ -767,33 +754,14 @@ public class ThirdFragment extends Fragment {
 
 
                 TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
-                tvBarcode.setText("Piece #" + pieceDetails.getBarcode());
-
-               //Uncomment once script is changed.
-                /*if (pieceDetails.isNotInFile()) {
-
-                    LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_not_manifested);
-                    llWrongDest.setVisibility(View.VISIBLE);
-
-                    TextView tvWrongDestHeader = dialogView.findViewById(R.id.tv_not_manifested_header);
-                    tvWrongDestHeader.setText("Manifest");
-
-                    TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_not_manifested_body);
-                    tvWrongDestBody.setText("Shipment is not manifested yet. ");
-                }*/
+                tvBarcode.setText("Piece #" + onLineValidation.getBarcode());
 
 
-                if (pieceDetails.getIsWrongDest() == 1) {
+                if (onLineValidation.getIsWrongDest() == 1) {
                     String stationName = "";
                     try {
                         Station station = null;
-
-                     /*   if (pieceDetails.getIsManifested() == 0)
-                            station = dbConnections.getStationByID(pieceDetails.getCustomerWaybillDestID() , mContext);
-                        else
-                            station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext);*/
-
-                        station = dbConnections.getStationByID(pieceDetails.getWaybillDestID() , mContext);
+                        station = dbConnections.getStationByID(onLineValidation.getWaybillDestID() , mContext);
 
                         if (station != null)
                             stationName = station.Name;
@@ -809,10 +777,10 @@ public class ThirdFragment extends Fragment {
 
                     TextView tvWrongDestBody = dialogView.findViewById(R.id.tv_wrong_dest_body);
                     tvWrongDestBody.setText("Shipment destination : " + stationName + "."
-                           );
+                    );
                 }
 
-                if (pieceDetails.getIsMultiPiece() == 1) {
+                if (onLineValidation.getIsMultiPiece() == 1) {
 
                     LinearLayout llMultiPiece = dialogView.findViewById(R.id.ll_is_multi_piece);
                     llMultiPiece.setVisibility(View.VISIBLE);
@@ -824,7 +792,7 @@ public class ThirdFragment extends Fragment {
                     tvMultiPieceBody.setText("Please check pieces.");
                 }
 
-                if (pieceDetails.getIsStopped() == 1) {
+                if (onLineValidation.getIsStopped() == 1) {
 
                     LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_is_stop_shipment);
                     llStopShipment.setVisibility(View.VISIBLE);
@@ -854,7 +822,7 @@ public class ThirdFragment extends Fragment {
                         // To avoid leaked window
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
-                                AddNewPiece();
+                            AddNewPiece();
                         }
                     }
                 });

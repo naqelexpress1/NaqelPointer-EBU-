@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
-import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
@@ -62,11 +61,11 @@ public class SplashScreenActivity
 
 
         //#startRegion
-        Intent intent = new Intent(SplashScreenActivity.this, RouteMap.class);
-        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-        intent.putParcelableArrayListExtra("places", places);
-        intent.putExtra("AreaData", AreaData);
-        startActivityForResult(intent, 1);
+//        Intent intent = new Intent(SplashScreenActivity.this, RouteMap.class);
+//        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+//        intent.putParcelableArrayListExtra("places", places);
+//        intent.putExtra("AreaData", AreaData);
+//        startActivityForResult(intent, 1);
         //#EndRegion
 
 //        try {

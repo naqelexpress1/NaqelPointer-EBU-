@@ -1564,7 +1564,7 @@ public class LoginActivity
                 } else {
                     GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
                     if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
-                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                         // dbConnections.UpdateDomaintriedTimes(GlobalVar.GV().triedTimes, DomainURL, getApplicationContext());
                         GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
                     }

@@ -258,6 +258,12 @@ public class TerminalHandling extends AppCompatActivity {
             }
 
         }
+        //mohammed
+         if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter Trip ID",
+                    GlobalVar.AlertType.Error);
+            return false;
+        }
 
 //        if (secondFragment == null) {
 //            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the waybill list",

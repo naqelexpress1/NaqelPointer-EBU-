@@ -1375,6 +1375,7 @@ public class GlobalVar {
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
                     myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
                     myRouteShipments.Position = position - 1;
+                    myRouteShipments.isOtp = result.getInt(result.getColumnIndex("IsOtp"));
 
                     myRouteShipmentList.add(myRouteShipments);
 
@@ -1552,6 +1553,7 @@ public class GlobalVar {
                     myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
                     myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
+                    myRouteShipments.isOtp = result.getInt(result.getColumnIndex("IsOtp"));
                     myRouteShipments.Position = position - 1;
 
                     myRouteShipmentList.add(myRouteShipments);

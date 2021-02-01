@@ -489,42 +489,44 @@ public class DeliveryActivity extends AppCompatActivity {
 
             String division = GlobalVar.getDivision(getApplicationContext());
 
-            if (GlobalVar.GV().isneedOtp) {
-                if (division.equals("Courier") && !secondFragment.Isnootp) {
-                    if (secondFragment.txtotpno.getText().toString().equals("")) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the OTPNo", GlobalVar.AlertType.Error);
+            if (bundle.getInt("isOtp") == 1) {
+                if (GlobalVar.GV().isneedOtp) {
+                    if (division.equals("Courier") && !secondFragment.Isnootp) {
+                        if (secondFragment.txtotpno.getText().toString().equals("")) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the OTPNo", GlobalVar.AlertType.Error);
 //                GlobalVar.GV().ShowMessage(this,"You have to enter the Receiver Name", GlobalVar.AlertType.Error);
-                        isValid = false;
-                        return isValid;
-                    } else {
-                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + DeliveryFirstFragment.txtWaybillNo.getText().toString() + "'",
-                                getApplicationContext());
+                            isValid = false;
+                            return isValid;
+                        } else {
+                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                            Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + DeliveryFirstFragment.txtWaybillNo.getText().toString() + "'",
+                                    getApplicationContext());
 
-                        if (result.getCount() > 0) {
-                            result.moveToFirst();
-                            int otpno = result.getInt(result.getColumnIndex("OTPNo"));
-                            if (otpno != Integer.parseInt(secondFragment.txtotpno.getText().toString())) {
-                                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Entered OTPNo is wrong , kindly contact Supervisor", GlobalVar.AlertType.Error);
-                                isValid = false;
-                                return isValid;
+                            if (result.getCount() > 0) {
+                                result.moveToFirst();
+                                int otpno = result.getInt(result.getColumnIndex("OTPNo"));
+                                if (otpno != Integer.parseInt(secondFragment.txtotpno.getText().toString())) {
+                                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Entered OTPNo is wrong , kindly contact Supervisor", GlobalVar.AlertType.Error);
+                                    isValid = false;
+                                    return isValid;
 
+                                }
                             }
                         }
-                    }
-                } else if (secondFragment.Isnootp) {
-                    if (secondFragment.iqamaid.getText().toString().length() == 0) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Iqama No", GlobalVar.AlertType.Error);
-                        isValid = false;
-                        return isValid;
-                    } else if (secondFragment.phoneno.getText().toString().length() == 0) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Mobile No", GlobalVar.AlertType.Error);
-                        isValid = false;
-                        return isValid;
-                    } else if (secondFragment.receivername.getText().toString().length() == 0) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Name", GlobalVar.AlertType.Error);
-                        isValid = false;
-                        return isValid;
+                    } else if (secondFragment.Isnootp) {
+                        if (secondFragment.iqamaid.getText().toString().length() == 0) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Iqama No", GlobalVar.AlertType.Error);
+                            isValid = false;
+                            return isValid;
+                        } else if (secondFragment.phoneno.getText().toString().length() == 0) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Mobile No", GlobalVar.AlertType.Error);
+                            isValid = false;
+                            return isValid;
+                        } else if (secondFragment.receivername.getText().toString().length() == 0) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Name", GlobalVar.AlertType.Error);
+                            isValid = false;
+                            return isValid;
+                        }
                     }
                 }
             }

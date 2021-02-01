@@ -2957,7 +2957,7 @@ public class DBConnections
             contentValues.put("IsMap", instance.IsMap);
             contentValues.put("IsPlan", instance.IsPlan);
             contentValues.put("CustomDuty", instance.CustomDuty); //Added by Riyam
-            contentValues.put("IsOtp", instance.CustomDuty); //Added by Riyam
+            contentValues.put("IsOtp", instance.isOtp); //Added by Riyam
 
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))

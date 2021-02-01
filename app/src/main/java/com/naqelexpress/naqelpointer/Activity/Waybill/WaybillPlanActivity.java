@@ -892,7 +892,9 @@ public class WaybillPlanActivity extends AppCompatActivity
 
     public void updateConsigneeMobileView(String phoneNo, String mobileNo) {
         txtPhoneNo.setText(phoneNo);
+        txtPhoneNo.setTag(phoneNo);
         txtMobileNo.setText(mobileNo);
+        txtMobileNo.setTag(mobileNo);
     }
 
     public void updateConsigneeMobileLocalDB(String phoneNo, String mobileNo) {

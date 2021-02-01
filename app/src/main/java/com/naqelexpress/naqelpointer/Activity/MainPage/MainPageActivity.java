@@ -833,7 +833,8 @@ public class MainPageActivity
     private void setValidationText () {
         //Riyam
         DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
-        if (devision.equals("Courier") || devision.equals("IRS")) { //TH , Courier & GWT app
+
+        if (GlobalVar.GV().IsTerminalApp || devision.equals("IRS")) {
 
             try {
                 llValidation.setVisibility(View.VISIBLE);

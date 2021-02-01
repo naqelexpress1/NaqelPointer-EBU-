@@ -98,6 +98,7 @@ public class MyRouteShipments implements Parcelable {
     public double CustomDuty; //Added by Riyam
     public int isArea = 0;
     public String AreaData = "";
+    public int isOtp; //Added by Riyam
 
     public MyRouteShipments() {
 
@@ -267,6 +268,7 @@ public class MyRouteShipments implements Parcelable {
                 instance.IsPaid = jsonObject.getInt("Ispaid");
                 instance.IsMap = jsonObject.getInt("IsMap");
                 instance.IsPlan = jsonObject.getInt("IsPlan");
+                instance.isOtp = jsonObject.getInt("IsOtp");
                 if (jsonObject.getInt("Complaint") != 0) {
                     instance.HasComplaint = true;
                     complaint = complaint + 1;
@@ -284,7 +286,8 @@ public class MyRouteShipments implements Parcelable {
                     instance.Sign = 0;
 
                 instance.Header = "";
-                instance.CustomDuty =  Double.parseDouble(jsonObject.getString("CDAmount"));; //Added by Riyam
+                instance.CustomDuty = Double.parseDouble(jsonObject.getString("CDAmount"));
+                ; //Added by Riyam
 
                 if (GlobalVar.GV().CourierDailyRouteID == 0) {
                     CourierDailyRoute courierDailyRoute = new CourierDailyRoute();
@@ -424,6 +427,7 @@ public class MyRouteShipments implements Parcelable {
         Position = in.readInt();
         DsOrderNo = in.readInt();
         CustomDuty = in.readDouble();
+        isOtp = in.readInt();
     }
 
     public static final Creator<MyRouteShipments> CREATOR = new Creator<MyRouteShipments>() {
@@ -665,6 +669,7 @@ public class MyRouteShipments implements Parcelable {
         parcel.writeInt(Position);
         parcel.writeInt(DsOrderNo);
         parcel.writeDouble(CustomDuty);
+        parcel.writeInt(isOtp);
     }
 
     public enum UpdateType {

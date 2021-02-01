@@ -175,7 +175,8 @@ public class DBConnections
                 "\"PiecesCount\" TEXT NOT NULL, \"Sign\" INTEGER Default 0 ,\"SeqNo\" INTEGER Default 0 ," +
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
-                " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger, IsScan Integer Default 0 , IsNotDelivered Default 0 , CustomDuty Integer )");
+                " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger, IsScan Integer Default 0 , IsNotDelivered Default 0 , CustomDuty Integer" +
+                ", IsOtp Integer )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -1073,7 +1074,7 @@ public class DBConnections
                 db.execSQL("ALTER TABLE FacilityLoggedIn ADD COLUMN FacilityID INTEGER  ");
 
             //Added by Riyam - Custom Duty
-            if (!isColumnExist("MyRouteShipments", "CustomDuty Integer"))
+            if (!isColumnExist("MyRouteShipments", "CustomDuty"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN CustomDuty Integer  ");
 
 
@@ -1090,8 +1091,8 @@ public class DBConnections
                 db.execSQL("ALTER TABLE AtDestination ADD COLUMN CTime DATETIME ");
 
 
-//            if (!isColumnExist("MyRouteShipments", "isCourierApproach"))
-//                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN isCourierApproach  INTEGER ");
+            if (!isColumnExist("MyRouteShipments", "IsOtp"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsOtp  INTEGER ");
         }
 
 
@@ -1524,7 +1525,7 @@ public class DBConnections
         Cursor cursor;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select EmployID from UpdateLoginStatus", null);
+            cursor = db.rawQuery("select EmployID from UpdateLoginStatus", null);
             if (cursor != null && cursor.getCount() >= 1) {
                 cursor.moveToFirst();
                 empID = cursor.getInt(cursor.getColumnIndex("EmployID"));
@@ -1533,7 +1534,7 @@ public class DBConnections
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "getUpdateLoginStatus " + e.toString());
+            Log.d("test", "getUpdateLoginStatus " + e.toString());
         }
         return empID;
     }
@@ -1543,7 +1544,7 @@ public class DBConnections
         Cursor cursor;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select EmployID from UpdateLoginStatus", null);
+            cursor = db.rawQuery("select EmployID from UpdateLoginStatus", null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 count = cursor.getCount();
@@ -1551,17 +1552,17 @@ public class DBConnections
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "UpdateLoginStatusCount " + e.toString());
+            Log.d("test", "UpdateLoginStatusCount " + e.toString());
         }
         return count;
     }
 
-    public int UpdateLoginStatusErrorCount(int employID , Context context) {
+    public int UpdateLoginStatusErrorCount(int employID, Context context) {
         int count = 0;
         Cursor cursor;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            cursor =  db.rawQuery("select ID from UpdateLoginStatusError where EmployID = " + employID, null);
+            cursor = db.rawQuery("select ID from UpdateLoginStatusError where EmployID = " + employID, null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 count = cursor.getCount();
@@ -1569,7 +1570,7 @@ public class DBConnections
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "UpdateLoginStatusErrorCount " + e.toString());
+            Log.d("test", "UpdateLoginStatusErrorCount " + e.toString());
         }
         return count;
     }
@@ -1669,11 +1670,11 @@ public class DBConnections
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            db.delete("UpdateLoginStatus", null,null );
+            db.delete("UpdateLoginStatus", null, null);
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "DeleteUpdateLoginStatus " + e.toString());
+            Log.d("test", "DeleteUpdateLoginStatus " + e.toString());
         }
         return result != -1;
     }
@@ -1683,11 +1684,11 @@ public class DBConnections
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            db.delete("UpdateLoginStatusError", null,null );
+            db.delete("UpdateLoginStatusError", null, null);
             db.close();
 
         } catch (SQLiteException e) {
-            Log.d("test" , "DeleteUpdateLoginStatusError " + e.toString());
+            Log.d("test", "DeleteUpdateLoginStatusError " + e.toString());
         }
         return result != -1;
     }
@@ -1849,7 +1850,7 @@ public class DBConnections
         return true;
     }
 
-    public void UpdateConsigneeNo (String waybillNo , String phoneNo , String mobileNo) {
+    public void UpdateConsigneeNo(String waybillNo, String phoneNo, String mobileNo) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -1860,7 +1861,7 @@ public class DBConnections
             String args[] = {waybillNo};
             db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
         } catch (Exception e) {
-            Log.d("test" , "DBConnection - Failed updating CNE");
+            Log.d("test", "DBConnection - Failed updating CNE");
         }
         db.close();
     }
@@ -2956,6 +2957,7 @@ public class DBConnections
             contentValues.put("IsMap", instance.IsMap);
             contentValues.put("IsPlan", instance.IsPlan);
             contentValues.put("CustomDuty", instance.CustomDuty); //Added by Riyam
+            contentValues.put("IsOtp", instance.CustomDuty); //Added by Riyam
 
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
@@ -6437,7 +6439,7 @@ public class DBConnections
     /********* Riyam - Online Validation *********/
 
     // TH - Courier
-    public boolean insertOnLineValidationOffset(List<OnlineValidationOffset> onLineValidationList, int processType , Context context) {
+    public boolean insertOnLineValidationOffset(List<OnlineValidationOffset> onLineValidationList, int processType, Context context) {
         boolean hasError = false;
 
         try {
@@ -6452,10 +6454,10 @@ public class DBConnections
             SQLiteStatement stmt = db.compileStatement(sql);
 
 
-            if (!isValidationFileEmpty(db , context))
+            if (!isValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidationOffset");
 
-            if (!isOnlineValidationFileEmpty(db , context))
+            if (!isOnlineValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidation");
 
 
@@ -6484,11 +6486,11 @@ public class DBConnections
 
                 } catch (Exception ex) {
                     hasError = true;
-                    Log.d("test" , TAG + "" + ex.toString());
+                    Log.d("test", TAG + "" + ex.toString());
                 }
             }
 
-            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+            boolean isFileDetailsInserted = insertOnLineValidationFileDetails(db, processType, GlobalVar.getCurrentDateTime(), context);
 
             if (!isFileDetailsInserted) {
                 return false;
@@ -6502,13 +6504,13 @@ public class DBConnections
 
         } catch (Exception ex) {
             hasError = true;
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
         return !hasError;
     }
 
     // GWT
-    public boolean insertOnLineValidationGWT(List<OnLineValidationGWT> onLineValidationList, int processType , Context context) {
+    public boolean insertOnLineValidationGWT(List<OnLineValidationGWT> onLineValidationList, int processType, Context context) {
         boolean hasError = false;
 
         try {
@@ -6523,10 +6525,10 @@ public class DBConnections
             SQLiteStatement stmt = db.compileStatement(sql);
 
 
-            if (!isOnlineValidationFileEmpty(db , context))
+            if (!isOnlineValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidation");
 
-            if (!isValidationFileEmpty(db , context))
+            if (!isValidationFileEmpty(db, context))
                 db.execSQL("delete from OnlineValidationOffset");
 
             for (int i = 0; i < onLineValidationList.size(); i++) {
@@ -6556,11 +6558,11 @@ public class DBConnections
 
                 } catch (Exception ex) {
                     hasError = true;
-                    Log.d("test" , TAG + "" + ex.toString());
+                    Log.d("test", TAG + "" + ex.toString());
                 }
             }
 
-            boolean isFileDetailsInserted =  insertOnLineValidationFileDetails(db,processType , GlobalVar.getCurrentDateTime() , context);
+            boolean isFileDetailsInserted = insertOnLineValidationFileDetails(db, processType, GlobalVar.getCurrentDateTime(), context);
 
             if (!isFileDetailsInserted) {
                 return false;
@@ -6574,16 +6576,16 @@ public class DBConnections
 
         } catch (Exception ex) {
             hasError = true;
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
         return !hasError;
     }
 
     //GWT
-    public OnLineValidation getPieceInformationByBarcode (String barcode , Context context) {
+    public OnLineValidation getPieceInformationByBarcode(String barcode, Context context) {
         OnLineValidation onLineValidation = null;
         try {
-            String selectQuery = "SELECT * FROM OnLineValidation WHERE Barcode = " + barcode ;
+            String selectQuery = "SELECT * FROM OnLineValidation WHERE Barcode = " + barcode;
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -6609,10 +6611,10 @@ public class DBConnections
     }
 
     //TH - Courier
-    public OnLineValidation getPieceInformationByWaybillNo (String waybillNo , String barcode , Context context) {
+    public OnLineValidation getPieceInformationByWaybillNo(String waybillNo, String barcode, Context context) {
         OnLineValidation onLineValidation = null;
         try {
-            String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo ;
+            String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo;
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -6636,7 +6638,7 @@ public class DBConnections
         return onLineValidation;
     }
 
-    public int getValidationFileCount (boolean isGWt , Context context ) {
+    public int getValidationFileCount(boolean isGWt, Context context) {
         int count = 0;
         try {
             String query = "";
@@ -6649,18 +6651,18 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery(query, null);
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
-                return cur.getCount() ;
+                return cur.getCount();
             }
             db.close();
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return count;
     }
 
-    public boolean insertOnLineValidationFileDetails(SQLiteDatabase db , int Process,String todayDatetime,Context context) {
+    public boolean insertOnLineValidationFileDetails(SQLiteDatabase db, int Process, String todayDatetime, Context context) {
         long result = 0;
         try {
 
@@ -6676,25 +6678,25 @@ public class DBConnections
 
             result = db.insert("OnLineValidationFileDetails", null, contentValues);
         } catch (Exception e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return result != -1;
     }
 
     //GWT
-    public boolean isValidOnlineValidationFile(int process , Context context) {
+    public boolean isValidOnlineValidationFile(int process, Context context) {
 
-        if (isOnlineValidationFileEmpty( context)) {
+        if (isOnlineValidationFileEmpty(context)) {
             return false;
         }
 
-        if (process == GlobalVar.NclGWT && !isGWTFile(context)){
-            Log.d("test" , "Procees " + process + " not GWT File");
+        if (process == GlobalVar.NclGWT && !isGWTFile(context)) {
+            Log.d("test", "Procees " + process + " not GWT File");
             return false;
         }
 
-        if (process != GlobalVar.NclGWT && isGWTFile(context)){
-            Log.d("test" , "Procees " + process + "  GWT File");
+        if (process != GlobalVar.NclGWT && isGWTFile(context)) {
+            Log.d("test", "Procees " + process + "  GWT File");
             return false;
         }
 
@@ -6704,7 +6706,7 @@ public class DBConnections
             return false;
         }*/
 
-        if (isOnlineValidationFileOutDated(process , context)) {
+        if (isOnlineValidationFileOutDated(process, context)) {
             return false;
         }
 
@@ -6712,19 +6714,19 @@ public class DBConnections
     }
 
     //TH - Courier
-    public boolean isValidValidationFile(int process , Context context) {
+    public boolean isValidValidationFile(int process, Context context) {
 
-        if (isValidationFileEmpty( context)) {
+        if (isValidationFileEmpty(context)) {
             return false;
         }
 
-        if (process == GlobalVar.NclGWT && !isGWTFile(context)){
-            Log.d("test" , "Procees " + process + " not GWT File");
+        if (process == GlobalVar.NclGWT && !isGWTFile(context)) {
+            Log.d("test", "Procees " + process + " not GWT File");
             return false;
         }
 
-        if (process != GlobalVar.NclGWT && isGWTFile(context)){
-            Log.d("test" , "Procees " + process + "  GWT File");
+        if (process != GlobalVar.NclGWT && isGWTFile(context)) {
+            Log.d("test", "Procees " + process + "  GWT File");
             return false;
         }
 
@@ -6734,7 +6736,7 @@ public class DBConnections
             return false;
         }*/
 
-        if (isOnlineValidationFileOutDated(process , context)) {
+        if (isOnlineValidationFileOutDated(process, context)) {
             return false;
         }
 
@@ -6742,7 +6744,7 @@ public class DBConnections
     }
 
 
-    public boolean isOnlineValidationFileOutDated(int process , Context context){
+    public boolean isOnlineValidationFileOutDated(int process, Context context) {
         try {
 
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -6782,7 +6784,7 @@ public class DBConnections
 
             db.close();
         } catch (Exception e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return false;
     }
@@ -6793,21 +6795,20 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
             db.close();
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return true;
     }
 
 
-
     //TH - Corier
-    public boolean isValidationFileEmpty(SQLiteDatabase db , Context context) {
+    public boolean isValidationFileEmpty(SQLiteDatabase db, Context context) {
         try {
 
             if (db == null)
@@ -6815,14 +6816,14 @@ public class DBConnections
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidationOffset", null);
 
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
 
 
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return true;
     }
@@ -6833,19 +6834,19 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidationOffset", null);
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
             db.close();
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return true;
     }
 
 
-    public boolean isOnlineValidationFileEmpty(SQLiteDatabase db , Context context) {
+    public boolean isOnlineValidationFileEmpty(SQLiteDatabase db, Context context) {
         try {
 
             if (db == null)
@@ -6853,15 +6854,15 @@ public class DBConnections
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidation", null);
 
-            if (cur != null ) {
+            if (cur != null) {
                 cur.moveToFirst();
 
-                Log.d("test" , TAG +" File count " + cur.getCount());
+                Log.d("test", TAG + " File count " + cur.getCount());
 
-                return cur.getCount() <= 0 ;
+                return cur.getCount() <= 0;
             }
         } catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+            Log.d("test", TAG + "" + e.toString());
         }
         return true;
     }
@@ -6871,7 +6872,7 @@ public class DBConnections
         Cursor cursor = null;
         try {
 
-            String selectQuery = "select UploadDate  from OnLineValidationFileDetails" ;
+            String selectQuery = "select UploadDate  from OnLineValidationFileDetails";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             cursor = db.rawQuery(selectQuery, null);
 
@@ -6879,10 +6880,8 @@ public class DBConnections
                 date = cursor.getString(cursor.getColumnIndex("UploadDate"));
 
             cursor.close();
-        }
-
-        catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+        } catch (SQLiteException e) {
+            Log.d("test", TAG + "" + e.toString());
         }
         return date;
     }
@@ -6893,7 +6892,7 @@ public class DBConnections
         Cursor cursor = null;
         try {
 
-            String selectQuery = "select Process  from OnLineValidationFileDetails" ;
+            String selectQuery = "select Process  from OnLineValidationFileDetails";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             cursor = db.rawQuery(selectQuery, null);
 
@@ -6901,18 +6900,16 @@ public class DBConnections
                 process = cursor.getInt(cursor.getColumnIndex("Process"));
 
             if (process == GlobalVar.NclGWT)
-                isGwtFile =  true;
+                isGwtFile = true;
 
             cursor.close();
-        }
-
-        catch (SQLiteException e) {
-            Log.d("test" , TAG + "" + e.toString());
+        } catch (SQLiteException e) {
+            Log.d("test", TAG + "" + e.toString());
         }
         return isGwtFile;
     }
 
-    public boolean updateWaybillDestID (Context context , String waybillNo , int newDestID) {
+    public boolean updateWaybillDestID(Context context, String waybillNo, int newDestID) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();

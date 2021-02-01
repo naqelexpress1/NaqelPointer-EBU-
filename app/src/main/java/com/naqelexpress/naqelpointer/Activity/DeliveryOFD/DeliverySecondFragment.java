@@ -701,7 +701,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         });*/
         alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "Payment Gateway", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                new ValidatePayment().execute(jsonObject.toString(), "1");
+                new ValidatePayment().execute(jsonObject.toString(), "1" , "false");
                 dialog.dismiss();
             }
         });
@@ -748,7 +748,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
         try {
             jsonObject.put("WaybillNo", Integer.parseInt(DeliveryFirstFragment.txtWaybillNo.getText().toString()));
-            new ValidatePayment().execute(jsonObject.toString(), "1");
+            new ValidatePayment().execute(jsonObject.toString(), "1" , "true");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -760,6 +760,8 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         String result = "";
         StringBuffer buffer;
         ProgressDialog progressDialog;
+        boolean automaticCall = false;
+
 
         @Override
         protected void onPreExecute() {
@@ -773,6 +775,11 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         protected String doInBackground(String... params) {
             String jsonData = params[0];
             String redirectfn = params[1];
+
+            if (params[2] != null) {
+                automaticCall = Boolean.parseBoolean(params[2]);
+            }
+
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
             InputStream ist = null;
@@ -840,20 +847,26 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
                     if (jsonObject.getBoolean("HasError")) {
 
-                        /*new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                        if (automaticCall) {
+                            tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
+
+                        } else {
+                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("ErrorMessage"))
-                                .show();*/
-                        tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
+                                .show();
+                        }
 
                     } else {
-                       /* new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
-                                .setTitleText("Info")
-                                .setContentText(jsonObject.getString("ErrorMessage"))
-                                .show();*/
 
-                        tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
-
+                        if (automaticCall) {
+                            tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
+                        } else {
+                            new SweetAlertDialog(getActivity(), SweetAlertDialog.SUCCESS_TYPE)
+                                    .setTitleText("Info")
+                                    .setContentText(jsonObject.getString("ErrorMessage"))
+                                    .show();
+                        }
                     }
 
 

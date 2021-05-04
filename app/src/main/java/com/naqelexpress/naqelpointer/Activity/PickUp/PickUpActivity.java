@@ -132,6 +132,10 @@ public class PickUpActivity extends AppCompatActivity {
                 } else
                     GlobalVar.RedirectSettings(PickUpActivity.this);
                 return true;
+
+            case R.id.getdistrict:
+                firstFragment.FetchDistricData();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -204,8 +208,8 @@ public class PickUpActivity extends AppCompatActivity {
                 firstFragment.OriginID, firstFragment.DestinationID,
                 GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()),
                 GlobalVar.GV().getDoubleFromString(firstFragment.txtWeight.getText().toString()),
-                TimeIn, DateTime.now(), firstFragment.txtRefNo.getText().toString(),
-                String.valueOf(Latitude), String.valueOf(Longitude));
+                DateTime.now(), DateTime.now(), firstFragment.txtRefNo.getText().toString(),
+                String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.districtID);
 
         int loadtypeid = 0;
         if (firstFragment.clientdetails.size() > 0) {
@@ -874,4 +878,6 @@ public class PickUpActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
 }

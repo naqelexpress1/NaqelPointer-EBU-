@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -44,6 +45,12 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation.ArrivedatDestination;
 import com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB.AtOrigin;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingList;
@@ -162,7 +169,7 @@ public class MainPageActivity
     public DataSync dataSync;
     int progressBarStatus = 0;
     TextView ofd, attempted, delivered, exceptions, productivity, complaint, compDelvrd, ComRemain,
-            tvValidationHeader,tvValidationDate,tvValidationCountHeader ,tvValidationCountBody ;
+            tvValidationHeader, tvValidationDate, tvValidationCountHeader, tvValidationCountBody;
 
     TableLayout tl, tl1;
     TextView user, version, devicestatus;
@@ -182,7 +189,7 @@ public class MainPageActivity
         try {
             setContentView(R.layout.mainpage);
 
-
+            registerFirebase();
             user = (TextView) findViewById(R.id.user);
             version = (TextView) findViewById(R.id.version);
             devicestatus = (TextView) findViewById(R.id.devicestatus);
@@ -470,10 +477,15 @@ public class MainPageActivity
         //total 28 cases for Menus
 
         user.setText("Welcome to Mr." + String.valueOf(GlobalVar.GV().EmployID));
-
+        // menu = 1;
         if (devision.equals("Courier")) {
-            cellTitle = new String[13];
-            cellIcon = new int[13];
+            if (menu == 1) {
+                cellTitle = new String[14];
+                cellIcon = new int[14];
+            } else {
+                cellTitle = new String[13];
+                cellIcon = new int[13];
+            }
 
 //            cellTitle = new String[11];
 //            cellIcon = new int[11];
@@ -510,7 +522,8 @@ public class MainPageActivity
             cellTitle[10] = "Booking List";//13
             cellTitle[11] = "Change Password";//13
             cellTitle[12] = "DeliverySheet by NCL";//13
-
+            if (menu == 1)
+                cellTitle[13] = "Skip Waybill in RL";//13 //Skip Waybill in RouteLine Seq
 
             itemposition.put(0, 0);
             itemposition.put(1, 1); // 1 is old screen
@@ -528,6 +541,8 @@ public class MainPageActivity
             itemposition.put(11, 24);
             itemposition.put(12, 28);
 
+            if (menu == 1)
+                itemposition.put(13, 29);
         }
 
 
@@ -661,6 +676,8 @@ public class MainPageActivity
             cellIcon[10] = R.drawable.contacts; //CBU
             cellIcon[11] = R.drawable.money; //CBU
             cellIcon[12] = R.drawable.deliverysheet; //CBU
+            if (menu == 1)
+                cellIcon[13] = R.drawable.recyclebin; //CBU
         }
         if (devision.equals("Express")) {
 
@@ -830,9 +847,9 @@ public class MainPageActivity
         compDelvrd.setText(String.valueOf(delivrd1));
     }
 
-    private void setValidationText () {
+    private void setValidationText() {
         //Riyam
-        DBConnections dbConnections = new DBConnections(getApplicationContext() , null);
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         if (GlobalVar.GV().IsTerminalApp || devision.equals("IRS")) {
 
@@ -843,10 +860,10 @@ public class MainPageActivity
 
                 if (devision.equals("Courier") && !dbConnections.isValidationFileEmpty(getApplicationContext())) {
                     uploadDate = dbConnections.getOnlineValidationUploadDate(getApplicationContext());
-                    count = String.valueOf(dbConnections.getValidationFileCount(false , getApplicationContext()));
-                } else if (devision.equals("IRS") && !dbConnections.isOnlineValidationFileEmpty(getApplicationContext())){
+                    count = String.valueOf(dbConnections.getValidationFileCount(false, getApplicationContext()));
+                } else if (devision.equals("IRS") && !dbConnections.isOnlineValidationFileEmpty(getApplicationContext())) {
                     uploadDate = dbConnections.getOnlineValidationUploadDate(getApplicationContext());
-                    count = String.valueOf(dbConnections.getValidationFileCount(true , getApplicationContext()));
+                    count = String.valueOf(dbConnections.getValidationFileCount(true, getApplicationContext()));
                 }
                 tvValidationDate.setText(uploadDate);
                 tvValidationCountBody.setText(count);
@@ -1336,6 +1353,19 @@ public class MainPageActivity
                             }
                         } else
                             GlobalVar.enableLocationSettings(MainPageActivity.this);
+
+                        break;
+                    case 29:
+                        if (VersionMatct()) {
+                            Intent deliverySheet = new Intent(getApplicationContext(),
+                                    com.naqelexpress.naqelpointer.Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine.class);
+//                                    Intent deliverySheet = new Intent(getApplicationContext(), DeliverySheetActivity.class);
+                            startActivity(deliverySheet);
+                        } else {
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    , true);
+                        }
 
                         break;
                 }
@@ -2574,6 +2604,7 @@ public class MainPageActivity
                 devicestatus.setTextColor(getResources().getColor(R.color.Green));
 
         }
+
     }
 
     @Override
@@ -2636,4 +2667,31 @@ public class MainPageActivity
         alertDialog.show();
     }
 
+    private void registerFirebase() {
+        try {
+
+            FirebaseApp.initializeApp(getApplicationContext());
+            final FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            if (mAuth.getUid() == null) {
+                mAuth.signInWithEmailAndPassword("966593793637@naqel.com.sa", "M@d237467")
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    //  updateUI(user);
+                                } else {
+                                    // If sign in fails, display a message to the user.
+
+                                    System.out.println("");
+
+                                }
+                            }
+
+                        });
+            }
+        } catch (Exception e) {
+            System.out.println("");
+        }
+    }
 }

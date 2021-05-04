@@ -3,7 +3,6 @@ package com.naqelexpress.naqelpointer.Activity.Delivery;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -15,7 +14,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -76,7 +74,7 @@ public class DeliveryFirstFragment
     private View rootView;
     Button btnOpenCamera;
     String shippername = "";
-
+    static int OTPNO = 0 , isOtp = 0;
     AppCompatImageButton btnCallMobile, btnCallMobile1;
     AppCompatImageButton btnWhatsApp, btnWhatsApp1;
     TelephonyManager mTelephonyManager;
@@ -95,6 +93,7 @@ public class DeliveryFirstFragment
 
             Lat = "0";
             Longi = "0";
+            OTPNO = 0;
 
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
@@ -444,10 +443,15 @@ public class DeliveryFirstFragment
                 shippername = result.getString(result.getColumnIndex("ClientName"));
                 jsonObject.put("Sign", result.getInt(result.getColumnIndex("Sign")));
                 jsonObject.put("ClientID", result.getInt(result.getColumnIndex("ClientID")));
+
+                OTPNO = result.getInt(result.getColumnIndex("OTPNo"));
+                isOtp = result.getInt(result.getColumnIndex("IsOtp"));
+
                 JSONObject coordinates = new JSONObject();
                 coordinates.put("Latitude", result.getString(result.getColumnIndex("Latitude")));
                 coordinates.put("Longitude", result.getString(result.getColumnIndex("Longitude")));
                 jsonObject.put("locationCoordinate", coordinates);
+
 
                 Lat = result.getString(result.getColumnIndex("Latitude"));
                 Longi = result.getString(result.getColumnIndex("Longitude"));

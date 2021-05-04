@@ -179,9 +179,13 @@
     <string name="prompt">Choose a Report</string>
     <string-array name="reportEBU">
         <item>At Origin</item>
+        <item>At Origin Pieces</item>
         <item>Arrived at Dest</item>
+        <item>Arrived at Dest Pieces</item>
         <item>Delivery Sheet</item>
+        <item>Delivery Sheet Pieces</item>
         <item>Load to Dest</item>
+        <item>Load to Dest Pieces</item>
         <item>Night Stock</item>
         <item>Not Delivery</item>
         <item>OnDelivery</item>
@@ -247,7 +251,8 @@
 
     <!-- Riyam New whatsapp messages 25/1/2021 -->
     <!-- Location msg -->
-    <string name="infotrackLocationLink">https://infotrack.naqelexpress.com/GPS/4.0/Home/FirstPage/</string>
+    <string name="infotrackLocationLink">https://infotrack.naqelexpress.com/GPS/12/Home/FirstPage/</string>
+    <!-- <string name="infotrackLocationLink">https://infotrack.naqelexpress.com/GPS/12/Home/FirstPage/</string>  https://infotrack.naqelexpress.com/GPS/4.0/Home/FirstPage/ -->
     <string name="customerLocationMsg1En">Hi,</string>
     <string name="customerLocationMsg2En">This is Naqel courier, Please share your location through below link to deliver your shipment</string>
     <string name="customerLocationMsg3En">from</string>

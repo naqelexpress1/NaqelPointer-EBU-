@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -195,6 +196,8 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
                 }
             }
         });
+        if (!GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID).equals("Express"))
+            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
     }
 
     private void visibleWeightModule() {

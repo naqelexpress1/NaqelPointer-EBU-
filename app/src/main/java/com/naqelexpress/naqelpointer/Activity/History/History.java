@@ -269,25 +269,49 @@ public class History extends Activity {
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
-                GetDeliverySheet();
+                GetDeliverySheet(0);
+            } else if (parent.getItemAtPosition(pos).toString().equals("Delivery Sheet Pieces")) {
+                ManualFunction = "Delivery Sheet";
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetDeliverySheet(1);
             } else if (parent.getItemAtPosition(pos).toString().equals("At Origin")) {
                 ManualFunction = "At Origin";
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
-                GetAtOrigin();
+                GetAtOrigin(0);
+            } else if (parent.getItemAtPosition(pos).toString().equals("At Origin Pieces")) {
+                ManualFunction = "At Origin";
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetAtOrigin(1);
             } else if (parent.getItemAtPosition(pos).toString().equals("Load to Dest")) {
                 ManualFunction = "Load to Dest";
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
-                GetLoadtoDest();
+                GetLoadtoDest(0);
+            } else if (parent.getItemAtPosition(pos).toString().equals("Load to Dest Pieces")) {
+                ManualFunction = "Load to Dest Pieces";
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetLoadtoDest(1);
             } else if (parent.getItemAtPosition(pos).toString().equals("Arrived at Dest")) {
                 ManualFunction = "Arrived at Dest";
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
-                GetArrivedatDest();
+                GetArrivedatDest(0);
+            } else if (parent.getItemAtPosition(pos).toString().equals("Arrived at Dest Pieces")) {
+                ManualFunction = "Arrived at Dest";
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetArrivedatDest(1);
             } else if (parent.getItemAtPosition(pos).toString().equals("Night Stock")) {
                 ManualFunction = "Night Stock";
                 mydeliverylist = new ArrayList<>();
@@ -385,7 +409,8 @@ public class History extends Activity {
         ArrayList<String> piececodes = new ArrayList<>();
 
         DBConnections db = new DBConnections(getApplicationContext(), null);
-        Cursor result = db.Fill("select * from PickUpAuto where WaybillNo = " + WaybillNo, getApplicationContext());
+        Cursor result = db.Fill("select * from PickUpAuto where WaybillNo = " + WaybillNo,
+                getApplicationContext());
         result.moveToFirst();
         String pieces[];
 
@@ -582,10 +607,13 @@ public class History extends Activity {
         return piececodes;
     }
 
-    private void GetDeliverySheet() {
+    private void GetDeliverySheet(int i) {
         try {
             if (!GetDivision())
-                mydeliverylist.addAll(GlobalVar.getDeliverySheetforEBU(getApplicationContext()));
+                if (i == 0)
+                    mydeliverylist.addAll(GlobalVar.getDeliverySheetforEBU(getApplicationContext()));
+                else
+                    mydeliverylist.addAll(GlobalVar.getDeliverySheetforEBUPieces(getApplicationContext()));
             else
                 mydeliverylist.addAll(GlobalVar.getDeliverySheet(getApplicationContext()));
         } catch (ParseException e) {
@@ -600,28 +628,46 @@ public class History extends Activity {
 
     }
 
-    private void GetArrivedatDest() {
-        mydeliverylist.addAll(GlobalVar.getArrivedatDest(getApplicationContext()));
-        if (mydeliverylist.size() > 0) {
-            myrouteadapter.notifyDataSetChanged();
-            nodata.setVisibility(View.GONE);
-        } else
-            nodata.setVisibility(View.VISIBLE);
-    }
-
-    private void GetLoadtoDest() {
-        mydeliverylist.addAll(GlobalVar.getLoadtoDest(getApplicationContext()));
+    private void GetArrivedatDest(int i) {
+        if (i == 0)
+            mydeliverylist.addAll(GlobalVar.getArrivedatDest(getApplicationContext()));
+        else if (i == 1)
+            mydeliverylist.addAll(GlobalVar.GetArrivedatDestPieces(getApplicationContext()));
         if (mydeliverylist.size() > 0) {
             myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
         } else
             nodata.setVisibility(View.VISIBLE);
 
+        mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                getPickupPieces(myBookingList.get(position).ID);
+
+
+            }
+        });
+    }
+
+    private void GetLoadtoDest(int i) {
+        if (i == 0)
+            mydeliverylist.addAll(GlobalVar.getLoadtoDest(getApplicationContext()));
+        else
+            mydeliverylist.addAll(GlobalVar.getLoadtoDestPiece(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
 
     }
 
-    private void GetAtOrigin() {
-        mydeliverylist.addAll(GlobalVar.getAtOrigin(getApplicationContext()));
+    private void GetAtOrigin(int i) {
+        if (i == 0)
+            mydeliverylist.addAll(GlobalVar.getAtOrigin(getApplicationContext()));
+        else
+            mydeliverylist.addAll(GlobalVar.getAtOriginPieces(getApplicationContext()));
         if (mydeliverylist.size() > 0) {
             myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
@@ -2267,4 +2313,6 @@ public class History extends Activity {
         });
         builderSingle.show();
     }
+
+
 }

@@ -27,6 +27,7 @@ public class PickUpRequest
     public int al;
     public int TruckID = 0;
     public String DeviceToken = "";
+    public int DistrictID;
     //    public double ReceivedAmount;
     public String CurrentVersion = GlobalVar.GV().AppVersion;
     public List<PickUpDetailRequest> PickUpDetailRequestList;

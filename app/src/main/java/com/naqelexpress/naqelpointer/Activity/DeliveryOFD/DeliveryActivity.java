@@ -181,7 +181,8 @@ public class DeliveryActivity extends AppCompatActivity {
 //                                    } else
                                     actualLocation();
                                 } else
-                                    SaveData();
+                                    //SaveData();
+                                    isConfirmActualLocation();
                             }
                         } else
                             GlobalVar.RedirectSettings(DeliveryActivity.this);
@@ -194,7 +195,8 @@ public class DeliveryActivity extends AppCompatActivity {
                             if (division.equals("Express"))
                                 actualLocation();
                             else
-                                SaveData();
+//                                SaveData();
+                                isConfirmActualLocation();
                         }
                     } else
                         GlobalVar.RedirectSettings(DeliveryActivity.this);
@@ -289,12 +291,14 @@ public class DeliveryActivity extends AppCompatActivity {
 //            return;
 //        }
 
+
         if (!dbConnections.UpdateMyRouteActionActivitySeqNo(getApplicationContext(), "Delivered", WaybillNo, bundle.getInt("SeqNo"),
                 bundle.getBoolean("isupdate"))) {
             GlobalVar.ShowDialog(DeliveryActivity.this, "Warning",
                     "Something went wrong , kindly save again", true);
             return;
         }
+
 
         Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + WaybillNo + "'",
                 getApplicationContext());
@@ -473,11 +477,7 @@ public class DeliveryActivity extends AppCompatActivity {
             return isValid;
         }
 
-        if (thirdFragment == null) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
-            isValid = false;
-            return isValid;
-        }
+
 
         if (secondFragment != null) {
             if (secondFragment.txtReceiverName.getText().toString().equals("")) {
@@ -533,6 +533,11 @@ public class DeliveryActivity extends AppCompatActivity {
 
         }
 
+        if (thirdFragment == null) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
+            isValid = false;
+            return isValid;
+        }
         if (thirdFragment != null)
             if (thirdFragment.DeliveryBarCodeList.size() <= 0) {
 //                GlobalVar.GV().ShowMessage(this,"You have to scan the piece barcodes", GlobalVar.AlertType.Error);
@@ -858,6 +863,28 @@ public class DeliveryActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 DeliveryFirstFragment.al = 0;
                 crossvalidation();
+            }
+        }).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
+
+    private void isConfirmActualLocation() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(DeliveryActivity.this);
+        builder.setTitle("Confirm Location?")
+                .setMessage("Is it Consignee Actual Location?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        DeliveryFirstFragment.al = 1;
+                        SaveData();
+                    }
+                }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                DeliveryFirstFragment.al = 0;
+                SaveData();
             }
         }).setCancelable(false);
         AlertDialog alertDialog = builder.create();

@@ -11,13 +11,18 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always" />
 
-    <item
+    <!--<item
         android:id="@+id/camera"
         android:icon="@android:drawable/ic_menu_camera"
         android:orderInCategory="100"
         android:title="Camera"
+        app:showAsAction="always" />-->
+    <item
+        android:id="@+id/refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:orderInCategory="100"
+        android:title="Refresh"
         app:showAsAction="always" />
-
 
     <item
         android:id="@+id/deleteall"

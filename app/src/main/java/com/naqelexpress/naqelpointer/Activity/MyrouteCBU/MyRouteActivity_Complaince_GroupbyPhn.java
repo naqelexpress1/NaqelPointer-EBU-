@@ -38,7 +38,6 @@ import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMap;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
-import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -101,7 +100,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         // toolbar fancy stuff
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Search");
-
 
 
         progressflag = 0;
@@ -773,16 +771,28 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                     System.out.println(e.getMessage());
                 }
                 return true;
-            case R.id.camera:
 
-                if (!GlobalVar.GV().checkPermission(MyRouteActivity_Complaince_GroupbyPhn.this, GlobalVar.PermissionType.Camera)) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(MyRouteActivity_Complaince_GroupbyPhn.this, GlobalVar.PermissionType.Camera);
-                } else {
-                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
-                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+//            case R.id.camera:
+//
+//                if (!GlobalVar.GV().checkPermission(MyRouteActivity_Complaince_GroupbyPhn.this, GlobalVar.PermissionType.Camera)) {
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+//                    GlobalVar.GV().askPermission(MyRouteActivity_Complaince_GroupbyPhn.this, GlobalVar.PermissionType.Camera);
+//                } else {
+//                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
+//                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+//                }
+//                return true;
+
+            case R.id.refresh:
+                if (!GlobalVar.GV().isSeqComplete(getApplicationContext())) {
+                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    dbConnections.RefreshMyRouteActionActivitySeqNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList);
+                    dbConnections.close();
+                    finish();
                 }
+
                 return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -932,8 +942,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);
-                httpURLConnection.setReadTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
-                httpURLConnection.setConnectTimeout(GlobalVar.GV().loadbalance_ConRedtimeout);
+                httpURLConnection.setReadTimeout(130000);
+                httpURLConnection.setConnectTimeout(130000);
                 httpURLConnection.connect();
 
                 dos = httpURLConnection.getOutputStream();
@@ -1511,6 +1521,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
             bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
             bundle.putInt("SeqNo", GlobalVar.GV().myRouteShipmentList.get(position).DsOrderNo);
+            bundle.putInt("isOtp", GlobalVar.GV().myRouteShipmentList.get(position).isOtp);
             bundle.putInt("position", position);
             bundle.putBoolean("isupdate", GlobalVar.GV().myRouteShipmentList.get(position).isupdate);
             intent.putExtras(bundle);

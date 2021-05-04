@@ -11,7 +11,7 @@ public class Booking implements Parcelable {
     public String RefNo = "";
     public int ClientID;
     public String ClientName = "";
-    public String ClientFName = "test";
+    public String ClientFName = "";
     public DateTime BookingDate = DateTime.now();
     public Double PicesCount = 0.0;
     public Double Weight = 0.0;

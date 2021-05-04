@@ -39,6 +39,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
+import com.naqelexpress.naqelpointer.Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.Languages;
 import com.naqelexpress.naqelpointer.Classes.OnUpdateListener;
@@ -59,22 +60,29 @@ import com.naqelexpress.naqelpointer.JSON.Request.DataTableParameters;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPendingCODResult;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
+import com.naqelexpress.naqelpointer.Models.Request.AlertRequest;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -94,7 +102,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "RouteLineSeq-2 16-01-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "WaybillSeriesTest - 01-05-2021 "; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -110,6 +118,9 @@ public class GlobalVar {
     public int AppIDForTH = 0; //for TH only 1
     //
     //
+    public static int ScanWaybillLength = 9;
+    public static String WaybillNoStartSeries = "8,9";
+
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
@@ -2116,6 +2127,7 @@ public class GlobalVar {
                 try {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
                     boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                    String ScannedTime = result.getString(result.getColumnIndex("CTime"));
 
                     JSONArray jsonArray = jsonObject.getJSONArray("WayBills");
                     for (int i = 0; i < jsonArray.length(); i++) {
@@ -2123,6 +2135,8 @@ public class GlobalVar {
                         MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                         onDeliveryRequest.ItemNo = obj.getString("WayBillNo");
                         onDeliveryRequest.IsDelivered = issync;
+                        onDeliveryRequest.ExpectedTime = DateTime.parse(ScannedTime);
+                        onDeliveryRequest.TypeID = 125;
                         DeliverySheetFromLocal.add(onDeliveryRequest);
                     }
 
@@ -2888,6 +2902,8 @@ public class GlobalVar {
     }
 
     public static boolean ValidateAutomacticDate(Context context) {
+//        if (GlobalVar.GV().EmployID <= 0)
+//            GlobalVar.GV().EmployID = GetEmployID(context);
 
         if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
             return true;
@@ -3948,5 +3964,316 @@ public class GlobalVar {
 
     public static String getCSEmail() {
         return "cs@NAQEL.com.sa";
+    }
+
+    //******************************* End Riyam ****************************
+
+    private AlertCallback alertCallback;
+
+    public void CommonAlertMessageActivity(String title, String msg,
+                                           final Activity activity, final AlertRequest alertRequest, final Enum type, String classname) {
+
+        if (classname.equals("SkipWaybillNoinRouteLine"))
+            alertCallback = new SkipWaybillNoinRouteLine();
+        else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
+            alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
+
+        SweetAlertDialog eDialog = new SweetAlertDialog(activity, alertRequest.getAlertType());
+
+        eDialog.setCancelable(alertRequest.getIsCancelable());
+        eDialog.setTitleText(title);
+        eDialog.setContentText(msg);
+        eDialog.setConfirmText("Yes");
+
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+                alertCallback.returnOk(type.getValue(), activity);
+                //if (alertRequest.getIsFinish())
+                //    activity.finish();
+
+            }
+//                activity.finish();
+
+
+        });
+        eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+                alertCallback.returnOk(1, activity);
+
+            }
+        });
+
+
+        eDialog.show();
+    }
+
+    public void CommonProgessAlertMessageActivity(String title, String msg,
+                                                  final Activity activity, final AlertRequest alertRequest,
+                                                  String classname) {
+        if (classname.equals("SkipWaybillNoinRouteLine"))
+            alertCallback = new SkipWaybillNoinRouteLine();
+        else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
+            alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
+
+        SweetAlertDialog eDialog = new SweetAlertDialog(activity, alertRequest.getAlertType());
+
+        eDialog.setCancelable(alertRequest.getIsCancelable());
+        eDialog.setTitleText(title);
+        eDialog.setContentText(msg);
+        alertCallback.returnCancel(1, eDialog);
+        eDialog.show();
+
+    }
+
+    public void alertMsgAll(String title, String msg, Activity activity, Enum type, String classname) {
+
+        AlertRequest alertRequest = new AlertRequest();
+        alertRequest.setAlertType(type.getValue());
+        alertRequest.setIsCancelable(false);
+        alertRequest.setIsFinish(true);
+        alertRequest.setAlrttitle(title);
+        alertRequest.setAlrtmessage(msg);
+
+        if (type.getValue() != Enum.PROGRESS_TYPE.getValue())
+            CommonAlertMessageActivity(title, msg, activity, alertRequest, type, classname);
+        else
+            CommonProgessAlertMessageActivity(title, msg, activity, alertRequest, classname);
+
+
+    }
+
+    public boolean isLastSeqComplete(Context context) {
+
+        boolean returnvalue = false;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from UpdateLastSeqNo Limit 1", context);
+        if (result != null && result.getCount() > 0) {
+
+            result.moveToFirst();
+            int isComplete = result.getInt(result.getColumnIndex("issync"));
+            if (isComplete == 1)
+                returnvalue = true;
+
+        }
+        result.close();
+        dbConnections.close();
+        return returnvalue;
+
+    }
+
+//    public void erroralert(String title, String msg, Activity activity) {
+//        AlertRequest alertRequest = new AlertRequest();
+//        alertRequest.setAlertType(Enum.ERROR_TYPE.getValue());
+//        alertRequest.setIsCancelable(false);
+//        alertRequest.setIsFinish(true);
+//        alertRequest.setAlrttitle(title);
+//        alertRequest.setAlrtmessage(msg);
+//
+//        CommonAlertMessageActivity(title, msg, activity, alertRequest);
+//
+//    }
+
+
+    public static String GetDateTimeFormat(String datetime) {
+        String dtime = "";
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try {
+            Date dt = formatter.parse(datetime);
+
+            DateFormat dfmt = new SimpleDateFormat("dd-MM-yyyy");
+            String dte = dfmt.format(dt);
+
+            DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm");
+            String time = fmt.print(DateTime.parse(datetime));
+            dtime = dte + " " + time;
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return dtime;
+    }
+
+    public static ArrayList<MyRouteShipments> GetArrivedatDestPieces(Context context) {
+
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from AtDestination order by id desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                    String ScannedTime = result.getString(result.getColumnIndex("CTime"));
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("Pallets");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                        onDeliveryRequest.ItemNo = obj.getString("PalletNo");
+                        onDeliveryRequest.IsDelivered = issync;
+                        onDeliveryRequest.ExpectedTime = DateTime.parse(ScannedTime);
+                        onDeliveryRequest.TypeID = 125;
+                        DeliverySheetFromLocal.add(onDeliveryRequest);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getLoadtoDestPiece(Context context) {
+
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from TripPlanDetails order by id desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
+
+                    JSONArray onLoading = jsonObject.getJSONArray("OnLoading");
+                    JSONObject onLoadingJSONObject = onLoading.getJSONObject(0);
+                    String ScannedTime = onLoadingJSONObject.getString("CTime");
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("Barcode");
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject obj = jsonArray.getJSONObject(i);
+                        MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                        onDeliveryRequest.ItemNo = obj.getString("BarCode");
+                        onDeliveryRequest.IsDelivered = issync;
+                        onDeliveryRequest.ExpectedTime = DateTime.parse(ScannedTime);
+                        onDeliveryRequest.TypeID = 125;
+                        DeliverySheetFromLocal.add(onDeliveryRequest);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getDeliverySheetforEBUPieces(Context context)
+            throws ParseException {
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select ocd.BarCode , oc.CTime , ocd.IsSync from OnCLoadingForDDetail ocd inner join OnCloadingForD oc " +
+                "on oc.ID = ocd.OnCLoadingForDID order by CTime asc ", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("BarCode"));
+                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                onDeliveryRequest.TypeID = 125;
+                onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
+                DeliverySheetFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getAtOriginPieces(Context context) {
+
+        ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from AtOrigin order by id desc", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                try {
+                    JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    boolean IsSync = result.getInt(result.getColumnIndex("IsSync")) > 0;
+
+                    JSONArray jsonArray = jsonObject.getJSONArray("AtOriginDetails");
+
+                    if (jsonArray.length() > 0) {
+                        DateTime ExpectedTime = DateTime.parse(jsonObject.getString("CTime"));
+
+//                       String PiecesCount =jsonObject.getString("CTime");
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject obj = jsonArray.getJSONObject(i);
+                            MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                            onDeliveryRequest.ItemNo = obj.getString("BarCode");
+                            onDeliveryRequest.IsDelivered = IsSync;
+                            onDeliveryRequest.ExpectedTime = ExpectedTime;
+                            onDeliveryRequest.TypeID = 125;
+//                        onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PieceCount"));
+                            DeliverySheetFromLocal.add(onDeliveryRequest);
+                        }
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+
+            }
+            while (result.moveToNext());
+
+
+        }
+        dbConnections.close();
+        return DeliverySheetFromLocal;
+    }
+
+    public static int GetEmployID(Context context) {
+
+        int EmployeID = 0;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from UserMeLogin  order by ID desc Limit 1", context);
+        if (result != null && result.getCount() > 0) {
+            result.moveToFirst();
+            EmployeID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
+
+        }
+        dbConnections.close();
+        if (result != null)
+            result.close();
+        return EmployeID;
     }
 }

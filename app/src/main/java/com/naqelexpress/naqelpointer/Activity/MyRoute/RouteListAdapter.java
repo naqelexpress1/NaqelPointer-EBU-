@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
+import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.format.DateTimeFormat;
@@ -165,7 +166,10 @@ public class RouteListAdapter
             }
 
         } else {
-            holder.txtWaybill.setText("Waybill No\n" + item.ItemNo);
+            if (item.TypeID == 125)
+                holder.txtWaybill.setText("Piece \n" + item.ItemNo);
+            else
+                holder.txtWaybill.setText("Waybill No\n" + item.ItemNo);
             holder.txtType.setVisibility(View.VISIBLE);
             holder.imgHasComplaint.setVisibility(View.GONE);
             holder.imgHasDeliveryRequest.setVisibility(View.VISIBLE);
@@ -197,19 +201,22 @@ public class RouteListAdapter
                 holder.txtType.setVisibility(View.VISIBLE);
                 holder.txtWaybill.setText(String.valueOf(item.ItemNo)
                         + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
-               // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
+                // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
 
-            }else if (item.TypeID == 124)//AtOrigin
+            } else if (item.TypeID == 124)//AtOrigin
             {
                 holder.txtType.setVisibility(View.VISIBLE);
                 holder.txtWaybill.setText(String.valueOf(item.ItemNo));
                 // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
 
+            } else if (item.TypeID == 125) { //AtDestination
+                holder.txtExpectedTime.setText(GlobalVar.GetDateTimeFormat(item.ExpectedTime.toString()));
             } else if (item.TypeID != 0) {
                 holder.txtType.setVisibility(View.VISIBLE);
                 holder.txtWaybill.setText("Waybillcount " + String.valueOf(item.TypeID) + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
                 holder.txtType.setText("Pieces Count " + String.valueOf(item.PiecesCount));
             }
+
             holder.imgHasLocation.setVisibility(View.GONE);
             holder.lbDeliveryDate.setVisibility(View.GONE);
             holder.txtAmount.setVisibility(View.GONE);

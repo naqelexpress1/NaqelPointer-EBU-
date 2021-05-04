@@ -98,6 +98,7 @@ public class DeliveryFirstFragment
             Longi = "0";
 
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
+            actualLocation.setVisibility(View.GONE);
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
             txtConsigneeName = (TextView) rootView.findViewById(R.id.txtConsigneeName);
             txtBillingType = (TextView) rootView.findViewById(R.id.txtBillingType);

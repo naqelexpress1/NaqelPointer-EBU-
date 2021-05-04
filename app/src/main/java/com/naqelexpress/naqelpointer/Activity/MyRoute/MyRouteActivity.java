@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
@@ -34,7 +35,6 @@ import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
-import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -75,8 +75,6 @@ public class MyRouteActivity
         setContentView(R.layout.myroutenew);
 
 
-
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -92,6 +90,8 @@ public class MyRouteActivity
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         mapListview.setLayoutManager(mLayoutManager);
 
+        LinearLayout laststopseqtime = (LinearLayout) findViewById(R.id.ll);
+        laststopseqtime.setVisibility(View.GONE);
 
         adapter = new RouteListAdapterNew(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
                 "CourierKpi", this);
@@ -478,16 +478,17 @@ public class MyRouteActivity
                     System.out.println(e.getMessage());
                 }
                 return true;
-            case R.id.camera:
-
-                if (!GlobalVar.GV().checkPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera)) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera);
-                } else {
-                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
-                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
-                }
-                return true;
+            //Replace with Refresh button , for RouteLine Seq
+//            case R.id.camera:
+//
+//                if (!GlobalVar.GV().checkPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera)) {
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+//                    GlobalVar.GV().askPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera);
+//                } else {
+//                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
+//                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+//                }
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -594,7 +595,8 @@ public class MyRouteActivity
                 String function = "BringDeliverySheetbyOFDPiece"; //CBU division
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
-                    function = "BringMyRouteShipments"; //EBU Divison
+                    function = "BringMyRouteShipmentsOtpGeneration";//"BringMyRouteShipments"; //EBU Divison
+
                 if (GlobalVar.GV().isFortesting)
                     function = "BringDeliverySheetFortest"; //EBU Divison
 

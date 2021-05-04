@@ -4,6 +4,11 @@
 
     package="com.naqelexpress.naqelpointer">
 
+    <queries>
+        <package android:name="com.google.android.apps.maps" />
+        <package android:name="com.whatsapp" />
+        <package android:name="com.google.firebase" />
+    </queries>
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission
@@ -1034,8 +1039,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
+        <activity
+            android:name=".Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine"
+            android:label="Skip Waybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
 
 
         <service

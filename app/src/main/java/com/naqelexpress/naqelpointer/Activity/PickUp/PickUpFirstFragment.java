@@ -1,9 +1,12 @@
 package com.naqelexpress.naqelpointer.Activity.PickUp;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,11 +14,15 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -26,7 +33,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
-import com.naqelexpress.naqelpointer.Activity.BookingCBU.Booking;
+import com.naqelexpress.naqelpointer.Activity.Booking.Booking;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
@@ -34,7 +41,13 @@ import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.BringClientData;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
+import com.naqelexpress.naqelpointer.Models.Request.CommonRequest;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
+import com.naqelexpress.naqelpointer.callback.Callback;
+import com.naqelexpress.naqelpointer.utils.PickupApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,12 +56,15 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.app.Activity.RESULT_OK;
 
 public class PickUpFirstFragment
-        extends Fragment {
+        extends Fragment implements AlertCallback, AdapterView.OnItemSelectedListener {
     View rootView;
     SpinnerDialog orgSpinnerDialog, destSpinnerDialog;
     EditText txtOrigin, txtDestination;
@@ -62,13 +78,17 @@ public class PickUpFirstFragment
     public static ArrayList<HashMap<String, String>> clientdetails;
     static int al = 0;
     String division = "";
+    com.toptoche.searchablespinnerlibrary.SearchableSpinner districtspinner;
+    int districtID = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
+        final DBConnections dbConnections = new DBConnections(getContext(), null);
         if (rootView == null) {
+
+
             LayoutInflater lf = getActivity().getLayoutInflater();
             rootView = lf.inflate(R.layout.pickupfirstfragmentnew, container, false);
 
@@ -88,6 +108,30 @@ public class PickUpFirstFragment
             txtRefNo = (EditText) rootView.findViewById(R.id.txtRefNo);
 
             Loadtype = (Spinner) rootView.findViewById(R.id.loadtype);
+            districtspinner = (com.toptoche.searchablespinnerlibrary.SearchableSpinner) rootView.findViewById(R.id.district);
+            districtspinner.setTitle("Select District");
+
+            districtspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View selectedItemView, int position, long id) {
+                    Toast.makeText(getContext(), parent.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
+                    if (parent.getSelectedItem().toString().equals("Select District"))
+                        return;
+                    districtID = dbConnections.getDistrictID(parent.getSelectedItem().toString(), getContext());
+                    if (districtID == -1) {
+                        GlobalVar.GV().alertMsgAll("Info", "Something went wrong , please select District once again",
+                                getActivity(),
+                                Enum.ERROR_TYPE, "PickUpFirstFragmentEBU");
+                        districtspinner.setSelection(0);
+                        districtID = 0;
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
 
             clientdetails = new ArrayList<>();
 
@@ -111,8 +155,11 @@ public class PickUpFirstFragment
             });
 
             String division = GlobalVar.getDivision(getContext());
-            if (division.equals("Express"))
+            if (division.equals("Express")) {
+                LinearLayout lld = (LinearLayout) rootView.findViewById(R.id.lldistrict);
+                lld.setVisibility(View.VISIBLE);
                 actualLocation.setVisibility(View.GONE);
+            }
 
             if (savedInstanceState == null) {
                 GetStationList();
@@ -159,11 +206,13 @@ public class PickUpFirstFragment
                         txtDestination.setText(StationFNameList.get(position));
                     txtPiecesCount.requestFocus();
                     DestinationID = StationList.get(position);
+                    initSpinner(false);
                 }
             });
 
 
         }
+
         String class_ = (String) getArguments().get("class");
         if (class_.equals("BookingDetailAcyivity")) {
             bookinglist = (ArrayList<Booking>) getArguments().get("value");
@@ -171,12 +220,14 @@ public class PickUpFirstFragment
             SetText();
         }
 
-        DBConnections dbConnections = new DBConnections(getContext(), null);
+
         Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
                 GlobalVar.GV().EmployID, getContext());
+
         if (result.getCount() > 0) {
             result.moveToFirst();
             division = result.getString(result.getColumnIndex("Division"));
+
         }
         if (division.equals("Express")) {
             txtOrigin.setFocusable(false);
@@ -240,6 +291,11 @@ public class PickUpFirstFragment
             }
         });
 
+        //FetchDistricData();
+        if (dbConnections != null)
+            dbConnections.close();
+
+
         return rootView;
     }
 
@@ -262,8 +318,8 @@ public class PickUpFirstFragment
 
         try {
 
-            txtWaybillNo.setText(bookinglist.get(position).RefNo);
-            txtWaybillNo.setInputType(InputType.TYPE_NULL);
+            // txtWaybillNo.setText(bookinglist.get(position).RefNo);
+            // txtWaybillNo.setInputType(InputType.TYPE_NULL);
             txtOrigin.setText(bookinglist.get(position).Orgin); //
             OriginID = bookinglist.get(position).OriginId;
             txtDestination.setText(bookinglist.get(position).Destination);
@@ -272,6 +328,7 @@ public class PickUpFirstFragment
             txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
             txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
             txtRefNo.setText(bookinglist.get(position).RefNo);
+            txtRefNo.setInputType(InputType.TYPE_NULL);
             DestinationID = bookinglist.get(position).DestinationId;
         } catch (Exception e) {
             System.out.println(e.toString());
@@ -360,6 +417,7 @@ public class PickUpFirstFragment
         outState.putStringArrayList("StationNameList", StationNameList);
         outState.putStringArrayList("StationFNameList", StationFNameList);
         outState.putSerializable("clientdetails", clientdetails);
+        outState.putInt("districtID", districtID);
     }
 
     @Override
@@ -379,6 +437,7 @@ public class PickUpFirstFragment
             StationList = savedInstanceState.getIntegerArrayList("StationList");
             StationNameList = savedInstanceState.getStringArrayList("StationNameList");
             StationFNameList = savedInstanceState.getStringArrayList("StationFNameList");
+            districtID = savedInstanceState.getInt("districtID");
             clientdetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("clientdetails");
         }
     }
@@ -494,6 +553,136 @@ public class PickUpFirstFragment
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonObjectRequest);
         requestQueue.getCache().remove(URL);
+
+    }
+
+//    private void initSpinner(boolean isexitdialog) {
+//
+//        ArrayAdapter spinnerArrayAdapter = null;
+//        DBConnections dbConnections = new DBConnections(getContext(), null);
+//        if (isexitdialog) {
+//            dbConnections.insertDistrictDataBulk(districtdatas, getContext());
+//            spinnerArrayAdapter = new ArrayAdapter(getActivity(),
+//                    android.R.layout.simple_spinner_item,
+//                    utilities.DistrictModelstoList(districtdatas));
+//        } else
+//            spinnerArrayAdapter = new ArrayAdapter(getActivity(),
+//                    android.R.layout.simple_spinner_item, dbConnections.getDistrictDatas(getContext())
+//            );
+//        dbConnections.close();
+//        // Step 3: Tell the spinner about our adapter
+//        districtspinner.setAdapter(spinnerArrayAdapter);
+//        spinnerArrayAdapter.notifyDataSetChanged();
+//        if (isexitdialog)
+//            exitdialog();
+//
+//    }
+
+    private void initSpinner(boolean isexitdialog) {
+
+        ArrayAdapter spinnerArrayAdapter = null;
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        if (isexitdialog) {
+
+            spinnerArrayAdapter = new ArrayAdapter(getActivity(),
+                    android.R.layout.simple_spinner_item,
+                    dbConnections.getDistrictDatas(getContext(), DestinationID));
+        } else
+            spinnerArrayAdapter = new ArrayAdapter(getActivity(),
+                    android.R.layout.simple_spinner_item, dbConnections.getDistrictDatas(getContext(), DestinationID)
+            );
+        dbConnections.close();
+        // Step 3: Tell the spinner about our adapter
+        districtspinner.setAdapter(spinnerArrayAdapter);
+        spinnerArrayAdapter.notifyDataSetChanged();
+        if (isexitdialog)
+            exitdialog();
+
+    }
+
+    List<DistrictDataModel> districtdatas = new ArrayList<>();
+    static SweetAlertDialog alertDialog;
+
+    public void FetchDistricData() {
+        CommonRequest commonRequest = new CommonRequest();
+        commonRequest.setStationID(GlobalVar.GV().StationID);
+        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch District Datas.",
+                getActivity(),
+                Enum.PROGRESS_TYPE, "PickUpFirstFragmentEBU");
+        PickupApi.fetchdistrictdata(new Callback<List<DistrictDataModel>>() {
+            @Override
+            public void returnResult(List<DistrictDataModel> result) {
+                System.out.println();
+
+                districtdatas.addAll(result);
+                DBConnections dbConnections = new DBConnections(getContext(), null);
+                dbConnections.insertDistrictDataBulk(districtdatas, getContext());
+                dbConnections.close();
+                exitdialog();
+                //initSpinner(true);
+            }
+
+            @Override
+            public void returnError(String message) {
+                //mView.showError(message);
+                exitdialog();
+                System.out.println(message);
+            }
+        }, commonRequest);
+    }
+
+    //Alert Click action
+    @Override
+    public void returnOk(final int value, final Activity activity) {
+
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            exitdialog();
+                            //if (Enum.SUCCESS_TYPE.getValue() == value)
+                            //     activity.finish();
+
+                        }
+                    });
+
+                }
+            });
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    @Override
+    public void returnCancel(int cancel, SweetAlertDialog alertDialog) {
+//        GlobalVar.GV().alertMsgAll("Error", "Please wait to fetch District Datas.",
+//                getActivity(),
+//                Enum.PROGRESS_TYPE, "PickUpFirstFragmentEBU");
+        this.alertDialog = alertDialog;
+    }
+
+    private void exitdialog() {
+        if (alertDialog != null) {
+            alertDialog.dismissWithAnimation();
+            alertDialog = null;
+        }
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+        switch (adapterView.getId()) {
+            case R.id.district:
+                Toast.makeText(getContext(), adapterView.getSelectedItem().toString(), Toast.LENGTH_LONG).show();
+                break;
+        }
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
 }

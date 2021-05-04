@@ -5,12 +5,14 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -19,17 +21,23 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +55,7 @@ import static android.app.Activity.RESULT_OK;
 public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
     View rootView;
-    EditText txtPOS;
+    EditText txtPOS, txtotpno;
     EditText txtCash;
     TextView lbTotal;
     public EditText txtReceiverName;
@@ -67,7 +75,9 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
     //String pic_name = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
     String StoredPath = "";
     int signmand = 0;
+    boolean Isnootp = false;
 
+    CheckBox otpcheckbox;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -78,6 +88,44 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             txtCash = (EditText) rootView.findViewById(R.id.txtCashAmount);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtReceiverName = (EditText) rootView.findViewById(R.id.txtCheckPointType);
+            txtotpno = (EditText) rootView.findViewById(R.id.otpno);
+            txtotpno.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                    // TODO Auto-generated method stub
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    // TODO Auto-generated method stub
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                    if (s.length() == 5) {
+                        DBConnections dbConnections = new DBConnections(getContext(), null);
+                        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + DeliveryFirstFragment.txtWaybillNo.getText().toString() + "'",
+                                getContext());
+
+                        if (result.getCount() > 0) {
+                            result.moveToFirst();
+                            int otpno = result.getInt(result.getColumnIndex("OTPNo"));
+                            String cnname = result.getString(result.getColumnIndex("ConsigneeName"));
+                            if (otpno != Integer.parseInt(txtotpno.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(rootView, "Entered OTPNo is wrong , kindly contact Supervisor", GlobalVar.AlertType.Error);
+
+
+                            } else {
+                                txtReceiverName.setText(cnname);
+                            }
+                        }
+
+                    }
+                }
+            });
 
             txtPOS.addTextChangedListener(this);
             txtCash.addTextChangedListener(this);
@@ -93,6 +141,28 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
             signmand = 0;
 
+
+            if (DeliveryFirstFragment.isOtp == 1) {
+                txtotpno.setVisibility(View.VISIBLE);
+            }
+
+            otpcheckbox = (CheckBox) rootView.findViewById(R.id.nootp);
+
+            otpcheckbox.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    //is chkIos checked?
+                    if (((CheckBox) v).isChecked()) {
+                        showPopupNoOTP();
+                        Isnootp = true;
+                    } else {
+                        Isnootp = false;
+                        popup.dismiss();
+                    }
+
+                }
+            });
 
             Button btn_get_sign = (Button) rootView.findViewById(R.id.signature);
 
@@ -433,6 +503,135 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
                     }
                 }
             }
+        }
+    }
+
+    static EditText iqamaid, phoneno, receivername;
+    PopupWindow popup;
+    boolean IsCancel = false;
+
+    private void showPopupNoOTP() {
+
+
+        try {
+            RelativeLayout viewGroup = (RelativeLayout) rootView.findViewById(R.id.popup);
+            LayoutInflater layoutInflater = (LayoutInflater)
+                    getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+            final View layout = layoutInflater.inflate(R.layout.nootp, null);
+
+
+            int IqamaLength = 0;
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            Cursor result = dbConnections.Fill("select IqamaLength from MyRouteShipments Where ItemNo = '"
+                            + DeliveryFirstFragment.txtWaybillNo.getText().toString() + "'",
+                    getContext());
+
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                IqamaLength = result.getInt(result.getColumnIndex("IqamaLength"));
+
+            }
+            result.close();
+            dbConnections.close();
+
+            iqamaid = (EditText) layout.findViewById(R.id.iqamaid);
+//            iqamaid.setVisibility(View.GONE);
+            iqamaid.setFilters(new InputFilter[]{new InputFilter.LengthFilter(IqamaLength)});
+            phoneno = (EditText) layout.findViewById(R.id.phoneno);
+            receivername = (EditText) layout.findViewById(R.id.receivername);
+
+            Button ok = (Button) layout.findViewById(R.id.ok);
+            Button cancel = (Button) layout.findViewById(R.id.cancel);
+            ok.setOnClickListener(new View.OnClickListener() {
+
+                public void onClick(View v) {
+
+                    if (iqamaid.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Iqama No", GlobalVar.AlertType.Error);
+                        return;
+                    } else if (phoneno.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Mobile No", GlobalVar.AlertType.Error);
+                        return;
+                    } else if (receivername.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Name", GlobalVar.AlertType.Error);
+                        return;
+                    }
+                    IsCancel = true;
+                    popup.dismiss();
+
+                }
+            });
+
+            cancel.setOnClickListener(new View.OnClickListener() {
+
+                public void onClick(View v) {
+                    iqamaid.setText("");
+                    phoneno.setText("");
+                    receivername.setText("");
+                    otpcheckbox.setChecked(false);
+                    Isnootp = false;
+                    IsCancel = true;
+                    popup.dismiss();
+
+                }
+            });
+
+            popup = new PopupWindow(getActivity());
+            popup.setContentView(layout);
+            popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+            popup.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+            popup.setFocusable(true);
+            popup.update();
+            popup.setOutsideTouchable(false);
+            int OFFSET_X = 30;
+            int OFFSET_Y = 30;
+            // Clear the default translucent background
+            popup.setBackgroundDrawable(new BitmapDrawable());
+            popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
+
+            //           popup.setTouchInterceptor(new View.OnTouchListener() {
+
+//                public boolean onTouch(View v, MotionEvent event) {
+//
+//                    if (!isInside(layout, event)) {
+//                        GlobalVar.GV().ShowSnackbar(rootView, "Kindly press Ok/Cancel Button", GlobalVar.AlertType.Error);
+//                        return false;
+//                    }
+////                    if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+////                        //popup.dismiss();
+////                        GlobalVar.GV().ShowSnackbar(rootView, "Kindly press Ok/Cancel Button", GlobalVar.AlertType.Error);
+////                        return true;
+////                    }
+////
+//                    return true;
+//                }
+//            });
+            popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    if (!IsCancel) {
+
+
+                        if (iqamaid.getText().toString().length() == 0) {
+                            GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Iqama No", GlobalVar.AlertType.Error);
+                            showPopupNoOTP();
+                            return;
+                        } else if (phoneno.getText().toString().length() == 0) {
+                            showPopupNoOTP();
+                            GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Mobile No", GlobalVar.AlertType.Error);
+                            return;
+                        } else if (receivername.getText().toString().length() == 0) {
+                            showPopupNoOTP();
+                            GlobalVar.GV().ShowSnackbar(rootView, "Kindly enter Name", GlobalVar.AlertType.Error);
+                            return;
+                        }
+                    }
+                    IsCancel = false;
+                }
+            });
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 }

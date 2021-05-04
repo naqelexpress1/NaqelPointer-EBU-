@@ -189,7 +189,7 @@ public class LocationService extends Service {
                         Mno = result.getString(result.getColumnIndex("MobileNo"));
                     }
                     result.close();
-                    
+
                     if (!devision.equals("Courier"))
                         return;
 
@@ -290,7 +290,7 @@ public class LocationService extends Service {
 
                                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
                                 final DatabaseReference myRef = database.getReference("LiveTracking");
-                                if (Node == "0") {
+                                if (Node == "0" || Node.equals("0")) {
                                     myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -332,7 +332,7 @@ public class LocationService extends Service {
 
                                 }
 
-                                if (Node != "0") {
+                                if (Node != "0" && !Node.equals("0")) {
                                     //String EmpID, String LatLng, String EmpName, String WaybillNo, String MobileNo, String ConsLocation
                                     final CourierDetailsFirebase user = new CourierDetailsFirebase(EID, String.valueOf(location.getLatitude() + "," + location.getLongitude()),
                                             EmpName, WaybillNo, Mno, ConsLocation, NWNo, location.getSpeed(), isnotify, BillingType, CollectedAmount);
@@ -386,8 +386,50 @@ public class LocationService extends Service {
                                     });
                                 }
                             }
-                        }
 
+
+                        } else {
+                            if (!GlobalVar.GV().isLastSeqComplete(getApplicationContext())) {
+
+
+                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                final DatabaseReference myRef = database.getReference("LiveTracking");
+                                final String Node = dbConnections.GetFBNode(getApplicationContext(), Integer.parseInt(EID));
+                                mAuth = FirebaseAuth.getInstance();
+                                if (mAuth.getUid() != null) {
+                                    myRef.orderByChild("EmpID").equalTo(EID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+//
+                                            Map newUserData = new HashMap();
+                                            newUserData.put("LatLng", String.valueOf(location.getLatitude() + "," + location.getLongitude()));
+                                            newUserData.put("NextWaybillNo", "0");
+                                            newUserData.put("EmpID", EID);
+                                            newUserData.put("MobileNo", Mno);
+                                            newUserData.put("ConsLocation", "0.0,0.0");
+                                            newUserData.put("ConsigneeName", "");
+                                            newUserData.put("Speed", location.getSpeed());
+                                            newUserData.put("isnotify", "0");
+                                            newUserData.put("BillingType", "0");
+                                            newUserData.put("CollectedAmount", "0");
+                                            newUserData.put("EmpName", EmpName);
+                                            //  newUserData.put("ConsLocation", ConsLocation);
+                                            myRef.child(Node).updateChildren(newUserData);
+                                            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                                            dbConnections.UpdateLastSeqWaybill(getApplicationContext());
+                                            dbConnections.close();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            Log.d("User", "");
+                                        }
+
+
+                                    });
+                                }
+                            }
+                        }
                         //Commented below for testing
                         if (requestQueue != null)
                             requestQueue.cancelAll("old");

@@ -52,7 +52,8 @@ public class SplashScreenActivity
     FirebaseAnalytics firebaseAnalytics;
     String key = "-MORKAgIlD5uuqZWtgCT";
     public static ArrayList<Location> places = new ArrayList<>();//96346
-    public  String AreaData = "";
+    public String AreaData = "";
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +61,9 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
+//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
+//        dbConnections1.deleteDeliverysheetData(getApplicationContext());
+//        dbConnections1.close();
         //#startRegion
 //        Intent intent = new Intent(SplashScreenActivity.this, RouteMap.class);
 //        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);

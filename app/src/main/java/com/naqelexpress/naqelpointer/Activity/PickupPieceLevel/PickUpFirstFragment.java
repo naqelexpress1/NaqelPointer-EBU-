@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +83,7 @@ public class PickUpFirstFragment
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
             txtWeight = (EditText) rootView.findViewById(R.id.txtWeight);

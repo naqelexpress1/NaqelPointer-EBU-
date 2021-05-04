@@ -379,7 +379,7 @@ public class VerifyMobileNo extends AppCompatActivity {
                     JSONObject jsonObject = new JSONObject(result);
                     if (!jsonObject.getBoolean("HasError")) {
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                        if (dbConnections.IsMobileNoVerified(MNo)) {
+                        if (dbConnections.IsMobileNoVerified("+" + MNo)) {
                             Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
                             startActivity(intent);
                             finish();

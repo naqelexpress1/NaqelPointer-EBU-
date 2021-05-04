@@ -445,14 +445,21 @@ public class DeliverySheetThirdFragment
 
     private void AddNewWaybill(String WaybillNo) {
 
-        if (WaybillNo.length() > 8)
-            WaybillNo = WaybillNo.substring(0, 8);
+        //--Below one for 8 Digits old method
+        // if (WaybillNo.length() > 8)
+        //     WaybillNo = WaybillNo.substring(0, 8);
 
-        if (WaybillNo.toString().length() == 8) {
-            if (!WaybillList.contains(WaybillNo.toString())) {
-                WaybillList.add(0, WaybillNo.toString());
-            }
-        }
+//        if (WaybillNo.toString().length() == 8) {
+//            if (!WaybillList.contains(WaybillNo.toString())) {
+//                WaybillList.add(0, WaybillNo.toString());
+//            }
+//        }
+        // }
+        //_____________________
+        if (!WaybillList.contains(WaybillNo))
+            WaybillList.add(0, WaybillNo);
+
+
     }
 
     private void ShowAlertMessage(String Message) {

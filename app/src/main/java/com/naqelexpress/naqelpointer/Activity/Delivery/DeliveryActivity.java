@@ -26,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.CustomerRating.CustomerRatings;
@@ -84,6 +85,30 @@ public class DeliveryActivity
         ViewPager mViewPager = (ViewPager) findViewById(container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
+
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                if (i == 1) {
+                    if (firstFragment.isOtp == 1)
+                        secondFragment.txtotpno.setVisibility(View.VISIBLE);
+                    else
+                        secondFragment.txtotpno.setVisibility(View.GONE);
+                }
+
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -301,7 +326,18 @@ public class DeliveryActivity
                 dbConnections.UpdateComplaint_Delivered(GlobalVar.getDate(), getApplicationContext());
 
             updateLocation();
-            if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al, "0", "", "",0)) {
+            String iqamaid = "", phoneno = "", rname = "";
+            if (secondFragment.Isnootp) {
+                iqamaid = secondFragment.iqamaid.getText().toString();
+                phoneno = secondFragment.phoneno.getText().toString();
+                rname = secondFragment.receivername.getText().toString();
+            }
+            int otpno = 0;
+            if (secondFragment.txtotpno.getText().toString() != null && secondFragment.txtotpno.getText().toString().length() > 0)
+                otpno = Integer.parseInt(secondFragment.txtotpno.getText().toString());
+            if (dbConnections.InsertOnDelivery(onDelivery, getApplicationContext(), firstFragment.al,
+                    iqamaid, phoneno, rname,
+                    otpno)) {
 
 //                int DeliveryID = dbConnections.getMaxID("OnDelivery", getApplicationContext());
 //                for (int i = 0; i < thirdFragment.DeliveryBarCodeList.size(); i++) {
@@ -410,6 +446,49 @@ public class DeliveryActivity
                 isValid = false;
                 return isValid;
             }
+
+        if (firstFragment.isOtp == 1) {
+            if (GlobalVar.GV().isneedOtp) {
+                if (!secondFragment.Isnootp) {
+                    if (secondFragment.txtotpno.getText().toString().equals("")) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the OTPNo", GlobalVar.AlertType.Error);
+//                GlobalVar.GV().ShowMessage(this,"You have to enter the Receiver Name", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    } else {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        Cursor result = dbConnections.Fill("select * from MyRouteShipments Where ItemNo = '" + firstFragment.txtWaybillNo.getText().toString() + "'",
+                                getApplicationContext());
+
+                        if (result.getCount() > 0) {
+                            result.moveToFirst();
+                            int otpno = result.getInt(result.getColumnIndex("OTPNo"));
+                            if (otpno != Integer.parseInt(secondFragment.txtotpno.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Entered OTPNo is wrong , kindly contact Supervisor", GlobalVar.AlertType.Error);
+                                isValid = false;
+                                return isValid;
+
+                            }
+                        }
+                    }
+                } else if (secondFragment.Isnootp) {
+//                    if (secondFragment.iqamaid.getText().toString().length() == 0) {
+//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Iqama No", GlobalVar.AlertType.Error);
+//                        isValid = false;
+//                        return isValid;
+//                    } else
+                    if (secondFragment.phoneno.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Mobile No", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    } else if (secondFragment.receivername.getText().toString().length() == 0) {
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly enter Name", GlobalVar.AlertType.Error);
+                        isValid = false;
+                        return isValid;
+                    }
+                }
+            }
+        }
         return isValid;
     }
 

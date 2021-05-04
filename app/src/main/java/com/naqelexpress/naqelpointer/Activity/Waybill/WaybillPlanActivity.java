@@ -464,6 +464,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         outState.putString("EmployName", GlobalVar.GV().EmployName);
         outState.putString("EmployStation", GlobalVar.GV().EmployStation);
         try {
+
             outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
             outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
 
@@ -483,8 +484,12 @@ public class WaybillPlanActivity extends AppCompatActivity
         GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
         GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
         GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
-        GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
-        GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+        try {
+            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
+            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+        } catch (Exception e) {
+            
+        }
     }
 
     PopupWindow popup;
@@ -941,7 +946,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 getWaybillNo() + " " +
                 getString(R.string.customerLocationMsg3En) + " " +
                 getClientName();
-        final String infoTrackLink = getString(R.string.infotrackLocationLink);
+        final String infoTrackLink = getString(R.string.infotrackLocationLink)+getWaybillNo();
         return locationMsgAr + "\n\n" + locationMsgEn + "\n\n" + infoTrackLink;
     }
 

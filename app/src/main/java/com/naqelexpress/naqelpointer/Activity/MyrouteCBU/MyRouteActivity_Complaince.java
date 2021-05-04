@@ -38,7 +38,6 @@ import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_SingleWaybill;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
-import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -730,16 +729,17 @@ public class MyRouteActivity_Complaince
                     System.out.println(e.getMessage());
                 }
                 return true;
-            case R.id.camera:
-
-                if (!GlobalVar.GV().checkPermission(MyRouteActivity_Complaince.this, GlobalVar.PermissionType.Camera)) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                    GlobalVar.GV().askPermission(MyRouteActivity_Complaince.this, GlobalVar.PermissionType.Camera);
-                } else {
-                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
-                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
-                }
-                return true;
+            //Replace with Refresh button , for RouteLine Seq
+//            case R.id.camera:
+//
+//                if (!GlobalVar.GV().checkPermission(MyRouteActivity_Complaince.this, GlobalVar.PermissionType.Camera)) {
+//                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+//                    GlobalVar.GV().askPermission(MyRouteActivity_Complaince.this, GlobalVar.PermissionType.Camera);
+//                } else {
+//                    Intent intent = new Intent(getApplicationContext().getApplicationContext(), NewBarCodeScanner.class);
+//                    startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+//                }
+//                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

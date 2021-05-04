@@ -21,6 +21,7 @@ public class PickUp {
     public String Latitude = "";
     public String Longitude = "";
     public String CurrentVersion = GlobalVar.GV().AppVersion;
+    public int DistrictID = 0;
 
     public PickUp(int ID) {
         this.ID = ID;
@@ -28,7 +29,7 @@ public class PickUp {
 
     public PickUp(int waybillNo, int clientID, int fromStationID, int toStationID, int pieceCount,
                   double weight, DateTime timeIn, DateTime timeOut, String refNo,
-                  String latitude, String longitude) {
+                  String latitude, String longitude, int DistrictID) {
         WaybillNo = waybillNo;
         ClientID = clientID;
         FromStationID = fromStationID;
@@ -40,5 +41,6 @@ public class PickUp {
         RefNo = refNo;
         Latitude = latitude;
         Longitude = longitude;
+        this.DistrictID = DistrictID;
     }
 }

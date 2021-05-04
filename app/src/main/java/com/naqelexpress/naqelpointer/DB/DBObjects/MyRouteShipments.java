@@ -98,7 +98,7 @@ public class MyRouteShipments implements Parcelable {
     public double CustomDuty; //Added by Riyam
     public int isArea = 0;
     public String AreaData = "";
-    public int isOtp; //Added by Riyam
+    public int isOtp;
 
     public MyRouteShipments() {
 

@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.PickUp;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -217,6 +220,10 @@ public class PickUpFirstFragment
         if (class_.equals("BookingDetailAcyivity")) {
             bookinglist = (ArrayList<Booking>) getArguments().get("value");
             position = (Integer) getArguments().get("position");
+            SetTextEbu();
+        } else if (class_.equals("BookingDetailAcyivityforCBU")) {
+            bookinglist = (ArrayList<Booking>) getArguments().get("value");
+            position = (Integer) getArguments().get("position");
             SetText();
         }
 
@@ -295,6 +302,22 @@ public class PickUpFirstFragment
         if (dbConnections != null)
             dbConnections.close();
 
+        txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    onBackpressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+
+                    setTxtWaybillNo(txtWaybillNo.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return rootView;
     }
@@ -318,18 +341,43 @@ public class PickUpFirstFragment
 
         try {
 
-            // txtWaybillNo.setText(bookinglist.get(position).RefNo);
+            txtWaybillNo.setText(bookinglist.get(position).RefNo);
+            txtWaybillNo.setInputType(InputType.TYPE_NULL);
+            txtOrigin.setText(bookinglist.get(position).Orgin); //
+            OriginID = bookinglist.get(position).OriginId;
+            txtDestination.setText(bookinglist.get(position).Destination);
+            txtDestination.setInputType(InputType.TYPE_NULL);
+            //txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+
+            DestinationID = bookinglist.get(position).DestinationId;
+            txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
+            //txtWeight.setText(String.valueOf(bookinglist.get(0).Weight));
+            //txtRefNo.setText(bookinglist.get(position).RefNo);
+            //txtRefNo.setInputType(InputType.TYPE_NULL);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+    }
+
+    private void SetTextEbu() {
+
+        try {
+
+            //txtWaybillNo.setText(bookinglist.get(0).RefNo);
             // txtWaybillNo.setInputType(InputType.TYPE_NULL);
             txtOrigin.setText(bookinglist.get(position).Orgin); //
             OriginID = bookinglist.get(position).OriginId;
             txtDestination.setText(bookinglist.get(position).Destination);
             txtDestination.setInputType(InputType.TYPE_NULL);
-            txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+            //txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+
+            DestinationID = bookinglist.get(position).DestinationId;
             txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
-            txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
+            //txtWeight.setText(String.valueOf(bookinglist.get(0).Weight));
             txtRefNo.setText(bookinglist.get(position).RefNo);
             txtRefNo.setInputType(InputType.TYPE_NULL);
-            DestinationID = bookinglist.get(position).DestinationId;
+            txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+            txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
         } catch (Exception e) {
             System.out.println(e.toString());
         }
@@ -361,15 +409,23 @@ public class PickUpFirstFragment
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
+
                         String barcode = extras.getString("barcode");
-                        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
-                        txtWaybillNo.setText(barcode);
+                        setTxtWaybillNo(barcode);
                     }
                 }
             }
         }
     }
 
+    private void setTxtWaybillNo(String barcode) {
+
+        if (barcode.length() > 8 && barcode.substring(0, 1).contains(GlobalVar.WaybillNoStartSeries)) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+        } else
+            txtWaybillNo.setText(barcode);
+        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
+    }
 
     public ArrayList<Integer> StationList = new ArrayList<>();
     public ArrayList<String> StationNameList = new ArrayList<>();
@@ -683,6 +739,22 @@ public class PickUpFirstFragment
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit PickUp")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
 
     }
 }

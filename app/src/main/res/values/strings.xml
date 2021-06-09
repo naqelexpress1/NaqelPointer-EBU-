@@ -347,5 +347,13 @@
     <!-- CS Support -->
     <string name="csSupportMsg1En">For customer service support, please contact us on:</string>
     <string name="csSupportMsg1Ar">عزيزي العميل، للمساعدة وطلب الدعم الرجاء التواصل معنا على:</string>
+
+
     <!-- End Riyam New whatsapp messages 25/1/2021 -->
+    <!-- ASR Watsapp MEssages location sharing -->
+    <string name="asr_whatsapplocation1"> Hello! This is NAQEL courier. Please share your location for picking up Return Shipment
+         </string>
+    <string name="asr_whatsapplocation2"> for   </string>
+    <string name="asr_whatsapplocation3"> using Link: </string>
+
 </resources>

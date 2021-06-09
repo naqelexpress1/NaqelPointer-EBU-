@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
+import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -74,8 +75,9 @@ public class VerifyMobileNo extends AppCompatActivity {
                 HashMap<String, String> temp = new HashMap<>();
                 int ismobilnoverified = result.getInt(result.getColumnIndex("IsMobileNoVerified"));
                 if (ismobilnoverified == 1) {
-                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
-                    startActivity(intent);
+//                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+//                    startActivity(intent);
+                    courierRatingPage();
                     finish();
                 }
 
@@ -85,6 +87,13 @@ public class VerifyMobileNo extends AppCompatActivity {
         } catch (Exception e) {
             System.out.println(e.toString());
         }
+    }
+
+
+    private void courierRatingPage() {
+        Intent intent = new Intent(getApplicationContext(), CourierRating.class);
+        startActivity(intent);
+        finish();
     }
 
     String MNo = "";

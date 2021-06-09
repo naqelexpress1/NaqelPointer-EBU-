@@ -4,22 +4,27 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -49,6 +54,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 public class BookingDetailActivity extends AppCompatActivity
         implements OnMapReadyCallback {
 
@@ -56,7 +63,7 @@ public class BookingDetailActivity extends AppCompatActivity
             txtDestination, txtPiecesCount, txtWeight, txtBillType, txtLoadType, txtReqTime, txtCloseTime,
             txtRReqTime, txtRCloseTime, txtSpecialInst;
     private GoogleMap mMap;
-    Booking myBooking;
+    BookingModel myBooking;
     String ConsigneeLatitude, ConsigneeLongitude;
     Marker now;
     double Latitude = 0;
@@ -64,7 +71,7 @@ public class BookingDetailActivity extends AppCompatActivity
     LatLng latLng;
     private int BookingId;
     int position;
-    ArrayList<Booking> bookinglist;
+    ArrayList<BookingModel> bookinglist;
     ArrayList<String> name;
     ArrayList<Integer> IDs;
 
@@ -82,7 +89,13 @@ public class BookingDetailActivity extends AppCompatActivity
 
 
         position = bundle.getInt("position");
-        bookinglist = getIntent().getParcelableArrayListExtra("value");
+        bookinglist = (ArrayList<BookingModel>) getIntent().getSerializableExtra("value");
+        //bookinglist = BookingList.myBookingList;
+        if (bookinglist.size() == 0) {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            bookinglist =
+                    dbConnections.getPickupSheetDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
+        }
         name = getIntent().getStringArrayListExtra("name");
         IDs = getIntent().getIntegerArrayListExtra("IDs");
 
@@ -101,59 +114,63 @@ public class BookingDetailActivity extends AppCompatActivity
         txtCloseTime = (TextView) findViewById(R.id.txtCloseTime);
 //        txtRReqTime = (TextView) findViewById(R.id.txtRReqTime);
 //        txtRCloseTime = (TextView) findViewById(R.id.txtRCloseTime);
+
         txtSpecialInst = (TextView) findViewById(R.id.txtSpecialInstruction);
 
         Date currentTime = Calendar.getInstance().getTime();
 
         TextView txtRemReqTime = (TextView) findViewById(R.id.txtRemReqTime);
-        txtRemReqTime.setVisibility(View.INVISIBLE);
+
         TextView txtRemCloseTime = (TextView) findViewById(R.id.txtRemCloseTime);
-        txtRemCloseTime.setVisibility(View.INVISIBLE);
+
 
         //BookingId=GlobalVar.GV().myBookingList.get(position).ID;
 
         myBooking = bookinglist.get(position);
-        txtReferenceNo.setText(bookinglist.get(position).RefNo);
+        txtReferenceNo.setText(String.valueOf(myBooking.getWaybillNo()));
         txtClientId.setText(String.valueOf(myBooking.ClientID));
         txtClient.setText(myBooking.ClientName);
-        txtContactPerson.setText(bookinglist.get(position).ContactPerson);
-        txtContactNo.setText(bookinglist.get(position).ContactNumber);
-        txtOrgin.setText(bookinglist.get(position).Orgin);
-        txtDestination.setText(bookinglist.get(position).Destination);
+        txtContactPerson.setText(myBooking.ConsigneeName);
+        txtContactNo.setText(myBooking.getPhoneNo());
+        txtOrgin.setText(myBooking.getOrgCode());
+        txtDestination.setText(myBooking.getDestCode());
 
 
-        txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
-        txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
-        txtBillType.setText(bookinglist.get(position).BillType);
-        txtLoadType.setText(bookinglist.get(position).LoadType);
+//        txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
+        txtPiecesCount.setVisibility(View.INVISIBLE);
+        //txtWeight.setText(String.valueOf(bookinglist.get(position).Weight));
+        txtWeight.setVisibility(View.INVISIBLE);
+        txtBillType.setText(myBooking.getCode());
+        //txtLoadType.setText(bookinglist.get(position).LoadType);
         txtLoadType.setVisibility(View.INVISIBLE);
         DateTimeFormatter fmtRT = DateTimeFormat.forPattern("HH:mm");
-        String dateStringRT = fmtRT.print(DateTime.parse(bookinglist.get(position).PickUpReqDT));
+        String dateStringRT = fmtRT.print(DateTime.parse(myBooking.Date));
 
         txtReqTime.setText(dateStringRT);
-        txtCloseTime.setText(bookinglist.get(position).OfficeUpTo.toString("HH:mm"));
+        //txtCloseTime.setText(bookinglist.get(position).OfficeUpTo.toString("HH:mm"));
+
 
         //txtRReqTime.setText(String.format("%R",(DateTime.now().minuteOfHour()-myBooking.PickUpReqDT)));
         // txtRCloseTime.setText(DateTime.now()-myBooking.OfficeUpTo);
 
 
-        txtSpecialInst.setText(bookinglist.get(position).SpecialInstruction);
+//        txtSpecialInst.setText(bookinglist.get(position).SpecialInstruction);
 
 
-        ConsigneeLatitude = myBooking.Latitude;
-        ConsigneeLongitude = myBooking.Longitude;
+        ConsigneeLatitude = myBooking.getLat();
+        ConsigneeLongitude = myBooking.getLng();
 
-        if (bookinglist.get(position).BillType.equals("A"))
+        if (myBooking.getCode().equals("A"))
             txtBillType.setText("On Account");
-        else if (bookinglist.get(position).BillType.equals("C"))
+        else if (myBooking.getCode().equals("C"))
             txtBillType.setText("Cash");
-        else if (bookinglist.get(position).BillType.equals("E"))
+        else if (myBooking.getCode().equals("E"))
             txtBillType.setText("External Billing");
-        else if (bookinglist.get(position).BillType.equals("F"))
+        else if (myBooking.getCode().equals("F"))
             txtBillType.setText("Free of Cost");
-        else if (bookinglist.get(position).BillType.equals("COD"))
+        else if (myBooking.getCode().equals("COD"))
             txtBillType.setText("Cash on Delivery");
-        else if (bookinglist.get(position).BillType.equals("FOD"))
+        else if (myBooking.getCode().equals("FOD"))
             txtBillType.setText("Freight on Delivery");
         else
             txtBillType.setText("Contact Admin");
@@ -223,6 +240,13 @@ public class BookingDetailActivity extends AppCompatActivity
             finish();
         }
 
+        txtRemReqTime.setVisibility(View.GONE);
+        txtRemCloseTime.setVisibility(View.GONE);
+        txtPiecesCount.setVisibility(View.GONE);
+        txtWeight.setVisibility(View.GONE);
+        txtLoadType.setVisibility(View.GONE);
+        txtCloseTime.setVisibility(View.GONE);
+        txtSpecialInst.setVisibility(View.GONE);
     }
 
 
@@ -249,19 +273,49 @@ public class BookingDetailActivity extends AppCompatActivity
                 BookingDetailActivity.this);
     }
 
+    public void sendWatsapp(View view) {
+
+
+        String mobileno = myBooking.getPhoneNo();
+        if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0) {
+            if (mobileno.length() == 10) {
+                String validate = mobileno.substring(0, 1);
+                if (validate.equals("0"))
+                    mobileno = mobileno.replaceFirst("0", "+966");
+            } else {
+                if (mobileno.length() > 10) {
+                    if (mobileno.contains("00966"))
+                        mobileno = mobileno.replaceFirst("00966", "+966");
+                } else if (mobileno.length() == 9) {
+                    mobileno = "+966" + mobileno;
+                }
+            }
+
+//                    GlobalVar.GV().MessageWhatsApp(rootView.getContext(),txtMobileNo.getTag().toString(),"hellow");
+
+            showPopup(mobileno);
+        } else
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Is not valid mobile number.", GlobalVar.AlertType.Warning);
+    }
+
     public void Delivered(View view) {
         //Status is Pickup
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        dbConnections.UpdateBookingStatus(BookingId, 3, view, getApplicationContext());
-        dbConnections.close();
+        try {
 
-        Intent intent = new Intent(BookingDetailActivity.this, PickUpActivity.class);
-        Bundle bundle = new Bundle();
-        intent.putParcelableArrayListExtra("value", bookinglist);
-        bundle.putString("class", "BookingDetailAcyivity");
-        bundle.putInt("position", position);
-        intent.putExtras(bundle);
-        startActivityForResult(intent, 0);
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.UpdateBookingStatus(BookingId, 3, view, getApplicationContext());
+            dbConnections.close();
+
+            Intent intent = new Intent(BookingDetailActivity.this, PickUpActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("value", bookinglist);
+            bundle.putString("class", "BookingDetailAcyivityforCBU");
+            bundle.putInt("position", position);
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 0);
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
         //To do need to call API
     }
 
@@ -338,12 +392,12 @@ public class BookingDetailActivity extends AppCompatActivity
                             jsonObject.put("Longitude", String.valueOf(Longitude));
                             jsonObject.put("Notes", Notes);
                             jsonObject.put("PickupExceptionID", exceptionID);
-                            jsonObject.put("PSDID", bookinglist.get(position).PSDID);
-                            jsonObject.put("PSID", bookinglist.get(position).PSID);
+                            jsonObject.put("PSDID", myBooking.getPickupsheetDetailID());
+                            jsonObject.put("PSID", myBooking.getPickupSheetID());
                             jsonObject.put("StationID", GlobalVar.GV().StationID);
                             jsonObject.put("TimeIn", DateTime.now());
                             jsonObject.put("UserID", GlobalVar.GV().UserID);
-                            jsonObject.put("WaybillNo", bookinglist.get(position).RefNo);
+                            jsonObject.put("WaybillNo", myBooking.getWaybillNo());
 
 
                             String jsonData = jsonObject.toString();
@@ -396,6 +450,20 @@ public class BookingDetailActivity extends AppCompatActivity
         now = mMap.addMarker(new MarkerOptions().position(GlobalVar.GV().currentLocation)
                 .icon(icon)
                 .title(getString(R.string.MyLocation)));
+        ShowShipmentMarker();
+    }
+
+    private void ShowShipmentMarker() {
+        if (ConsigneeLongitude.length() > 3 && ConsigneeLongitude.length() > 3) {
+            LatLng latLng = new LatLng(GlobalVar.GV().getDoubleFromString(ConsigneeLatitude), GlobalVar.GV().getDoubleFromString(ConsigneeLongitude));
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.deliverymarker);
+            mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .icon(icon)
+                    .title(String.valueOf(myBooking.getWaybillNo())));
+        }
+//        else
+//            mapFragment.getView().setVisibility(View.GONE);
     }
 
     @Override
@@ -491,6 +559,13 @@ public class BookingDetailActivity extends AppCompatActivity
                 try {
                     JSONObject jsonObject = new JSONObject(finalJson);
                     crreateAlert(jsonObject.getString("ErrorMessage"));
+                    if (!jsonObject.getBoolean("HasError")) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        BookingList.isException = true;
+                        dbConnections.UpdatepickupsheetdetailsID(myBooking.getWaybillNo(), 1);
+                        BookingList.myBookingList.get(myBooking.sNo - 1).setIsPickedup(1);
+                        dbConnections.close();
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -517,5 +592,138 @@ public class BookingDetailActivity extends AppCompatActivity
 
         AlertDialog dialog1 = builder.create();
         dialog1.show();
+    }
+
+    PopupWindow popup;
+
+    private void showPopup(final String mobileno) {
+
+
+        LinearLayout viewGroup = (LinearLayout) findViewById(R.id.popup);
+        LayoutInflater layoutInflater = (LayoutInflater)
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        View layout = layoutInflater.inflate(R.layout.messagedrafts, viewGroup);
+
+        final TextView customerlocation = (TextView) layout.findViewById(R.id.customerlocation);
+        final TextView frontofthedoor = (TextView) layout.findViewById(R.id.frontofthedoor);
+        final TextView cssupport = (TextView) layout.findViewById(R.id.cssupport);
+        final TextView resndotp = (TextView) layout.findViewById(R.id.resendotp);
+        resndotp.setVisibility(View.GONE);
+        final String arabic = "عزيزي العميل, n\n  رجاء قم بمشاركة موقعك على الرابط المرفق أدناه لنقوم بتوصيل شحنتك.(" + " " +
+                myBooking.getWaybillNo()
+                + ") من)" + myBooking.getClientName();
+
+        customerlocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ConsigneeLatitude != null && ConsigneeLatitude.length() < 2)
+//                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
+//                            + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
+//                            + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
+//                            + txtWaybillNo.getText().toString(), getApplicationContext());
+                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getLocationMsg(), getApplicationContext());
+                else
+                    alertforcommon();
+
+                popup.dismiss();
+            }
+        });
+        frontofthedoor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.doorPredefinedMsg)
+//                        + " " + txtWaybillNo.getText().toString() + getString(R.string.doorPredefinedMsg1)
+//                        + txtShipperName.getText().toString() + getString(R.string.doorPredefinedMsg2)
+//                        + txtWaybillNo.getText().toString() + "\n\n\n" + arabic, getApplicationContext());
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getFrontDoorMsg(), getApplicationContext());
+                popup.dismiss();
+            }
+        });
+        cssupport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+//                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.csPredefinedMsg) + "\n\n\n" + arabic, getApplicationContext());
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getCsSupportMsg(), getApplicationContext());
+                popup.dismiss();
+            }
+        });
+
+
+        popup = new PopupWindow(BookingDetailActivity.this);
+        popup.setContentView(layout);
+        popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
+        popup.setFocusable(true);
+        popup.update();
+        popup.setOutsideTouchable(false);
+        int OFFSET_X = 30;
+        int OFFSET_Y = 30;
+        // Clear the default translucent background
+        popup.setBackgroundDrawable(new BitmapDrawable());
+        popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
+    }
+
+    private String getLocationMsg() {
+        String armsg1 = "مرحبا , أنا مندوب شركة ناقل الرجاء مشاركة الموقع عبر الرابط التالي:  ";
+        String armsg2 = "من اجل استلام الشحنة ";
+        String armsg3 = "من";
+        String armsg4 = "للاسترجاع";
+        final String locationMsgAr = armsg1 + "\n" +
+                getString(R.string.infotrackLocationLink) + " " + armsg2 + " " +
+                getWaybillNo() + " " + armsg3 + " " +
+
+                getClientName() + " " + armsg4;
+
+        final String locationMsgEn = "Hello! This is NAQEL courier. Please share your location " +
+                "for picking up Return Shipment " + "\n" +
+
+                getWaybillNo() + " for " +
+                getClientName() + " using Link: " + getString(R.string.infotrackLocationLink);
+
+
+        return locationMsgAr + "\n\n" + locationMsgEn;
+    }
+
+    private String getWaybillNo() {
+        return String.valueOf(myBooking.getWaybillNo());
+    }
+
+    private String getClientName() {
+        return myBooking.getClientName();
+    }
+
+    private String getFrontDoorMsg() {
+        String armsg1 = "مرحبا , مندوب ناقل وصل الى موقعك لاستلام شحنتكم ";
+        String armsg2 = "من";
+        final String frontDoorMsgAr = armsg1 +
+                getWaybillNo() + " " + armsg2 + " " +
+                getClientName();
+        final String frontDoorMsgEn = "Hello! NAQEL courier has arrived at your front door to pick up Return shipment" +
+                getWaybillNo() + " for " +
+                getClientName();
+        return frontDoorMsgAr + "\n\n" + frontDoorMsgEn;
+    }
+
+    private String getCsSupportMsg() {
+        final String csSupportMsgAr = getString(R.string.csSupportMsg1Ar) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        final String csSupportMsgMsgEn = getString(R.string.csSupportMsg1En) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        return csSupportMsgAr + "\n\n" + csSupportMsgMsgEn;
+    }
+
+    private void alertforcommon() {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(true);
+        eDialog.setTitleText("Has Location");
+        eDialog.setContentText("This Shipment already has Location , kindly please start");
+        eDialog.show();
+
     }
 }

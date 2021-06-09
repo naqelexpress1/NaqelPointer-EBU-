@@ -1,0 +1,31 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.naqelexpress.naqelpointer.Activity.MyRoute.MyRouteActivity">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:orderInCategory="100"
+        android:title="Search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/refresh"
+        android:icon="@android:drawable/ic_menu_rotate"
+        android:orderInCategory="100"
+        android:title="Refresh"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/deleteall"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:iconTint="@color/NaqelRed"
+        android:orderInCategory="100"
+        android:title="Delete"
+        app:showAsAction="always"
+        tools:ignore="HardcodedText" />
+
+
+</menu>

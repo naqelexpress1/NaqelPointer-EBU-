@@ -39,6 +39,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
+import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
 import com.naqelexpress.naqelpointer.Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.Languages;
@@ -102,7 +103,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "WaybillSeriesTest - 01-05-2021 "; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "Pickup : Piece/Weight - 08-06-2021 "; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -119,32 +120,22 @@ public class GlobalVar {
     //
     //
     public static int ScanWaybillLength = 9;
-    public static String WaybillNoStartSeries = "8,9";
+    public static int ScanBarcodeLength = 14;
+    public static String WaybillNoStartSeries = "8";
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
-    public String NaqelPointerAPILink_For5_1 = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink_For5_2 = "http://35.188.10.142:8084/Api/Pointer/"; // http://35.188.10.142:8001/NaqelPointer/NewStructure/Api/Pointer/
-    public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink_UploadImage = "http://35.188.10.142:8084/Api/Pointer/";
-    // public String NaqelPointerAPILink = "http://34.93.221.35/NaqelPointer/api/pointer/"; NaqelWay IP
-    // public String NaqelPointerAPILink1_ForDomain = "https://mobilepointerapi2.naqelexpress.com/Api/Pointer/"; //NaqelWay
-    // public String NaqelPointerAPILink2_ForDomain = "https://mobilepointerapi1.naqelexpress.com/Api/Pointer/";//RouteOptimization
-    public String NaqelPointerAPILink1_ForDomain = "http://34.93.221.35/NaqelPointer/api/pointer/";
-    public String NaqelPointerAPILink2_ForDomain = "http://35.188.10.142:8084/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+    public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+    public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+    public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
     public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
-    // public String NaqelPointerAPILink = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
-    //public String NaqelPointerAPILink = "http://35.188.10.142:8001/NaqelPointer/V2/Api/Pointer/";
-    public String NaqelPointerLivetracking = "http://35.188.10.142:8001/NaqelPointer/V9/Home/";
-    public String NaqelPointerLivetrackingLocation = "http://35.188.10.142:8001/NaqelPointer/V9/Location/";
-    //    public String NaqelPointerLivetrackingPusher = "http://35.188.10.142:8098/Location/PusherApi";
-    public String NaqelPointerLivetrackingPusher = "http://212.12.186.108:8080/api/CourierLocation/InsertCourierLocation";
-    public String NaqelApk = "http://35.188.10.142:8001/NaqelPointer/Download/";
-    //private static String NaqelAPITest_V10 = "http://35.188.10.142:8001/NaqelPointer/V10/Api/Pointer/";
-    //public static String NaqelAPIUAT = "http://35.188.10.142:8087/api/pointer/";
-    // public static String NaqelLocalAPI = "http://192.168.3.16:45461/api/pointer/";
+    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
     static IPointerAPI iPointerAPI;
 
 
@@ -159,10 +150,7 @@ public class GlobalVar {
     public boolean isneedOtp = true;
 
     public boolean isFortesting = false;
-
-    //public String NaqelPointerAPILink = "http://212.93.160.150/NaqelAPIServices/RouteOptimization/2.0/WCFRouteOptimization.svc/";
-    //public String NaqelPointerWebAPILink = "http://212.93.160.150/NaqelAPIServices/InfoTrackWebAPI/1.0/API/";
-    // public String NaqelPointerWebAPILink = "https://infotrack.naqelexpress.com/NaqelAPIServices/RouteOptimization/3.3/API/";
+    public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;
     public String EmployName = "";
@@ -1283,6 +1271,7 @@ public class GlobalVar {
         haslocation.clear();
 //        MyRouteActivity.places.clear();
         MyRouteActivity_Complaince_GroupbyPhn.places.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.clear();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED &&
@@ -1292,10 +1281,11 @@ public class GlobalVar {
             Location location = GlobalVar.getLastKnownLocation(context);
             location.setSpeed(0);
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
-            if (location != null)
-
+            if (location != null) {
 //                MyRouteActivity.places.add(location);
                 MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+                MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(location);
+            }
         }
 
         DBConnections dbConnections = new DBConnections(context, null);
@@ -1348,6 +1338,8 @@ public class GlobalVar {
                         if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
 //                            MyRouteActivity.places.add(sp);
                             MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
+                        if (result.getInt(result.getColumnIndex("IsPlan")) == 1)
+                            MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(sp);
 
                     }
 
@@ -1457,6 +1449,7 @@ public class GlobalVar {
         haslocation.clear();
 //        MyRouteActivity.places.clear();
         MyRouteActivity_Complaince_GroupbyPhn.places.clear();
+        MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.clear();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED &&
@@ -1466,10 +1459,12 @@ public class GlobalVar {
             Location location = GlobalVar.getLastKnownLocation(context);
             location.setSpeed(0);
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
-            if (location != null)
-
+            if (location != null) {
 //                MyRouteActivity.places.add(location);
                 MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+
+                MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(location);
+            }
 
         }
 
@@ -1528,6 +1523,8 @@ public class GlobalVar {
                         if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
 //                            MyRouteActivity.places.add(sp);
                             MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
+                        if (result.getInt(result.getColumnIndex("IsPlan")) == 1)
+                            MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(sp);
                     }
 
                     myRouteShipments.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
@@ -2163,11 +2160,15 @@ public class GlobalVar {
 
         DBConnections dbConnections = new DBConnections(context, null);
         Cursor result = dbConnections.Fill("select * from TripPlanDetails order by id desc", context);
+
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
                 try {
                     JSONObject jsonObject = new JSONObject(result.getString(result.getColumnIndex("Json")));
+                    JSONArray onLoading = jsonObject.getJSONArray("OnLoading");
+                    JSONObject onLoadingJSONObject = onLoading.getJSONObject(0);
+                    String ScannedTime = onLoadingJSONObject.getString("CTime");
                     boolean issync = result.getInt(result.getColumnIndex("IsSync")) > 0;
 
                     JSONArray jsonArray = jsonObject.getJSONArray("WayBill");
@@ -2175,6 +2176,7 @@ public class GlobalVar {
                         JSONObject obj = jsonArray.getJSONObject(i);
                         MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                         onDeliveryRequest.ItemNo = obj.getString("WaybillNo");
+                        onDeliveryRequest.ExpectedTime = DateTime.parse(ScannedTime);
                         onDeliveryRequest.IsDelivered = issync;
                         DeliverySheetFromLocal.add(onDeliveryRequest);
                     }
@@ -2902,9 +2904,8 @@ public class GlobalVar {
     }
 
     public static boolean ValidateAutomacticDate(Context context) {
-//        if (GlobalVar.GV().EmployID <= 0)
-//            GlobalVar.GV().EmployID = GetEmployID(context);
 
+        //return true;
         if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
             return true;
 
@@ -2932,12 +2933,7 @@ public class GlobalVar {
             }
 
         }
-//        else {
-//            if (GlobalVar.GV().EmployID == 90189)
-//                return true;
-//            else
-//                return false;
-//        }
+
         return false;
 
     }
@@ -3474,9 +3470,19 @@ public class GlobalVar {
         boolean isvalid = true;
         try {
             double barcode = Double.parseDouble(Barcode);
-            if (Barcode.length() == 13) {
-                String validChar = Barcode.substring(8, 12);
-                if (!validChar.equals("0000"))
+            if (Barcode.length() == GlobalVar.ScanBarcodeLength || Barcode.length() == 13) {
+                int splitlength = 0, waybilllength = 0;
+
+                if (Barcode.length() == 13) {
+                    splitlength = 11;
+                    waybilllength = 8;
+                } else {
+                    splitlength = GlobalVar.ScanBarcodeLength - 2;
+                    waybilllength = GlobalVar.ScanWaybillLength;
+                }
+
+                String validChar = Barcode.substring(waybilllength, splitlength);
+                if (!validChar.equals("000"))
                     isvalid = false;
             } else
                 isvalid = false;
@@ -3764,11 +3770,11 @@ public class GlobalVar {
             location.setSpeed(0);
 
             //ll = new LatLng(location.getLatitude(), location.getLongitude());
-            if (location != null)
-
+            if (location != null) {
 //                MyRouteActivity.places.add(location);
                 MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(location);
-            MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+                MyRouteActivity_Complaince_GroupbyPhn.places.add(location);
+            }
         }
 
         DBConnections dbConnections = new DBConnections(context, null);
@@ -3820,7 +3826,8 @@ public class GlobalVar {
                         //Places places = new Places(position, latlong);
                         if (Double.parseDouble(myRouteShipments.Longitude) != 0.0)
 //                            MyRouteActivity.places.add(sp);
-                            MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(sp);
+                            if (result.getInt(result.getColumnIndex("IsPlan")) == 1)
+                                MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.add(sp);
                         MyRouteActivity_Complaince_GroupbyPhn.places.add(sp);
 
                     }
@@ -3973,10 +3980,7 @@ public class GlobalVar {
     public void CommonAlertMessageActivity(String title, String msg,
                                            final Activity activity, final AlertRequest alertRequest, final Enum type, String classname) {
 
-        if (classname.equals("SkipWaybillNoinRouteLine"))
-            alertCallback = new SkipWaybillNoinRouteLine();
-        else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
-            alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
+        setCallback(classname);
 
         SweetAlertDialog eDialog = new SweetAlertDialog(activity, alertRequest.getAlertType());
 
@@ -4013,13 +4017,29 @@ public class GlobalVar {
         eDialog.show();
     }
 
-    public void CommonProgessAlertMessageActivity(String title, String msg,
-                                                  final Activity activity, final AlertRequest alertRequest,
-                                                  String classname) {
+    private void setCallback(String classname) {
+//        if (classname.equals("SkipWaybillNoinRouteLine"))
+//            alertCallback = new SkipWaybillNoinRouteLine();
+//        else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
+//            alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
+//        else if (classname.equals("MyRouteActivity_Complaince_GroupbyPhn"))
+//            alertCallback = new MyRouteActivity_Complaince_GroupbyPhn();
+
         if (classname.equals("SkipWaybillNoinRouteLine"))
             alertCallback = new SkipWaybillNoinRouteLine();
         else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
             alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
+        else if (classname.equals("MyRouteActivity_Complaince_GroupbyPhn"))
+            alertCallback = new MyRouteActivity_Complaince_GroupbyPhn();
+        else if (classname.equals("CourierRating"))
+            alertCallback = new CourierRating();
+    }
+
+    public void CommonProgessAlertMessageActivity(String title, String msg,
+                                                  final Activity activity, final AlertRequest alertRequest,
+                                                  String classname) {
+
+        setCallback(classname);
 
         SweetAlertDialog eDialog = new SweetAlertDialog(activity, alertRequest.getAlertType());
 

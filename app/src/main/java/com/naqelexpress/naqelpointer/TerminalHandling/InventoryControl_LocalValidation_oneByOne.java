@@ -37,10 +37,10 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -62,7 +62,7 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener , IAPICallListener {
+public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener, IAPICallListener {
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
@@ -142,7 +142,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                     if (!division.equals("Courier"))
-                         AddNewPiece();
+                        AddNewPiece();
                     else {
                         THAddNewPiece();
                     }
@@ -155,6 +155,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,7 +245,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode").trim();
                         txtBarCode.setText(barcode);
-                        Log.d("test" , "Divison " + division);
+                        Log.d("test", "Divison " + division);
                         if (!division.equals("Courier"))
                             AddNewPiece();
                         else {
@@ -276,8 +277,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
 
@@ -323,7 +324,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         //Get barcode info (Delivery req - rto req - citc - NoOfAttempts) and add it to lists
         GetNCLDatafromDB(txtBarCode.getText().toString());
-
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
@@ -398,10 +398,10 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 //                    txtBarCode.requestFocus();
                         initViews();
 
-                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                     }
-                     ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
-                       "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
 
 
                     // return;
@@ -421,7 +421,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 //                    txtBarCode.requestFocus();
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                         ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery \n" +
-                             "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     } else {
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                         ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
@@ -459,35 +459,35 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+//            if (txtBarCode.getText().toString().length() == 13) {
 
-                if (!WaybillAttempt.equals("No Data")) {
-                   GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                    ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
-                }
-
-                // SaveData(txtBarCode.getText().toString());
-
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
-                temp.put("Status", "0");
-                temp.put("Ref", lbTotal.getText().toString());
-                delrtoreq.add(temp);
-
-                inventorycontrol.add(0, txtBarCode.getText().toString());
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                initViews();
-
-            } else {
-
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                return;
-
+            if (!WaybillAttempt.equals("No Data")) {
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+                ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
+                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
             }
+
+            // SaveData(txtBarCode.getText().toString());
+
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("Status", "0");
+            temp.put("Ref", lbTotal.getText().toString());
+            delrtoreq.add(temp);
+
+            inventorycontrol.add(0, txtBarCode.getText().toString());
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            initViews();
+
+//            } else {
+//
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//                txtBarCode.setText("");
+//                txtBarCode.requestFocus();
+//                return;
+//
+//            }
         } else {
             if (!ismatch) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
@@ -524,8 +524,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
 
@@ -572,7 +572,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         //Get barcode info (Delivery req - rto req - citc - NoOfAttempts) and add it to lists
         GetNCLDatafromDB(txtBarCode.getText().toString());
-
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
@@ -683,36 +682,36 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            //if (txtBarCode.getText().toString().length() == 13) {
 
-                if (!WaybillAttempt.equals("No Data")) {
-                     try {
-                         onLineValidation.setNoOfAttempts(Integer.parseInt(WaybillAttempt));
-                     } catch (Exception ex) {
-                         Log.d("test" , "Add new piece - no of attempt" + ex.toString());
-                     }
-
+            if (!WaybillAttempt.equals("No Data")) {
+                try {
+                    onLineValidation.setNoOfAttempts(Integer.parseInt(WaybillAttempt));
+                } catch (Exception ex) {
+                    Log.d("test", "Add new piece - no of attempt" + ex.toString());
                 }
 
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
-                temp.put("Status", "0");
-                temp.put("Ref", lbTotal.getText().toString());
-                delrtoreq.add(temp);
-
-                inventorycontrol.add(0, txtBarCode.getText().toString());
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                initViews();
-
-            } else {
-
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                return;
-
             }
+
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("Status", "0");
+            temp.put("Ref", lbTotal.getText().toString());
+            delrtoreq.add(temp);
+
+            inventorycontrol.add(0, txtBarCode.getText().toString());
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            initViews();
+
+//            } else {
+//
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//                txtBarCode.setText("");
+//                txtBarCode.requestFocus();
+//                return;
+//
+//            }
         } else {
             if (!ismatch) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
@@ -731,7 +730,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         showDialog(onLineValidation);
 
     }
-
 
 
     String WaybillAttempt = "19127";
@@ -766,7 +764,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 } while (cursor.moveToNext());
             }
 
-           //CITC
+            //CITC
             cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 and BarCode='" + Barcode + "'", getApplicationContext());
             if (cursor.getCount() > 0) {
                 iscitcshipments.clear();
@@ -1099,7 +1097,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     }
 
 
-
     // Insert delvery Req in DeliverReq table  & Rto req in RtoReq table
     private class BringNCLData extends AsyncTask<String, Integer, String> {
         StringBuffer buffer;
@@ -1392,8 +1389,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                         if (clear == 0) {
                             txtBarCode.setText("");
                             txtBarCode.requestFocus();
-                        }
-                        else if (clear == 2)
+                        } else if (clear == 2)
                             SaveData(1);
                         else if (clear == 3)
                             insertManual1();
@@ -1412,7 +1408,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     ArrayList<Integer> ids1 = new ArrayList<>();
     int totalsize = 0;
     boolean isRunning = false, somethingwrong = false;
-
 
 
     private void ErrorAlert(final String title, String message) {
@@ -1439,7 +1434,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Try Again",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                     getOnlineValidation();
+                        getOnlineValidation();
                     }
                 });
 
@@ -1499,9 +1494,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     Handler isdeviceonlinehandler;
 
 
-
     int uploaddatacount = 0;
-
 
 
     private class SaveAtTerminalHandlingbyManual extends AsyncTask<String, Integer, String> {
@@ -1795,7 +1788,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         boolean isValid;
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        isValid = dbConnections.isValidValidationFile(GlobalVar.DsAndInventoryTHCourier , getApplicationContext());
+        isValid = dbConnections.isValidValidationFile(GlobalVar.DsAndInventoryTHCourier, getApplicationContext());
         if (isValid)
             return true;
         return false;
@@ -1806,7 +1799,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         onLineValidation.setBarcode(barcode);
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                                                   , barcode , getApplicationContext());
+                    , barcode, getApplicationContext());
 
             if (onLineValidationLocal != null) {
 
@@ -1837,13 +1830,13 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
                 onLineValidation.setNoOfAttempts(onLineValidationLocal.getNoOfAttempts());
 
-                    onLineValidation.setBarcode(barcode);
-                    onLineValidationList.add(onLineValidation);
+                onLineValidation.setBarcode(barcode);
+                onLineValidationList.add(onLineValidation);
 
             }
 
         } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
+            Log.d("test", "isValidPieceBarcode " + e.toString());
         }
 
         return onLineValidation;
@@ -1879,14 +1872,16 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                              else
                                  station =  dbConnections.getStationByID(pieceDetails.getWaybillDestID() , getApplicationContext());*/
 
-                        station =  dbConnections.getStationByID(onlineValidation.getWaybillDestID() , getApplicationContext());
+                        station = dbConnections.getStationByID(onlineValidation.getWaybillDestID(), getApplicationContext());
 
 
                         if (station != null)
                             stationName = station.Name;
                         else
-                            Log.d("test" , "Station is null");
-                    } catch (Exception e) { Log.d("test" , "showDialog " + e.toString());}
+                            Log.d("test", "Station is null");
+                    } catch (Exception e) {
+                        Log.d("test", "showDialog " + e.toString());
+                    }
 
 
                     LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
@@ -1950,7 +1945,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     }*/
 
                 OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(onlineValidation.getBarcode())
-                        , onlineValidation.getBarcode() , getApplicationContext());
+                        , onlineValidation.getBarcode(), getApplicationContext());
                 String noOfAttempts = "";
                 if (onLineValidationLocal != null || !WaybillAttempt.equals("No Data")) {
                     noOfAttempts = String.valueOf(onlineValidation.getNoOfAttempts());
@@ -1964,7 +1959,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 tvNoOfAttemptsHeader.setText("Number of attempts");
                 TextView tvNoOfAttemptsBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
                 tvNoOfAttemptsBody.setText("Number of attempts : " + noOfAttempts);
-
 
 
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
@@ -1984,11 +1978,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
             }
         } catch (Exception e) {
-            Log.d("test" , "showDialog " + e.toString());
+            Log.d("test", "showDialog " + e.toString());
         }
     }
 
-    private OnLineValidation getOnLineValidationPiece (String barcode) {
+    private OnLineValidation getOnLineValidationPiece(String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
                 if (pieceDetail.getBarcode().equals(barcode))
@@ -1996,7 +1990,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
 
         } catch (Exception e) {
-            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+            Log.d("test", "getOnLineValidationPiece " + e.toString());
         }
         return null;
     }
@@ -2004,15 +1998,15 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     @Override
     public void onCallComplete(boolean hasError, String errorMessage) {
         if (hasError)
-            ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+            ErrorAlertOnlineValidation("Failed Loading File", "Kindly Try Again \n \n " + errorMessage);
         else
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
     }
 
 
-    private void getOnlineValidation () {
-        APICall apiCall = new APICall(getApplicationContext() , InventoryControl_LocalValidation_oneByOne.this , this);
-        apiCall.getOnlineValidationDataOffset(GlobalVar.DsAndInventoryTHCourier,0 , 1);
+    private void getOnlineValidation() {
+        APICall apiCall = new APICall(getApplicationContext(), InventoryControl_LocalValidation_oneByOne.this, this);
+        apiCall.getOnlineValidationDataOffset(GlobalVar.DsAndInventoryTHCourier, 0, 1);
     }
 
 

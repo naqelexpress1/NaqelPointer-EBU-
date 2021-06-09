@@ -17,7 +17,7 @@ public class Booking implements Parcelable {
     public Double Weight = 0.0;
     public String SpecialInstruction = "";
     public DateTime OfficeUpTo = DateTime.now();
-    public String PickUpReqDT ="";
+    public String PickUpReqDT = "";
     public String ContactPerson = "";
     public String ContactNumber = "";
     public String Address = "";
@@ -34,12 +34,13 @@ public class Booking implements Parcelable {
     public String GPSLocation = "";
     public int PSID;
     public int PSDID;
+    public int SNo;
 
     public Booking() {
     }
 
     public Booking(int psid, int psdid, String refno, String pickUpReqDT, String contactPerson,
-                   String orgin, String destination, String billType ,String contactNumber
+                   String orgin, String destination, String billType, String contactNumber, int SNo
     ) {
         PSID = psid;
         PSDID = psdid;
@@ -50,6 +51,7 @@ public class Booking implements Parcelable {
         Destination = destination;
         BillType = billType;
         ContactNumber = contactNumber;
+        this.SNo = SNo;
 
     }
 
@@ -85,6 +87,7 @@ public class Booking implements Parcelable {
         OriginId = in.readInt();
         DestinationId = in.readInt();
         GPSLocation = in.readString();
+        SNo = in.readInt();
     }
 
     public static final Creator<Booking> CREATOR = new Creator<Booking>() {
@@ -138,6 +141,6 @@ public class Booking implements Parcelable {
         out.writeInt(OriginId);
         out.writeInt(DestinationId);
         out.writeString(GPSLocation);
-
+        out.writeInt(SNo);
     }
 }

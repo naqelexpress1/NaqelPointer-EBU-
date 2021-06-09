@@ -32,9 +32,11 @@ import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
 
+import java.util.List;
+
 // Created by Ismail on 21/03/2018.
 
-public class CheckPointsActivity extends AppCompatActivity {
+public class CheckPointsActivity extends AppCompatActivity implements ICheckPoint {
     CheckPointsFirstFragment firstFragment;
     CheckPointsSecondFragment secondFragment;
     CheckPointsThirdFragment thirdFragment;
@@ -258,6 +260,12 @@ public class CheckPointsActivity extends AppCompatActivity {
 
 
         return isValid;
+    }
+
+    @Override
+    public void onHoldShipments(List<String> onHoldShipments) {
+        if (thirdFragment != null)
+        thirdFragment.setOnHoldShipments(onHoldShipments);
     }
 
     public static class PlaceholderFragment extends Fragment {

@@ -611,43 +611,7 @@ public class MyRouteActivity_Complaince
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.OptimizeShipments:
-//                if (ActivityCompat.checkSelfPermission(CourierKpi.this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                        == PackageManager.PERMISSION_GRANTED &&
-//                        ActivityCompat.checkSelfPermission(CourierKpi.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                                == PackageManager.PERMISSION_GRANTED) {
-//                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
-//
-//                    Latitude = location.getLatitude();
-//                    Longitude = location.getLongitude();
-//
-//                }
-//                Optimization optimization = new Optimization();
-//                optimization.CurrentLocation = String.valueOf(Latitude) + "," + String.valueOf(Longitude);
-//                optimization.EmployID = String.valueOf(GlobalVar.GV().EmployID);
-//                optimization.FleetNo = "test";
-//                String MyShipments = "";
-//                for (int i = 0; i < GlobalVar.GV().kpi.size(); i++) {
-//                    MyShipments += GlobalVar.GV().kpi.get(i).ItemNo;
-//                    if (i < GlobalVar.GV().kpi.size() - 1)
-//                        MyShipments += ",";
-//                }
-//                optimization.Waybills = MyShipments;
-//                String jsonData = JsonSerializerDeserializer.serialize(optimization, true);
-//                ProjectAsyncTask task = new ProjectAsyncTask("Optimize", "Post", jsonData, "http://35.188.10.142/NaqelRouteApi/api/");
-//                task.setUpdateListener(new OnUpdateListener() {
-//                    public void onPostExecuteUpdate(String obj) {
-//                        new MyRouteShipments(obj, MyRouteShipments.UpdateType.Optimization, getApplicationContext(),
-//                                getWindow().getDecorView().getRootView());
-//                        adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().kpi, "CourierKpi");
-//                        mapListview.setAdapter(adapter);
-//                        //GlobalVar.GV().ShowSnackbar(GlobalVar.GV().rootView, "Finish Optimizing Shipments", GlobalVar.AlertType.Info);
-//                    }
-//
-//                    public void onPreExecuteUpdate() {
-//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Start Optimizing Shipments", GlobalVar.AlertType.Info);
-//                    }
-//                });
-//                task.execute();
+
                 return true;
             case R.id.deleteall:
                 deleteConfirmRoute();

@@ -13,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -199,36 +198,26 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
     ProgressDialog progressDialog;
 
+//if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
+// Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.group1:
-                //if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
                 fetchgroup("1");
-//                else
-//                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.group2:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("2");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                fetchgroup("2");
                 break;
             case R.id.group3: //Shipment Processing
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("3");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                fetchgroup("3");
                 break;
             case R.id.group4: //Linehul
-
                 fetchgroup("4");
                 break;
             case R.id.group5:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("5");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                fetchgroup("5");
                 break;
             case R.id.ncl:
                 Intent intent = new Intent(this, NclShipmentActivity.class);
@@ -250,10 +239,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
             //related to Mohammed
             case R.id.truckarrival:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
-                    fetchgroup("8");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
+                fetchgroup("8");
                 break;
 
         }

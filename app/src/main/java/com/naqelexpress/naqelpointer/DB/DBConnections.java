@@ -14,6 +14,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.google.gson.Gson;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingModel;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Booking;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPoint;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -79,7 +82,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 150; // AuthKey , Duplicate Customer , MobileNo Verified
+    private static final int Version = 152; // AuthKey , Duplicate Customer , MobileNo Verified
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -177,7 +180,7 @@ public class DBConnections
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
                 " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger, IsScan Integer Default 0 , IsNotDelivered Default 0 , CustomDuty Integer" +
-                ", IsOtp Integer )");
+                ", IsOtp Integer , AreaWaypoints TEXT )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -502,6 +505,17 @@ public class DBConnections
                 "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
                 " \"Process\"  INTEGER NOT NULL ," +
                 " \"UploadDate\"  DATETIME NOT NULL)");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS PickupSheetDetails " +
+                "(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , SNo INTEGER ,  PickupSheetID INTEGER  , " +
+                "FromStationID INTEGER  , ToStationID INTEGER   , OrgCode TEXT  , " +
+                "DestCode TEXT   , WaybillNo INTEGER   , Code TEXT  , " +
+                "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
+                ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
+                "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER  )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
 
         /*  END -  Riyam */
 
@@ -855,6 +869,25 @@ public class DBConnections
                     "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
                     "\"issync\"  int )");
 
+//            db.execSQL("CREATE TABLE IF NOT EXISTS PickupSheetDetails " +
+//                    "(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , PickupSheetID INTEGER NOT NULL , " +
+//                    "FromStationID INTEGER NOT NULL, ToStationID INTEGER NOT NULL , OrgCode TEXT Not Null, " +
+//                    "DestCode TEXT Not Null , WaybillNo INTEGER Not Null , Code TEXT Not Null, " +
+//                    "ConsigneeName TEXT Not Null , Remark TEXT  Not Null , PickupsheetDetailID INTEGER NOT NULL " +
+//                    ", Lat TEXT  Not Null, Lng TEXT  Not Null , Date TEXT  Not Null , PhoneNo TEXT  Not Null ." +
+//                    "isPickedup INTEGER Not NULL)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS PickupSheetDetails " +
+                    "(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , SNo INTEGER ,  PickupSheetID INTEGER  , " +
+                    "FromStationID INTEGER  , ToStationID INTEGER   , OrgCode TEXT  , " +
+                    "DestCode TEXT   , WaybillNo INTEGER   , Code TEXT  , " +
+                    "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
+                    ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
+                    "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -1114,6 +1147,10 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteShipments", "IsOtp"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN IsOtp  INTEGER ");
+
+
+            if (!isColumnExist("MyRouteShipments", "AreaWaypoints"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN AreaWaypoints TEXT  ");
 
             if (!isColumnExist("PickUpAuto", "DistrictID"))
                 db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN DistrictID INTEGER");
@@ -2521,6 +2558,25 @@ public class DBConnections
 
     }
 
+    public void clearMyRouteComplaince(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            // db.delete("CourierDailyRoute", null, null);
+
+            db.delete("MyRouteCompliance", null, null);
+            db.delete("SuggestLocations", null, null);
+            db.delete("plannedLocation", null, null);
+            db.delete("MyRouteActionActivity", null, null);
+            db.delete("DuplicateCustomer", null, null);
+            db.delete("UpdateLastSeqNo", null, null);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+
+    }
+
 
     public boolean CloseCurrentCourierDailyRoute(View View, Context context) {
         try {
@@ -2986,6 +3042,7 @@ public class DBConnections
             contentValues.put("IsPlan", instance.IsPlan);
             contentValues.put("CustomDuty", instance.CustomDuty); //Added by Riyam
             contentValues.put("IsOtp", instance.isOtp);
+            contentValues.put("AreaWaypoints", instance.AreaWaypoints);
 
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
@@ -7446,20 +7503,40 @@ public class DBConnections
     public boolean InsertSuggestLocation(Context context, String location) {
         long result = 0;
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            ContentValues contentValues = new ContentValues();
-            contentValues.put("StringData", location);
-            contentValues.put("Date", GlobalVar.getDate());
-            contentValues.put("EmpID", GlobalVar.GV().EmployID);
-            contentValues.put("IsSync", 0);
-            result = db.insert("SuggestLocations", null, contentValues);
+            if (!getSuggestLocationCount(context)) {
+                SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+                ContentValues contentValues = new ContentValues();
+                contentValues.put("StringData", location);
+                contentValues.put("Date", GlobalVar.getDate());
+                contentValues.put("EmpID", GlobalVar.GV().EmployID);
+                contentValues.put("IsSync", 0);
+                result = db.insert("SuggestLocations", null, contentValues);
 
-            db.close();
+                db.close();
+            }
         } catch (SQLiteException e) {
 
         }
         return result != -1;
     }
+
+    public boolean getSuggestLocationCount(Context context) {
+        try {
+
+            Cursor isCount = Fill("select *  from SuggestLocations Where  EmpID = " + GlobalVar.GV().EmployID + " and" +
+                    " Date = '" + GlobalVar.getDate() + "'", context);
+
+            if (isCount != null && isCount.getCount() > 0) {
+                return true;
+            }
+
+        } catch (SQLiteException e) {
+
+        }
+
+        return false;
+    }
+
 
     public boolean DeleteSuggestLocation(Context context) {
         long result = 0;
@@ -7515,6 +7592,7 @@ public class DBConnections
             String args[] = {GlobalVar.getDate()};
             db.execSQL("delete from SuggestLocations");
             db.execSQL("delete from plannedLocation");
+            db.execSQL("delete from OptimizeLastSeqStopTime");
             db.close();
 
         } catch (SQLiteException e) {
@@ -9076,7 +9154,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
                     SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
-            db.execSQL("delete from OptimizeLastSeqStopTime");
+            // db.execSQL("delete from OptimizeLastSeqStopTime");
 
             ContentValues contentValues = new ContentValues();
             contentValues.put("EndSeqtime", "");
@@ -9367,4 +9445,201 @@ public class DBConnections
         db.close();
     }
 
+    public void insertPickupsheetDetailsData(ArrayList<BookingModel>
+                                                     bookingModelList, Context context) {
+
+        // deleteDistrictData(context);
+        String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
+                "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
+                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, " +
+                "? ,?,?,?,?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (BookingModel booking : bookingModelList) {
+            stmt.bindString(1, String.valueOf(booking.getPickupSheetID()));
+            stmt.bindString(2, String.valueOf(booking.getFromStationID()));
+            stmt.bindString(3, String.valueOf(booking.getToStationID()));
+            stmt.bindString(4, String.valueOf(booking.getOrgCode()));
+            stmt.bindString(5, String.valueOf(booking.getDestCode()));
+            stmt.bindString(6, String.valueOf(booking.getWaybillNo()));
+            stmt.bindString(7, String.valueOf(booking.getCode()));
+            stmt.bindString(8, String.valueOf(booking.getConsigneeName()));
+            stmt.bindString(9, String.valueOf(booking.getRemark()));
+            stmt.bindString(10, String.valueOf(booking.getPickupsheetDetailID()));
+            stmt.bindString(11, String.valueOf(booking.getLat()));
+            stmt.bindString(12, String.valueOf(booking.getLng()));
+            stmt.bindString(13, String.valueOf(booking.getDate()));
+            stmt.bindString(14, String.valueOf(booking.getPhoneNo()));
+            stmt.bindString(15, String.valueOf(booking.getEmployID()));
+            stmt.bindString(16, String.valueOf(booking.getClientID()));
+            stmt.bindString(17, String.valueOf(booking.getClientName()));
+            stmt.bindString(18, String.valueOf(booking.getIsPickedup()));
+            stmt.bindString(19, String.valueOf(booking.getsNo()));
+
+
+            stmt.execute();
+            //long entryID = stmt.executeInsert();
+            //stmt.clearBindings();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+    public ArrayList<BookingModel> getPickupSheetDetailsData(Context context, int EmployID) {
+
+        ArrayList<BookingModel> bookingModelArrayList = new ArrayList<>();
+        Station station = null;
+        try {
+            String selectQuery = "SELECT * FROM PickupSheetDetails WHERE EmployID = " + EmployID;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    BookingModel bookingModel = new BookingModel();
+                    bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
+                    bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
+                    bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
+                    bookingModel.setOrgCode(cursor.getString(cursor.getColumnIndex("OrgCode")));
+                    bookingModel.setDestCode(cursor.getString(cursor.getColumnIndex("DestCode")));
+                    bookingModel.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    bookingModel.setCode(cursor.getString(cursor.getColumnIndex("Code")));
+                    bookingModel.setConsigneeName(cursor.getString(cursor.getColumnIndex("ConsigneeName")));
+                    bookingModel.setRemark(cursor.getString(cursor.getColumnIndex("Remark")));
+                    bookingModel.setPickupsheetDetailID(cursor.getInt(cursor.getColumnIndex("PickupsheetDetailID")));
+                    bookingModel.setLat(cursor.getString(cursor.getColumnIndex("Lat")));
+                    bookingModel.setLng(cursor.getString(cursor.getColumnIndex("Lng")));
+                    bookingModel.setDate(cursor.getString(cursor.getColumnIndex("Date")));
+                    bookingModel.setPhoneNo(cursor.getString(cursor.getColumnIndex("PhoneNo")));
+                    bookingModel.setIsPickedup(cursor.getInt(cursor.getColumnIndex("isPickedup")));
+                    bookingModel.setEmployID(cursor.getInt(cursor.getColumnIndex("EmployID")));
+                    bookingModel.setClientName(cursor.getString(cursor.getColumnIndex("ClientName")));
+                    bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
+                    bookingModelArrayList.add(bookingModel);
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return bookingModelArrayList;
+    }
+
+    public void insertPickupsheetReasonData(ArrayList<PickupSheetReasonModel>
+                                                    pickupSheetReasonModels, Context context) {
+
+        deleteDistrictData(context);
+        String sql = "insert into PickupSheetReason (Name,DBID ) values (?, ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (PickupSheetReasonModel model : pickupSheetReasonModels) {
+
+
+            stmt.bindString(1, String.valueOf(model.getName()));
+            stmt.bindString(2, String.valueOf(model.getID()));
+
+
+            stmt.execute();
+            //long entryID = stmt.executeInsert();
+            //stmt.clearBindings();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+    public ArrayList<PickupSheetReasonModel> getPickupSheetDetailsReasonData(Context context) {
+
+        ArrayList<PickupSheetReasonModel> pickupSheetReasonModelArrayList = new ArrayList<>();
+        Station station = null;
+        try {
+            String selectQuery = "SELECT * FROM PickupSheetReason ";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    PickupSheetReasonModel bookingModel = new PickupSheetReasonModel();
+                    BookingList.name.add(cursor.getString(cursor.getColumnIndex("Name")));
+                    BookingList.ID.add(cursor.getInt(cursor.getColumnIndex("DBID")));
+                    bookingModel.setID(cursor.getInt(cursor.getColumnIndex("DBID")));
+                    bookingModel.setName(cursor.getString(cursor.getColumnIndex("Name")));
+
+                    pickupSheetReasonModelArrayList.add(bookingModel);
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return pickupSheetReasonModelArrayList;
+    }
+
+    public boolean UpdatepickupsheetdetailsID(int Waybillno, int ispickup) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        //Put the filed which you want to update.
+        contentValues.put("isPickedup", ispickup);
+
+        try {
+            String args[] = {String.valueOf(Waybillno)};
+            db.update("PickupSheetDetails", contentValues, "WaybillNo=?", args);
+        } catch (Exception e) {
+
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public void clearAllPickupsheetData(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            // db.delete("CourierDailyRoute", null, null);
+            db.delete("PickupSheetDetails", null, null);
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+
+    }
+
+    public static String getUserPassword(Context context, int empID) {
+        String pwd = "";
+        Cursor cursor;
+        try {
+
+            String args[] = {String.valueOf(empID)};
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery("select Password from UserME Where EmployID =?", args, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                pwd = cursor.getString(cursor.getColumnIndex("Password"));
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            Log.d("test", "getFacilityID " + e.toString());
+        }
+        return pwd;
+    }
 }

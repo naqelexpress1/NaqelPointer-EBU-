@@ -26,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.naqelexpress.naqelpointer.Activity.Booking.Booking;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingModel;
 import com.naqelexpress.naqelpointer.Activity.WaybillMeasurments.WaybillMeasurementActivity;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -39,6 +40,8 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.UpdateLocation;
 
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,7 +80,12 @@ public class PickUpActivity extends AppCompatActivity {
         if (class_.equals("BookingDetailAcyivity")) {
             position = bundle.getInt("position");
             bookinglist = getIntent().getParcelableArrayListExtra("value");
+        } else if (class_.equals("BookingDetailAcyivityforCBU")) {
+            position = bundle.getInt("position");
+            ArrayList<BookingModel> bookinglist = (ArrayList<BookingModel>) getIntent().getSerializableExtra("value");
+            setBookingData(bookinglist.get(position));
         }
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -227,8 +235,23 @@ public class PickUpActivity extends AppCompatActivity {
                 appendPiececode = appendPiececode + "," + secondFragment.PickUpBarCodeList.get(i);
 
         }
+        boolean isok = true;
+        if (class_.equals("BookingDetailAcyivityforCBU")) {
+            if (dbConnections.UpdatepickupsheetdetailsID(Integer.parseInt(firstFragment.txtWaybillNo.getText().toString() ) , 2)) {
+                isok = dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode);
+                if (!isok) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);
+                    return;
+                }
+            } else {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);
 
-        if (dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode)) {
+                return;
+            }
+        } else
+            isok = dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode);
+
+        if (isok) {
             //     int PickUpID = dbConnections.getMaxID("PickUpAuto", getApplicationContext());
             //   for (int i = 0; i < secondFragment.PickUpBarCodeList.size(); i++) {
             //  PickUpDetail pickUpDetail = new PickUpDetail(secondFragment.PickUpBarCodeList.get(i), PickUpID);
@@ -486,10 +509,14 @@ public class PickUpActivity extends AppCompatActivity {
         public Fragment getItem(int pos) {
 
             Bundle bundle = new Bundle();
-            if (class_.equals("BookingDetailAcyivity")) {
+            if (class_.equals("BookingDetailAcyivity")) { //class_.equals("")
                 bundle.putSerializable("value", bookinglist);
                 bundle.putInt("position", position);
                 bundle.putString("class", "BookingDetailAcyivity");
+            } else if (class_.equals("BookingDetailAcyivityforCBU")) {
+                bundle.putSerializable("value", bookinglist);
+                bundle.putInt("position", position);
+                bundle.putString("class", "BookingDetailAcyivityforCBU");
             } else
                 bundle.putString("class", "Pickup");
 
@@ -848,6 +875,8 @@ public class PickUpActivity extends AppCompatActivity {
         outState.putString("EmployStation", GlobalVar.GV().EmployStation);
         outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
         outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
+
+        outState.putString("class_", class_);
     }
 
     @Override
@@ -864,6 +893,7 @@ public class PickUpActivity extends AppCompatActivity {
             GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
             GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
             GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
+            class_ = savedInstanceState.getString("class_");
         }
     }
 
@@ -879,5 +909,27 @@ public class PickUpActivity extends AppCompatActivity {
         return false;
     }
 
+    private void setBookingData(BookingModel bookingModel) {
+
+        try {
+            bookinglist = new ArrayList<>();
+            Booking booking = new Booking();
+            booking.RefNo = String.valueOf(bookingModel.getWaybillNo());
+            booking.BillType = bookingModel.getCode();
+            booking.Destination = bookingModel.getDestCode();
+            booking.ContactNumber = bookingModel.getConsigneeName();
+            booking.DestinationId = bookingModel.getToStationID();
+            booking.EmployeeId = GlobalVar.GV().EmployID;
+            booking.Orgin = bookingModel.getOrgCode();
+            booking.OriginId = bookingModel.ToStationID;
+            DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+            DateTime dt = formatter.parseDateTime(bookingModel.getDate());
+            booking.BookingDate = dt;
+
+            bookinglist.add(booking);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
 
 }

@@ -115,6 +115,7 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
             }
         });
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -667,6 +668,7 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
                         SaveData();
                     } else
                         ShowAlertMessage(jsonObject.getString("ErrorMessage"), 1);
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -786,7 +788,7 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
 
             dbConnections.close();
         } catch (Exception e) {
-            Log.d("test" , e.toString());
+            Log.d("test", e.toString());
         }
     }
 

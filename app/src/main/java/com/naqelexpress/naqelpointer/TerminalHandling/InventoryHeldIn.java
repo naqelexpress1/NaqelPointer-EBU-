@@ -127,6 +127,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         });
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +198,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
+                        if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength)
                             txtBarCode.setText(barcode);
 
                     }
@@ -218,7 +219,7 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         }
 
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ",""))) { //validupto.getText().toString()
+            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
                 return;
@@ -233,8 +234,8 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase() , getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),txtBarCode.getText().toString() + " is invalid bin" , GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
             lbTotal.setText(txtBarCode.getText().toString());
@@ -339,29 +340,29 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         }
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            // if (txtBarCode.getText().toString().length() == 13) {
 
-                // SaveData(txtBarCode.getText().toString());
+            // SaveData(txtBarCode.getText().toString());
 
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
-                temp.put("Status", "0");
-                temp.put("Ref", lbTotal.getText().toString());
-                delrtoreq.add(temp);
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("Status", "0");
+            temp.put("Ref", lbTotal.getText().toString());
+            delrtoreq.add(temp);
 
-                inventorycontrol.add(0, txtBarCode.getText().toString());
-                // lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                initViews();
-                // if (inventorycontrol.size() > 5)
-                //     inventorycontrol.remove(5);
-            } else {
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                txtBarCode.setText("");
-                txtBarCode.requestFocus();
-                return;
-            }
+            inventorycontrol.add(0, txtBarCode.getText().toString());
+            // lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            initViews();
+            // if (inventorycontrol.size() > 5)
+            //     inventorycontrol.remove(5);
+//            } else {
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//                txtBarCode.setText("");
+//                txtBarCode.requestFocus();
+//                return;
+//            }
         } else {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);

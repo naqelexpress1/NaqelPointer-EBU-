@@ -61,6 +61,10 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
+//        startService(
+//                new Intent(SplashScreenActivity.this,
+//                        com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
+
 //        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
 //        dbConnections1.deleteDeliverysheetData(getApplicationContext());
 //        dbConnections1.close();

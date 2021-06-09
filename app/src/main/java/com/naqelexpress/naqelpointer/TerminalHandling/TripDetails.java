@@ -22,6 +22,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -95,6 +96,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         });
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -289,14 +291,14 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
                 return true;
 
             case R.id.completed:
-                if (trips.get("TripID").equals("null") || trips.get("TripID").equals("0")) {
-                    ShowAlertMessage("TripID is not created , kindly create TripID and try to close", 0);
-                    return false;
-                }
-                Intent intent = new Intent(TripDetails.this, CloseTruck.class);
-                intent.putExtra("tripdata", trips);
-                startActivityForResult(intent, 1);
-                //ConfirmationtoCompleteLoad();
+                 if (trips.get("TripID").equals("null") || trips.get("TripID").equals("0")) {
+                     ShowAlertMessage("TripID is not created , kindly create TripID and try to close", 0);
+                     return false;
+                 }
+                 Intent intent = new Intent(TripDetails.this, CloseTruck.class);
+                 intent.putExtra("tripdata", trips);
+                 startActivityForResult(intent, 1);
+                 //ConfirmationtoCompleteLoad();
 
                 return true;
             default:
@@ -604,7 +606,7 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
         protected String doInBackground(String... params) {
 
-//            String jsonData = params[0];
+//          String jsonData = params[0];
             HttpURLConnection httpURLConnection = null;
             OutputStream dos = null;
             InputStream ist = null;
@@ -693,40 +695,44 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
 
     private void SaveData(String TripID) {
 
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        boolean IsSaved = true;
+      try {
+          DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+          boolean IsSaved = true;
 
-        int reachedsize = 0;
-        int ID = 0;
-        for (String nclno : ncl) {
+          int reachedsize = 0;
+          int ID = 0;
+          for (String nclno : ncl) {
 
-            if (reachedsize == 20)
-                reachedsize = 0;
-            if (reachedsize == 0) {
-                ID = insertHeader(TripID);
-            }
-            CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(nclno, ID);
-            do {
-                IsSaved = dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
-            } while (!IsSaved);
+              if (reachedsize == 20)
+                  reachedsize = 0;
+              if (reachedsize == 0) {
+                  ID = insertHeader(TripID);
+              }
+              CheckPointBarCodeDetails checkPointBarCodeDetails = new CheckPointBarCodeDetails(nclno, ID);
+              do {
+                  IsSaved = dbConnections.InsertCheckPointBarCodeDetails(checkPointBarCodeDetails, getApplicationContext());
+              } while (!IsSaved);
 
-            reachedsize++;
-        }
+              reachedsize++;
+          }
 
 
-        if (IsSaved) {
-            if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
-                startService(
-                        new Intent(TripDetails.this,
-                                com.naqelexpress.naqelpointer.service.TerminalHandling.class));
-            }
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
-            finish();
-        } else
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
-                    GlobalVar.AlertType.Error);
+          if (IsSaved) {
+              if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.TerminalHandling.class)) {
+                  startService(
+                          new Intent(TripDetails.this,
+                                  com.naqelexpress.naqelpointer.service.TerminalHandling.class));
+              }
+              GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.SaveSuccessfully), GlobalVar.AlertType.Info);
+              finish();
+          } else
+              GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NotSaved),
+                      GlobalVar.AlertType.Error);
 
-        dbConnections.close();
+          dbConnections.close();
+      } catch (Exception e) {
+          Log.d("test" , e.toString());
+      }
     }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {

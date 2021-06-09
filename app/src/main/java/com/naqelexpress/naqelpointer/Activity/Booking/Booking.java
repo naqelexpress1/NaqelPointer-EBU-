@@ -13,8 +13,8 @@ public class Booking implements Parcelable {
     public String ClientName = "";
     public String ClientFName = "";
     public DateTime BookingDate = DateTime.now();
-    public Double PicesCount;
-    public Double Weight;
+    public Double PicesCount = 0.0;
+    public Double Weight = 0.0;
     public String SpecialInstruction = "";
     public DateTime OfficeUpTo = DateTime.now();
     public String PickUpReqDT;

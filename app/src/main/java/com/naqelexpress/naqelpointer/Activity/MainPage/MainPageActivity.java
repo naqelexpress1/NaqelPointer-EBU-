@@ -75,6 +75,7 @@ import com.naqelexpress.naqelpointer.Activity.NightStock.NightStockActivity;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Activity.PendingMoney.PendingMoneyActivity;
 import com.naqelexpress.naqelpointer.Activity.PickUp.PickUpActivity;
+import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
 import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
@@ -480,11 +481,11 @@ public class MainPageActivity
         // menu = 1;
         if (devision.equals("Courier")) {
             if (menu == 1) {
+                cellTitle = new String[15];
+                cellIcon = new int[15];
+            } else {
                 cellTitle = new String[14];
                 cellIcon = new int[14];
-            } else {
-                cellTitle = new String[13];
-                cellIcon = new int[13];
             }
 
 //            cellTitle = new String[11];
@@ -522,8 +523,10 @@ public class MainPageActivity
             cellTitle[10] = "Booking List";//13
             cellTitle[11] = "Change Password";//13
             cellTitle[12] = "DeliverySheet by NCL";//13
+            cellTitle[13] = "Rating";//13
+
             if (menu == 1)
-                cellTitle[13] = "Skip Waybill in RL";//13 //Skip Waybill in RouteLine Seq
+                cellTitle[14] = "Skip Waybill in RL";//13 //Skip Waybill in RouteLine Seq
 
             itemposition.put(0, 0);
             itemposition.put(1, 1); // 1 is old screen
@@ -540,9 +543,9 @@ public class MainPageActivity
             itemposition.put(10, 11);
             itemposition.put(11, 24);
             itemposition.put(12, 28);
-
+            itemposition.put(13, 30);
             if (menu == 1)
-                itemposition.put(13, 29);
+                itemposition.put(14, 29);
         }
 
 
@@ -676,8 +679,10 @@ public class MainPageActivity
             cellIcon[10] = R.drawable.contacts; //CBU
             cellIcon[11] = R.drawable.money; //CBU
             cellIcon[12] = R.drawable.deliverysheet; //CBU
+            cellIcon[13] = android.R.drawable.star_big_off; //CBU
+
             if (menu == 1)
-                cellIcon[13] = R.drawable.recyclebin; //CBU
+                cellIcon[14] = R.drawable.recyclebin; //CBU
         }
         if (devision.equals("Express")) {
 
@@ -1360,6 +1365,19 @@ public class MainPageActivity
                             Intent deliverySheet = new Intent(getApplicationContext(),
                                     com.naqelexpress.naqelpointer.Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine.class);
 //                                    Intent deliverySheet = new Intent(getApplicationContext(), DeliverySheetActivity.class);
+                            startActivity(deliverySheet);
+                        } else {
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    , true);
+                        }
+
+                        break;
+                    case 30:
+                        if (VersionMatct()) {
+                            Intent deliverySheet = new Intent(getApplicationContext(),
+                                    CourierRating.class);
+//
                             startActivity(deliverySheet);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",

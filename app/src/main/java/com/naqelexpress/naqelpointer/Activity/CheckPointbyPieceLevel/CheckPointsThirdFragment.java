@@ -18,12 +18,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.InputFilter;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
@@ -33,6 +36,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BarcodeInfoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.BarcodeInfoResult;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,6 +46,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -57,6 +62,7 @@ public class CheckPointsThirdFragment
 
 
     private Intent intent;
+    private List<String> onHoldShipments = new ArrayList<>();
 
 
     @Override
@@ -121,6 +127,7 @@ public class CheckPointsThirdFragment
             });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(View.GONE);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,6 +141,9 @@ public class CheckPointsThirdFragment
             });
 
             initViews();
+
+
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
             //initDialog();
         }
 
@@ -159,7 +169,7 @@ public class CheckPointsThirdFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
+                        if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength)
                             txtBarCode.setText(barcode);
 //                        GlobalVar.GV().MakeSound(GlobalVar.GV().context, R.raw.barcodescanned);
 //                        if (txtBarCode.getText().toString().length() > 12)
@@ -285,13 +295,13 @@ public class CheckPointsThirdFragment
         }
 
         if (!BarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
-                BarCodeList.add(0, txtBarCode.getText().toString());
-                lbTotal.setText(getString(R.string.lbCount) + BarCodeList.size());
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
-                txtBarCode.setText("");
-                initViews();
-            }
+            //if (txtBarCode.getText().toString().length() == 13) {
+            BarCodeList.add(0, txtBarCode.getText().toString());
+            lbTotal.setText(getString(R.string.lbCount) + BarCodeList.size());
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+            txtBarCode.setText("");
+            initViews();
+            //}
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
@@ -459,4 +469,73 @@ public class CheckPointsThirdFragment
         alertDialog.show();
 
     }
+
+    /*** Riyam ***/
+    public void setOnHoldShipments(List<String> onHoldShipments) {
+        try {
+            this.onHoldShipments = onHoldShipments;
+        } catch (Exception ex) {
+            Log.d("test", "test " + ex.toString());
+        }
+    }
+
+    public void showFlagsPopup(final OnLineValidation onLineValidation) {
+        try {
+            if (onLineValidation != null) {
+
+                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+
+                final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(getContext());
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                final TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece #" + onLineValidation.getBarcode());
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK & Quit");
+
+                if (onLineValidation.getIsNoBayanNo() == 1) {
+
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_no_bayan);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_no_bayan_header);
+                    tvStopShipmentHeader.setText("Bayan Number");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_no_bayan_body);
+                    tvStopShipmentBody.setText("The Shipment has no Bayan number.Kindly contact GateWay team");
+
+                }
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                alertDialog.show();
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+
+                            //Don't record if it's high value with no Bayan
+                            if (onLineValidation.getIsNoBayanNo() == 1) {
+                                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                                AddNewPiece();
+                                //GlobalVar.GV().ShowSnackbar(rootView, "Shipment has no Bayan number.Scan won't be recorded", GlobalVar.AlertType.Warning);
+                                txtBarCode.getText().clear();
+                            }
+
+                        }
+                    }
+                });
+            }
+        } catch (Exception e) {
+            Log.d("test", "test " + e.toString());
+        }
+    }
+
+    /*** Riyam - END ***/
 }

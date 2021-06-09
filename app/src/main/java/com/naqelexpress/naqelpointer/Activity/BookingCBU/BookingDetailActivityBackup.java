@@ -1,14 +1,21 @@
-package com.naqelexpress.naqelpointer.Activity.Booking;
+package com.naqelexpress.naqelpointer.Activity.BookingCBU;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.GoogleMap;
@@ -27,12 +34,21 @@ import com.naqelexpress.naqelpointer.R;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class BookingDetailActivity extends AppCompatActivity
+public class BookingDetailActivityBackup extends AppCompatActivity
         implements OnMapReadyCallback {
 
     TextView txtReferenceNo, txtClientId, txtClient, txtContactPerson, txtContactNo, txtOrgin,
@@ -48,24 +64,26 @@ public class BookingDetailActivity extends AppCompatActivity
     private int BookingId;
     int position;
     ArrayList<Booking> bookinglist;
+    ArrayList<String> name;
+    ArrayList<Integer> IDs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.bookingdetailnew);
+        setContentView(R.layout.bookingdetailpickupsheet);
         Bundle bundle = getIntent().getExtras();
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-
+//
 //        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-
         mapFragment.getMapAsync(this);
 
 
         position = bundle.getInt("position");
         bookinglist = getIntent().getParcelableArrayListExtra("value");
+        name = getIntent().getStringArrayListExtra("name");
+        IDs = getIntent().getIntegerArrayListExtra("IDs");
 
         txtReferenceNo = (TextView) findViewById(R.id.txtReferenceNo);
         txtClientId = (TextView) findViewById(R.id.txtClientId);
@@ -198,7 +216,7 @@ public class BookingDetailActivity extends AppCompatActivity
 
 
         } else {
-            ActivityCompat.requestPermissions(BookingDetailActivity.this,
+            ActivityCompat.requestPermissions(BookingDetailActivityBackup.this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     1);
             finish();
@@ -227,7 +245,7 @@ public class BookingDetailActivity extends AppCompatActivity
 
     public void CallConsignee(View view) {
         GlobalVar.GV().makeCall(txtContactNo.getText().toString(), getWindow().getDecorView().getRootView(),
-                BookingDetailActivity.this);
+                BookingDetailActivityBackup.this);
     }
 
     public void Delivered(View view) {
@@ -236,7 +254,7 @@ public class BookingDetailActivity extends AppCompatActivity
         dbConnections.UpdateBookingStatus(BookingId, 3, view, getApplicationContext());
         dbConnections.close();
 
-        Intent intent = new Intent(BookingDetailActivity.this, PickUpActivity.class);
+        Intent intent = new Intent(BookingDetailActivityBackup.this, PickUpActivity.class);
         Bundle bundle = new Bundle();
         intent.putParcelableArrayListExtra("value", bookinglist);
         bundle.putString("class", "BookingDetailAcyivity");
@@ -244,6 +262,112 @@ public class BookingDetailActivity extends AppCompatActivity
         intent.putExtras(bundle);
         startActivityForResult(intent, 0);
         //To do need to call API
+    }
+
+    public void Exception(View view) {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(BookingDetailActivity.this);
+//        builder.setTitle("Pickup Exception");
+//
+//        final EditText notes = new EditText(BookingDetailActivity.this);
+//        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+//                LinearLayout.LayoutParams.MATCH_PARENT,
+//                LinearLayout.LayoutParams.MATCH_PARENT);
+//        notes.setLayoutParams(lp);
+//
+//
+//        CharSequence[] cs = name.toArray(new CharSequence[name.size()]);
+//        //String[] animals = {"horse", "cow", "camel", "sheep", "goat"};
+//        builder.setItems(cs, new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                Toast.makeText(getApplicationContext(), notes.getText().toString(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        AlertDialog dialog = builder.create();
+//        dialog.setView(notes);
+//        dialog.show();
+
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(BookingDetailActivityBackup.this);
+        //builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Pickup Exception");
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+                (BookingDetailActivityBackup.this, android.R.layout.select_dialog_item);
+
+        arrayAdapter.addAll(name);
+
+
+        builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = arrayAdapter.getItem(which);
+                final int exceptionID = IDs.get(which);
+                final AlertDialog.Builder builder = new AlertDialog.Builder(BookingDetailActivityBackup.this);
+                builder.setTitle(strName);
+
+                final EditText notes = new EditText(BookingDetailActivityBackup.this);
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT);
+                notes.setLayoutParams(lp);
+
+
+                builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String Notes = "";
+                        if (notes.getText().toString().length() > 0)
+                            Notes = notes.getText().toString();
+                        JSONObject jsonObject = new JSONObject();
+                        try {
+
+
+                            jsonObject.put("EmployID", GlobalVar.GV().EmployID);
+
+
+                            jsonObject.put("Latitude", String.valueOf(Latitude));
+                            jsonObject.put("Longitude", String.valueOf(Longitude));
+                            jsonObject.put("Notes", Notes);
+                            jsonObject.put("PickupExceptionID", exceptionID);
+                            jsonObject.put("PSDID", bookinglist.get(position).PSDID);
+                            jsonObject.put("PSID", bookinglist.get(position).PSID);
+                            jsonObject.put("StationID", GlobalVar.GV().StationID);
+                            jsonObject.put("TimeIn", DateTime.now());
+                            jsonObject.put("UserID", GlobalVar.GV().UserID);
+                            jsonObject.put("WaybillNo", bookinglist.get(position).RefNo);
+
+
+                            String jsonData = jsonObject.toString();
+
+                            new SavePickupException().execute(jsonData);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                AlertDialog dialog1 = builder.create();
+                dialog1.setView(notes);
+                dialog1.show();
+            }
+        });
+        builderSingle.show();
+// create and show the alert dialog
+
     }
 
     public void AcceptClick(View view) {
@@ -265,7 +389,7 @@ public class BookingDetailActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        GlobalVar.GV().ChangeMapSettings(mMap, BookingDetailActivity.this, getWindow().getDecorView().getRootView());
+        GlobalVar.GV().ChangeMapSettings(mMap, BookingDetailActivityBackup.this, getWindow().getDecorView().getRootView());
 
         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
         now = mMap.addMarker(new MarkerOptions().position(GlobalVar.GV().currentLocation)
@@ -292,4 +416,105 @@ public class BookingDetailActivity extends AppCompatActivity
         }
     }//onActivityResult
 
+    private class SavePickupException extends AsyncTask<String, Void, String> {
+        String result = "";
+        StringBuffer buffer;
+        ProgressDialog pd;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pd = new ProgressDialog(BookingDetailActivityBackup.this);
+            pd.setTitle("Loading");
+            pd.setMessage("Your request is being process,kindly please wait ");
+            pd.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+
+
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertPickupException"); //LoadtoDestination
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            if (finalJson != null) {
+                try {
+                    JSONObject jsonObject = new JSONObject(finalJson);
+                    crreateAlert(jsonObject.getString("ErrorMessage"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                super.onPostExecute(String.valueOf(finalJson));
+
+            }
+
+            pd.dismiss();
+        }
+    }
+
+    private void crreateAlert(String msg) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(BookingDetailActivityBackup.this);
+        builder.setTitle(msg);
+
+
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+
+        AlertDialog dialog1 = builder.create();
+        dialog1.show();
+    }
 }

@@ -61,7 +61,7 @@ public class BringTripDetails extends Activity implements TripDetailsAdapter.Ite
     private RecyclerView recyclerView;
     static ArrayList<HashMap<String, String>> tripDetails;
     private Paint p = new Paint();
-    int function = 0;
+    int function = 0; // 0 LoadToTrip - 1 TruckArrival
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

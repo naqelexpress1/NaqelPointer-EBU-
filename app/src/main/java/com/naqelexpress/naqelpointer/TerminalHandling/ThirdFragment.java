@@ -19,9 +19,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.InputFilter;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +36,8 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,9 +79,58 @@ public class ThirdFragment extends Fragment {
 
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
+            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackPressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
+                                FirstFragment.CheckPointTypeID == 2) {
+                            if (txtBarCode != null && txtBarCode.getText().toString().length() == 10) {
+                                if (IsValid()) {
+                                    AddNewPiece();
+                                } else {
+                                    requestfocus();
+                                }
+                            }
+                        } else {
+                            if (txtBarCode != null && txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
+                                if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                                    GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+                                    GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                                    txtBarCode.setText("");
+                                    return false;
+                                }
+                                if (IsValid()) {
+                                    String barcode = txtBarCode.getText().toString();
+                                    if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
+                                        if (isValidPieceBarcode(barcode)) {
+                                            AddNewPiece();
+                                        } else {
+                                            showDialog(getOnLineValidationPiece(barcode));
+                                        }
+                                    } else {
+                                        AddNewPiece();
+                                    }
 
-            txtBarCode.addTextChangedListener(new TextWatcher() {
+                                } else {
+                                    requestfocus();
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            /*txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -129,10 +178,11 @@ public class ThirdFragment extends Fragment {
                     }
 
                 }
-            });
+            });*/
 
             // this one
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(View.GONE);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -376,8 +426,12 @@ public class ThirdFragment extends Fragment {
         if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
                 FirstFragment.CheckPointTypeID == 2) {
             picecodeLength = 10;
-        } else
-            picecodeLength = 13;
+        } else {
+            if (txtBarCode.getText().length() == 13)
+                picecodeLength = 13;
+            else if (txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)
+                picecodeLength = GlobalVar.ScanBarcodeLength;
+        }
 
         if (!BarCodeList.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == picecodeLength) {
@@ -610,7 +664,7 @@ public class ThirdFragment extends Fragment {
         com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                 (FirstFragment.CheckPointTypeID, String.valueOf(TerminalHandling.Latitude),
                         String.valueOf(TerminalHandling.Longitude), 44, req
-                        , "" , 0);
+                        , "", 0);
 
         if (dbConnections.InsertTerminalHandling(checkPoint, getContext())) {
             int ID = dbConnections.getMaxID("CheckPoint", getContext());
@@ -699,7 +753,7 @@ public class ThirdFragment extends Fragment {
         try {
 
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode , getContext());
+                    , barcode, getContext());
 
             OnLineValidation onLineValidation = new OnLineValidation();
 
@@ -707,7 +761,7 @@ public class ThirdFragment extends Fragment {
             if (onLineValidationLocal != null) {
 
 
-                if ( onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+                if (onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
                     onLineValidation.setIsWrongDest(1);
                     onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
                     isValid = false;
@@ -736,14 +790,14 @@ public class ThirdFragment extends Fragment {
             }
 
         } catch (Exception e) {
-            Log.d("test" , TAG + e.toString());
+            Log.d("test", TAG + e.toString());
         }
         return isValid;
     }
 
 
     public void showDialog(final OnLineValidation onLineValidation) {
-        DBConnections dbConnections = new DBConnections(mContext , null);
+        DBConnections dbConnections = new DBConnections(mContext, null);
         try {
             if (onLineValidation != null) {
                 final android.app.AlertDialog.Builder dialogBuilder = new android.app.AlertDialog.Builder(mContext);
@@ -761,13 +815,14 @@ public class ThirdFragment extends Fragment {
                     String stationName = "";
                     try {
                         Station station = null;
-                        station = dbConnections.getStationByID(onLineValidation.getWaybillDestID() , mContext);
+                        station = dbConnections.getStationByID(onLineValidation.getWaybillDestID(), mContext);
 
                         if (station != null)
                             stationName = station.Name;
                         else
-                            Log.d("test" , "Station is null");
-                    } catch (Exception e) {}
+                            Log.d("test", "Station is null");
+                    } catch (Exception e) {
+                    }
 
                     LinearLayout llWrongDest = dialogView.findViewById(R.id.ll_wrong_dest);
                     llWrongDest.setVisibility(View.VISIBLE);
@@ -828,11 +883,11 @@ public class ThirdFragment extends Fragment {
                 });
             }
         } catch (Exception e) {
-            Log.d("test" , "showDialog " + e.toString());
+            Log.d("test", "showDialog " + e.toString());
         }
     }
 
-    private OnLineValidation getOnLineValidationPiece (String barcode) {
+    private OnLineValidation getOnLineValidationPiece(String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
                 if (pieceDetail.getBarcode().equals(barcode))
@@ -840,11 +895,25 @@ public class ThirdFragment extends Fragment {
             }
 
         } catch (Exception e) {
-            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+            Log.d("test", "getOnLineValidationPiece " + e.toString());
         }
         return null;
     }
 
-
-
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        // handler.removeCallbacksAndMessages(null);
+                        // isdeviceonlinehandler.removeCallbacksAndMessages(null);
+                        //countDownTimer.cancel();
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
 }

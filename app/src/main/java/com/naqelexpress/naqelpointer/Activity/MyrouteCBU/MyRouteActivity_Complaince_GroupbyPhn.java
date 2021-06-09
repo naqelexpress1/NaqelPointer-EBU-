@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
@@ -25,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,14 +38,18 @@ import com.naqelexpress.naqelpointer.Activity.Booking.BookingPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
 import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMap;
+import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMapbyDistrict;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
+import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_byDistrict;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
 import com.naqelexpress.naqelpointer.service.LocationService;
 
 import org.joda.time.DateTime;
@@ -66,11 +72,11 @@ import Error.ErrorReporter;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class MyRouteActivity_Complaince_GroupbyPhn
-        extends AppCompatActivity implements RouteListAdapterGroupbyPNo.RouteAdapterListener {
+        extends AppCompatActivity implements RouteListAdapterGroupbyPNo.RouteAdapterListener, AlertCallback {
     private RecyclerView mapListview;
     private RouteListAdapterGroupbyPNo adapter;
     Button btnStartTrip, btnCloseTrip;
-    TextView txtStartTrip, txtCloseTrip;
+    TextView txtStartTrip, txtCloseTrip, txtplannedlocationcount, txttoltallocationcount;
     public static ArrayList<Location> places = new ArrayList<>();//96346
     public static ArrayList<Location> Optmizeplaces = new ArrayList<>();//96346
     protected boolean flag_thread = false;
@@ -81,6 +87,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
     ArrayList<MyRouteShipments> myRouteShipmentstemp = new ArrayList<>();
     public static String AreaData = "";
+    TableLayout tl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +128,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         txtStartTrip = (TextView) findViewById(R.id.txtStartTrip);
         txtCloseTrip = (TextView) findViewById(R.id.txtCloseTrip);
 
+        txtplannedlocationcount = (TextView) findViewById(R.id.plannedlocation);
+        txttoltallocationcount = (TextView) findViewById(R.id.totallocation);
+
+        tl = (TableLayout) findViewById(R.id.tl);
+        tl.setVisibility(View.VISIBLE);
 
         if (GlobalVar.GV().CourierDailyRouteID == 0) {
             btnStartTrip.setVisibility(View.VISIBLE);
@@ -225,8 +237,10 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
         GlobalVar.GV().CourierDailyRouteID = 0;
         checkCourierDailyRouteID(false, 1);
-        GetPlannedLocation();
-
+        GetPlannedLocation(); //please uncomment in live
+        IstotalLocationcount();
+        //MyRouteCompliance1();
+        //deleteConfirmRoute();
 
     }
 
@@ -267,6 +281,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 myRouteShipmentstemp.addAll(GlobalVar.GV().myRouteShipmentList);
 
                 RouteMap.places.clear();
+                RouteMap_byDistrict.places.clear();
 
 //                //UnComment
 //                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
@@ -365,13 +380,28 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         }
     }
 
+//    private int plannedCount() {
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        Cursor plannedcount = dbConnections.Fill("select * from OptimizeLastSeqStopTime ", getApplicationContext());
+//        int Legscount = 0;
+//        if (plannedcount.getCount() > 0) {
+//            plannedcount.moveToFirst();
+//            Legscount = plannedcount.getInt(plannedcount.getColumnIndex("GooglePlannedLocationCount"));
+//        }
+//        plannedcount.close();
+//        return Legscount;
+//    }
+
     private int plannedCount() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         Cursor plannedcount = dbConnections.Fill("select * from OptimizeLastSeqStopTime ", getApplicationContext());
         int Legscount = 0;
         if (plannedcount.getCount() > 0) {
             plannedcount.moveToFirst();
-            Legscount = plannedcount.getInt(plannedcount.getColumnIndex("GooglePlannedLocationCount"));
+            do {
+                Legscount = Legscount + plannedcount.getInt(plannedcount.getColumnIndex("GooglePlannedLocationCount"));
+            } while (plannedcount.moveToNext());
+
         }
         plannedcount.close();
         return Legscount;
@@ -391,11 +421,19 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                     GlobalVar.GV().LoadMyRouteShipments("OrderNo", true, getApplicationContext(),
                             getWindow().getDecorView().getRootView());
 
-                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
-                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                    intent.putParcelableArrayListExtra("places", places);
-                    intent.putExtra("AreaData", AreaData);
-                    startActivityForResult(intent, 1);
+                    if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                        intent.putExtra("AreaData", AreaData);
+                        startActivityForResult(intent, 1);
+                    } else {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                        intent.putExtra("AreaData", AreaData);
+                        startActivityForResult(intent, 1);
+                    }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -411,7 +449,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
         boolean ishasLocation = false;
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        Cursor ds = dbConnections.Fill("select count(ID) totalcount from MyRouteShipments where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and CourierDailyRouteID = " +
+        Cursor ds = dbConnections.Fill("select count(ID) totalcount from MyRouteShipments " +
+                "where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and IsPlan = 1  and CourierDailyRouteID = " +
                 GlobalVar.GV().CourierDailyRouteID, getApplicationContext());
         if (ds.getCount() > 0) {
             ds.moveToFirst();
@@ -419,6 +458,28 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             if (count >= 1)
                 ishasLocation = true;
         }
+        return ishasLocation;
+    }
+
+    private boolean IstotalLocationcount() {
+
+        boolean ishasLocation = false;
+        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor ds = dbConnections.Fill("select ID  from MyRouteShipments " +
+                "where Latitude <> '0' and Longitude <> '0' and Latitude <>'' and Longitude <> ''  and CourierDailyRouteID = " +
+                GlobalVar.GV().CourierDailyRouteID, getApplicationContext());
+        if (ds != null)
+            txttoltallocationcount.setText("Total Location " + String.valueOf(ds.getCount()));
+//        if (ds.getCount() > 0) {
+//            ds.moveToFirst();
+//            int count = ds.getInt(ds.getColumnIndex("totalcount"));
+//            if (count >= 1)
+//                ishasLocation = true;
+
+
+//        }
+        ds.close();
+        dbConnections.close();
         return ishasLocation;
     }
 
@@ -514,11 +575,19 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                         sDialog.dismissWithAnimation();
 
                         try {
-                            Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
-                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                            intent.putParcelableArrayListExtra("places", places);
-                            intent.putExtra("AreaData", AreaData);
-                            startActivityForResult(intent, 1);
+                            if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
+                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                                intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                                intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                                intent.putExtra("AreaData", AreaData);
+                                startActivityForResult(intent, 1);
+                            } else {
+                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                                intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                                intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                                intent.putExtra("AreaData", AreaData);
+                                startActivityForResult(intent, 1);
+                            }
                         } catch (Exception e) {
                             System.out.println(e.getMessage());
                         }
@@ -577,6 +646,48 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         dbConnections.close();
     }
 
+
+    private void MyRouteCompliance1() {
+
+        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.clearMyRouteComplaince(getApplicationContext());
+
+        if (GlobalVar.GV().CourierDailyRouteID == 0)
+            return;
+
+
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(false);
+        eDialog.setTitleText("Are you sure?");
+        eDialog.setContentText("Are you follow to Deliver by Google Map");
+        eDialog.setConfirmText("Yes");
+//                eDialog.setCancelText("Yes");
+
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+
+                sDialog.dismissWithAnimation();
+
+                try {
+                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                    intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                    intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                    intent.putExtra("AreaData", AreaData);
+                    startActivityForResult(intent, 1);
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+
+            }
+        });
+        eDialog.show();
+
+        dbConnections.close();
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -610,6 +721,16 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public void returnOk(int ok, Activity activity) {
+        exitdialog();
+    }
+
+    @Override
+    public void returnCancel(int cancel, SweetAlertDialog alertDialog) {
+        this.alertDialog = alertDialog;
+    }
+
 
     class Optimization {
         public String CurrentLocation;
@@ -625,43 +746,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.OptimizeShipments:
-//                if (ActivityCompat.checkSelfPermission(CourierKpi.this, Manifest.permission.ACCESS_FINE_LOCATION)
-//                        == PackageManager.PERMISSION_GRANTED &&
-//                        ActivityCompat.checkSelfPermission(CourierKpi.this, Manifest.permission.ACCESS_COARSE_LOCATION)
-//                                == PackageManager.PERMISSION_GRANTED) {
-//                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
-//
-//                    Latitude = location.getLatitude();
-//                    Longitude = location.getLongitude();
-//
-//                }
-//                Optimization optimization = new Optimization();
-//                optimization.CurrentLocation = String.valueOf(Latitude) + "," + String.valueOf(Longitude);
-//                optimization.EmployID = String.valueOf(GlobalVar.GV().EmployID);
-//                optimization.FleetNo = "test";
-//                String MyShipments = "";
-//                for (int i = 0; i < GlobalVar.GV().kpi.size(); i++) {
-//                    MyShipments += GlobalVar.GV().kpi.get(i).ItemNo;
-//                    if (i < GlobalVar.GV().kpi.size() - 1)
-//                        MyShipments += ",";
-//                }
-//                optimization.Waybills = MyShipments;
-//                String jsonData = JsonSerializerDeserializer.serialize(optimization, true);
-//                ProjectAsyncTask task = new ProjectAsyncTask("Optimize", "Post", jsonData, "http://35.188.10.142/NaqelRouteApi/api/");
-//                task.setUpdateListener(new OnUpdateListener() {
-//                    public void onPostExecuteUpdate(String obj) {
-//                        new MyRouteShipments(obj, MyRouteShipments.UpdateType.Optimization, getApplicationContext(),
-//                                getWindow().getDecorView().getRootView());
-//                        adapter = new RouteListAdapter(getApplicationContext(), GlobalVar.GV().kpi, "CourierKpi");
-//                        mapListview.setAdapter(adapter);
-//                        //GlobalVar.GV().ShowSnackbar(GlobalVar.GV().rootView, "Finish Optimizing Shipments", GlobalVar.AlertType.Info);
-//                    }
-//
-//                    public void onPreExecuteUpdate() {
-//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Start Optimizing Shipments", GlobalVar.AlertType.Info);
-//                    }
-//                });
-//                task.execute();
+
                 return true;
             case R.id.deleteall:
                 deleteConfirmRoute();
@@ -755,9 +840,21 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                         getWindow().getDecorView().getRootView());
 
                 try {
-                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, OptimiseMap.class);
-                    intent.putParcelableArrayListExtra("myroute", myRouteShipmentList);
-                    startActivityForResult(intent, 2);
+                    int areaCount = getAreaWaybills().size();
+                    if (areaCount == 0) {
+                        GlobalVar.GV().alertMsgAll("Info", "No Planned Location", MyRouteActivity_Complaince_GroupbyPhn.this, Enum.ERROR_TYPE,
+                                "MyRouteActivity_Complaince_GroupbyPhn");
+                        return true;
+                    }
+                    if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, OptimiseMap.class);
+                        intent.putParcelableArrayListExtra("myroute", myRouteShipmentList);
+                        startActivityForResult(intent, 2);
+                    } else {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, OptimiseMapbyDistrict.class);
+                        intent.putParcelableArrayListExtra("myroute", myRouteShipmentList);
+                        startActivityForResult(intent, 2);
+                    }
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -881,7 +978,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
 
     //------------------------Bring My Route Shipments -------------------------------
-    public void BringMyRouteShipments(BringMyRouteShipmentsRequest bringMyRouteShipmentsRequest, int buttonclick) {
+    public void BringMyRouteShipments(BringMyRouteShipmentsRequest bringMyRouteShipmentsRequest,
+                                      int buttonclick) {
 
         String jsonData = JsonSerializerDeserializer.serialize(bringMyRouteShipmentsRequest, true);
         new BringMyRouteShipmentsList().execute(jsonData, String.valueOf(buttonclick));
@@ -924,7 +1022,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             InputStream ist = null;
 
             try {
-                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute_GroupbyArea";//""BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
+                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute_GroupbyDistrict";//""BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
 //                function = "BringDeliverySheetbyOFDPiece_PlanAll"; //BringDeliverySheetbyOFDPiece_PlanAll
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
@@ -1921,7 +2019,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         }
     }
 
-    private void AlertCommon(String title, String message, final int type, final int updateDB, final int refNo) {
+    private void AlertCommon(String title, String message, final int type, final int updateDB,
+                             final int refNo) {
         SweetAlertDialog eDialog = new SweetAlertDialog(this, type);
         eDialog.setTitleText(title);
         eDialog.setContentText(message);
@@ -1942,8 +2041,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         eDialog.show();
     }
 
-    SweetAlertDialog pDialog;
-
 
     public void GetPlannedLocation() {
 
@@ -1954,7 +2051,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //        Cursor result = dbConnections.Fill("select * from plannedLocation where   Date ='" + GlobalVar.getDate()
 //                + "' and  EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
 
-        Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " + GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
+        Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " +
+                GlobalVar.GV().EmployID + "  order by position asc ", getApplicationContext());
 
 
         int seconds = 0;
@@ -1994,7 +2092,17 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
             } while (result.moveToNext());
         }
-        lastseqstoptime.setText("Last Seq Stop time : " + addtime);
+        if (result != null && result.getCount() == 0) {
+            addtime = "";
+            lastseqstoptime.setText("No Plan");
+        } else
+            lastseqstoptime.setText("Last Seq Stop time : " + addtime);
+
+        if (lastseqstoptime.getText().toString().equals("No Plan"))
+            txtplannedlocationcount.setText("");
+        else
+            txtplannedlocationcount.setText("Planned Count : " + String.valueOf(result.getCount() - 1));
+
         result.close();
         dbConnections.close();
 
@@ -2118,5 +2226,72 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         }
     }
 
+    private ArrayList<Location> getAreaWaybills() {
+        GlobalVar.GV().alertMsgAll("please wait ", "", MyRouteActivity_Complaince_GroupbyPhn.this, Enum.PROGRESS_TYPE,
+                "MyRouteActivity_Complaince_GroupbyPhn");
 
+//        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
+//        pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+//        pDialog.setTitleText("Optimizing routes kindly please wait");
+//        pDialog.setCancelable(false);
+//        pDialog.show();
+
+        ArrayList<Location> tlocation = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        GlobalVar.GV().CourierDailyRouteID = dbConnections.getMaxID("CourierDailyRoute Where EmployID = " + GlobalVar.GV().EmployID
+                + " and EndTime is NULL ", getApplicationContext());
+        String AreaWaypoints = "";
+        if (GlobalVar.GV().CourierDailyRouteID != 0) {
+            Cursor result = dbConnections.Fill("select * from MyRouteShipments Where CourierDailyRouteID = " +
+                    GlobalVar.GV().CourierDailyRouteID + " and AreaWaypoints <> '0' ", getApplicationContext());
+            if (result.getCount() > 0) {
+                result.moveToFirst();
+                AreaWaypoints = result.getString(result.getColumnIndex("AreaWaypoints"));
+                System.out.println(AreaWaypoints);
+            }
+        }
+
+        if (AreaWaypoints.length() > 5) {
+            String spllitbyArea[] = AreaWaypoints.split(";");
+
+            for (int i = 1; i < spllitbyArea.length; i++) {
+                //  tlocation.clear();
+                String splitAreaLength[] = spllitbyArea[i].split("#");
+                String splitWaybillinfo1[] = splitAreaLength[0].split(":");
+                for (int j = 0; j < splitWaybillinfo1.length; j++) {
+                    String splitWaybillinfo[] = splitWaybillinfo1[j].split("_");
+                    String splitGeoinfo[] = splitWaybillinfo[3].split(",");
+                    Location sp = new Location("");
+                    try {
+
+                        sp.setLatitude(Double.parseDouble(splitGeoinfo[0]));
+                        sp.setLongitude(Double.parseDouble(splitGeoinfo[1]));
+                        if (Double.parseDouble(splitGeoinfo[1]) != 0.0) {
+
+                            sp.setSpeed(Integer.parseInt(splitWaybillinfo[0]) + 1);
+                        }
+                    } catch (Exception e) {
+                        sp.setLatitude(0);
+                        sp.setLongitude(0);
+                    }
+                    tlocation.add(sp);
+                }
+
+
+            }
+        }
+        exitdialog();
+        return tlocation;
+    }
+
+    static SweetAlertDialog alertDialog;
+
+    private void exitdialog() {
+        if (alertDialog != null) {
+            alertDialog.dismissWithAnimation();
+            alertDialog = null;
+        }
+    }
 }

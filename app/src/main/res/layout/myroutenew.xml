@@ -49,18 +49,55 @@
             app:layout_constraintRight_toRightOf="parent"
             tools:ignore="RtlHardcoded" />
 
-        <TextView
-            android:id="@+id/laststopseqtime"
+        <TableLayout
+            android:id="@+id/tl"
             android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="0.8"
-            android:gravity="right"
-            android:text="Estimated Time of last Sequenced stop is : "
-            android:textColor="@color/NaqelRed"
-            android:textSize="12sp"
-            android:textStyle="bold"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/top"
+            tools:ignore="MissingConstraints">
 
-            tools:ignore="RtlHardcoded" />
+            <TextView
+                android:id="@+id/laststopseqtime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:gravity="start"
+                android:text="Estimated Time of last Sequenced stop is : "
+                android:textColor="@color/NaqelRed"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/totallocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:gravity="start"
+                android:text="Total location :"
+                android:textColor="@color/NaqelRed"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:ignore="RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/plannedlocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8"
+                android:gravity="start"
+                android:text="Planned location :"
+                android:textColor="@color/NaqelRed"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:ignore="RtlHardcoded" />
+        </TableLayout>
 
 
     </LinearLayout>

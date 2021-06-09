@@ -270,4 +270,11 @@
     <string name="csSupportMsg1En">For customer service support, please contact us on:</string>
     <string name="csSupportMsg1Ar">عزيزي العميل، للمساعدة وطلب الدعم الرجاء التواصل معنا على:</string>
     <!-- End Riyam New whatsapp messages 25/1/2021 -->
+
+    <string name="asr_whatsapplocation1"> مرحبا , أنا مندوب شركة ناقل الرجاء مشاركة الموقع عبر الرابط التالي:
+         </string> link
+    <string name="asr_whatsapplocation2"> من اجل استلام الشحنة    </string> WB
+    <string name="asr_whatsapplocation3"> من  </string> brand name
+
+    للاسترجاع
 </resources>

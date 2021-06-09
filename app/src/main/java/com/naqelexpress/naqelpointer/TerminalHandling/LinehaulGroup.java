@@ -174,10 +174,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
 
                 break;
             case R.id.shipmentarrrivedatdest:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
                     fetchgroup("8");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
 //            case R.id.group3:
 //                fetchgroup("4");
@@ -189,10 +186,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.llgroup5:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
                     fetchgroup("5");
-                else
-                    Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.ncl:
                 if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
@@ -219,12 +213,9 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.arrivedatdest:
-                if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
                 Intent arrivedat = new Intent(LinehaulGroup.this, BringTripDetails.class);
                 arrivedat.putExtra("Function", 1);
                 startActivity(arrivedat);
-            } else
-                Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.undoncl:
                 if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {

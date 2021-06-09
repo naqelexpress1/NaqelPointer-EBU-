@@ -157,6 +157,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         });
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -290,7 +291,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             txtBarCode.setText("");
             return;
         }
-        
+
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -939,7 +940,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
     }*/
 
-//mohammed
+    //mohammed
     private void SaveHeldOutData(String piece, String refno) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

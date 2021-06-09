@@ -1,14 +1,17 @@
 package com.naqelexpress.naqelpointer.Activity.PickupPieceLevel;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -82,7 +85,7 @@ public class PickUpFirstFragment
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-
+            txtWaybillNo.setKeyListener(null);
             txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
@@ -92,6 +95,27 @@ public class PickUpFirstFragment
             Loadtype = (Spinner) rootView.findViewById(R.id.loadtype);
 
             clientdetails = new ArrayList<>();
+
+
+            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackPressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (txtWaybillNo.getText().length() == 8 || txtWaybillNo.getText().length() == GlobalVar.ScanWaybillLength) {
+
+                        } else
+                            txtWaybillNo.setText("");
+
+                        return true;
+                    }
+                    return false;
+                }
+            });
 
 
             adapter = new PickupAdapter(clientdetails, getContext());
@@ -300,8 +324,11 @@ public class PickUpFirstFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
-                        txtWaybillNo.setText(barcode);
+                        if (barcode.length() == 8 || barcode.length() == GlobalVar.ScanWaybillLength) {
+
+                            GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
+                            txtWaybillNo.setText(barcode);
+                        }
                     }
                 }
             }
@@ -459,5 +486,19 @@ public class PickUpFirstFragment
         requestQueue.add(jsonObjectRequest);
         requestQueue.getCache().remove(URL);
 
+    }
+
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit PickUp")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

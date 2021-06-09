@@ -32,7 +32,6 @@ import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
@@ -86,23 +85,21 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         setContentView(R.layout.checkpoints);
 
 
-
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         group = bundle.getString("group"); // In case of Arrival --> Group 8  In case of shipment processing --> Group 3
 
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
-       try {
-           if (division.equals("Courier") && group.equals("Group 8")) { //Courier includes TH && Only in Arrival Module
-               if (!isValidValidationFile()) {
-                 getOnlineValidation();
-               }
-           }
-       } catch (Exception e) {
-           Log.d(TAG , e.toString());
-       }
-
+        try {
+            if (division.equals("Courier") && group.equals("Group 8")) { //Courier includes TH && Only in Arrival Module
+                if (!isValidValidationFile()) {
+                    getOnlineValidation();
+                }
+            }
+        } catch (Exception e) {
+            Log.d(TAG, e.toString());
+        }
 
 
         status.clear();
@@ -129,8 +126,6 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-
 
 
         TimeIn = DateTime.now();
@@ -244,22 +239,19 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             - if check point arrival --> hardcode CheckPointTypeDetailID (reason drop-down list is removed for arrival)
             - Add TripID  */
             com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling checkPoint;
-            if (firstFragment.CheckPointTypeID == 7 ) {
+            if (firstFragment.CheckPointTypeID == 7) {
                 CheckPointTypeDetailID = 40;
                 checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                         (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                                 String.valueOf(Longitude), CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
                                 "", thirdFragment.Barcodes.size(), Integer.parseInt(firstFragment.txtCheckPointType_TripID.getText().toString()));
-            } else  {
+            } else {
                 CheckPointTypeDetailID = firstFragment.CheckPointTypeDetailID;
                 checkPoint = new com.naqelexpress.naqelpointer.DB.DBObjects.TerminalHandling
                         (firstFragment.CheckPointTypeID, String.valueOf(Latitude),
                                 String.valueOf(Longitude), CheckPointTypeDetailID, firstFragment.txtCheckPointTypeDDetail.getText().toString(),
                                 "", thirdFragment.Barcodes.size());
             }
-
-
-
 
 
             if (dbConnections.InsertTerminalHandling(checkPoint, getApplicationContext())) {
@@ -308,18 +300,11 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the reason",
                     GlobalVar.AlertType.Error);
             return false;
-        }
-
-       else if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0 && TerminalHandling.group.equals("Group 8")) {
+        } else if (firstFragment.txtCheckPointType_TripID.getText().toString().length() == 0 && TerminalHandling.group.equals("Group 8")) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the trip ID",
                     GlobalVar.AlertType.Error);
             return false;
-        }
-
-
-
-
-        else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
+        } else if (firstFragment.txtCheckPointTypeDDetail.getVisibility() == View.VISIBLE) {
             if (firstFragment.CheckPointTypeDDetailID == 1 && firstFragment.txtCheckPointTypeDDetail.getText().toString().length() == 0) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to select the Date",
                         GlobalVar.AlertType.Error);
@@ -895,8 +880,8 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
                 try {
 
                     //the url here
-                  URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
-                    //URL url = new URL("http://35.188.10.142:8087/md/api/pointer/InsertTerminalHandlingByPiece"); //LoadtoDestination
+                    URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertTerminalHandlingByPiece"); //LoadtoDestination
+
 
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -1051,11 +1036,11 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         boolean isValid;
         try {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            isValid = dbConnections.isValidValidationFile(GlobalVar.NclArrivalTH , getApplicationContext());
+            isValid = dbConnections.isValidValidationFile(GlobalVar.NclArrivalTH, getApplicationContext());
             if (isValid)
                 return true;
         } catch (Exception ex) {
-            Log.d("test" , "TerminalHandling Activity - isValidOnlineValidationFile() " + ex.toString());
+            Log.d("test", "TerminalHandling Activity - isValidOnlineValidationFile() " + ex.toString());
         }
         return false;
     }
@@ -1074,15 +1059,16 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlertOnlineValidation("Failed Loading File" , "Kindly Try Again \n \n " + errorMessage);
+                ErrorAlertOnlineValidation("Failed Loading File", "Kindly Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
-    private void getOnlineValidation () {
-        APICall apiCall = new APICall(getApplicationContext() , TerminalHandling.this , this);
-        apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH,0 , 1);
+    private void getOnlineValidation() {
+        APICall apiCall = new APICall(getApplicationContext(), TerminalHandling.this, this);
+        apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH, 0, 1);
     }
 }
 

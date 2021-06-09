@@ -159,6 +159,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         });
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(View.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -299,6 +300,11 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
             return;
         }
 
+        if (txtBarCode.getText().toString().length() <= 9) {
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Ncl Number",
+                    GlobalVar.AlertType.Error);
+            return;
+        }
         String Barcode = txtBarCode.getText().toString().substring(0, 10);
 
         try {
@@ -1062,7 +1068,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
     }*/
 
 
-   //mohammed
+    //mohammed
     private void SaveHeldOutData(String piece, String refno) {
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);

@@ -18,9 +18,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -83,24 +82,43 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
         txtbinlocation.setVisibility(View.GONE);
 
-        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
-        txtBarCode.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
+//        txtBarCode.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (txtBarCode != null && txtBarCode.getText().length() == 13)
+//                    AddNewPiece();
+//            }
+//        });
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (txtBarCode != null && txtBarCode.getText().length() == 13)
+        txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                     AddNewPiece();
+
+                    return true;
+                }
+                return false;
             }
         });
 
         Button btnOpenCamera = (Button) findViewById(R.id.btnOpenCamera);
+        btnOpenCamera.setVisibility(recyclerView.GONE);
         btnOpenCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -154,7 +172,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
+                        if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength)
                             txtBarCode.setText(barcode);
 
                     }
@@ -191,21 +209,21 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         }
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            // if (txtBarCode.getText().toString().length() == 13) {
 
-                //SaveData(txtBarCode.getText().toString());
+            //SaveData(txtBarCode.getText().toString());
 
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
-                temp.put("Status", "0");
-                temp.put("Ref", "");
-                delrtoreq.add(temp);
+            HashMap<String, String> temp = new HashMap<>();
+            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("Status", "0");
+            temp.put("Ref", "");
+            delrtoreq.add(temp);
 
-                inventorycontrol.add(0, txtBarCode.getText().toString());
-                lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
-                txtBarCode.setText("");
-                initViews();
-            }
+            inventorycontrol.add(0, txtBarCode.getText().toString());
+            lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
+            txtBarCode.setText("");
+            initViews();
+            // }
         } else {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);

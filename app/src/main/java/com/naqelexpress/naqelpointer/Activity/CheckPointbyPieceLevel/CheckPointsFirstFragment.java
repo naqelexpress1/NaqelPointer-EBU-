@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.CheckPointbyPieceLevel;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,10 +12,12 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
@@ -34,6 +37,7 @@ public class CheckPointsFirstFragment
     public EditText txtCheckPointType, txtCheckPointTypeDDetail;
     public static EditText txtCheckPointTypeDetail;
     SpinnerDialog checkPointTypeSpinnerDialog, checkPointTypeDetailSpinnerDialog, checkPointTypeDDetailSpinnerDialog;
+    private LinearLayout llTripID;
     public int CheckPointTypeID = 0, CheckPointTypeDDetailID = 0;
     public static int CheckPointTypeDetailID = 0;
     public ArrayList<Integer> CheckPointTypeList = new ArrayList<>();
@@ -48,6 +52,18 @@ public class CheckPointsFirstFragment
     public ArrayList<String> CheckPointTypeDDetailNameList = new ArrayList<>();
     public ArrayList<String> CheckPointTypeDDetailFNameList = new ArrayList<>();
 
+    public ArrayList<String> onHoldShipments = new ArrayList<>();
+    private ICheckPoint iCheckPoint;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            iCheckPoint = (ICheckPoint) context;
+        } catch (ClassCastException e) {
+            Log.d("test" , "test"  + e.toString());
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,6 +74,7 @@ public class CheckPointsFirstFragment
             txtCheckPointTypeDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDetail);
             txtCheckPointTypeDDetail = (EditText) rootView.findViewById(R.id.txtCheckPointTypeDDetail);
 
+            llTripID = rootView.findViewById(R.id.tripID_Linear);
             txtCheckPointType.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDetail.setInputType(InputType.TYPE_NULL);
             txtCheckPointTypeDDetail.setInputType(InputType.TYPE_NULL);

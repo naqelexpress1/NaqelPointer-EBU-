@@ -2,17 +2,12 @@ package com.naqelexpress.naqelpointer.Activity.BookingCBU;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.app.SearchManager;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,16 +36,14 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class BookingList extends AppCompatActivity {
+public class BookingListBackup extends AppCompatActivity {
 
 
     private SwipeMenuListView mapListview;
-    private BookingListAdapter adapter;
-    //public ArrayList<Booking> myBookingList;
-    public static ArrayList<BookingModel> myBookingList;
-    public static ArrayList<PickupSheetReasonModel> pickupSheetReasonModelArrayList;
+    private BookingListAdapterBackup adapter;
+    public ArrayList<Booking> myBookingList;
+    public ArrayList<BookingModel> bookingModelArrayList;
     private TextView nodata;
-    public static boolean isException = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +56,8 @@ public class BookingList extends AppCompatActivity {
 
             myBookingList = new ArrayList<>();
 
+            setAdapter();
+
 
             nodata = (TextView) findViewById(R.id.nodata);
 
@@ -71,7 +66,6 @@ public class BookingList extends AppCompatActivity {
                 //GetBookingList();
                 ReadfromLocal();
 
-            // setAdapter();
             // GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
 
             SwipeMenuCreator creator = new SwipeMenuCreator() {
@@ -120,21 +114,17 @@ public class BookingList extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and WaybillNo=" +
-                            myBookingList.get(position).WaybillNo, getApplicationContext());
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0 and WaybillNo=" + myBookingList.get(position).RefNo, getApplicationContext());
                     if (result.getCount() == 0) {
                         try {
 
-                            Intent intent = new Intent(BookingList.this, BookingDetailActivity.class);
+                            Intent intent = new Intent(BookingListBackup.this, BookingDetailActivity.class);
                             Bundle bundle = new Bundle();
-                            // bundle.putE("value", (Serializable) myBookingList.get(position));
-                            bundle.putSerializable("value", myBookingList);
-                            int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
-
-                            bundle.putInt("position", pos);
+                            intent.putParcelableArrayListExtra("value", myBookingList);
+                            bundle.putInt("position", position);
                             bundle.putStringArrayList("name", name);
                             bundle.putIntegerArrayList("IDs", ID);
-                            bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
+                            bundle.putString("ID", String.valueOf(myBookingList.get(position).PSDID));
                             intent.putExtras(bundle);
                             // startActivityForResult(intent, 0);
                             startActivity(intent);
@@ -155,37 +145,10 @@ public class BookingList extends AppCompatActivity {
 
     }
 
-    private SearchView searchView;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.pickupsheetmenu, menu);
-
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        searchView = (SearchView) menu.findItem(R.id.action_search)
-                .getActionView();
-        searchView.setSearchableInfo(searchManager
-                .getSearchableInfo(getComponentName()));
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-
-        // listening to search query text change
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // filter recycler view when query submitted
-                adapter.getFilter().filter(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String query) {
-                // filter recycler view when text is changed
-                adapter.getFilter().filter(query);
-                return false;
-            }
-        });
-
+        inflater.inflate(R.menu.refresh, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -193,18 +156,15 @@ public class BookingList extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.refresh:
-
                 GetBookingList();
                 return true;
-            case R.id.deleteall:
-                deleteConfirmRoute();
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
     private void setAdapter() {
-        adapter = new BookingListAdapter(BookingList.this, myBookingList, "BookingList");
+        adapter = new BookingListAdapterBackup(BookingListBackup.this, myBookingList, "BookingList");
 
         mapListview.setAdapter(adapter);
     }
@@ -258,7 +218,7 @@ public class BookingList extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
-            pd = new ProgressDialog(BookingList.this);
+            pd = new ProgressDialog(BookingListBackup.this);
             pd.setTitle("Loading");
             pd.setMessage("Downloading your Booking Request ");
             pd.show();
@@ -273,7 +233,7 @@ public class BookingList extends AppCompatActivity {
             InputStream ist = null;
 
             try {
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "PickupsheetDetailsWithLatLng"); //PickupsheetDetails
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "PickupsheetDetails");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -320,9 +280,8 @@ public class BookingList extends AppCompatActivity {
         @Override
         protected void onPostExecute(String finalJson) {
             if (finalJson != null) {
-                deleteBookingData();
                 myBookingList.clear();
-                PickupSheetDetails(finalJson);
+                Booking(finalJson);
                 pd.dismiss();
 
             } else {
@@ -335,106 +294,104 @@ public class BookingList extends AppCompatActivity {
         }
     }
 
-    public static ArrayList<String> name = new ArrayList<>();
-    public static ArrayList<Integer> ID = new ArrayList<>();
+    ArrayList<String> name = new ArrayList<>();
+    ArrayList<Integer> ID = new ArrayList<>();
 
-//    public void Booking(String finalJson) {
-//        try {
-//
-//            JSONObject dataObject = new JSONObject(finalJson);
-//            JSONArray jsonArray = dataObject.getJSONArray("PickupSheet");
-//            JSONArray jsonArrayMs = dataObject.getJSONArray("MissingReason");
-//            if (jsonArray.length() > 0) {
-//                nodata.setVisibility(View.GONE);
-//                for (int i = 0; i < jsonArray.length(); i++) {
-//
-//                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-//                    Booking instance = new Booking();
-//                    try {
-//                        //instance.ID = Integer.parseInt(jsonObject.getString("id"));
-//                        //hot code
-//                        //instance.ID = 923122 + i;
-//                        // Delete Old ID If found
-//                        //        dbConnections.DeleteBooking( instance.ID);
-//
-//                        instance.PSID = jsonObject.getInt("PickupSheetID");
-//                        instance.PSDID = jsonObject.getInt("PickupsheetDetailID");
-//                        instance.RefNo = jsonObject.getString("WaybillNo");
-//                        // instance.ClientID = Integer.parseInt(jsonObject.getString("ClientID"));
-//                        //instance.ClientName = jsonObject.getString("ClientName");
-//                        instance.PickUpReqDT = jsonObject.getString("Date");
-//                        // instance.PicesCount = jsonObject.getDouble("PicesCount");
-//                        // instance.Weight = Double.parseDouble(jsonObject.getString("Weight"));
-//                        //instance.SpecialInstruction = jsonObject.getString("SpecialInstruction");
-//                        //instance.OfficeUpTo = DateTime.parse(jsonObject.getString("OfficeUpTo"));
-//                        //instance.PickUpReqDT = DateTime.parse(jsonObject.getString("PickUpReqDT"));
-//                        instance.ContactPerson = jsonObject.getString("ConsigneeName");
-//                        instance.ContactNumber = jsonObject.getString("PhoneNo");
-//                        //instance.Address = jsonObject.getString("FirstAddress");
-//                        //instance.Latitude = jsonObject.getString("Latitude");
-//                        //instance.Longitude = jsonObject.getString("Longitude");
-//                        //instance.GPSLocation = jsonObject.getString("GPSLocation");
-//                        // instance.Status = jsonObject.getInt("CurrentStatusID");
-//                        instance.Orgin = jsonObject.getString("OrgCode");
-//                        instance.Destination = jsonObject.getString("DestCode");
-//                        //instance.LoadType = jsonObject.getString("LoadType");
-//                        //instance.BillType = jsonObject.getString("BillType");
-//                        instance.BillType = jsonObject.getString("Code");
-//                        //instance.EmployeeId = Integer.parseInt(jsonObject.getString("AssignedCourierEmployeeID"));
-//                        //instance.OriginId = jsonObject.getInt("OriginStationID");
-//                        //instance.DestinationId = jsonObject.getInt("DestinationStationID");
-//
-//
-//                        //boolean v = dbConnections.InsertBooking(instance);
-////                    System.out.println(v);
-//
-//
-//                        myBookingList.add(new Booking(instance.PSID, instance.PSDID, instance.RefNo,
-//                                instance.PickUpReqDT, instance.ContactPerson, instance.Orgin, instance.Destination, instance.BillType,
-//                                instance.ContactNumber, (i + 1)
-//                        ));
-//
-//                        // myBookingList.add(instance);
-//
-//                    } catch (JSONException ignored) {
-//                        System.out.println(ignored);
-//                    }
-//                }
-//                adapter.notifyDataSetChanged();
-//            } else
-//                nodata.setVisibility(View.VISIBLE);
-//
-//            if (jsonArrayMs.length() > 0) {
-//
-//                for (int i = 0; i < jsonArrayMs.length(); i++) {
-//
-//                    JSONObject jsonObject = jsonArrayMs.getJSONObject(i);
-//
-//                    try {
-//                        name.add(jsonObject.getString("Name"));
-//
-//                        ID.add(jsonObject.getInt("ID"));
-//
-//                    } catch (JSONException ignored) {
-//                        System.out.println(ignored);
-//                    }
-//                }
-//
-//            }
-//        } catch (JSONException ignored) {
-//            System.out.println(ignored);
-//        }
-//    }
+    public void Booking(String finalJson) {
+        try {
+
+            JSONObject dataObject = new JSONObject(finalJson);
+            JSONArray jsonArray = dataObject.getJSONArray("PickupSheet");
+            JSONArray jsonArrayMs = dataObject.getJSONArray("MissingReason");
+            if (jsonArray.length() > 0) {
+                nodata.setVisibility(View.GONE);
+                for (int i = 0; i < jsonArray.length(); i++) {
+
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    Booking instance = new Booking();
+                    try {
+                        //instance.ID = Integer.parseInt(jsonObject.getString("id"));
+                        //hot code
+                        //instance.ID = 923122 + i;
+                        // Delete Old ID If found
+                        //        dbConnections.DeleteBooking( instance.ID);
+
+                        instance.PSID = jsonObject.getInt("PickupSheetID");
+                        instance.PSDID = jsonObject.getInt("PickupsheetDetailID");
+                        instance.RefNo = jsonObject.getString("WaybillNo");
+                        // instance.ClientID = Integer.parseInt(jsonObject.getString("ClientID"));
+                        //instance.ClientName = jsonObject.getString("ClientName");
+                        instance.PickUpReqDT = jsonObject.getString("Date");
+                        // instance.PicesCount = jsonObject.getDouble("PicesCount");
+                        // instance.Weight = Double.parseDouble(jsonObject.getString("Weight"));
+                        //instance.SpecialInstruction = jsonObject.getString("SpecialInstruction");
+                        //instance.OfficeUpTo = DateTime.parse(jsonObject.getString("OfficeUpTo"));
+                        //instance.PickUpReqDT = DateTime.parse(jsonObject.getString("PickUpReqDT"));
+                        instance.ContactPerson = jsonObject.getString("ConsigneeName");
+                        instance.ContactNumber = jsonObject.getString("PhoneNo");
+                        //instance.Address = jsonObject.getString("FirstAddress");
+                        //instance.Latitude = jsonObject.getString("Latitude");
+                        //instance.Longitude = jsonObject.getString("Longitude");
+                        //instance.GPSLocation = jsonObject.getString("GPSLocation");
+                        // instance.Status = jsonObject.getInt("CurrentStatusID");
+                        instance.Orgin = jsonObject.getString("OrgCode");
+                        instance.Destination = jsonObject.getString("DestCode");
+                        //instance.LoadType = jsonObject.getString("LoadType");
+                        //instance.BillType = jsonObject.getString("BillType");
+                        instance.BillType = jsonObject.getString("Code");
+                        //instance.EmployeeId = Integer.parseInt(jsonObject.getString("AssignedCourierEmployeeID"));
+                        //instance.OriginId = jsonObject.getInt("OriginStationID");
+                        //instance.DestinationId = jsonObject.getInt("DestinationStationID");
+
+
+                        //boolean v = dbConnections.InsertBooking(instance);
+//                    System.out.println(v);
+
+
+                        myBookingList.add(new Booking(instance.PSID, instance.PSDID, instance.RefNo,
+                                instance.PickUpReqDT, instance.ContactPerson, instance.Orgin, instance.Destination, instance.BillType,
+                                instance.ContactNumber, (i + 1)
+                        ));
+
+                        // myBookingList.add(instance);
+
+                    } catch (JSONException ignored) {
+                        System.out.println(ignored);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            } else
+                nodata.setVisibility(View.VISIBLE);
+
+            if (jsonArrayMs.length() > 0) {
+
+                for (int i = 0; i < jsonArrayMs.length(); i++) {
+
+                    JSONObject jsonObject = jsonArrayMs.getJSONObject(i);
+
+                    try {
+                        name.add(jsonObject.getString("Name"));
+
+                        ID.add(jsonObject.getInt("ID"));
+
+                    } catch (JSONException ignored) {
+                        System.out.println(ignored);
+                    }
+                }
+
+            }
+        } catch (JSONException ignored) {
+            System.out.println(ignored);
+        }
+    }
 
 
     public void PickupSheetDetails(String finalJson) {
         try {
             ArrayList<BookingModel> myBookingList = new ArrayList<>();
-            ArrayList<PickupSheetReasonModel> pickupSheetReasonModels = new ArrayList<>();
             JSONObject dataObject = new JSONObject(finalJson);
             JSONArray jsonArray = dataObject.getJSONArray("PickupSheet");
             JSONArray jsonArrayMs = dataObject.getJSONArray("MissingReason");
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             if (jsonArray.length() > 0) {
 
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -455,23 +412,10 @@ public class BookingList extends AppCompatActivity {
                         instance.setRemark(jsonObject.getString("Remark"));
                         instance.setOrgCode(jsonObject.getString("OrgCode"));
                         instance.setDestCode(jsonObject.getString("DestCode"));
-                        instance.setClientID(jsonObject.getInt("ClientID"));
-                        instance.setClientName(jsonObject.getString("ClientName"));
-                        String latlng = jsonObject.getString("LatLng");
-                        String split[] = new String[2];
-                        split[0] = "0";
-                        split[1] = "0";
-                        if (latlng != null && latlng.contains(",")) {
-                            split = latlng.split(",");
-                        }
-                        instance.setLat(split[0]);
-                        instance.setLng(split[1]);
+                        instance.setLat(jsonObject.getString("Lat"));
+                        instance.setLng(jsonObject.getString("Lng"));
                         instance.setCode(jsonObject.getString("Code"));
                         instance.setEmployID(jsonObject.getInt("EmployID"));
-
-
-                        //instance.setIsPickedup(jsonObject.getInt("IsPickedup"));
-                        instance.setIsPickedup(0);
                         myBookingList.add(instance);
 
 
@@ -480,8 +424,10 @@ public class BookingList extends AppCompatActivity {
                     }
                 }
 
-
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 dbConnections.insertPickupsheetDetailsData(myBookingList, getApplicationContext());
+                dbConnections.close();
+
             }
 
             if (jsonArrayMs.length() > 0) {
@@ -491,22 +437,16 @@ public class BookingList extends AppCompatActivity {
                     JSONObject jsonObject = jsonArrayMs.getJSONObject(i);
 
                     try {
-                        PickupSheetReasonModel reasonModel = new PickupSheetReasonModel();
-                        // name.add(jsonObject.getString("Name"));
-                        //ID.add(jsonObject.getInt("ID"));
-                        reasonModel.setID(jsonObject.getInt("ID"));
-                        reasonModel.setName(jsonObject.getString("Name"));
-                        pickupSheetReasonModels.add(reasonModel);
+                        name.add(jsonObject.getString("Name"));
+
+                        ID.add(jsonObject.getInt("ID"));
 
                     } catch (JSONException ignored) {
                         System.out.println(ignored);
                     }
                 }
-                dbConnections.insertPickupsheetReasonData(pickupSheetReasonModels, getApplicationContext());
 
             }
-            dbConnections.close();
-            ReadfromLocal();
         } catch (JSONException ignored) {
             System.out.println(ignored);
         }
@@ -515,7 +455,7 @@ public class BookingList extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //outState.putParcelableArrayList("myBookingList", myBookingList);
+        outState.putParcelableArrayList("myBookingList", myBookingList);
         outState.putInt("EmployID", GlobalVar.GV().EmployID);
         outState.putInt("UserID", GlobalVar.GV().UserID);
         outState.putInt("StationID", GlobalVar.GV().StationID);
@@ -530,7 +470,7 @@ public class BookingList extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            // myBookingList = savedInstanceState.getParcelableArrayList("myBookingList");
+            myBookingList = savedInstanceState.getParcelableArrayList("myBookingList");
             setAdapter();
             GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
             GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
@@ -543,64 +483,14 @@ public class BookingList extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (isException)
-            setAdapter();
-        isException = false;
-    }
-
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        myBookingList =
+        bookingModelArrayList =
                 dbConnections.getPickupSheetDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
-        if (myBookingList.size() > 0) {
-            setAdapter();
-            nodata.setVisibility(View.GONE);
-
-            mapListview.setVisibility(View.VISIBLE);
-            pickupSheetReasonModelArrayList = dbConnections.getPickupSheetDetailsReasonData(getApplicationContext());
-        } else
+        if (bookingModelArrayList.size() > 0)
+            adapter.notifyDataSetChanged();
+        else
             nodata.setVisibility(View.VISIBLE);
-    }
-
-    private void deleteConfirmRoute() {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(BookingList.this);
-        builder1.setTitle("Info");
-        builder1.setMessage("Do you want to delete all? ");
-        builder1.setCancelable(true);
-
-        builder1.setPositiveButton(
-                "Yes",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                        deleteBookingData();
-
-                        finish();
-
-                    }
-                });
-
-        builder1.setNegativeButton(
-                "No",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
-
-        AlertDialog alert11 = builder1.create();
-        alert11.show();
-    }
-
-    private void deleteBookingData() {
-        myBookingList.clear();
-        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        dbConnections.clearAllPickupsheetData(getApplicationContext());
-
-        dbConnections.close();
     }
 }
 

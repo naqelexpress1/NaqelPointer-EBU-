@@ -20,6 +20,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -95,6 +96,7 @@ public class PlannedRoute_MyRouteComp extends Service {
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             public void run() {
                 // new DownloadJSON().execute();
                 try {
@@ -218,7 +220,8 @@ public class PlannedRoute_MyRouteComp extends Service {
                         JSONObject sl_obj = new JSONObject();
                         sl_obj.put("ID", result.getInt(result.getColumnIndex("ID")));
                         //sl_obj.put("SLByte", b.toString());
-                        String encodedString = java.util.Base64.getEncoder().encodeToString(b);
+                        String encodedString = android.util.Base64.encodeToString(b, Base64.DEFAULT);
+                        //String encodedString = java.util.Base64.getEncoder().encodeToString(b);
                         sl_obj.put("SLByte", encodedString);
                         sl_array.put(sl_obj);
 //                            String split[] = data.split("@");
@@ -257,7 +260,8 @@ public class PlannedRoute_MyRouteComp extends Service {
                         JSONObject sl_obj = new JSONObject();
                         sl_obj.put("ID", result.getInt(result.getColumnIndex("ID")));
                         sl_obj.put("position", result.getInt(result.getColumnIndex("position")));
-                        String encodedString = java.util.Base64.getEncoder().encodeToString(b);
+                       // String encodedString = java.util.Base64.getEncoder().encodeToString(b);
+                        String encodedString = android.util.Base64.encodeToString(b, Base64.DEFAULT);
                         sl_obj.put("PLByte", encodedString);
                         // sl_obj.put("Date", encodedString);
                         // sl_obj.put("PLByte", encodedString);

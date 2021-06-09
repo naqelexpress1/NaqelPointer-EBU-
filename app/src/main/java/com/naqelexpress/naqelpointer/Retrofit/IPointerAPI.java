@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Retrofit;
 
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
 import com.naqelexpress.naqelpointer.Models.NotificationModels;
+import com.naqelexpress.naqelpointer.Models.RatingModel;
 import com.naqelexpress.naqelpointer.Models.Request.CommonRequest;
 import com.naqelexpress.naqelpointer.Models.Request.NotificationRequest;
 import com.naqelexpress.naqelpointer.Models.SkipRouteLineSeqWaybillnoReasonModels;
@@ -37,4 +38,8 @@ public interface IPointerAPI {
     //for fetch district
     @POST("GetDistrictDatas")
     Observable<List<DistrictDataModel>> GetDistrictDatas(@Body CommonRequest commonRequest);
+
+    // Fetch Courier Rating
+    @POST("CourierRating")
+    Observable<RatingModel> CourierRating(@Body CommonRequest commonRequest);
 }

@@ -48,7 +48,6 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.ProjectAsyncTask;
 import com.naqelexpress.naqelpointer.JSON.Request.GetDeliveryStatusRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.GetUserMEDataRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CheckNewVersionResult;
@@ -489,23 +488,7 @@ public class LoginActivity
         public String EmployID;
         public String DeviceId;
     }
-
-    private void SetDeviceId() {
-        String DeviceId = "XXXX";
-        //To Do from FCM
-
-        Optimization optimization = new Optimization();
-
-        optimization.EmployID = String.valueOf(GlobalVar.GV().EmployID);
-        optimization.DeviceId = DeviceId;
-
-        String jsonData = JsonSerializerDeserializer.serialize(optimization, true);
-        ProjectAsyncTask task = new ProjectAsyncTask("Optimize", "Post", jsonData, "http://35.188.10.142/NaqelRouteApi/api/");
-        task.execute();
-
-
-    }
-
+    
 
 //    @Override
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1693,8 +1676,8 @@ public class LoginActivity
 
                 httpURLConnection.setRequestMethod("POST");
                 httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                httpURLConnection.setReadTimeout(30000);
-                httpURLConnection.setConnectTimeout(30000);
+                httpURLConnection.setReadTimeout(160000);
+                httpURLConnection.setConnectTimeout(160000);
 
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setDoOutput(true);

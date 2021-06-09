@@ -570,7 +570,8 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         }
 
         if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            if (txtBarCode.getText().toString().length() == 13 ||
+                    txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
 
                 // SaveData(txtBarCode.getText().toString());
 

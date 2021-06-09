@@ -99,6 +99,7 @@ public class MyRouteShipments implements Parcelable {
     public int isArea = 0;
     public String AreaData = "";
     public int isOtp;
+    public String AreaWaypoints = "";
 
     public MyRouteShipments() {
 
@@ -269,6 +270,12 @@ public class MyRouteShipments implements Parcelable {
                 instance.IsMap = jsonObject.getInt("IsMap");
                 instance.IsPlan = jsonObject.getInt("IsPlan");
                 instance.isOtp = jsonObject.getInt("IsOtp");
+
+                if (i == 0)
+                    instance.AreaWaypoints = MyRouteActivity_Complaince_GroupbyPhn.AreaData;
+                else
+                    instance.AreaWaypoints = "0";
+
                 if (jsonObject.getInt("Complaint") != 0) {
                     instance.HasComplaint = true;
                     complaint = complaint + 1;

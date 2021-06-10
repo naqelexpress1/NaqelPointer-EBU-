@@ -61,7 +61,7 @@ public class BookingDetailActivity extends AppCompatActivity
 
     TextView txtReferenceNo, txtClientId, txtClient, txtContactPerson, txtContactNo, txtOrgin,
             txtDestination, txtPiecesCount, txtWeight, txtBillType, txtLoadType, txtReqTime, txtCloseTime,
-            txtRReqTime, txtRCloseTime, txtSpecialInst;
+            txtRReqTime, txtRCloseTime, txtSpecialInst, txtBookingRefNo, txtGoodDesc;
     private GoogleMap mMap;
     BookingModel myBooking;
     String ConsigneeLatitude, ConsigneeLongitude;
@@ -88,9 +88,13 @@ public class BookingDetailActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
-        position = bundle.getInt("position");
-        bookinglist = (ArrayList<BookingModel>) getIntent().getSerializableExtra("value");
-        //bookinglist = BookingList.myBookingList;
+        try {
+            position = bundle.getInt("position");
+            if (getIntent().getParcelableArrayListExtra("value") != null)
+                bookinglist = getIntent().getParcelableArrayListExtra("value");
+        } catch (Exception e) {
+            bookinglist = BookingList.myBookingList;
+        }
         if (bookinglist.size() == 0) {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             bookinglist =
@@ -112,6 +116,9 @@ public class BookingDetailActivity extends AppCompatActivity
         txtLoadType = (TextView) findViewById(R.id.txtLoadType);
         txtReqTime = (TextView) findViewById(R.id.txtReqTime);
         txtCloseTime = (TextView) findViewById(R.id.txtCloseTime);
+        txtBookingRefNo = (TextView) findViewById(R.id.txtRefno);
+        txtGoodDesc = (TextView) findViewById(R.id.txtgoodsDesc);
+        txtCloseTime = (TextView) findViewById(R.id.txtCloseTime);
 //        txtRReqTime = (TextView) findViewById(R.id.txtRReqTime);
 //        txtRCloseTime = (TextView) findViewById(R.id.txtRCloseTime);
 
@@ -124,6 +131,17 @@ public class BookingDetailActivity extends AppCompatActivity
         TextView txtRemCloseTime = (TextView) findViewById(R.id.txtRemCloseTime);
 
 
+        txtBookingRefNo.setVisibility(View.VISIBLE);
+        txtGoodDesc.setVisibility(View.VISIBLE);
+
+        LinearLayout ll1 = (LinearLayout) findViewById(R.id.ll1);
+
+        LinearLayout ll2 = (LinearLayout) findViewById(R.id.ll2);
+
+
+        ll1.setVisibility(View.VISIBLE);
+        ll2.setVisibility(View.VISIBLE);
+
         //BookingId=GlobalVar.GV().myBookingList.get(position).ID;
 
         myBooking = bookinglist.get(position);
@@ -134,7 +152,8 @@ public class BookingDetailActivity extends AppCompatActivity
         txtContactNo.setText(myBooking.getPhoneNo());
         txtOrgin.setText(myBooking.getOrgCode());
         txtDestination.setText(myBooking.getDestCode());
-
+        txtBookingRefNo.setText(myBooking.getRefNo());
+        txtGoodDesc.setText(myBooking.getGoodDesc());
 
 //        txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
         txtPiecesCount.setVisibility(View.INVISIBLE);

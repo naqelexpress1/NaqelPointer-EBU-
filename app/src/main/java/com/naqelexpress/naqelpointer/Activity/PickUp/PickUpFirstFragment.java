@@ -341,18 +341,18 @@ public class PickUpFirstFragment
 
         try {
 
-            txtWaybillNo.setText(bookinglist.get(position).RefNo);
+            txtWaybillNo.setText(bookinglist.get(0).RefNo);
             txtWaybillNo.setInputType(InputType.TYPE_NULL);
-            txtOrigin.setText(bookinglist.get(position).Orgin); //
-            OriginID = bookinglist.get(position).OriginId;
-            txtDestination.setText(bookinglist.get(position).Destination);
+            txtOrigin.setText(bookinglist.get(0).Orgin); //
+            OriginID = bookinglist.get(0).OriginId;
+            txtDestination.setText(bookinglist.get(0).Destination);
             txtDestination.setInputType(InputType.TYPE_NULL);
             //txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
 
-            DestinationID = bookinglist.get(position).DestinationId;
-            txtClientID.setText(String.valueOf(bookinglist.get(position).ClientID));
-            //txtWeight.setText(String.valueOf(bookinglist.get(0).Weight));
-            //txtRefNo.setText(bookinglist.get(position).RefNo);
+            DestinationID = bookinglist.get(0).DestinationId;
+            txtClientID.setText(String.valueOf(bookinglist.get(0).ClientID));
+            txtWeight.setText(String.valueOf(bookinglist.get(0).Weight));
+//            txtRefNo.setText(bookinglist.get(0).);
             //txtRefNo.setInputType(InputType.TYPE_NULL);
         } catch (Exception e) {
             System.out.println(e.toString());

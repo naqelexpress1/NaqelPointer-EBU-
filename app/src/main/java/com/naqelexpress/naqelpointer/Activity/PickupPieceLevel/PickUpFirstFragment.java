@@ -106,8 +106,9 @@ public class PickUpFirstFragment
                         onBackPressed();
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                        if (txtWaybillNo.getText().length() == 8 || txtWaybillNo.getText().length() == GlobalVar.ScanWaybillLength) {
-
+                        if (txtWaybillNo.getText().length() == 8 ||
+                                txtWaybillNo.getText().length() == GlobalVar.ScanWaybillLength) {
+                            setTxtWaybillNo(txtWaybillNo.getText().toString());
                         } else
                             txtWaybillNo.setText("");
 
@@ -269,6 +270,15 @@ public class PickUpFirstFragment
         return rootView;
     }
 
+    private void setTxtWaybillNo(String barcode) {
+
+        if (barcode.length() > 8 && barcode.substring(0, 1).contains(GlobalVar.WaybillNoStartSeries)) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+        } else
+            txtWaybillNo.setText(barcode);
+        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
+    }
+
     private void setOriginDest() {
 
         if (GlobalVar.GV().IsEnglish())
@@ -327,7 +337,8 @@ public class PickUpFirstFragment
                         if (barcode.length() == 8 || barcode.length() == GlobalVar.ScanWaybillLength) {
 
                             GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
-                            txtWaybillNo.setText(barcode);
+                            setTxtWaybillNo(barcode);
+                            //txtWaybillNo.setText(barcode);
                         }
                     }
                 }

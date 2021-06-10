@@ -82,7 +82,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 152; // AuthKey , Duplicate Customer , MobileNo Verified
+    private static final int Version = 153; // AuthKey , Duplicate Customer , MobileNo Verified
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -512,7 +512,8 @@ public class DBConnections
                 "DestCode TEXT   , WaybillNo INTEGER   , Code TEXT  , " +
                 "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
                 ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
-                "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER  )");
+                "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
+                "RefNo TEXT , GoodDesc TEXT )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -1157,6 +1158,12 @@ public class DBConnections
 
             if (!isColumnExist("DistrictData", "StationID"))
                 db.execSQL("ALTER TABLE DistrictData ADD COLUMN StationID INTEGER");
+
+            if (!isColumnExist("PickupSheetDetails", "RefNo"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN RefNo TEXT");
+
+            if (!isColumnExist("PickupSheetDetails", "GoodDesc"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN GoodDesc TEXT");
         }
 
 
@@ -9451,8 +9458,8 @@ public class DBConnections
         // deleteDistrictData(context);
         String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
                 "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
-                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, " +
-                "? ,?,?,?,?);";
+                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, " +
+                "? ,?,?,?,?,?,?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
         db.beginTransaction();
@@ -9478,6 +9485,8 @@ public class DBConnections
             stmt.bindString(17, String.valueOf(booking.getClientName()));
             stmt.bindString(18, String.valueOf(booking.getIsPickedup()));
             stmt.bindString(19, String.valueOf(booking.getsNo()));
+            stmt.bindString(20, String.valueOf(booking.getRefNo()));
+            stmt.bindString(21, String.valueOf(booking.getGoodDesc()));
 
 
             stmt.execute();
@@ -9522,6 +9531,8 @@ public class DBConnections
                     bookingModel.setEmployID(cursor.getInt(cursor.getColumnIndex("EmployID")));
                     bookingModel.setClientName(cursor.getString(cursor.getColumnIndex("ClientName")));
                     bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
+                    bookingModel.setRefNo(cursor.getString(cursor.getColumnIndex("RefNo")));
+                    bookingModel.setGoodDesc(cursor.getString(cursor.getColumnIndex("GoodDesc")));
                     bookingModelArrayList.add(bookingModel);
 
                 } while (cursor.moveToNext());

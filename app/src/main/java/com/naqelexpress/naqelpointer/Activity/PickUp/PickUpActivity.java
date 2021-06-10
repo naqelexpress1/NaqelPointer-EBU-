@@ -237,7 +237,7 @@ public class PickUpActivity extends AppCompatActivity {
         }
         boolean isok = true;
         if (class_.equals("BookingDetailAcyivityforCBU")) {
-            if (dbConnections.UpdatepickupsheetdetailsID(Integer.parseInt(firstFragment.txtWaybillNo.getText().toString() ) , 2)) {
+            if (dbConnections.UpdatepickupsheetdetailsID(Integer.parseInt(firstFragment.txtWaybillNo.getText().toString()), 2)) {
                 isok = dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode);
                 if (!isok) {
                     GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);

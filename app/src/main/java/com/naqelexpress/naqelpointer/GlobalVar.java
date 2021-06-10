@@ -103,7 +103,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "Pickup : Piece/Weight - 08-06-2021 "; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "Rating/Goods/RefNo/Pickup Disable - 10-06-2021 "; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

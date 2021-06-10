@@ -128,7 +128,7 @@ public class BookingList extends AppCompatActivity {
                             Intent intent = new Intent(BookingList.this, BookingDetailActivity.class);
                             Bundle bundle = new Bundle();
                             // bundle.putE("value", (Serializable) myBookingList.get(position));
-                            bundle.putSerializable("value", myBookingList);
+                            bundle.putParcelableArrayList("value", myBookingList);
                             int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
 
                             bundle.putInt("position", pos);
@@ -457,7 +457,10 @@ public class BookingList extends AppCompatActivity {
                         instance.setDestCode(jsonObject.getString("DestCode"));
                         instance.setClientID(jsonObject.getInt("ClientID"));
                         instance.setClientName(jsonObject.getString("ClientName"));
+                        instance.setRefNo(jsonObject.getString("RefNo"));
+                        instance.setGoodDesc(jsonObject.getString("GoodDesc"));
                         String latlng = jsonObject.getString("LatLng");
+
                         String split[] = new String[2];
                         split[0] = "0";
                         split[1] = "0";

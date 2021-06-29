@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +62,7 @@ public class DeliveryThirdFragment extends Fragment {
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -73,12 +74,15 @@ public class DeliveryThirdFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-                        AddNewPiece();
+//                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
+//                        AddNewPiece();
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                        AddNewPiece8and9();
                 }
             });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(View.GONE);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -207,6 +211,22 @@ public class DeliveryThirdFragment extends Fragment {
     private void removeView() {
         if (view.getParent() != null) {
             ((ViewGroup) view.getParent()).removeView(view);
+        }
+    }
+
+    private void AddNewPiece8and9() {
+        if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
+            DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+            lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+            txtBarCode.setText("");
+            initViews();
+
+
+        } else {
+            GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
         }
     }
 

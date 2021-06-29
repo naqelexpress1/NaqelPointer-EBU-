@@ -61,7 +61,7 @@ public class BookingDetailActivity extends AppCompatActivity
 
     TextView txtReferenceNo, txtClientId, txtClient, txtContactPerson, txtContactNo, txtOrgin,
             txtDestination, txtPiecesCount, txtWeight, txtBillType, txtLoadType, txtReqTime, txtCloseTime,
-            txtRReqTime, txtRCloseTime, txtSpecialInst, txtBookingRefNo, txtGoodDesc;
+            txtRReqTime, txtRCloseTime, txtSpecialInst, txtBookingRefNo, txtGoodDesc, txtMobileNo;
     private GoogleMap mMap;
     BookingModel myBooking;
     String ConsigneeLatitude, ConsigneeLongitude;
@@ -119,6 +119,8 @@ public class BookingDetailActivity extends AppCompatActivity
         txtBookingRefNo = (TextView) findViewById(R.id.txtRefno);
         txtGoodDesc = (TextView) findViewById(R.id.txtgoodsDesc);
         txtCloseTime = (TextView) findViewById(R.id.txtCloseTime);
+        txtMobileNo = (TextView) findViewById(R.id.txtMobileNo);
+
 //        txtRReqTime = (TextView) findViewById(R.id.txtRReqTime);
 //        txtRCloseTime = (TextView) findViewById(R.id.txtRCloseTime);
 
@@ -154,6 +156,7 @@ public class BookingDetailActivity extends AppCompatActivity
         txtDestination.setText(myBooking.getDestCode());
         txtBookingRefNo.setText(myBooking.getRefNo());
         txtGoodDesc.setText(myBooking.getGoodDesc());
+        txtMobileNo.setText(myBooking.getMobileNo());
 
 //        txtPiecesCount.setText(String.valueOf(bookinglist.get(position).PicesCount));
         txtPiecesCount.setVisibility(View.INVISIBLE);
@@ -292,10 +295,28 @@ public class BookingDetailActivity extends AppCompatActivity
                 BookingDetailActivity.this);
     }
 
+    public void CallConsignee1(View view) {
+        GlobalVar.GV().makeCall(txtMobileNo.getText().toString(), getWindow().getDecorView().getRootView(),
+                BookingDetailActivity.this);
+    }
+
     public void sendWatsapp(View view) {
 
+        //String mobileno =
+        bywatsapp(myBooking.getPhoneNo());
 
-        String mobileno = myBooking.getPhoneNo();
+    }
+
+    public void sendWatsapp1(View view) {
+
+        //String mobileno =
+        bywatsapp(myBooking.getMobileNo());
+
+    }
+
+    private void bywatsapp(String mobileno) {
+        //
+
         if (!mobileno.equals("null") && mobileno != null && mobileno.length() > 0) {
             if (mobileno.length() == 10) {
                 String validate = mobileno.substring(0, 1);

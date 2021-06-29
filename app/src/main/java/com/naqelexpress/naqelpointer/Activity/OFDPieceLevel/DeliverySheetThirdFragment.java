@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,6 +82,8 @@ public class DeliverySheetThirdFragment
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+
             DBConnections dbConnections = new DBConnections(getContext(), null);
             if (GlobalVar.ValidateAutomacticDate(getContext())) {
                 dbConnections.DeleteFacilityLoggedIn(getContext());
@@ -100,7 +103,7 @@ public class DeliverySheetThirdFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13) {
+                    if (txtBarCode != null && (txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
                         if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
                             GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
                             GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
@@ -280,7 +283,7 @@ public class DeliverySheetThirdFragment
 
     private void AddNewPiece(String WaybillNo) {
         if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
                 PieceBarCodeWaybill.add(0, txtBarCode.getText().toString() + "-" + WaybillNo);
                 PieceBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());

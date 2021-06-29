@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,6 +50,8 @@ public class WayBillDetails extends Fragment // implements ResultInterface
                 waybillcount = (TextView) rootView.findViewById(R.id.waybillcount);
                 txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+                txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+
                 txtBarCode.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -61,7 +64,9 @@ public class WayBillDetails extends Fragment // implements ResultInterface
                     @Override
                     public void afterTextChanged(Editable s) {
                         if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            setTxtWaybillNo();
+
                     }
                 });
                 // waybilldetails.clear();
@@ -72,6 +77,22 @@ public class WayBillDetails extends Fragment // implements ResultInterface
         }
     }
 
+    private void setTxtWaybillNo() {
+
+        String barcode = txtBarCode.getText().toString();
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
+    }
 
     private void ValidateWayBill(String waybillno) {
         if (!validatewaybilldetails.contains(waybillno)) {

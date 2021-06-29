@@ -378,8 +378,16 @@ public class WaybillPlanActivity extends AppCompatActivity
             }
             if (GlobalVar.isCourierReachedConsigneeLocation(getApplicationContext(), Double.parseDouble(ConsigneeLatitude), Double.parseDouble(ConsigneeLongitude))) {
 
+                String waybillno = "";
+                if (txtWaybillNo.getText().toString().length() == 8)
+                    waybillno = txtWaybillNo.getText().toString().substring(0, 8);
+                else
 
-                String waybillno = txtWaybillNo.getText().toString().substring(0, 8);
+                    waybillno = txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength);
+
+                if (waybillno.length() == 0)
+                    finish();
+
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 Cursor result = dbConnections.Fill("select PiecesCount from MyRouteShipments Where ItemNo = '"
                                 + waybillno + "'",
@@ -488,7 +496,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
             GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
         } catch (Exception e) {
-            
+
         }
     }
 
@@ -946,7 +954,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 getWaybillNo() + " " +
                 getString(R.string.customerLocationMsg3En) + " " +
                 getClientName();
-        final String infoTrackLink = getString(R.string.infotrackLocationLink)+getWaybillNo();
+        final String infoTrackLink = getString(R.string.infotrackLocationLink) + getWaybillNo();
         return locationMsgAr + "\n\n" + locationMsgEn + "\n\n" + infoTrackLink;
     }
 

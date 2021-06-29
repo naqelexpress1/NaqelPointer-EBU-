@@ -488,7 +488,7 @@ public class LoginActivity
         public String EmployID;
         public String DeviceId;
     }
-    
+
 
 //    @Override
 //    public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -810,6 +810,8 @@ public class LoginActivity
                     installaionfile = "terminalapp.apk";
                 else if (!GetDivision())
                     installaionfile = "naqelpointerEBU.apk";
+
+                setinstallationfile();
 
                 URL url = new URL(GlobalVar.GV().NaqelApk + installaionfile);
                 connection = (HttpURLConnection) url.openConnection();
@@ -1306,6 +1308,7 @@ public class LoginActivity
 
                     }
 
+                    setinstallationfile();
 
                     if (GlobalVar.GV().CheckDataAvailability(getUserMEDataResult.Division, getApplicationContext(),
                             getUserMEDataResult.EmployID, getUserMEDataResult.Password, getUserMEDataResult.UpdateMenu)) {
@@ -1348,6 +1351,15 @@ public class LoginActivity
             dismissUserMeProgressdialog();
             super.onPostExecute(String.valueOf(finalJson));
         }
+    }
+
+    private void setinstallationfile() {
+        if (GlobalVar.GV().IsTerminalApp)
+            installaionfile = "terminalapp.apk";
+        else if (GlobalVar.GV().LoginVariation)
+            installaionfile = "naqelpointerEBU.apk";
+        else
+            installaionfile = "naqelpointer.apk";
     }
 
 
@@ -1468,7 +1480,7 @@ public class LoginActivity
                     if (GlobalVar.GV().EmployID == 19127) //&& GlobalVar.GV().EmployID == 17099
                         versioncode = jo.getInt("VersionCode");
 
-
+                    setinstallationfile();
                     if (jo.getInt("VersionCode") == versioncode) {
                         // if (jo.getInt("ChangesMainMenu") == 1) {
                         JSONArray station = jsonObject.getJSONArray("Station");

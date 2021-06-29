@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -28,7 +29,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -41,6 +44,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.RatingBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -175,6 +179,8 @@ public class MainPageActivity
     TableLayout tl, tl1;
     TextView user, version, devicestatus;
     LinearLayout llValidation;
+    float Rating = 0;
+    RatingBar ratingBar;
 
     //TextView out
     @Override
@@ -200,6 +206,9 @@ public class MainPageActivity
             tvValidationCountBody = findViewById(R.id.tv_validation_file_count_body);
             llValidation = findViewById(R.id.ll_validation);
 
+            ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+            ratingBar.setNumStars(3);
+            ratingBar.setVisibility(View.GONE);
             tl = (TableLayout) findViewById(R.id.tl);
             tl1 = (TableLayout) findViewById(R.id.tl1);
 
@@ -322,6 +331,7 @@ public class MainPageActivity
 
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Rating = dbConnections.getCourierRating(GlobalVar.GV().EmployID, getApplicationContext());
 
         setValidationText();
 
@@ -395,11 +405,11 @@ public class MainPageActivity
             devision = result.getString(result.getColumnIndex("Division"));
             menu = result.getInt(result.getColumnIndex("Menu"));
 
-            if (GlobalVar.GV().EmployID == 19127) {
-                devision = "Express";
-                menu = 1;
-                LoadMenu();
-            }
+//            if (GlobalVar.GV().EmployID == 19127) {
+//                devision = "Express";
+//                menu = 1;
+//                LoadMenu();
+//            }
 //                    devision = "Express";
             if (devision.equals("0")) {
 
@@ -747,15 +757,25 @@ public class MainPageActivity
             MainPageNavigation();
 
         if (devision.equals("Express") || devision.equals("IRS")) {
-            tl.setVisibility(View.GONE);
-            tl1.setVisibility(View.GONE);
+            hidevisibleproductivity();
         } else if (GlobalVar.GV().IsTerminalApp) {
-            tl.setVisibility(View.GONE);
-            tl1.setVisibility(View.GONE);
+            hidevisibleproductivity();
         } else if (devision.equals("Courier")) {
-            tl.setVisibility(View.VISIBLE);
-            tl1.setVisibility(View.VISIBLE);
+            enablevisibleproductivity();
         }
+    }
+
+    private void hidevisibleproductivity() {
+        tl.setVisibility(View.GONE);
+        tl1.setVisibility(View.GONE);
+        ratingBar.setVisibility(View.GONE);
+    }
+
+    private void enablevisibleproductivity() {
+        ratingBar.setRating(Rating);
+        ratingBar.setVisibility(View.VISIBLE);
+        tl.setVisibility(View.VISIBLE);
+        tl1.setVisibility(View.VISIBLE);
     }
 
     private void GetMasterData() {
@@ -1395,6 +1415,14 @@ public class MainPageActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
+        if (devision.equals("Courier")) {
+            MenuItem item = menu.findItem(R.id.ratingmeanu);
+            item.setVisible(true);
+            SpannableString s = new SpannableString("Rating " + String.valueOf(Rating));
+            s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
+            item.setTitle(s);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 

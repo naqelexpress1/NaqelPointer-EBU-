@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +63,7 @@ public class DeliverySheetSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtWaybillNo.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -74,16 +76,20 @@ public class DeliverySheetSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
-                            txtWaybillNo.getText().toString().length() == 9)
-                    )
-                        AddNewWaybill();
+//                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
+//                            txtWaybillNo.getText().toString().length() == 9)
+//                    )
+//                        AddNewWaybill();
+                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                        setTxtWaybillNo();
                 }
             });
 
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
             //intent = new Intent(getActivity().getApplicationContext(), NewBarCodeScanner.class);
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -134,6 +140,25 @@ public class DeliverySheetSecondFragment
 
 
         return rootView;
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWaybillNo.getText().toString();
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            //AddNewWaybill();//(txtWaybillNo.getText().toString().substring(0, 8));
+            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void initViews() {
@@ -284,6 +309,25 @@ public class DeliverySheetSecondFragment
         }
     }
 
+    private void AddNewWaybill8and9(String WaybillNo) {
+        // String WaybillNo = txtWaybillNo.getText().toString();
+        //if (WaybillNo.length() > 8)
+        //  WaybillNo = WaybillNo.substring(0, 8);
+
+        if (WaybillNo.toString().length() >= 8) {
+            if (!WaybillList.contains(WaybillNo.toString())) {
+                WaybillList.add(0, WaybillNo.toString());
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                lbTotal.setText(getString(R.string.lbCount) + WaybillList.size());
+                txtWaybillNo.setText("");
+                initViews();
+            } else {
+                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                txtWaybillNo.setText("");
+            }
+        }
+    }
 //    @SuppressLint("RestrictedApi")
 //    private void initDialog() {
 //        alertDialog = new AlertDialog.Builder(this.getContext());

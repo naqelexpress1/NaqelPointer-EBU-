@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,7 +57,7 @@ public class Waybill extends Fragment {
 
 
             txtBarCode = (EditText) rootView.findViewById(R.id.waybillno);
-
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             waybilgrid = (GridView) rootView.findViewById(R.id.waybills);
             adapter = new WaybillAdapter(validatewaybillist, getContext(), getActivity());
             waybilgrid.setAdapter(adapter);
@@ -74,7 +75,8 @@ public class Waybill extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                        ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                        setTxtWaybillNo();
                 }
             });
 
@@ -83,6 +85,23 @@ public class Waybill extends Fragment {
         }
 
         return rootView;
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtBarCode.getText().toString();
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void ReadFromLocal() {

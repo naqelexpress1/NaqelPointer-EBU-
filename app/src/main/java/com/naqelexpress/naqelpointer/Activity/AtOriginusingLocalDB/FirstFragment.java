@@ -62,8 +62,14 @@ public class FirstFragment extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
+                            //if (setTxtWaybillNo())
+                            setTxtWaybillNo();
+//                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            //  ValidateWayBill(txtBarCode.getText().toString());
+                        }
                     }
                 });
 
@@ -78,6 +84,23 @@ public class FirstFragment extends Fragment {
 
             return rootView;
         }
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtBarCode.getText().toString();
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void ValidateWayBill(String waybillno) {

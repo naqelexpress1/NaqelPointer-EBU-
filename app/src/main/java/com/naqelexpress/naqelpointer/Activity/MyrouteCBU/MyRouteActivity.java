@@ -442,7 +442,7 @@ public class MyRouteActivity
                     System.out.println(e.getMessage());
                 }
                 return true;
-                //Replace with Refresh button , for RouteLine Seq
+            //Replace with Refresh button , for RouteLine Seq
 //            case R.id.camera:
 //
 //                if (!GlobalVar.GV().checkPermission(MyRouteActivity.this, GlobalVar.PermissionType.Camera)) {
@@ -906,7 +906,7 @@ public class MyRouteActivity
             try {
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 boolean loop = false;
-                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext());
+                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext() ,0);
                 int time = 1000;
                 while (!loop)
                     Thread.sleep(time);

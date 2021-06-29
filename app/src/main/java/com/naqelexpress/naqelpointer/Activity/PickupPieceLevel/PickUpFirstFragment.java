@@ -9,9 +9,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
-import android.view.KeyEvent;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +86,7 @@ public class PickUpFirstFragment
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.addTextChangedListener(textWatcher);
             txtWaybillNo.setKeyListener(null);
             txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
@@ -97,26 +99,26 @@ public class PickUpFirstFragment
             clientdetails = new ArrayList<>();
 
 
-            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        onBackPressed();
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                        if (txtWaybillNo.getText().length() == 8 ||
-                                txtWaybillNo.getText().length() == GlobalVar.ScanWaybillLength) {
-                            setTxtWaybillNo(txtWaybillNo.getText().toString());
-                        } else
-                            txtWaybillNo.setText("");
-
-                        return true;
-                    }
-                    return false;
-                }
-            });
+//            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        onBackPressed();
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                        if (txtWaybillNo.getText().length() == 8 ||
+//                                txtWaybillNo.getText().length() == GlobalVar.ScanWaybillLength) {
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+//                        } else
+//                            txtWaybillNo.setText("");
+//
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
 
 
             adapter = new PickupAdapter(clientdetails, getContext());
@@ -270,9 +272,24 @@ public class PickUpFirstFragment
         return rootView;
     }
 
-    private void setTxtWaybillNo(String barcode) {
+    private void setTxtWaybillNo() {
 
-        if (barcode.length() > 8 && barcode.substring(0, 1).contains(GlobalVar.WaybillNoStartSeries)) {
+        String barcode = txtWaybillNo.getText().toString();
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+    }
+
+    private void setTxtWaybillNo(String barcode) {
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() > 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
             txtWaybillNo.setText(barcode.substring(0, 8));
         } else
             txtWaybillNo.setText(barcode);
@@ -512,4 +529,26 @@ public class PickUpFirstFragment
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
 }

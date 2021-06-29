@@ -59,6 +59,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurement;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurementDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
+import com.naqelexpress.naqelpointer.Models.RatingModel;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidationGWT;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnlineValidationOffset;
@@ -82,7 +83,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 153; // AuthKey , Duplicate Customer , MobileNo Verified
+    private static final int Version = 156; // AuthKey , Duplicate Customer , MobileNo Verified
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -471,6 +472,13 @@ public class DBConnections
                 "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
                 "\"issync\"  int )");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierRating\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT " +
+                "NOT NULL  UNIQUE , " +
+                "\"EmployID\" INT NOT NULL , \"Rating\"  TEXT )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupsheetMobileNo\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"Name\" INTEGER NOT NULL , \"MobileNo\" TEXT, \"RawID\" INTEGER  )");
+
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
                 "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -513,7 +521,7 @@ public class DBConnections
                 "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
                 ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
                 "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
-                "RefNo TEXT , GoodDesc TEXT )");
+                "RefNo TEXT , GoodDesc TEXT , MobileNo TEXT  )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -819,6 +827,10 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"FBNode\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     " Node TEXT  NOT NULL , EmpID Integer Not Null)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupsheetMobileNo\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"Name\" INTEGER NOT NULL , \"MobileNo\" TEXT, \"RawID\" INTEGER  )");
+
             /*  Added By : Riyam */
             db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
                     "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -884,10 +896,15 @@ public class DBConnections
                     "DestCode TEXT   , WaybillNo INTEGER   , Code TEXT  , " +
                     "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
                     ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
-                    "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER  )");
+                    "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
+                    "RefNo TEXT , GoodDesc TEXT  ,  MobileNo TEXT  )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierRating\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT " +
+                    "NOT NULL  UNIQUE , " +
+                    "\"EmployID\" INT NOT NULL , \"Rating\"  TEXT )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -1164,6 +1181,10 @@ public class DBConnections
 
             if (!isColumnExist("PickupSheetDetails", "GoodDesc"))
                 db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN GoodDesc TEXT");
+
+            if (!isColumnExist("PickupSheetDetails", "MobileNo"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN MobileNo TEXT");
+
         }
 
 
@@ -3211,7 +3232,7 @@ public class DBConnections
                 db.delete("BarCode", "Date!=?", args);
                 db.delete("Complaint", "Date!=?", args);
                 db.delete("Productivity", "Date!=?", args);
-                GlobalVar.deleteContactRawID(ContactDetails(context), context);
+                GlobalVar.deleteContactRawID(ContactDetails(context), context, 0);
             } catch (Exception e) {
                 GlobalVar.GV().ShowSnackbar(view, e.getMessage(), GlobalVar.AlertType.Error);
             }
@@ -9458,8 +9479,8 @@ public class DBConnections
         // deleteDistrictData(context);
         String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
                 "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
-                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, " +
-                "? ,?,?,?,?,?,?);";
+                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc , MobileNo" +
+                " ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ? ,?,?,?,?,?,? ,?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
         db.beginTransaction();
@@ -9487,7 +9508,7 @@ public class DBConnections
             stmt.bindString(19, String.valueOf(booking.getsNo()));
             stmt.bindString(20, String.valueOf(booking.getRefNo()));
             stmt.bindString(21, String.valueOf(booking.getGoodDesc()));
-
+            stmt.bindString(22, String.valueOf(booking.getMobileNo()));
 
             stmt.execute();
             //long entryID = stmt.executeInsert();
@@ -9533,6 +9554,8 @@ public class DBConnections
                     bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
                     bookingModel.setRefNo(cursor.getString(cursor.getColumnIndex("RefNo")));
                     bookingModel.setGoodDesc(cursor.getString(cursor.getColumnIndex("GoodDesc")));
+                    bookingModel.setMobileNo(cursor.getString(cursor.getColumnIndex("MobileNo")));
+
                     bookingModelArrayList.add(bookingModel);
 
                 } while (cursor.moveToNext());
@@ -9652,5 +9675,99 @@ public class DBConnections
             Log.d("test", "getFacilityID " + e.toString());
         }
         return pwd;
+    }
+
+    public boolean InsertCourierRating(RatingModel instance, Context context) {
+
+        Long result = null;
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            db.execSQL("delete from CourierRating");
+            ContentValues contentValues = new ContentValues();
+
+            contentValues.put("EmployID", GlobalVar.GV().EmployID);
+            contentValues.put("Rating", String.valueOf(instance.getRating()));
+
+            result = db.insert("CourierRating", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+
+    }
+
+    public float getCourierRating(int EmployID, Context context) {
+
+        Cursor cursor = null;
+        float Rating = 0;
+        try {
+            String selectQuery = "SELECT Rating FROM CourierRating Where EmployID = " + EmployID;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            cursor = db.rawQuery(selectQuery, null);
+
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                Rating = Float.parseFloat(cursor.getString(cursor.getColumnIndex("Rating")));
+            }
+            cursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return Rating;
+    }
+
+    public boolean InsertPickupSheetMnos(String name, String Mno, int rawid, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("Name", name);
+            contentValues.put("MobileNo", Mno);
+            contentValues.put("RawID", rawid);
+            result = db.insert("PickupsheetMobileNo", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public ArrayList<HashMap<String, String>> PickupSheetContactDetails(Context context) {
+        ArrayList<HashMap<String, String>> contactdetails = new ArrayList<HashMap<String, String>>();
+        try {
+            Cursor mnocursor = Fill("select * from PickupsheetMobileNo", context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("mno", mnocursor.getString(mnocursor.getColumnIndex("MobileNo")));
+                    temp.put("name", mnocursor.getString(mnocursor.getColumnIndex("Name")));
+                    temp.put("rawid", String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("RawID"))));
+                    contactdetails.add(temp);
+
+                } while (mnocursor.moveToNext());
+            }
+            mnocursor.close();
+        } catch (SQLiteException e) {
+
+        } finally {
+
+        }
+        return contactdetails;
+    }
+
+    public void DeleteContactWithRaw_Pickupsheet(int ID, String name, String Mno) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String args[] = {String.valueOf(ID), name, Mno};
+        db.delete("PickupsheetMobileNo", "RawID = ? AND Name = ? AND MobileNo = ?", args);
+        db.close();
     }
 }

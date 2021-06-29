@@ -49,13 +49,14 @@ public class CourierRating extends AppCompatActivity implements AlertCallback {
             @Override
             public void run() {
                 try {
-                    sleep(10000);
+                    sleep(5000);
 
                     redirectMainPage();
 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    redirectMainPage();
+                    finish();
+                    //redirectMainPage();
                 }
             }
         };
@@ -70,18 +71,21 @@ public class CourierRating extends AppCompatActivity implements AlertCallback {
 
 
     private void FetchRating() {
-        GlobalVar.GV().alertMsgAll("Info", "Please wait to Rating", CourierRating.this,
+        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        int EMPID = GlobalVar.GetEmployID(getApplicationContext());
+        GlobalVar.GV().alertMsgAll("Info", "Please wait " + String.valueOf(EMPID), CourierRating.this,
                 Enum.PROGRESS_TYPE, "CourierRating");
 
         CommonRequest commonRequest = new CommonRequest();
-        commonRequest.setEmployID(GlobalVar.GV().EmployID);
-        commonRequest.setPassword(DBConnections.getUserPassword(getApplicationContext(), GlobalVar.GV().EmployID));
+        commonRequest.setEmployID(EMPID);
+        commonRequest.setPassword(DBConnections.getUserPassword(getApplicationContext(), EMPID));
 
         RatingApi.fetchRating(new Callback<RatingModel>() {
             @Override
             public void returnResult(RatingModel result) {
                 System.out.println();
                 // listen to the rating bar changes
+                dbConnections.InsertCourierRating(result, getApplicationContext());
                 addListenerOnRatingBar(result.getRating());
                 RedirecttoMainPage();
 
@@ -90,9 +94,13 @@ public class CourierRating extends AppCompatActivity implements AlertCallback {
 
             @Override
             public void returnError(String message) {
-                RedirecttoMainPage();
-                System.out.println(message);
+                //RedirecttoMainPage();
                 exitdialog();
+                GlobalVar.GV().alertMsgAll("Info", message, CourierRating.this,
+                        Enum.NORMAL_TYPE, "CourierRating");
+
+                System.out.println(message);
+
             }
         }, commonRequest);
     }
@@ -101,10 +109,11 @@ public class CourierRating extends AppCompatActivity implements AlertCallback {
     public void addListenerOnRatingBar(float ratingtxt) {
 
         final RatingBar ratingBar = (RatingBar) findViewById(R.id.ratingBar);
+        ratingBar.setNumStars(3);
         final TextView ratingBarResult = (TextView) findViewById(R.id.ratingBarResult);
 
         ratingBar.setRating(ratingtxt);
-        ratingBarResult.setText("Result : " + String.valueOf(ratingtxt));
+        ratingBarResult.setText(String.valueOf(ratingtxt));
 
 //        ratingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 //            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {

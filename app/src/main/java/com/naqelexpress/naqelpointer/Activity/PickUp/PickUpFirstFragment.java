@@ -12,7 +12,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -105,6 +107,8 @@ public class PickUpFirstFragment
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.addTextChangedListener(textWatcher);
+
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
             txtWeight = (EditText) rootView.findViewById(R.id.txtWeight);
@@ -319,6 +323,25 @@ public class PickUpFirstFragment
             }
         });
 
+//        txtWaybillNo.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
+//                        txtWaybillNo.getText().toString().length() == GlobalVar.ScanWaybillLength)
+//                )
+//                    setTxtWaybillNo(txtWaybillNo.getText().toString());
+//            }
+//        });
+
         return rootView;
     }
 
@@ -418,12 +441,30 @@ public class PickUpFirstFragment
         }
     }
 
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWaybillNo.getText().toString();
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+    }
+
     private void setTxtWaybillNo(String barcode) {
 
-        if (barcode.length() > 8 && barcode.substring(0, 1).contains(GlobalVar.WaybillNoStartSeries)) {
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() > 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
             txtWaybillNo.setText(barcode.substring(0, 8));
         } else
             txtWaybillNo.setText(barcode);
+
+        txtPiecesCount.requestFocus();
         GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
     }
 
@@ -757,4 +798,26 @@ public class PickUpFirstFragment
         alertDialog.show();
 
     }
+
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
 }

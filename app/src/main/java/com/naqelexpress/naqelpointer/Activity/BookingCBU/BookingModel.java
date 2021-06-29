@@ -23,8 +23,17 @@ public class BookingModel implements Parcelable {
     public String ClientName = "";
     public int ClientID;
     public int EmployID;
-    public String GoodDesc ="";
+    public String GoodDesc = "";
     public String RefNo = "";
+    public String MobileNo = "";
+
+    public String getMobileNo() {
+        return MobileNo;
+    }
+
+    public void setMobileNo(String mobileNo) {
+        MobileNo = mobileNo;
+    }
 
     public BookingModel() {
     }
@@ -67,6 +76,7 @@ public class BookingModel implements Parcelable {
         EmployID = in.readInt();
         RefNo = in.readString();
         GoodDesc = in.readString();
+        MobileNo = in.readString();
     }
 
     public static final Creator<BookingModel> CREATOR = new Creator<BookingModel>() {
@@ -261,5 +271,6 @@ public class BookingModel implements Parcelable {
         parcel.writeInt(EmployID);
         parcel.writeString(RefNo);
         parcel.writeString(GoodDesc);
+        parcel.writeString(MobileNo);
     }
 }

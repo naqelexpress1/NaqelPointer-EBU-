@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,6 +51,7 @@ public class NotDeliveredFirstFragment extends Fragment implements DatePickerDia
 
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.setFilters(new InputFilter[] { new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength) });
             txtpieces = (EditText) rootView.findViewById(R.id.pieces);
             txtReason = (EditText) rootView.findViewById(R.id.txtReason);
             txtReason.setInputType(InputType.TYPE_NULL);

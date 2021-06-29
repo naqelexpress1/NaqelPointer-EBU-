@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +43,7 @@ public class SingleLoad extends Fragment {
 
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -54,8 +55,9 @@ public class SingleLoad extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-                        ValidateWayBill(txtBarCode.getText().toString());
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                        // ValidateWayBill(txtBarCode.getText().toString());
+                        setBarcode();
                 }
             });
 
@@ -66,6 +68,16 @@ public class SingleLoad extends Fragment {
 
         ReadFromLocal();
         return rootView;
+    }
+
+    private void setBarcode() {
+        if (txtBarCode.getText().length() >= 13) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidateWayBill(txtBarCode.getText().toString());
+
+        }
+
+
     }
 
     private void ValidateWayBill(String barcode) {

@@ -72,7 +72,8 @@ public class PickUpSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
+                    if (txtBarCode != null && txtBarCode.getText().length() == 13
+                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
                         AddNewPiece();
                 }
             });

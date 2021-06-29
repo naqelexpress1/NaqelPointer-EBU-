@@ -1189,7 +1189,7 @@ public class MyRouteActivity_Complaince
             try {
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 boolean loop = false;
-                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext());
+                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext() , 0);
                 int time = 1000;
                 while (!loop)
                     Thread.sleep(time);

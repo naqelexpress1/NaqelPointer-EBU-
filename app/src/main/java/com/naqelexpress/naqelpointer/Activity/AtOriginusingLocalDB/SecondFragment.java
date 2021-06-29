@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -69,12 +70,13 @@ public class SecondFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-                        ValidateWayBill(txtBarCode.getText().toString());
+                    //if (txtBarCode != null && txtBarCode.getText().length() == 13)
+                    //    ValidateWayBill(txtBarCode.getText().toString());
+                    setBarcode();
                 }
             });
 
-
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
             // SelectedwaybillBardetails.clear();
             // ValidateBarCodeList.clear();
             lbTotal.setText(getString(R.string.lbCount) + SelectedwaybillBardetails.size());
@@ -84,6 +86,20 @@ public class SecondFragment extends Fragment {
 
         return rootView;
     }
+
+
+    private void setBarcode() {
+        if (txtBarCode.getText().length() >= 13) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidateWayBill(txtBarCode.getText().toString());
+
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
+    }
+
 
     private void ValidateWayBill(String barcode) {
         if (!ValidateBarCodeList.contains(barcode)) {

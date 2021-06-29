@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -54,6 +55,7 @@ public class DeliverySheetThirdFragment
         super.onCreate(savedInstanceState);
         setRetainInstance(true); //Will ignore onDestroy Method (Nested Fragments no need this if parent have it)
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -65,6 +67,7 @@ public class DeliverySheetThirdFragment
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -77,14 +80,17 @@ public class DeliverySheetThirdFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-                        AddNewPiece();
+//                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
+//                        AddNewPiece();
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                        setBarcode();
                 }
             });
 
             intent = new Intent(this.getContext(), NewBarCodeScanner.class);
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -101,6 +107,18 @@ public class DeliverySheetThirdFragment
         }
 
         return rootView;
+    }
+
+    private void setBarcode() {
+        if (txtBarCode.getText().length() >= 13) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            AddNewPiece13and14();
+
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void initViews() {
@@ -231,6 +249,22 @@ public class DeliverySheetThirdFragment
     private void AddNewPiece() {
         if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 13) {
+                PieceBarCodeList.add(0, txtBarCode.getText().toString());
+                lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                txtBarCode.setText("");
+                initViews();
+            }
+        } else {
+            GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+        }
+    }
+
+    private void AddNewPiece13and14() {
+        if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
+            if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
                 PieceBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

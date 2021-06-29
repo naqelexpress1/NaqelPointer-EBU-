@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -70,6 +72,8 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
 
         txtWaybillNo = (EditText) findViewById(R.id.txtWaybillNo);
+        txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+
         txtWeight = (EditText) findViewById(R.id.weight);
         txtTotalPieces = (EditText) findViewById(R.id.txtTotalPieces);
         txtReason = (EditText) findViewById(R.id.txtReason);
@@ -93,6 +97,27 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             txtTotalPieces.setText(bundle.getString("PiecesCount"));
             txtTotalPieces.setEnabled(false);
         }
+
+        txtWaybillNo.addTextChangedListener(textWatcher);
+      /*  txtWaybillNo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+//                    if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() == 8 ||
+//                            txtWaybillNo.getText().toString().length() == 9)
+//                        AddNewWaybill();
+                if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                    //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                    setTxtWaybillNo();
+            }
+        });*/
 
         chNoVolume.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -196,8 +221,29 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
                 }
             }
         });
-        if (!GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID).equals("Express"))
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+        // if (!GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID).equals("Express"))
+        //     txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWaybillNo.getText().toString();
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void visibleWeightModule() {
@@ -688,5 +734,27 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
 }
 

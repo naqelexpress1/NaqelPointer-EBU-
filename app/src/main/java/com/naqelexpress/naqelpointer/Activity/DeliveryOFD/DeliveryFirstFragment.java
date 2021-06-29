@@ -18,6 +18,7 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
+import android.text.InputFilter;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -100,6 +101,7 @@ public class DeliveryFirstFragment
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             actualLocation.setVisibility(View.GONE);
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtConsigneeName = (TextView) rootView.findViewById(R.id.txtConsigneeName);
             txtBillingType = (TextView) rootView.findViewById(R.id.txtBillingType);
             txtCODAmount = (TextView) rootView.findViewById(R.id.txtCODAmount);
@@ -380,7 +382,11 @@ public class DeliveryFirstFragment
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         if (barcode.length() > 8)
-                            barcode = barcode.substring(0, 8);
+                            //barcode = barcode.substring(0, 8);
+                            if (barcode.length() == 8)
+                                barcode = barcode.substring(0, 8);
+                            else
+                                barcode = barcode.substring(0, GlobalVar.ScanWaybillLength);
                         txtWaybillNo.setText(barcode);
                         GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                     }

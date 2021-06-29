@@ -103,7 +103,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "Rating/Goods/RefNo/Pickup Disable - 10-06-2021 "; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "ASR MNO Auto Save - 29-06-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -121,7 +121,7 @@ public class GlobalVar {
     //
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
-    public static String WaybillNoStartSeries = "8";
+    public static String WaybillNoStartSeries = "812345679"; //
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -2958,7 +2958,7 @@ public class GlobalVar {
 
 
     public static boolean deleteContactRawID
-            (ArrayList<HashMap<String, String>> contacts, Context context) {
+            (ArrayList<HashMap<String, String>> contacts, Context context, int callfunction) {
         // First select raw contact id by given name and family name.
         DBConnections dbConnections = new DBConnections(context, null);
         for (HashMap<String, String> contact : contacts) {
@@ -3011,7 +3011,10 @@ public class GlobalVar {
 
             // Delete raw_contacts table related data.
             contentResolver.delete(contactUri, contactWhereClause.toString(), null);
-            dbConnections.DeleteContactWithRaw(Integer.parseInt(contact.get("rawid")), contact.get("name"), contact.get("mno"));
+            if (callfunction == 0)
+                dbConnections.DeleteContactWithRaw(Integer.parseInt(contact.get("rawid")), contact.get("name"), contact.get("mno"));
+            else if (callfunction == 1)
+                dbConnections.DeleteContactWithRaw_Pickupsheet(Integer.parseInt(contact.get("rawid")), contact.get("name"), contact.get("mno"));
 
         }
         dbConnections.close();

@@ -17,6 +17,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,7 +60,9 @@ public class MultiDeliverySecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtWaybilll = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybilll.addTextChangedListener(new TextWatcher() {
+            txtWaybilll.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+            txtWaybilll.addTextChangedListener(textWatcher);
+           /* txtWaybilll.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -71,14 +74,15 @@ public class MultiDeliverySecondFragment
                 @Override
                 public void afterTextChanged(Editable s) {
                     if (txtWaybilll != null && txtWaybilll.getText().toString().length() == 8 ||
-                            txtWaybilll.getText().toString().length() == 9)
+                            txtWaybilll.getText().toString().length() == GlobalVar.ScanWaybillLength)
                         AddNewWaybill();
                 }
-            });
+            });*/
 
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
             intent = new Intent(getActivity(), NewBarCodeScanner.class);
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            btnOpenCamera.setVisibility(view.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -97,6 +101,27 @@ public class MultiDeliverySecondFragment
             // initDialog();
         }
         return rootView;
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWaybilll.getText().toString();
+        // txtWaybilll.removeTextChangedListener(textWatcher);
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            AddNewWaybill8and9(barcode.substring(0, 8));
+
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     private void initViews() {
@@ -216,10 +241,31 @@ public class MultiDeliverySecondFragment
         }
     }
 
+
+    private void AddNewWaybill8and9(String WaybillNo) {
+
+
+        if (WaybillNo.toString().length() == 8 || WaybillNo.toString().length() == GlobalVar.ScanWaybillLength) {
+            if (!WaybillList.contains(WaybillNo.toString())) {
+                WaybillList.add(0, WaybillNo.toString());
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                lbTotal.setText(getString(R.string.lbCount) + WaybillList.size());
+                txtWaybilll.setText("");
+                initViews();
+            } else {
+                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                txtWaybilll.setText("");
+            }
+        }
+        txtWaybilll.addTextChangedListener(textWatcher);
+    }
+
     private void AddNewWaybill() {
         String WaybillNo = txtWaybilll.getText().toString();
         if (WaybillNo.length() > 8)
             WaybillNo = WaybillNo.substring(0, 8);
+
         if (WaybillNo.toString().length() == 8) {
             if (!WaybillList.contains(WaybillNo.toString())) {
                 WaybillList.add(0, WaybillNo.toString());
@@ -294,4 +340,26 @@ public class MultiDeliverySecondFragment
             initViews();
         }
     }
+
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybilll != null && txtWaybilll.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
 }

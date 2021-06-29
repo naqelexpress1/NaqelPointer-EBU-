@@ -25,7 +25,9 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.Global;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
 import com.naqelexpress.naqelpointer.R;
 
 import org.json.JSONArray;
@@ -62,7 +64,8 @@ public class BookingList extends AppCompatActivity {
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
 
             myBookingList = new ArrayList<>();
-
+            ID.clear();
+            name.clear();
 
             nodata = (TextView) findViewById(R.id.nodata);
 
@@ -459,7 +462,13 @@ public class BookingList extends AppCompatActivity {
                         instance.setClientName(jsonObject.getString("ClientName"));
                         instance.setRefNo(jsonObject.getString("RefNo"));
                         instance.setGoodDesc(jsonObject.getString("GoodDesc"));
+                        instance.setMobileNo(jsonObject.getString("MobileNo"));
                         String latlng = jsonObject.getString("LatLng");
+
+                        savemobilenointocontacts(jsonObject.getString("PhoneNo"),
+                                jsonObject.getString("MobileNo"), jsonObject.getString("ConsigneeName"),
+                                String.valueOf(i + 1), String.valueOf(jsonObject.getInt("WaybillNo")));
+
 
                         String split[] = new String[2];
                         split[0] = "0";
@@ -512,6 +521,26 @@ public class BookingList extends AppCompatActivity {
             ReadfromLocal();
         } catch (JSONException ignored) {
             System.out.println(ignored);
+        }
+    }
+
+    private void savemobilenointocontacts(String phoneno, String mno, String name, String SNo, String WaybillNo) {
+        ArrayList<String> MNos = new ArrayList<>();
+        if (!phoneno.equals("null") && phoneno != null && !phoneno.equals("0")
+                && phoneno.length() > 0)
+
+            MNos.add(phoneno);
+
+
+        if (!mno.equals("null") && mno != null &&
+                !mno.equals("0") && mno.length() > 0) {
+
+            MNos.add(mno);
+        }
+
+        if (MNos.size() > 0) {
+            Global global = new Global(BookingList.this);
+            global.addMobileNumberintoContacts(SNo + " - ASR - " + WaybillNo, MNos, WaybillNo);
         }
     }
 
@@ -579,9 +608,19 @@ public class BookingList extends AppCompatActivity {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
+
+                        //Global global = new Global(BookingList.this);
+                        GlobalVar.GV().alertMsgAll("", "Please wait", BookingList.this, Enum.PROGRESS_TYPE,
+                                "BookingList");
+//                        global.DeleteContact();
+                        new DeleteContact().execute("");
                         deleteBookingData();
 
-                        finish();
+//                        global.DeleteContact = new Global.DeleteContact();
+//
+//                        new Global.DeleteContact().execute("http://images.com/image.jpg");
+
+                        //finish();
 
                     }
                 });
@@ -604,6 +643,56 @@ public class BookingList extends AppCompatActivity {
         dbConnections.clearAllPickupsheetData(getApplicationContext());
 
         dbConnections.close();
+    }
+
+    public class DeleteContact extends AsyncTask<String, String, String> {
+
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            try {
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                boolean loop = false;
+                loop = GlobalVar.deleteContactRawID(dbConnections.PickupSheetContactDetails(getApplicationContext()), getApplicationContext(), 1);
+                int time = 1000;
+                while (!loop)
+                    Thread.sleep(time);
+
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+
+            }
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+//            if (progressDialog != null && progressDialog.isShowing())
+//                progressDialog.dismiss();
+            finish();
+
+        }
+
+
+        @Override
+        protected void onPreExecute() {
+//            progressDialog = ProgressDialog.show(activity,
+//                    "Info",
+//                    "Your Request is being process,kindly please wait");
+        }
+
+
+        @Override
+        protected void onProgressUpdate(String... text) {
+
+
+        }
+
     }
 }
 

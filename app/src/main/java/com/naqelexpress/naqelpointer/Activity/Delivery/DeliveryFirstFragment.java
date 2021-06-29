@@ -18,6 +18,9 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.TelephonyManager;
+import android.text.Editable;
+import android.text.InputFilter;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,7 +77,7 @@ public class DeliveryFirstFragment
     private View rootView;
     Button btnOpenCamera;
     String shippername = "";
-    static int OTPNO = 0 , isOtp = 0;
+    static int OTPNO = 0, isOtp = 0;
     AppCompatImageButton btnCallMobile, btnCallMobile1;
     AppCompatImageButton btnWhatsApp, btnWhatsApp1;
     TelephonyManager mTelephonyManager;
@@ -82,6 +85,7 @@ public class DeliveryFirstFragment
     boolean signrequired = false;
     static int al = 0;
     public static String Lat = "0", Longi = "0";
+    boolean isExist = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,6 +101,7 @@ public class DeliveryFirstFragment
 
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
+            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtConsigneeName = (TextView) rootView.findViewById(R.id.txtConsigneeName);
             txtBillingType = (TextView) rootView.findViewById(R.id.txtBillingType);
             txtCODAmount = (TextView) rootView.findViewById(R.id.txtCODAmount);
@@ -245,7 +250,7 @@ public class DeliveryFirstFragment
                 }
             });
 
-
+            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -259,7 +264,29 @@ public class DeliveryFirstFragment
                 }
             });
 
+           /* txtWaybillNo.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (!isExist) {
+
+
+                        if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            setTxtWaybillNo();
+                    }
+
+                }
+            });*/
+
+            txtWaybillNo.addTextChangedListener(textWatcher);
             initViews();
 
             // GlobalVar.GV().activity.setRequestedOrientation(getResources().getConfiguration().orientation);
@@ -267,6 +294,26 @@ public class DeliveryFirstFragment
 
 
         return rootView;
+    }
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWaybillNo.getText().toString();
+        txtWaybillNo.removeTextChangedListener(textWatcher);
+        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+            txtWaybillNo.setText(barcode.substring(0, 8));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+        }
+
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
     String mobilevalidate = "", phonenovalidate = "";
@@ -650,9 +697,13 @@ public class DeliveryFirstFragment
                     btnWhatsApp.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.whatsapp));
                     btnWhatsApp1.setImageDrawable(ContextCompat.getDrawable(getActivity(), R.drawable.whatsapp));
                 }
+
+                if (waybillDetailsResult.HasError)
+                    isOtp = 0;
             } else
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.wentwrong), GlobalVar.AlertType.Error);
             progressDialog.dismiss();
+
             super.onPostExecute(String.valueOf(finalJson));
         }
     }
@@ -773,5 +824,27 @@ public class DeliveryFirstFragment
         popup.setBackgroundDrawable(new BitmapDrawable());
         popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
     }
+
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
 
 }

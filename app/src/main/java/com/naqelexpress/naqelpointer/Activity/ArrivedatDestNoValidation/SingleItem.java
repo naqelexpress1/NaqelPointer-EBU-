@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class SingleItem extends Fragment {
                 waybilgrid.setAdapter(adapter);
 
                 palletbarcode = (EditText) rootView.findViewById(R.id.palletbarcode);
+                palletbarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
                 palletbarcode.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -58,8 +60,9 @@ public class SingleItem extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (palletbarcode != null && palletbarcode.getText().length() == 13)
-                            ValidatePallet(palletbarcode.getText().toString());
+                        if (palletbarcode != null && palletbarcode.getText().length() >= 13)
+//                            ValidatePallet(palletbarcode.getText().toString());
+                            setBarcode();
                     }
                 });
             }
@@ -67,6 +70,18 @@ public class SingleItem extends Fragment {
             ReadFromLocal();
             return rootView;
         }
+    }
+
+    private void setBarcode() {
+        if (palletbarcode.getText().length() >= 13) {
+            //txtBarCode.setText(barcode.substring(0, 8));
+            ValidatePallet(palletbarcode.getText().toString());
+
+        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
     }
 
 

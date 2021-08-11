@@ -78,6 +78,8 @@ public class NewBarCodeScanner extends AppCompatActivity
         } catch (Exception e) {
             System.out.println(e.toString());
         }
+
+
     }
 
     @Override

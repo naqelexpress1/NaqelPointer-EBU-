@@ -64,6 +64,7 @@ public class DeliverySheetSecondFragment
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
             txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+
             txtWaybillNo.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {

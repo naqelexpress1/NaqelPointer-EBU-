@@ -33,8 +33,10 @@ public interface IPointerAPI {
     //for CBU
     @POST("SkipRouteLineSeqWaybillno")
     Observable<NotificationModels> SkipRouteLineSeqWaybillno(@Body NotificationRequest notificationRequest);
+
     @GET("FetchSkipRouteLineSeqWaybillnoReason")
     Observable<List<SkipRouteLineSeqWaybillnoReasonModels>> SkipRouteLineSeqWaybillnoReason();
+
     //for fetch district
     @POST("GetDistrictDatas")
     Observable<List<DistrictDataModel>> GetDistrictDatas(@Body CommonRequest commonRequest);
@@ -42,4 +44,8 @@ public interface IPointerAPI {
     // Fetch Courier Rating
     @POST("CourierRating")
     Observable<RatingModel> CourierRating(@Body CommonRequest commonRequest);
+
+    //BayanNo Details
+    @POST("CourierRating")
+    Observable<RatingModel> FetchBayanNoDetails(@Body CommonRequest commonRequest);
 }

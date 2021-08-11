@@ -409,7 +409,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             return;
         }
 
-        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
+        /*if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
@@ -419,7 +419,7 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             GlobalVar.RedirectSettings(InventoryControl_LocalValidationReleaseWaybills.this);
             return;
-        }
+        }*/
 
         if (pieceDenied.contains(txtBarCode.getText().toString())) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
@@ -618,7 +618,8 @@ public class InventoryControl_LocalValidationReleaseWaybills extends AppCompatAc
         try {
 
 
-            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode='" + Barcode + "'", getApplicationContext());
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 " +
+                    "and BarCode='" + Barcode + "'", getApplicationContext());
             if (cursor.getCount() > 0) {
                 isdeliveryReq.clear();
                 // isNclDelReq.clear();

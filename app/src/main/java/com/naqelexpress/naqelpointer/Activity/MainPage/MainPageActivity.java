@@ -773,7 +773,7 @@ public class MainPageActivity
 
     private void enablevisibleproductivity() {
         ratingBar.setRating(Rating);
-        ratingBar.setVisibility(View.VISIBLE);
+        //ratingBar.setVisibility(View.VISIBLE);
         tl.setVisibility(View.VISIBLE);
         tl1.setVisibility(View.VISIBLE);
     }
@@ -1567,7 +1567,8 @@ public class MainPageActivity
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
                             try {
-                                Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                                Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" +
+                                        BuildConfig.APPLICATION_ID));
                                 startActivity(i);
                             } catch (Exception e) {
                                 GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);

@@ -123,12 +123,14 @@ public class WaybillPlanActivity extends AppCompatActivity
                 @Override
                 public void onClick(View v) {
                     GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                   // GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
                 }
             });
             btnCallMobile1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     GlobalVar.GV().makeCall(txtPhoneNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    //GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
                 }
             });
 

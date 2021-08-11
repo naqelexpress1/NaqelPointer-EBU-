@@ -103,7 +103,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "ASR MNO Auto Save - 29-06-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "TH IsMix Test - 03-08-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -121,7 +121,7 @@ public class GlobalVar {
     //
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
-    public static String WaybillNoStartSeries = "812345679"; //
+    public static String WaybillNoStartSeries = "8"; //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -1171,6 +1171,36 @@ public class GlobalVar {
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setData(Uri.parse("tel:" + MobileNo));
+            if (!GlobalVar.GV().checkPermission(activity, PermissionType.Phone)) {
+                GlobalVar.GV().ShowSnackbar(view, activity.getString(R.string.NeedPhonePermission), GlobalVar.AlertType.Error);
+                GlobalVar.GV().askPermission(activity, PermissionType.Phone);
+            } else
+                activity.getApplicationContext().startActivity(intent);
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void makeCallAwaya(String MobileNo, View view, Activity activity) {
+        try {
+            if (MobileNo == "0") {
+                GlobalVar.GV().ShowSnackbar(view, "Invalid Contact Number", GlobalVar.AlertType.Error);
+                return;
+            }
+
+//            Intent intent1 = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
+//            intent1.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
+//                    activity.getPackageName());
+//            activity.startActivity(intent1);
+            String mno = "";
+            if (MobileNo.length() >= 9) {
+                mno = "90" + MobileNo.substring(MobileNo.length() - 9);
+            } else
+                return;
+
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setData(Uri.parse("tel:" + mno));
             if (!GlobalVar.GV().checkPermission(activity, PermissionType.Phone)) {
                 GlobalVar.GV().ShowSnackbar(view, activity.getString(R.string.NeedPhonePermission), GlobalVar.AlertType.Error);
                 GlobalVar.GV().askPermission(activity, PermissionType.Phone);
@@ -3657,7 +3687,8 @@ public class GlobalVar {
             @Override
             public void onClick(SweetAlertDialog sDialog) {
                 try {
-                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                    Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:"
+                            + BuildConfig.APPLICATION_ID));
                     activity.startActivityForResult(i, 15);
                 } catch (Exception e) {
                     GlobalVar.ShowDialog(activity, "Contacts Permission necessary", "Kindly please contact our Admin", true);
@@ -4298,5 +4329,27 @@ public class GlobalVar {
         if (result != null)
             result.close();
         return EmployeID;
+    }
+
+    public static HashMap<String, Object> GetEmployID_Name(Context context) {
+
+        HashMap<String, Object> empdetails = new HashMap();
+
+        int EmployeID = 0;
+        String EmployName = "";
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select EmployID , EmployName from UserME  order by ID desc Limit 1", context);
+        if (result != null && result.getCount() > 0) {
+            result.moveToFirst();
+            EmployeID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
+            EmployName = result.getString(result.getColumnIndex("EmployName"));
+            empdetails.put("EmployeID", EmployeID);
+            empdetails.put("EmployName", EmployName);
+        }
+        dbConnections.close();
+        if (result != null)
+            result.close();
+
+        return empdetails;
     }
 }

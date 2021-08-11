@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="MissingDefaultResource">
+
+
+    <TextView
+        android:id="@+id/txtname"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:singleLine="true"
+        android:text="Mr.Mohamed Ismail"
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp"
+        android:textStyle="normal" />
+
+
+    <TextView
+        android:id="@+id/txtyourrating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtname"
+
+        android:layout_marginStart="10dp"
+
+        android:text="Your Rating For This Month"
+        android:textColor="@android:color/background_dark"
+        android:textSize="18sp"
+        android:textStyle="normal" />
+
+    <RatingBar
+        android:id="@+id/ratingBar"
+
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="end"
+        android:gravity="center"
+        android:isIndicator="true"
+        android:numStars="5"
+        android:stepSize="0.1"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:ignore="MissingConstraints" />
+
+
+    <TextView
+        android:id="@+id/ratingBarResult"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/ratingBar"
+
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:text="Result : 0.0"
+        android:textColor="@android:color/background_dark"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/buttonGetRatingBarResult"
+        android:layout_width="368dp"
+        android:layout_height="48dp"
+        android:text="Submit Result"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ratingBarResult" />
+
+
+</RelativeLayout>

@@ -47,7 +47,7 @@ public class ScanNclNoFragment extends Fragment {
     private View rootView;
     private SpinnerDialog destSpinnerDialog , destFacilitySpinnerDialog;
     private EditText etOriginFacility , etDestFacility;
-    private CheckBox checkMix;
+    static  CheckBox checkMix;
     private Button btngenerate;
 
     public int OriginID = 0, DestinationID = 0 ,

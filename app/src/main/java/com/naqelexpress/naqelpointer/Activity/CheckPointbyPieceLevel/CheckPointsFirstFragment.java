@@ -61,7 +61,7 @@ public class CheckPointsFirstFragment
         try {
             iCheckPoint = (ICheckPoint) context;
         } catch (ClassCastException e) {
-            Log.d("test" , "test"  + e.toString());
+            Log.d("test", "test" + e.toString());
         }
     }
 
@@ -479,4 +479,24 @@ public class CheckPointsFirstFragment
 
         }
     }
+
+//    private void FetchReason() {
+//        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch Skip Reasons.",
+//                getActivity(),
+//                Enum.PROGRESS_TYPE, "SkipWaybillNoinRouteLine");
+//        NotificationApi.skipRouteLineReason(new Callback<List<SkipRouteLineSeqWaybillnoReasonModels>>() {
+//            @Override
+//            public void returnResult(List<SkipRouteLineSeqWaybillnoReasonModels> result) {
+//                System.out.println();
+//                //skipReasonList.addAll(result);
+//                //initSpinner();
+//            }
+//
+//            @Override
+//            public void returnError(String message) {
+//                //mView.showError(message);
+//                System.out.println(message);
+//            }
+//        });
+//    }
 }

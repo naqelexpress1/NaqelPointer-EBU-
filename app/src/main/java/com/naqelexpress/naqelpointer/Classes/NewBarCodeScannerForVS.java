@@ -7,23 +7,26 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.vision.barcode.Barcode;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
+import com.naqelexpress.naqelpointer.MLBarcode.BarcodeCapture;
+import com.naqelexpress.naqelpointer.MLBarcode.BarcodeGraphic;
+import com.naqelexpress.naqelpointer.MLBarcode.MobilevisionBarcode.BarcodeRetriever;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import me.dm7.barcodescanner.zbar.BarcodeFormat;
-import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
 
 //import android.media.Ringtone;
@@ -31,7 +34,7 @@ import me.dm7.barcodescanner.zbar.ZBarScannerView;
 //import android.net.Uri;
 
 public class NewBarCodeScannerForVS extends AppCompatActivity
-        implements ZBarScannerView.ResultHandler {
+        implements BarcodeRetriever {
     private static final String FLASH_STATE = "FLASH_STATE";
     private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
     private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
@@ -45,64 +48,172 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
-    private DBConnections dbConnections ;
+    private DBConnections dbConnections;
     private List<OnLineValidation> onLineValidationList;
     private String division;
+
+    BarcodeCapture barcodeCapture;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        setContentView(R.layout.newbarcodescanner);
+        setContentView(R.layout.barcode_google);
+
+
+        barcodeCapture = (BarcodeCapture) getSupportFragmentManager().findFragmentById(R.id.barcode);
+//        barcodeCapture = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
+
+        barcodeCapture.setRetrieval(this);
 
         try {
             division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
-            dbConnections = new DBConnections(getApplicationContext() , null);
+            dbConnections = new DBConnections(getApplicationContext(), null);
             onLineValidationList = new ArrayList<>();
-        } catch (Exception e ) {
-            Log.d("test" , "Scanner " + e.toString());
+        } catch (Exception e) {
+            Log.d("test", "Scanner " + e.toString());
         }
 
-        if (state != null) {
-            mFlash = state.getBoolean(FLASH_STATE, false);
-            mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
-            mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
-            mCameraId = state.getInt(CAMERA_ID, -1);
-        } else {
-            mFlash = false;
-            mAutoFocus = true;
-            mSelectedIndices = null;
-            mCameraId = -1;
+//        if (state != null) {
+//            mFlash = state.getBoolean(FLASH_STATE, false);
+//            mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
+//            mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
+//            mCameraId = state.getInt(CAMERA_ID, -1);
+//        } else {
+//            mFlash = false;
+//            mAutoFocus = true;
+//            mSelectedIndices = null;
+//            mCameraId = -1;
+//
+//            if (scannedBarCode.size() == 0) {
+//                Bundle extras = getIntent().getExtras();
+//                scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+//                ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+//                ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+//            }
+//        }
 
-            if (scannedBarCode.size() == 0) {
-                Bundle extras = getIntent().getExtras();
-                scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
-                ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
-                ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
-            }
+        if (scannedBarCode.size() == 0) {
+            Bundle extras = getIntent().getExtras();
+            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
         }
 
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-        mScannerView = new ZBarScannerView(this);
-        setupFormats();
-        contentFrame.addView(mScannerView);
-        Button btnFlash = (Button) findViewById(R.id.btnFlash);
-        btnFlash.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mFlash = !mFlash;
-                mScannerView.setFlash(mFlash);
-            }
-        });
+        //ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+//        mScannerView = new ZBarScannerView(this);
+//        setupFormats();
+//        contentFrame.addView(mScannerView);
+//        Button btnFlash = (Button) findViewById(R.id.btnFlash);
+//        btnFlash.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mFlash = !mFlash;
+//                mScannerView.setFlash(mFlash);
+//            }
+//        });
         setRequestedOrientation(getResources().getConfiguration().orientation);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mScannerView.setResultHandler(this);
-        mScannerView.startCamera(mCameraId);
-        mScannerView.setFlash(mFlash);
-        mScannerView.setAutoFocus(mAutoFocus);
+//        mScannerView.setResultHandler(this);
+//        mScannerView.startCamera(mCameraId);
+//        mScannerView.setFlash(mFlash);
+//        mScannerView.setAutoFocus(mAutoFocus);
+    }
+
+    @Override
+    public void onRetrieved(final Barcode barcode) {
+
+
+        barcodeCapture.stopScanning();
+        handleResult(barcode.displayValue);
+    }
+
+    @Override
+    public void onRetrievedMultiple(final Barcode closetToClick, final List<BarcodeGraphic> barcodeGraphics) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                String message = "Code selected : " + closetToClick.displayValue + "\n\nother " +
+//                        "codes in frame include : \n";
+//                for (int index = 0; index < barcodeGraphics.size(); index++) {
+//                    Barcode barcode = barcodeGraphics.get(index).getBarcode();
+//                    message += (index + 1) + ". " + barcode.displayValue + "\n";
+//                }
+//                AlertDialog.Builder builder = new AlertDialog.Builder(NewBarCodeScanner.this)
+//                        .setTitle("code retrieved")
+//                        .setMessage(message);
+//                builder.show();
+//            }
+//        });
+
+    }
+
+    @Override
+    public void onBitmapScanned(SparseArray<Barcode> sparseArray) {
+        for (int i = 0; i < sparseArray.size(); i++) {
+            Barcode barcode = sparseArray.valueAt(i);
+            Log.e("value", barcode.displayValue);
+        }
+
+    }
+
+    @Override
+    public void onRetrievedFailed(String reason) {
+
+    }
+
+    @Override
+    public void onPermissionRequestDenied() {
+
+    }
+
+
+    public void handleResult(String rawResult) {
+//        Intent intent = new Intent();
+//        // String result = rawResult.getContents();
+//        //Log.d("test", "result " + result);
+//        intent.putExtra("barcode", rawResult);
+//        setResult(RESULT_OK, intent);
+//        finish();
+
+
+        String result = rawResult;
+
+        // To show onlineValidation warning if any
+        boolean isConflict = !scannedBarCode.contains(result);
+        if (division.equals("Courier")) {
+            onlineValidation(result, isConflict);
+        }
+
+        if (scannedBarCode.contains(result)) {
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+            if (!ScanbyDevice.contains(result)) {
+                ScanbyDevice.add(result);
+                onBackPressed();
+            }
+            // mScannerView.resumeCameraPreview(this);
+
+        } else {
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            if (!ConflictBarcode.contains(result))
+                ConflictBarcode.add(result);
+
+            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                conflict(result);
+
+        }
+
+        // mScannerView.resumeCameraPreview(this);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -140,7 +251,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 //    }
 //
 
-    @Override
+    /*@Override
     public void handleResult(Result rawResult) {
 
         String result = rawResult.getContents();
@@ -148,7 +259,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
         // To show onlineValidation warning if any
         boolean isConflict = !scannedBarCode.contains(result);
         if (division.equals("Courier")) {
-            onlineValidation(result ,isConflict );
+            onlineValidation(result, isConflict);
         }
 
         if (scannedBarCode.contains(result)) {
@@ -170,7 +281,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
         mScannerView.resumeCameraPreview(this);
 
 
-    }
+    }*/
 
     public void conflict(String Barcode) {
         AlertDialog.Builder builder = new AlertDialog.Builder(NewBarCodeScannerForVS.this);
@@ -179,9 +290,9 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-                        // finish();
+                        finish();
                         // startActivity(getIntent());
-                        mScannerView.resumeCameraPreview(NewBarCodeScannerForVS.this);
+//                        mScannerView.resumeCameraPreview(NewBarCodeScannerForVS.this);
                     }
                 });
         AlertDialog alertDialog = builder.create();
@@ -205,7 +316,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
-        mScannerView.stopCamera();
+//        mScannerView.stopCamera();
     }
 
 
@@ -231,27 +342,38 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-//        Bundle bundle = new Bundle();
+
+        barcodeCapture.stopScanning();
         Intent intent = new Intent();
         intent.putExtra("test", "test");
         intent.putExtra("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("scannedBarCode", scannedBarCode);
-        //bundle.putSerializable("ScanbyDevice", ScanbyDevice);
         intent.putExtra("ScanbyDevice", ScanbyDevice);
-//        bundle.putSerializable("ConflictBarcode", ConflictBarcode);
         intent.putExtra("ConflictBarcode", ConflictBarcode);
-        //intent.putExtras(bundle);
         setResult(RESULT_OK, intent);
+        finish();
+
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        builder.setTitle("Exit")
+//                .setMessage("Are you sure you want to exit ?")
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int which) {
+//
+//                    }
+//                }).setNegativeButton("Cancel", null).setCancelable(false);
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
+
 
 //        finish();//finishing activity
         super.onBackPressed();
     }
 
-    private void onlineValidation(String barcode , boolean isConflict) {
+    private void onlineValidation(String barcode, boolean isConflict) {
         boolean isShowWarning = false;
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode , getApplicationContext());
+                    , barcode, getApplicationContext());
             OnLineValidation onLineValidation = new OnLineValidation();
 
             if (onLineValidationLocal != null) {
@@ -280,11 +402,11 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
             }
 
         } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
+            Log.d("test", "isValidPieceBarcode " + e.toString());
         }
     }
 
-    private OnLineValidation getOnLineValidationPiece (String barcode) {
+    private OnLineValidation getOnLineValidationPiece(String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
                 if (pieceDetail.getBarcode().equals(barcode))
@@ -292,7 +414,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
             }
 
         } catch (Exception e) {
-            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+            Log.d("test", "getOnLineValidationPiece " + e.toString());
         }
         return null;
     }
@@ -365,7 +487,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
             }
         } catch (Exception e) {
-            Log.d("test" , "showDialog " + e.toString());
+            Log.d("test", "showDialog " + e.toString());
         }
     }
 }

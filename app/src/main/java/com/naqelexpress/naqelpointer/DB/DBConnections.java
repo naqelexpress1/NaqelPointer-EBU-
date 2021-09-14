@@ -59,6 +59,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurement;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurementDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
+import com.naqelexpress.naqelpointer.Models.IsFollowSequncerModel;
 import com.naqelexpress.naqelpointer.Models.RatingModel;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidationGWT;
@@ -83,7 +84,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 156; // AuthKey , Duplicate Customer , MobileNo Verified
+    private static final int Version = 158; // isFollowSeq
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -480,6 +481,14 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupsheetMobileNo\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" INTEGER NOT NULL , \"MobileNo\" TEXT, \"RawID\" INTEGER  )");
 
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS isFollowGoogle(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                "WaybillNo INTEGER NOT NULL , IsFollow BOOL NOT NULL , Date DATETIME NOT NULL , Issync INTEGER ," +
+                "ConsLatitude TEXT NOT NULL , ConsLongitude TEXT NOT NULL , " +
+                "CourierLatitude TEXT NOT NULL , CourierLongitude TEXT NOT NULL   ," +
+                " FollowTime DATETIME NOT NULL , DeliverysheetID TEXT , EmployeeID int    )");
+
+
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
                 "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -522,7 +531,8 @@ public class DBConnections
                 "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
                 ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
                 "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
-                "RefNo TEXT , GoodDesc TEXT , MobileNo TEXT  )");
+                "RefNo TEXT , GoodDesc TEXT , MobileNo TEXT," +
+                "IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT    )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -832,6 +842,12 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupsheetMobileNo\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" INTEGER NOT NULL , \"MobileNo\" TEXT, \"RawID\" INTEGER  )");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS isFollowGoogle(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                    "WaybillNo INTEGER NOT NULL , IsFollow BOOL NOT NULL , Date DATETIME NOT NULL , Issync INTEGER ," +
+                    "ConsLatitude TEXT NOT NULL , ConsLongitude TEXT NOT NULL , " +
+                    "CourierLatitude TEXT NOT NULL , CourierLongitude TEXT NOT NULL   ," +
+                    " FollowTime DATETIME NOT NULL , DeliverysheetID TEXT , EmployeeID int  )");
+
             /*  Added By : Riyam */
             db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
                     "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -898,7 +914,8 @@ public class DBConnections
                     "ConsigneeName TEXT   , Remark TEXT    , PickupsheetDetailID INTEGER   " +
                     ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
                     "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
-                    "RefNo TEXT , GoodDesc TEXT  ,  MobileNo TEXT  )");
+                    "RefNo TEXT , GoodDesc TEXT  ,  MobileNo TEXT, " +
+                    " IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -1185,6 +1202,19 @@ public class DBConnections
 
             if (!isColumnExist("PickupSheetDetails", "MobileNo"))
                 db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN MobileNo TEXT");
+
+            if (!isColumnExist("PickupSheetDetails", "IsSPL"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN IsSPL BOOL");
+            if (!isColumnExist("PickupSheetDetails", "SPLOfficesID"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SPLOfficesID INTEGER");
+            if (!isColumnExist("PickupSheetDetails", "SpLatLng"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SpLatLng TEXT");
+            if (!isColumnExist("PickupSheetDetails", "BKHeader"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN BKHeader TEXT");
+            if (!isColumnExist("PickupSheetDetails", "SPMobile"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SPMobile TEXT");
+            if (!isColumnExist("PickupSheetDetails", "SPOfficeName"))
+                db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SPOfficeName TEXT");
 
         }
 
@@ -1548,6 +1578,9 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             String args[] = {GlobalVar.getDate()};
             db.delete("FacilityLoggedIn", "IsDate!=?", args);
+            // db.delete("isFollowGoogle", "Date!=?", args);
+            db.delete("isFollowGoogle", "Date!='" + GlobalVar.getDate() + "'" +
+                    " and Issync = 1", null);
             db.close();
 
         } catch (SQLiteException e) {
@@ -9569,6 +9602,194 @@ public class DBConnections
         return bookingModelArrayList;
     }
 
+    //SpASRRegular
+    public void insertPickupsheetDetails_SPASRREGData(ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
+            BookingModel>
+                                                              bookingModelList, Context context) {
+
+        // deleteDistrictData(context);
+        String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
+                "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
+                "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc , MobileNo," +
+                "IsSPL , SPLOfficesID , SpLatLng , BKHeader , SPMobile , SPOfficeName " +
+                " ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ? ,?,?,?,?,?,? ,?,?,?,?,?,? ,?);";
+
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
+
+        for (com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel booking :
+                bookingModelList) {
+            stmt.bindString(1, String.valueOf(booking.getPickupSheetID()));
+            stmt.bindString(2, String.valueOf(booking.getFromStationID()));
+            stmt.bindString(3, String.valueOf(booking.getToStationID()));
+            stmt.bindString(4, String.valueOf(booking.getOrgCode()));
+            stmt.bindString(5, String.valueOf(booking.getDestCode()));
+            stmt.bindString(6, String.valueOf(booking.getWaybillNo()));
+            stmt.bindString(7, String.valueOf(booking.getCode()));
+            stmt.bindString(8, String.valueOf(booking.getConsigneeName()));
+            stmt.bindString(9, String.valueOf(booking.getRemark()));
+            stmt.bindString(10, String.valueOf(booking.getPickupsheetDetailID()));
+            stmt.bindString(11, String.valueOf(booking.getLat()));
+            stmt.bindString(12, String.valueOf(booking.getLng()));
+            stmt.bindString(13, String.valueOf(booking.getDate()));
+            stmt.bindString(14, String.valueOf(booking.getPhoneNo()));
+            stmt.bindString(15, String.valueOf(booking.getEmployID()));
+            stmt.bindString(16, String.valueOf(booking.getClientID()));
+            stmt.bindString(17, String.valueOf(booking.getClientName()));
+            stmt.bindString(18, String.valueOf(booking.getIsPickedup()));
+            stmt.bindString(19, String.valueOf(booking.getsNo()));
+            stmt.bindString(20, String.valueOf(booking.getRefNo()));
+            stmt.bindString(21, String.valueOf(booking.getGoodDesc()));
+            stmt.bindString(22, String.valueOf(booking.getMobileNo()));
+            if (booking.getisSPL())
+                stmt.bindString(23, "1");
+            else
+                stmt.bindString(23, "0");
+            stmt.bindString(24, String.valueOf(booking.getSPLOfficesID()));
+            stmt.bindString(25, String.valueOf(booking.getSpLatLng()));
+            stmt.bindString(26, String.valueOf(booking.getBKHeader()));
+            stmt.bindString(27, String.valueOf(booking.getSPMobile()));
+            stmt.bindString(28, String.valueOf(booking.getSPOfficeName()));
+
+
+            stmt.execute();
+            //long entryID = stmt.executeInsert();
+            //stmt.clearBindings();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
+        db.close();
+    }
+
+    public ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+    getPickupSheetSpAsrRegDetailsData(Context context, int EmployID) {
+
+        ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+                bookingModelArrayList = new ArrayList<>();
+        bookingModelArrayList = getPickupSheetSpDetailsData(context, EmployID);
+        Station station = null;
+        try {
+            String selectQuery = "SELECT * FROM PickupSheetDetails WHERE IsSPL <> 1 and  EmployID = " + EmployID;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
+                            BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
+                    bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
+                    bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
+                    bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
+                    bookingModel.setOrgCode(cursor.getString(cursor.getColumnIndex("OrgCode")));
+                    bookingModel.setDestCode(cursor.getString(cursor.getColumnIndex("DestCode")));
+                    bookingModel.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    bookingModel.setCode(cursor.getString(cursor.getColumnIndex("Code")));
+                    bookingModel.setConsigneeName(cursor.getString(cursor.getColumnIndex("ConsigneeName")));
+                    bookingModel.setRemark(cursor.getString(cursor.getColumnIndex("Remark")));
+                    bookingModel.setPickupsheetDetailID(cursor.getInt(cursor.getColumnIndex("PickupsheetDetailID")));
+                    bookingModel.setLat(cursor.getString(cursor.getColumnIndex("Lat")));
+                    bookingModel.setLng(cursor.getString(cursor.getColumnIndex("Lng")));
+                    bookingModel.setDate(cursor.getString(cursor.getColumnIndex("Date")));
+                    bookingModel.setPhoneNo(cursor.getString(cursor.getColumnIndex("PhoneNo")));
+                    bookingModel.setIsPickedup(cursor.getInt(cursor.getColumnIndex("isPickedup")));
+                    bookingModel.setEmployID(cursor.getInt(cursor.getColumnIndex("EmployID")));
+                    bookingModel.setClientName(cursor.getString(cursor.getColumnIndex("ClientName")));
+                    bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
+                    bookingModel.setRefNo(cursor.getString(cursor.getColumnIndex("RefNo")));
+                    bookingModel.setGoodDesc(cursor.getString(cursor.getColumnIndex("GoodDesc")));
+                    bookingModel.setMobileNo(cursor.getString(cursor.getColumnIndex("MobileNo")));
+                    bookingModel.setSPL(cursor.getInt(cursor.getColumnIndex("IsSPL")) > 0);
+                    bookingModel.setSPLOfficesID(cursor.getInt(cursor.getColumnIndex("SPLOfficesID")));
+                    bookingModel.setSpLatLng(cursor.getString(cursor.getColumnIndex("SpLatLng")));
+                    bookingModel.setBKHeader(cursor.getString(cursor.getColumnIndex("BKHeader")));
+                    bookingModel.setSPMobile(cursor.getString(cursor.getColumnIndex("SPMobile")));
+                    bookingModel.setSPOfficeName(cursor.getString(cursor.getColumnIndex("SPOfficeName")));
+
+
+                    bookingModelArrayList.add(bookingModel);
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return bookingModelArrayList;
+    }
+
+    public ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+    getPickupSheetSpDetailsData(Context context, int EmployID) {
+
+        ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+                bookingModelArrayList = new ArrayList<>();
+
+        Station station = null;
+        try {
+            String selectQuery = "SELECT * , Count(IsSPL) WaybillCount FROM PickupSheetDetails WHERE IsSPL = 1 and  EmployID = "
+                    + EmployID + " Group by SPLOfficesID";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            int Sno = 1;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
+                            BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
+                    bookingModel.setsNo(Sno);
+                    bookingModel.setWaybillcount(cursor.getInt(cursor.getColumnIndex("WaybillCount")));
+                    bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
+                    bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
+                    bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
+                    bookingModel.setOrgCode(cursor.getString(cursor.getColumnIndex("OrgCode")));
+                    bookingModel.setDestCode(cursor.getString(cursor.getColumnIndex("DestCode")));
+                    bookingModel.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    bookingModel.setCode(cursor.getString(cursor.getColumnIndex("Code")));
+                    bookingModel.setConsigneeName(cursor.getString(cursor.getColumnIndex("ConsigneeName")));
+                    bookingModel.setRemark(cursor.getString(cursor.getColumnIndex("Remark")));
+                    bookingModel.setPickupsheetDetailID(cursor.getInt(cursor.getColumnIndex("PickupsheetDetailID")));
+                    bookingModel.setLat(cursor.getString(cursor.getColumnIndex("Lat")));
+                    bookingModel.setLng(cursor.getString(cursor.getColumnIndex("Lng")));
+                    bookingModel.setDate(cursor.getString(cursor.getColumnIndex("Date")));
+                    bookingModel.setPhoneNo(cursor.getString(cursor.getColumnIndex("PhoneNo")));
+                    bookingModel.setIsPickedup(cursor.getInt(cursor.getColumnIndex("isPickedup")));
+                    bookingModel.setEmployID(cursor.getInt(cursor.getColumnIndex("EmployID")));
+                    bookingModel.setClientName(cursor.getString(cursor.getColumnIndex("ClientName")));
+                    bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
+                    bookingModel.setRefNo(cursor.getString(cursor.getColumnIndex("RefNo")));
+                    bookingModel.setGoodDesc(cursor.getString(cursor.getColumnIndex("GoodDesc")));
+                    bookingModel.setMobileNo(cursor.getString(cursor.getColumnIndex("MobileNo")));
+                    bookingModel.setSPL(cursor.getInt(cursor.getColumnIndex("IsSPL")) > 0);
+                    bookingModel.setSPLOfficesID(cursor.getInt(cursor.getColumnIndex("SPLOfficesID")));
+                    bookingModel.setSpLatLng(cursor.getString(cursor.getColumnIndex("SpLatLng")));
+                    bookingModel.setBKHeader(cursor.getString(cursor.getColumnIndex("BKHeader")));
+                    bookingModel.setSPMobile(cursor.getString(cursor.getColumnIndex("SPMobile")));
+                    bookingModel.setSPOfficeName(cursor.getString(cursor.getColumnIndex("SPOfficeName")));
+
+                    Sno = Sno + 1;
+
+                    bookingModelArrayList.add(bookingModel);
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return bookingModelArrayList;
+    }
+
+
     public void insertPickupsheetReasonData(ArrayList<PickupSheetReasonModel>
                                                     pickupSheetReasonModels, Context context) {
 
@@ -9648,7 +9869,7 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             // db.delete("CourierDailyRoute", null, null);
             db.delete("PickupSheetDetails", null, null);
-
+            db.delete("PickupSheetReason", null, null);
             db.close();
         } catch (SQLiteException e) {
 
@@ -9771,4 +9992,133 @@ public class DBConnections
         db.delete("PickupsheetMobileNo", "RawID = ? AND Name = ? AND MobileNo = ?", args);
         db.close();
     }
+
+    public boolean InsertIsFollowGoogle(IsFollowSequncerModel isFollowSequncerModel, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            if (isexistwaybillno_IsFollowGoogle(isFollowSequncerModel.getWaybillNo(), context))
+                return true;
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("WaybillNo", isFollowSequncerModel.getWaybillNo());
+            contentValues.put("IsFollow", isFollowSequncerModel.getIsFollow());
+            contentValues.put("Date", GlobalVar.getDate());
+            contentValues.put("Issync", 0);
+            contentValues.put("ConsLatitude", isFollowSequncerModel.getConsLatitude());
+            contentValues.put("ConsLongitude", isFollowSequncerModel.getConsLongitude());
+            contentValues.put("CourierLatitude", isFollowSequncerModel.getCourierLatitude());
+            contentValues.put("CourierLongitude", isFollowSequncerModel.getCourierLongitude());
+            contentValues.put("FollowTime", GlobalVar.getCurrentDateTime());
+            contentValues.put("DeliverysheetID", isFollowSequncerModel.getDeliverysheetID());
+            contentValues.put("EmployeeID", isFollowSequncerModel.getEmployeeID());
+
+
+            result = db.insert("isFollowGoogle", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public boolean isexistwaybillno_IsFollowGoogle(int Waybillno, Context context) {
+
+        boolean ishas = false;
+        final DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor ds = dbConnections.Fill("select count(ID) totalcount from isFollowGoogle  where WaybillNo =  " +
+                Waybillno, context);
+
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            int count = ds.getInt(ds.getColumnIndex("totalcount"));
+            if (count >= 1)
+                ishas = true;
+        }
+        return ishas;
+
+    }
+
+    public boolean Update_IsFollowGoogle(String ids) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+
+        //Put the filed which you want to update.
+//        contentValues.put("Issync", 1);
+        try {
+//            String args[] = {String.valueOf(ids)};
+//            db.update("isFollowGoogle", contentValues, "ID=?", args);
+//
+//            db.execSQL("update isFollowGoogle set Issync = 1 where ID in("+ids+" ) ");
+            db.execSQL("update isFollowGoogle set Issync = 1 where ID in(" + ids + " ) ");
+
+        } catch (Exception e) {
+            //GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error);
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public String GetDeliverysheetIDbyWaybillNo(Context context, int WaybillNo) {
+        String DeliverySheetID = "0";
+        try {
+            Cursor mnocursor = Fill("select Distinct DeliverySheetID from MyRouteShipments where ItemNo = " + WaybillNo, context);
+
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    DeliverySheetID = DeliverySheetID + "," + String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("DeliverySheetID")));
+
+
+                } while (mnocursor.moveToNext());
+            } else
+
+                mnocursor.close();
+        } catch (SQLiteException e) {
+
+        }
+        return DeliverySheetID.replace("0,", "");
+    }
+
+    public void delete_isFollowGoogle(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.execSQL("delete from isFollowGoogle");
+
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+
+    }
+
+    public static int GetTruckID(int EmpID, Context context) {
+        int truckid = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);//SELECT *  FROM  Productivity WHERE ID = (SELECT MAX(ID)  FROM Productivity)
+            final String query = "SELECT TruckID  FROM  UserME Where EmployID = " + EmpID + " Order by ID Desc Limit 1";
+            Cursor cur = db.rawQuery(query, null);
+
+            if (cur != null && cur.getCount() > 0) {
+                cur.moveToFirst();
+                truckid = cur.getInt(cur.getColumnIndex("TruckID"));
+
+
+                db.close();
+            }
+
+            cur.close();
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return truckid;
+    }
+
 }

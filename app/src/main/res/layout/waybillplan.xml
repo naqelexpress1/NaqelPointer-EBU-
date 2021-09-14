@@ -469,6 +469,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_total_amount_body"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
+            <Button
+                android:id="@+id/toGoogle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:onClick="toGoogle"
+                android:text="To Google"
+                app:layout_constraintHorizontal_bias="0.0"
+
+                app:layout_constraintTop_toBottomOf="@+id/lbPODType"
+                tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded" />
 
             <fragment
                 android:id="@+id/map"

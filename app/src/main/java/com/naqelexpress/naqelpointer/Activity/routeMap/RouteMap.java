@@ -277,8 +277,10 @@ public class RouteMap extends AppCompatActivity implements OnMapReadyCallback, G
                     //    double latitude = location.getLatitude();
 
 
-                    if (position != 0)
-                        custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
+                    if (position != 0){
+                        //commented by ismail because couriers are miss use
+                        //custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
+                         }
                     else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
 //                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());

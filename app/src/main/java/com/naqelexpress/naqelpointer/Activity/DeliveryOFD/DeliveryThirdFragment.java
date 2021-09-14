@@ -100,7 +100,7 @@ public class DeliveryThirdFragment extends Fragment {
                 if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
                     btnOpenCamera.setVisibility(View.GONE);
 
-                    if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                    if (!GlobalVar.GV().getDeviceName().contains("TC25") && !GlobalVar.GV().getDeviceName().contains("TC26")) {
                         txtBarCode.setKeyListener(null);
                         txtBarCode.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -275,9 +275,12 @@ public class DeliveryThirdFragment extends Fragment {
                     alertDialog.show();
                 }
             } else {
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
-                AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this Waybill/OFD Scan,kindly please contact supervisor?")
+                try {
+
+
+                    GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this Waybill/OFD Scan,kindly please contact supervisor?")
 //                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialogInterface, int which) {
@@ -287,23 +290,26 @@ public class DeliveryThirdFragment extends Fragment {
 //                                txtBarCode.setText("");
 //                            }
 //                        })
-                        .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int which) {
-                                if (GlobalVar.GV().isFortesting) {
-                                    if (!IsDelivered(txtBarCode.getText().toString())) {
-                                        DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-                                        lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
-                                        txtBarCode.setText("");
-                                        initViews();
+                            .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int which) {
+                                    if (GlobalVar.GV().isFortesting) {
+                                        if (!IsDelivered(txtBarCode.getText().toString())) {
+                                            DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+                                            lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+                                            txtBarCode.setText("");
+                                            initViews();
+                                        }
                                     }
+                                    txtBarCode.setText("");
                                 }
-                                txtBarCode.setText("");
-                            }
-                        })
-                        .setCancelable(false);
-                AlertDialog alertDialog = builder.create();
-                alertDialog.show();
+                            })
+                            .setCancelable(false);
+                    AlertDialog alertDialog = builder.create();
+                    alertDialog.show();
+                } catch (Exception e) {
+                    System.out.println(e);
+                }
             }
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);

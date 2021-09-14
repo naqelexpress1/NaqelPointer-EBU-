@@ -16,7 +16,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,22 +63,22 @@ public class PickUpSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-//            txtBarCode.addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                }
-//
-//                @Override
-//                public void afterTextChanged(Editable s) {
-//                    if (txtBarCode != null && txtBarCode.getText().length() == 13
-//                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
-//                        AddNewPiece();
-//                }
-//            });
+            txtBarCode.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (txtBarCode != null && txtBarCode.getText().length() == 13
+                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
+                        AddNewPiece();
+                }
+            });
 
             txtBarCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
@@ -260,6 +262,13 @@ public class PickUpSecondFragment
 
     private void AddNewPiece() {
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
+        if (PickUpActivity.class_.equals("BookingDetailAcyivityforCBU")) {
+            if (!txtBarCode.getText().toString().contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
+                return;
+            }
+        }
         if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 13
                     || txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength) {

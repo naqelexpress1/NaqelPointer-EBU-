@@ -134,6 +134,13 @@ dependencies {
     //implementation  'com.jakewharton.rxbinding2:rxbinding:2.0.0'
    // implementation "io.reactivex.rxjava3:rxjava:3.x.y"
 
+    //For MLBarcode Package
+    //implementation 'androidx.appcompat:appcompat:1.0.0'
+   // implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    //implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

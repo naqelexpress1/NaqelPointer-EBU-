@@ -836,6 +836,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //                } else
 //                    Toast.makeText(getApplicationContext(), "No Location ", Toast.LENGTH_LONG).show();
 
+                if (!GlobalVar.isMyroutesync(getApplicationContext())) {
+                    GlobalVar.ShowDialog(MyRouteActivity_Complaince_GroupbyPhn.this,
+                            "Info", "Please wait, try after sometime ", true);
+                    return false;
+                }
                 ArrayList<MyRouteShipments> myRouteShipmentList = GlobalVar.GV().LoadMyRouteShipmentsOptimizeMap("OrderNo", true, getApplicationContext(),
                         getWindow().getDecorView().getRootView());
 
@@ -1388,7 +1393,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             try {
                 DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                 boolean loop = false;
-                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext() , 0);
+                loop = GlobalVar.deleteContactRawID(dbConnections.ContactDetails(getApplicationContext()), getApplicationContext(), 0);
                 int time = 1000;
                 while (!loop)
                     Thread.sleep(time);
@@ -2101,7 +2106,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         if (lastseqstoptime.getText().toString().equals("No Plan"))
             txtplannedlocationcount.setText("");
         else
-            txtplannedlocationcount.setText("Planned Count : " + String.valueOf(result.getCount() - 1));
+            txtplannedlocationcount.setText("Planned Count : " + String.valueOf(result.getCount()));
 
         result.close();
         dbConnections.close();

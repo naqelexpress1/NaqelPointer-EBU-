@@ -15,37 +15,43 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="16dp"
+            android:layout_marginRight="8dp"
             android:layout_weight="1"
             android:hint="@string/EnterEmployID"
             android:inputType="number" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/txtBarcode"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="Piece Code"
+            android:inputType="number"
+            android:maxLength="14"
+            android:text="" />
 
         <Button
             android:id="@+id/btnOpenCamera"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="16dp"
             android:background="@drawable/camera"
+            android:visibility="gone"
             app:layout_constraintRight_toLeftOf="@+id/btnGetWaybillDetails"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints,RtlHardcoded" />
     </LinearLayout>
-
-
-    <EditText
-        android:id="@+id/txtBarcode"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="8dp"
-        android:ems="10"
-        android:hint="Piece Code"
-        android:inputType="number"
-        android:maxLength="13"
-        android:text="" />
-
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -77,12 +83,12 @@
         android:id="@+id/barcode"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:numColumns="1"
         android:scrollbars="vertical" />
 

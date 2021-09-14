@@ -41,7 +41,7 @@ public class CourierRating extends AppCompatActivity implements AlertCallback {
         //   btn.setVisibility(View.GONE);
 
         FetchRating();
-
+        // redirectMainPage();
 
     }
 

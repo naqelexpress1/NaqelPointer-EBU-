@@ -67,6 +67,7 @@ public class SkipWaybillNoinRouteLine
     private void FetchReason() {
         GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch Skip Reasons.", SkipWaybillNoinRouteLine.this,
                 Enum.PROGRESS_TYPE , "SkipWaybillNoinRouteLine");
+
         NotificationApi.skipRouteLineReason(new Callback<List<SkipRouteLineSeqWaybillnoReasonModels>>() {
             @Override
             public void returnResult(List<SkipRouteLineSeqWaybillnoReasonModels> result) {

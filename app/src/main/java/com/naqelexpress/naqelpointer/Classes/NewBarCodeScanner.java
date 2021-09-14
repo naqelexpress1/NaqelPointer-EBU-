@@ -1,157 +1,181 @@
 package com.naqelexpress.naqelpointer.Classes;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
+import android.util.SparseArray;
+import android.widget.CheckBox;
 
+import com.google.android.gms.vision.barcode.Barcode;
+import com.naqelexpress.naqelpointer.MLBarcode.BarcodeCapture;
+import com.naqelexpress.naqelpointer.MLBarcode.BarcodeGraphic;
+import com.naqelexpress.naqelpointer.MLBarcode.MobilevisionBarcode.BarcodeRetriever;
 import com.naqelexpress.naqelpointer.R;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import Error.ErrorReporter;
-import me.dm7.barcodescanner.zbar.BarcodeFormat;
-import me.dm7.barcodescanner.zbar.Result;
-import me.dm7.barcodescanner.zbar.ZBarScannerView;
 //import android.media.Ringtone;
 //import android.media.RingtoneManager;
 //import android.net.Uri;
 
-public class NewBarCodeScanner extends AppCompatActivity
-        implements ZBarScannerView.ResultHandler {
-    private static final String FLASH_STATE = "FLASH_STATE";
-    private static final String AUTO_FOCUS_STATE = "AUTO_FOCUS_STATE";
-    private static final String SELECTED_FORMATS = "SELECTED_FORMATS";
-    private static final String CAMERA_ID = "CAMERA_ID";
-    private ZBarScannerView mScannerView;
-    private boolean mFlash;
-    private boolean mAutoFocus;
-    private ArrayList<Integer> mSelectedIndices;
-    private int mCameraId = -1;
+public class NewBarCodeScanner extends AppCompatActivity implements BarcodeRetriever {
+
+    private static final String TAG = "BarcodeMain";
+
+    CheckBox fromXMl, pause;
+    SwitchCompat drawRect, autoFocus, supportMultiple, touchBack, drawText, flash, frontCam;
+
+    BarcodeCapture barcodeCapture;
+
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
-        Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
-        setContentView(R.layout.newbarcodescannerlands);
+        // Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
-        try {
-            if (state != null) {
-                mFlash = state.getBoolean(FLASH_STATE, false);
-                mAutoFocus = state.getBoolean(AUTO_FOCUS_STATE, true);
-                mSelectedIndices = state.getIntegerArrayList(SELECTED_FORMATS);
-                mCameraId = state.getInt(CAMERA_ID, -1);
-            } else {
-                mFlash = false;
-                mAutoFocus = true;
-                mSelectedIndices = null;
-                mCameraId = -1;
-            }
+        setContentView(R.layout.barcode_google);
 
-            ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-            mScannerView = new ZBarScannerView(this);
-            setupFormats();
-            contentFrame.addView(mScannerView);
-            Button btnFlash = (Button) findViewById(R.id.btnFlash);
-            btnFlash.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mFlash = !mFlash;
-                    mScannerView.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                mScannerView.setFlash(mFlash);
-                            } catch (Exception e) {
-                            }
-                        }
-                    }, 5000);
 
-                }
-            });
-            setRequestedOrientation(getResources().getConfiguration().orientation);
-        } catch (Exception e) {
-            System.out.println(e.toString());
-        }
+        barcodeCapture = (BarcodeCapture) getSupportFragmentManager().findFragmentById(R.id.barcode);
+//        barcodeCapture = (SupportMapFragment) getSupportFragmentManager()
+//                .findFragmentById(R.id.map);
 
+        barcodeCapture.setRetrieval(this);
+//
+//        fromXMl = (CheckBox) findViewById(R.id.from_xml);
+//        pause = (CheckBox) findViewById(R.id.pause);
+//        drawRect = (SwitchCompat) findViewById(R.id.draw_rect);
+//        autoFocus = (SwitchCompat) findViewById(R.id.focus);
+//        supportMultiple = (SwitchCompat) findViewById(R.id.support_multiple);
+//        touchBack = (SwitchCompat) findViewById(R.id.touch_callback);
+//        drawText = (SwitchCompat) findViewById(R.id.draw_text);
+//        flash = (SwitchCompat) findViewById(R.id.on_flash);
+//        frontCam = (SwitchCompat) findViewById(R.id.front_cam);
+//
+//        findViewById(R.id.stop).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                barcodeCapture.stopScanning();
+//            }
+//        });
+//
+//        findViewById(R.id.refresh).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (fromXMl.isChecked()) {
+//
+//                } else {
+//                    barcodeCapture.setShowDrawRect(drawRect.isChecked())
+//                            .setSupportMultipleScan(supportMultiple.isChecked())
+//                            .setTouchAsCallback(touchBack.isChecked())
+//                            .shouldAutoFocus(autoFocus.isChecked())
+//                            .setShowFlash(flash.isChecked())
+//                            .setShowFlash(flash.isChecked())
+//                            .setBarcodeFormat(Barcode.ALL_FORMATS)
+//                            .setCameraFacing(frontCam.isChecked() ? CameraSource.CAMERA_FACING_FRONT : CameraSource.CAMERA_FACING_BACK)
+//                            .setShouldShowText(drawText.isChecked());
+//                    if (pause.isChecked())
+//                        barcodeCapture.pause();
+//                    else
+//                        barcodeCapture.resume();
+//                    barcodeCapture.refresh(true);
+//                }
+//            }
+//        });
+
+    }
+
+
+    @Override
+    public void onRetrieved(final Barcode barcode) {
+        Log.d(TAG, "Barcode read: " + barcode.displayValue);
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+////                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+////                        .setTitle("code retrieved")
+////                        .setMessage(barcode.displayValue);
+////                builder.show();
+//                barcodeCapture.stopScanning();
+//                handleResult(barcode.displayValue);
+//            }
+//        });
+
+        barcodeCapture.stopScanning();
+        handleResult(barcode.displayValue);
+    }
+
+    @Override
+    public void onRetrievedMultiple(final Barcode closetToClick, final List<BarcodeGraphic> barcodeGraphics) {
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                String message = "Code selected : " + closetToClick.displayValue + "\n\nother " +
+//                        "codes in frame include : \n";
+//                for (int index = 0; index < barcodeGraphics.size(); index++) {
+//                    Barcode barcode = barcodeGraphics.get(index).getBarcode();
+//                    message += (index + 1) + ". " + barcode.displayValue + "\n";
+//                }
+//                AlertDialog.Builder builder = new AlertDialog.Builder(NewBarCodeScanner.this)
+//                        .setTitle("code retrieved")
+//                        .setMessage(message);
+//                builder.show();
+//            }
+//        });
 
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        try {
-            mScannerView.setResultHandler(this);
-        } catch (Exception e) {
+    public void onBitmapScanned(SparseArray<Barcode> sparseArray) {
+        for (int i = 0; i < sparseArray.size(); i++) {
+            Barcode barcode = sparseArray.valueAt(i);
+            Log.e("value", barcode.displayValue);
         }
-        try {
-            mScannerView.startCamera(mCameraId);
-        } catch (Exception e) {
-        }
-        try {
-            mScannerView.setFlash(mFlash);
-        } catch (Exception e) {
-        }
-        try {
-            mScannerView.setAutoFocus(mAutoFocus);
-        } catch (Exception e) {
-        }
+
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putBoolean(FLASH_STATE, mFlash);
-        outState.putBoolean(AUTO_FOCUS_STATE, mAutoFocus);
-        outState.putIntegerArrayList(SELECTED_FORMATS, mSelectedIndices);
-        outState.putInt(CAMERA_ID, mCameraId);
+    public void onRetrievedFailed(String reason) {
+
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
+    public void onPermissionRequestDenied() {
 
-        if (savedInstanceState != null) {
-            mFlash = savedInstanceState.getBoolean(FLASH_STATE);
-            mAutoFocus = savedInstanceState.getBoolean(AUTO_FOCUS_STATE);
-            mSelectedIndices = savedInstanceState.getIntegerArrayList(SELECTED_FORMATS);
-            mCameraId = savedInstanceState.getInt(CAMERA_ID);
-        }
     }
 
-    @Override
-    public void handleResult(Result rawResult) {
+
+    public void handleResult(String rawResult) {
         Intent intent = new Intent();
-        String result = rawResult.getContents();
-        Log.d("test", "result " + result);
-        intent.putExtra("barcode", result);
+        // String result = rawResult.getContents();
+        //Log.d("test", "result " + result);
+        intent.putExtra("barcode", rawResult);
         setResult(RESULT_OK, intent);
         finish();
     }
 
-    public void setupFormats() {
-        List<BarcodeFormat> formats = new ArrayList<>();
-        if (mSelectedIndices == null || mSelectedIndices.isEmpty()) {
-            mSelectedIndices = new ArrayList<>();
-            for (int i = 0; i < BarcodeFormat.ALL_FORMATS.size(); i++)
-                mSelectedIndices.add(i);
-        }
-
-        for (int index : mSelectedIndices)
-            formats.add(BarcodeFormat.ALL_FORMATS.get(index));
-        if (mScannerView != null)
-            mScannerView.setFormats(formats);
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Exit")
+                .setMessage("Are you sure you want to exit ?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        barcodeCapture.stopScanning();
+                        finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        mScannerView.stopCamera();
-
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

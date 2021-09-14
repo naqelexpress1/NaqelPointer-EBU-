@@ -29,6 +29,7 @@ import com.naqelexpress.naqelpointer.Global;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.Enum.Enum;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,7 +44,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class BookingList extends AppCompatActivity {
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
+public class BookingList extends AppCompatActivity implements AlertCallback {
 
 
     private SwipeMenuListView mapListview;
@@ -251,6 +254,16 @@ public class BookingList extends AppCompatActivity {
         }
         //adapter.notifyDataSetChanged();
 
+
+    }
+
+    @Override
+    public void returnOk(int ok, Activity activity) {
+
+    }
+
+    @Override
+    public void returnCancel(int cancel, SweetAlertDialog alertDialog) {
 
     }
 

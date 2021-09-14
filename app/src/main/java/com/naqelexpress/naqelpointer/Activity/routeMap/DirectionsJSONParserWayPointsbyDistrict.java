@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_byDistrict.jsonobject_route;
+import static com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_byDistrict.precount;
+
 /**
  * Created by anupamchugh on 27/11/15.
  */
@@ -36,12 +39,14 @@ public class DirectionsJSONParserWayPointsbyDistrict {
         JSONArray ovpolyline = null;
         JSONObject ovpoints = null;
         int legsCount = 0;
+
         try {
 
             jRoutes = jObject.getJSONArray("routes");
 
             /** Traversing all routes */
             for (int i = 0; i < jRoutes.length(); i++) {
+
                 int waypointsJsonArray = 0;
                 waypointsJsonArray = waypointsJsonArray + preposition;
                 jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
@@ -49,6 +54,7 @@ public class DirectionsJSONParserWayPointsbyDistrict {
                 String pline = (String) ((JSONObject) jRoutes.get(i)).getJSONObject("overview_polyline").get("points");
                 for (int m = 0; m < jLegs.length(); m++) {
 
+                    RouteMap_byDistrict.precount = RouteMap_byDistrict.precount + 1;
                     List path = new ArrayList<HashMap<String, String>>();
                     HashMap<String, String> hm_ = new HashMap<String, String>();
                     String km = "";
@@ -126,17 +132,24 @@ public class DirectionsJSONParserWayPointsbyDistrict {
                         }
 
                         if (insertdata)
-                            dbConnections.InsertPlannedLocationWayPoints(conext, jrsonObject.toString(), m, Integer.parseInt(wno), km, duration,
+                            dbConnections.InsertPlannedLocationWayPoints(conext, jrsonObject.toString(), precount, Integer.parseInt(wno), km, duration,
                                     ((JSONObject) jLegs.get(m)).getString("start_address"),
                                     ((JSONObject) jLegs.get(m)).getString("end_address"), durationvalue);
 //                        }
+
                         dbConnections.close();
                     }
 
                 }
             }
 
+
             if (insertdata) {
+
+                HashMap<String, String> temp = new HashMap<>();
+                temp.put("json", jObject.toString());
+                jsonobject_route.add(temp);
+
                 ArrayList<Location> tplaces = new ArrayList<>();
                 if (waypointOrder != null && waypointOrder.length() > 0) {
                     for (int i = 0; i < waypointOrder.length() + 1; i++) {

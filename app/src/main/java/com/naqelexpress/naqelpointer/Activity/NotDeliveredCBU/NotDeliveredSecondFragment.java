@@ -95,7 +95,7 @@ public class NotDeliveredSecondFragment
             if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
                 btnOpenCamera.setVisibility(View.GONE);
 
-                if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                if (!GlobalVar.GV().getDeviceName().contains("TC25") && !GlobalVar.GV().getDeviceName().contains("TC26")) {
                     txtBarCode.setKeyListener(null);
                     txtBarCode.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -313,7 +313,7 @@ public class NotDeliveredSecondFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
+                        if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength)
                             txtBarCode.setText(barcode);
 
                     }

@@ -139,7 +139,7 @@ public class DeliverySheetThirdFragment
                 if (GlobalVar.GV().istxtBoxEnabled(getContext())) {
                     btnOpenCamera.setVisibility(View.GONE);
 
-                    if (!GlobalVar.GV().getDeviceName().contains("TC25")) {
+                    if (!GlobalVar.GV().getDeviceName().contains("TC25") && !GlobalVar.GV().getDeviceName().contains("TC26")) {
                         txtBarCode.setKeyListener(null);
                         txtBarCode.setOnClickListener(new View.OnClickListener() {
                             @Override

@@ -102,6 +102,8 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
     ArrayList<HashMap<String, String>> AreaListAll = new ArrayList<>();
     ArrayList<HashMap<String, String>> AreaListSortbyRadiusandArea = new ArrayList<>();
     Location lastlocation;
+    public static ArrayList<HashMap<String, String>> jsonobject_route = new ArrayList<>();
+    static int precount = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +117,7 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
         //dbConnections.clearMyRouteComplaince(getApplicationContext());
         dbConnections.close();
 
-
+        precount = -1;
         Bundle extras = getIntent().getExtras();
         myRouteShipmentList = extras.getParcelableArrayList("myroute");
         tplaces = extras.getParcelableArrayList("places");
@@ -233,6 +235,9 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
         if (!IsPlanned)
             OptimizeLocation();
 
+        stopService(
+                new Intent(this,
+                        com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
 
     }
 
@@ -320,9 +325,10 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
                     //    double latitude = location.getLatitude();
 
 
-                    if (position != 0)
-                        custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
-                    else
+                    if (position != 0) {
+                        //commented by ismail because couriers are miss use
+                        // custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
+                    } else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
 //                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
 
@@ -423,6 +429,7 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
                     if (i == places.size() - 2) {
                         if (pDialog != null && pDialog.isShowing())
                             pDialog.dismissWithAnimation();
+                        System.out.println(jsonobject_route.toString());
                         break;
                     }
 
@@ -629,6 +636,7 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
                 if (isMapReady)
                     ShowShipmentMarker();
             }
+            System.out.println(jsonobject_route.toString());
             pDialog.dismissWithAnimation();
         }
     }
@@ -683,9 +691,9 @@ public class RouteMap_byDistrict extends AppCompatActivity implements OnMapReady
         if (pDialog != null && pDialog.isShowing())
             pDialog.dismissWithAnimation();
 
-        stopService(
-                new Intent(this,
-                        com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
+//        stopService(
+//                new Intent(this,
+//                        com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class));
         if (!isMyServiceRunning(com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp.class)) {
             startService(
                     new Intent(this,

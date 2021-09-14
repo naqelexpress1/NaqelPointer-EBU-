@@ -64,6 +64,7 @@ import com.naqelexpress.naqelpointer.Activity.CourierKPIEBU.CourierKpi;
 import com.naqelexpress.naqelpointer.Activity.Delivery.DeliveryActivity;
 import com.naqelexpress.naqelpointer.Activity.DeliverysheetEBU.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Activity.EBURoute.DeliverySheet;
+import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.History.History;
 import com.naqelexpress.naqelpointer.Activity.IncabCheckList.IncCabChecklist;
 import com.naqelexpress.naqelpointer.Activity.Incident.Incident;
@@ -506,11 +507,11 @@ public class MainPageActivity
             cellIcon = new int[5];
         } else if (devision.equals("Express")) {
             if (menu == 0) {
-                cellTitle = new String[18];
-                cellIcon = new int[18];
+                cellTitle = new String[19];
+                cellIcon = new int[19];//18
             } else {
-                cellTitle = new String[23];
-                cellIcon = new int[23];
+                cellTitle = new String[24];
+                cellIcon = new int[24];
             }
         }
 
@@ -586,6 +587,7 @@ public class MainPageActivity
                 cellTitle[20] = "Chat";//CBU 7
                 cellTitle[21] = "KPI";//CBU 7
                 cellTitle[22] = "InCab CheckList";//CBU 7
+                cellTitle[23] = "Fuel Model";//CBU 7
             } else {
 
                 cellTitle[0] = getResources().getString(R.string.BookingList);//11
@@ -606,7 +608,7 @@ public class MainPageActivity
                 cellTitle[15] = "Chat";//CBU 7
                 cellTitle[16] = "KPI";//CBU 7
                 cellTitle[17] = "InCab CheckList";//CBU 7
-
+                cellTitle[18] = "Fuel Model";//CBU 7
             }
 
             if (menu == 1) {
@@ -634,6 +636,7 @@ public class MainPageActivity
                 itemposition.put(20, 25);
                 itemposition.put(21, 26);
                 itemposition.put(22, 27);
+                itemposition.put(23, 31);
             } else {
                 itemposition.put(0, 11);
                 itemposition.put(1, 5); //18
@@ -653,6 +656,7 @@ public class MainPageActivity
                 itemposition.put(15, 25);
                 itemposition.put(16, 26);
                 itemposition.put(17, 27);
+                itemposition.put(18, 31);
                 // itemposition.put(18, 11);
             }
 
@@ -723,6 +727,7 @@ public class MainPageActivity
                 cellIcon[20] = R.drawable.contacts; //CBU
                 cellIcon[21] = R.drawable.customclearence; //CBU
                 cellIcon[22] = R.drawable.car; //CBU
+                cellIcon[23] = R.drawable.fuel; //CBU
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -743,6 +748,7 @@ public class MainPageActivity
                 cellIcon[15] = R.drawable.contacts; //CBU
                 cellIcon[16] = R.drawable.customclearence; //CBU
                 cellIcon[17] = R.drawable.car; //CBU
+                cellIcon[18] = R.drawable.fuel; //CBU
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
@@ -948,8 +954,8 @@ public class MainPageActivity
     }
 
     private boolean GetDivision() {
-        if (GlobalVar.GV().EmployID == 19127)
-            return false;
+//        if (GlobalVar.GV().EmployID == 19127)
+//            return false;
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
         if (division.equals("Express"))
@@ -1176,7 +1182,8 @@ public class MainPageActivity
                                     Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
                                     startActivity(bookingList);
                                 } else {
-                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+                                    //Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
                                     startActivity(bookingList);
                                 }
                             } else {
@@ -1399,6 +1406,19 @@ public class MainPageActivity
                                     CourierRating.class);
 //
                             startActivity(deliverySheet);
+                        } else {
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    , true);
+                        }
+
+                        break;
+                    case 31:
+                        if (VersionMatct()) {
+                            Intent fuel = new Intent(getApplicationContext(),
+                                    Fuel.class);
+//
+                            startActivity(fuel);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
                                     "Kindly Update our Latest Version.(Logout and Login again)"

@@ -60,10 +60,9 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
+//        GlobalVar.toGoogle("21.454545","45.1520205", SplashScreenActivity.this);
 
-//        startService(
-//                new Intent(SplashScreenActivity.this,
-//                        com.naqelexpress.naqelpointer.service.TerminalHandlingBulk.class));
+
 
 //        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
 //        dbConnections1.deleteDeliverysheetData(getApplicationContext());
@@ -231,9 +230,10 @@ public class SplashScreenActivity
 //        dbConnections1.close();
 //
 
-//        DBConnections db = new DBConnections(getApplicationContext(), null);
+        //DBConnections db = new DBConnections(getApplicationContext(), null);
+        // db.delete_isFollowGoogle(getApplicationContext());
 //        db.deleteAllLocation(getApplicationContext());
-//        db.close();
+        // db.close();
 
 
 //        startService(
@@ -275,6 +275,7 @@ public class SplashScreenActivity
                         sleep(2000);
 
                         loginPage();
+//                        loginPage_test();
 
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -291,6 +292,11 @@ public class SplashScreenActivity
             GlobalVar.RedirectSettings(SplashScreenActivity.this);
     }
 
+
+    void loginPage_test() {
+        Intent intent = new Intent(SplashScreenActivity.this, com.naqelexpress.naqelpointer.Activity.GoogleBarcode.MainActivity.class);
+        startActivity(intent);
+    }
 
     void loginPage() {
 

@@ -25,10 +25,10 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
-import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
 import org.joda.time.DateTime;
@@ -89,7 +89,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                 }
             }
         } catch (Exception e) {
-            Log.d("test" , TAG + " " + e.toString());
+            Log.d("test", TAG + " " + e.toString());
         }
 
         conflict.clear();
@@ -105,6 +105,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         waybilgrid.setAdapter(adapter);
 
         txtBarcode = (EditText) findViewById(R.id.txtBarcode);
+//        txtBarcode.setKeyListener(null);
         employid = (EditText) findViewById(R.id.employ);
         count = (TextView) findViewById(R.id.count);
 
@@ -124,9 +125,9 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     GlobalVar.GV().askPermission(ValidationDS.this, GlobalVar.PermissionType.Camera);
                 } else {
                     if (waybilldetails.size() > 0) {
-                        NewBarCodeScannerForVS.scannedBarCode.clear();
-                        NewBarCodeScannerForVS.ScanbyDevice.clear();
-                        NewBarCodeScannerForVS.ConflictBarcode.clear();
+                        scannedBarCode.clear();
+                        ScanbyDevice.clear();
+                        ConflictBarcode.clear();
                         Bundle bundle = new Bundle();
                         Intent intent = new Intent(ValidationDS.this.getApplicationContext(), NewBarCodeScannerForVS.class);
                         bundle.putSerializable("scannedBarCode", scannedBarCode);
@@ -152,7 +153,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (txtBarcode != null && txtBarcode.getText().length() == 13) {
+                if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength || txtBarcode.getText().length() == 13) {
                     String result = txtBarcode.getText().toString();
                     if (!GlobalVar.GV().isValidBarcode(result)) {
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
@@ -162,11 +163,10 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     }
 
 
-
                     // To show onlineValidation warning if any
                     boolean isConflict = !scannedBarCode.contains(result);
                     if (division.equals("Courier")) {
-                        onlineValidation(result ,isConflict );
+                        onlineValidation(result, isConflict);
                     }
 
 
@@ -298,10 +298,11 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlert("File Not Loaded" , "Kindly check your internet connection & Try Again \n \n " + errorMessage);
+                ErrorAlert("File Not Loaded", "Kindly check your internet connection & Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     private void ErrorAlert(final String title, String message) {
@@ -732,17 +733,17 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         boolean isValid;
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        isValid = dbConnections.isValidValidationFile(GlobalVar.DsValidationCourier , getApplicationContext());
+        isValid = dbConnections.isValidValidationFile(GlobalVar.DsValidationCourier, getApplicationContext());
         if (isValid)
             return true;
         return false;
     }
 
-    private void onlineValidation(String barcode , boolean isConflict) {
+    private void onlineValidation(String barcode, boolean isConflict) {
         boolean isShowWarning = false;
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode , getApplicationContext());
+                    , barcode, getApplicationContext());
 
             OnLineValidation onLineValidation = new OnLineValidation();
 
@@ -772,11 +773,11 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
             }
 
         } catch (Exception e) {
-            Log.d("test" , "isValidPieceBarcode " + e.toString());
+            Log.d("test", "isValidPieceBarcode " + e.toString());
         }
     }
 
-    private OnLineValidation getOnLineValidationPiece (String barcode) {
+    private OnLineValidation getOnLineValidationPiece(String barcode) {
         try {
             for (OnLineValidation pieceDetail : onLineValidationList) {
                 if (pieceDetail.getBarcode().equals(barcode))
@@ -784,7 +785,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
             }
 
         } catch (Exception e) {
-            Log.d("test" , "getOnLineValidationPiece " + e.toString());
+            Log.d("test", "getOnLineValidationPiece " + e.toString());
         }
         return null;
     }
@@ -857,13 +858,13 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
             }
         } catch (Exception e) {
-            Log.d("test" , "showDialog " + e.toString());
+            Log.d("test", "showDialog " + e.toString());
         }
     }
 
-    public void getOnlineValidationFile () {
-        APICall apiCall = new APICall(getApplicationContext() , ValidationDS.this , this);
-        apiCall.getOnlineValidationDataOffset(GlobalVar.DsValidationCourier , 0 , 1);
+    public void getOnlineValidationFile() {
+        APICall apiCall = new APICall(getApplicationContext(), ValidationDS.this, this);
+        apiCall.getOnlineValidationDataOffset(GlobalVar.DsValidationCourier, 0, 1);
 
     }
 

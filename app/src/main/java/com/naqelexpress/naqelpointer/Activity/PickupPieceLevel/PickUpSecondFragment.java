@@ -1,6 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.PickupPieceLevel;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
+import android.app.Service;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -46,6 +48,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -217,6 +220,30 @@ public class PickUpSecondFragment
         super.onStart();
         initViews();
         // initDialog();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+       // isAppOnTop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //isAppOnTop();
+    }
+
+    private boolean isAppOnTop() {
+        ActivityManager am = (ActivityManager) getActivity().getSystemService(Service.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> tasks;
+        tasks = am.getRunningTasks(1);
+        ActivityManager.RunningTaskInfo running = tasks.get(0);
+        if (running.topActivity.getPackageName().equals("com.naqelexpress.naqelpointer")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void initSwipe() {

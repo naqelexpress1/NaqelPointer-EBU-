@@ -1,10 +1,14 @@
 package com.naqelexpress.naqelpointer.Retrofit;
 
+import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
+import com.naqelexpress.naqelpointer.Models.FuelTypeModels;
 import com.naqelexpress.naqelpointer.Models.NotificationModels;
 import com.naqelexpress.naqelpointer.Models.RatingModel;
 import com.naqelexpress.naqelpointer.Models.Request.CommonRequest;
+import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.Models.Request.NotificationRequest;
+import com.naqelexpress.naqelpointer.Models.Request.PickupSheetSPASRRegResult;
 import com.naqelexpress.naqelpointer.Models.SkipRouteLineSeqWaybillnoReasonModels;
 import com.naqelexpress.naqelpointer.Retrofit.Request.OnlineValidationRequest;
 import com.naqelexpress.naqelpointer.Retrofit.Response.RetrofitCallResponse;
@@ -48,4 +52,16 @@ public interface IPointerAPI {
     //BayanNo Details
     @POST("CourierRating")
     Observable<RatingModel> FetchBayanNoDetails(@Body CommonRequest commonRequest);
+
+    //Fuel
+    @POST("InsertExpFuel")
+    Observable<CommonResult> InsertExpFuel(@Body FuelRequest fuelRequest);
+
+    //Fetch Fuel Type
+    @GET("FetchFuelType")
+    Observable<List<FuelTypeModels>> FetchFuelType();
+
+    //Pickupsheet Deatails SPASRReg
+    @POST("PickupsheetDetailsSpAsrReg")
+    Observable<PickupSheetSPASRRegResult> PickupsheetDetailsSpAsrReg(@Body CommonRequest commonRequest);
 }

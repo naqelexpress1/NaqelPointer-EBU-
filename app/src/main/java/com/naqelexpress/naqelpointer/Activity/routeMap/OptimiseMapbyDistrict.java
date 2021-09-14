@@ -235,9 +235,10 @@ public class OptimiseMapbyDistrict extends AppCompatActivity implements OnMapRea
                     //    double latitude = location.getLatitude();
 
 
-                    if (position != 0)
+                    if (position != 0) {
+                        //commented by ismail because couriers are miss use
                         custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
-                    else
+                    } else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
 //                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
 
@@ -1115,7 +1116,7 @@ public class OptimiseMapbyDistrict extends AppCompatActivity implements OnMapRea
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         Cursor result = dbConnections.Fill("select * from SuggestLocations where Date = '" + GlobalVar.getDate() + "'" +
-                " and EmpID = " + GlobalVar.GV().EmployID , getApplicationContext()); // + " Limit 1"
+                " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext()); // + " Limit 1"
         if (result != null && result.getCount() > 0) {
             Issuggest = true;
             result.moveToFirst();
@@ -1164,7 +1165,7 @@ public class OptimiseMapbyDistrict extends AppCompatActivity implements OnMapRea
         Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
                 " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
 
-        if (result.getCount() == places.size() -1 ) {
+        if (result.getCount() == places.size() - 1) {
 
 
             if (result != null && result.getCount() > 0) {

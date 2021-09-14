@@ -64,7 +64,7 @@ public class PickUpActivity extends AppCompatActivity {
     ArrayList<Booking> bookinglist;
 
     int position;
-    String class_;
+    static String class_;
 
 
     @Override

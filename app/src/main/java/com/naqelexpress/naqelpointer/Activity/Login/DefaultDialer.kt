@@ -44,7 +44,7 @@ class DefaultDialer : AppCompatActivity() {
         }
 
         val intent = Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER)
-                .putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
+            .putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, packageName)
         startActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER)
     }
 

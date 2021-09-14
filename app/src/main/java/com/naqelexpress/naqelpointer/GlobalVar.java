@@ -37,6 +37,8 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList;
+import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
 import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
@@ -103,7 +105,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "TH IsMix Test - 03-08-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU App 9 Series test - 06-09-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -117,10 +119,13 @@ public class GlobalVar {
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
+    public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
     //
+
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
+    public static boolean ManualType = false;
     public static String WaybillNoStartSeries = "8"; //812345679
 
     private String WebServiceVersion = "2.0";
@@ -2717,7 +2722,7 @@ public class GlobalVar {
         LocationManager locationManager = (LocationManager) context
                 .getSystemService(LOCATION_SERVICE);
         Location lastKnownLocation = null;
-        //  String network = LocationManager.NETWORK_PROVIDER;
+        //  String network   = LocationManager.NETWORK_PROVIDER;
         String gps = LocationManager.GPS_PROVIDER;
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
@@ -4067,6 +4072,12 @@ public class GlobalVar {
             alertCallback = new MyRouteActivity_Complaince_GroupbyPhn();
         else if (classname.equals("CourierRating"))
             alertCallback = new CourierRating();
+        else if (classname.equals("BookingList"))
+            alertCallback = new BookingList();
+        else if (classname.equals("Fuel"))
+            alertCallback = new Fuel();
+        else if (classname.equals("com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList"))
+            alertCallback = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList();
     }
 
     public void CommonProgessAlertMessageActivity(String title, String msg,
@@ -4352,4 +4363,48 @@ public class GlobalVar {
 
         return empdetails;
     }
+
+    public static boolean isMyroutesync(Context context) {
+        boolean issync = true;
+        DBConnections db = new DBConnections(context, null);
+        //db.DeleteAllSuggestLocation(getApplicationContext());
+
+        Cursor cursor = db.Fill("select count(*) total from MyRouteCompliance where IsSync = 0", context);
+        if (cursor.getCount() > 0) {
+
+            cursor.moveToFirst();
+
+            int count = Integer.parseInt(cursor.getString(cursor.getColumnIndex("total")));
+            if (count > 0)
+                issync = false;
+            db.close();
+            cursor.close();
+        }
+
+        return issync;
+    }
+
+    public static void toGoogle(String lat, String lng, Activity activity, Location location) {
+//        Uri gmmIntentUri = Uri.parse("geo:" + lat + "," + lng);
+//        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+//        mapIntent.setPackage("com.google.android.apps.maps");
+//        if (mapIntent.resolveActivity(activity.getPackageManager()) != null) {
+//            activity.startActivity(mapIntent);
+//        }
+        String api = "http://maps.google.com/maps?saddr=";
+        StringBuilder sb = new StringBuilder();
+        sb.append(api);
+
+
+        sb.append(location.getLatitude() + "," + location.getLongitude());
+        sb.append("&daddr=");
+        sb.append(lat + "," + lng);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sb.toString()));
+        intent.setPackage("com.google.android.apps.maps");
+        activity.startActivity(intent);
+
+
+    }
+
+
 }

@@ -24,6 +24,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -44,7 +45,9 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.CongisneeUpdatedNoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CongisneeUpdatedNoResult;
+import com.naqelexpress.naqelpointer.Models.IsFollowSequncerModel;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.service.IsFollowSequencerService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,7 +64,7 @@ import Error.ErrorReporter;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class WaybillPlanActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
+        implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     Marker now;
     TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount,
@@ -117,13 +120,14 @@ public class WaybillPlanActivity extends AppCompatActivity
             btnWhatsApp1 = (AppCompatImageButton) findViewById(R.id.btnWhatsapp1);
             sms = (AppCompatImageButton) findViewById(R.id.sms);
             sms1 = (AppCompatImageButton) findViewById(R.id.sms1);
+            Button togoogle = (Button) findViewById(R.id.toGoogle);
 
 
             btnCallMobile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
-                   // GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    // GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
                 }
             });
             btnCallMobile1.setOnClickListener(new View.OnClickListener() {
@@ -242,6 +246,8 @@ public class WaybillPlanActivity extends AppCompatActivity
 
             }
 
+            if (ConsigneeLatitude.length() == 0)
+                togoogle.setVisibility(View.GONE);
 
             spinnerDialog = new ConsingeeMobileSpinnerDialog(WaybillPlanActivity.this, txtPhoneNo.getText().toString(),
                     txtMobileNo.getText().toString(), getWindow().getDecorView().getRootView());
@@ -444,6 +450,8 @@ public class WaybillPlanActivity extends AppCompatActivity
                     .icon(icon)
                     .title(getString(R.string.MyLocation)));
 
+            //mMap.getUiSettings().setMapToolbarEnabled(false);
+
             ShowShipmentMarker();
         } catch (Exception e) {
             System.out.println(e);
@@ -458,6 +466,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                     .position(latLng)
                     .icon(icon)
                     .title(txtWaybillNo.getText().toString()));
+            mMap.setOnMarkerClickListener(WaybillPlanActivity.this);
         }
 //        else
 //            mapFragment.getView().setVisibility(View.GONE);
@@ -645,6 +654,16 @@ public class WaybillPlanActivity extends AppCompatActivity
         p = new Point();
         p.x = location[0];
         p.y = location[1];
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+
+        if (!marker.getTitle().equals("My Location")) {
+            //handle click here
+            toGoogle();
+        }
+        return false;
     }
 
     private class ResendOtpNo extends AsyncTask<String, Void, String> {
@@ -983,4 +1002,60 @@ public class WaybillPlanActivity extends AppCompatActivity
                 GlobalVar.getCSEmail();
         return csSupportMsgAr + "\n\n" + csSupportMsgMsgEn;
     }
+
+    public void toGoogle(View view) {
+//        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//        Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
+//        IsFollowSequncerModel isFollowSequncerModel = new IsFollowSequncerModel();
+//        isFollowSequncerModel.setWaybillNo(Integer.parseInt(getWaybillNo()));
+//        isFollowSequncerModel.setIsFollow(1);
+//        isFollowSequncerModel.setConsLatitude(ConsigneeLatitude);
+//        isFollowSequncerModel.setConsLongitude(ConsigneeLongitude);
+//        isFollowSequncerModel.setCourierLatitude(String.valueOf(location.getLatitude()));
+//        isFollowSequncerModel.setCourierLongitude(String.valueOf(location.getLongitude()));
+//        isFollowSequncerModel.setDeliverysheetID(dbConnections.GetDeliverysheetIDbyWaybillNo(getApplicationContext(), Integer.parseInt(getWaybillNo())));
+//        isFollowSequncerModel.setEmployeeID(GlobalVar.GV().EmployID);
+//
+//        if (dbConnections.InsertIsFollowGoogle(isFollowSequncerModel, getApplicationContext())) {
+//            if (!GlobalVar.isMyServiceRunning(IsFollowSequencerService.class, getApplicationContext())) {
+//                startService(
+//                        new Intent(WaybillPlanActivity.this,
+//                                com.naqelexpress.naqelpointer.service.IsFollowSequencerService.class));
+//            }
+//            GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
+//        } else
+//            GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Something went wrong," +
+//                    "Please try again", true);
+        toGoogle();
+
+    }
+
+    private void toGoogle() {
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
+        IsFollowSequncerModel isFollowSequncerModel = new IsFollowSequncerModel();
+        isFollowSequncerModel.setWaybillNo(Integer.parseInt(getWaybillNo()));
+        isFollowSequncerModel.setIsFollow(1);
+        isFollowSequncerModel.setConsLatitude(ConsigneeLatitude);
+        isFollowSequncerModel.setConsLongitude(ConsigneeLongitude);
+        isFollowSequncerModel.setCourierLatitude(String.valueOf(location.getLatitude()));
+        isFollowSequncerModel.setCourierLongitude(String.valueOf(location.getLongitude()));
+        isFollowSequncerModel.setDeliverysheetID(dbConnections.GetDeliverysheetIDbyWaybillNo(getApplicationContext(), Integer.parseInt(getWaybillNo())));
+        isFollowSequncerModel.setEmployeeID(GlobalVar.GV().EmployID);
+
+        if (dbConnections.InsertIsFollowGoogle(isFollowSequncerModel, getApplicationContext())) {
+            mMap.getUiSettings().setMapToolbarEnabled(true);
+            if (!GlobalVar.isMyServiceRunning(IsFollowSequencerService.class, getApplicationContext())) {
+                startService(
+                        new Intent(WaybillPlanActivity.this,
+                                com.naqelexpress.naqelpointer.service.IsFollowSequencerService.class));
+            }
+            //  GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
+        } else
+            GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Something went wrong," +
+                    "Please try again", true);
+    }
+
+
 }

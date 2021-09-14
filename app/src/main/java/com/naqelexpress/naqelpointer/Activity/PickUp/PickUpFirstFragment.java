@@ -73,7 +73,9 @@ public class PickUpFirstFragment
     View rootView;
     SpinnerDialog orgSpinnerDialog, destSpinnerDialog;
     EditText txtOrigin, txtDestination;
-    public EditText txtWaybillNo, txtPiecesCount, txtWeight, txtRefNo, txtClientID;
+    public EditText txtPiecesCount, txtWeight, txtRefNo, txtClientID;
+    public static EditText txtWaybillNo;
+
     public int OriginID = 0, DestinationID = 0;
     ArrayList<Booking> bookinglist;
     int position;

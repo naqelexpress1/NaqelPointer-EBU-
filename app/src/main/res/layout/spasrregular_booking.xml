@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White">
+
+
+    <TableLayout
+        android:id="@+id/tl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+
+            <TextView
+                android:id="@+id/skucheck"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".3"
+                android:background="@drawable/round"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="SKU Check"
+                android:textColor="#373A38"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/txtReferenceNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".7"
+                android:text=""
+                android:textColor="@color/NaqelRed"
+                android:visibility="gone"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".3"
+                android:text="Waybill No "
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/txtdescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".7"
+                android:text="123456789"
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </LinearLayout>
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".3"
+                android:text="Description "
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/txtWaybillNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".7"
+                android:text="Yello Dress 1 Piece / Blue Dress 1 Piece"
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="8dp"
+            android:background="@color/NaqelGray" />
+
+
+        <EditText
+            android:id="@+id/txtBarcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+
+            android:ems="10"
+            android:gravity="center"
+            android:hint="@string/txtBarCode"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLength="14"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/lbTotal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="Count : 0"
+            android:textColor="@color/NaqelBlue"
+            tools:ignore="HardcodedText" />
+
+
+    </TableLayout>
+
+    <android.support.v7.widget.RecyclerView
+
+        android:id="@+id/card_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btnOpenCamera"
+        android:layout_below="@id/tl"
+        android:layout_margin="8dp"
+        android:scrollbars="vertical" />
+
+    <LinearLayout
+        android:id="@+id/llbtm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:weightSum="1">
+
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_weight=".3"
+            android:background="@drawable/round"
+            android:text="Resend QR"
+            android:textColor="#B4ADA9"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/exception"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight=".3"
+            android:background="@drawable/round"
+            android:text="Exception"
+            android:textColor="#B4ADA9"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnOpenCamera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_above="@id/llbtm"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/camera"
+        tools:ignore="HardcodedText" />
+
+</RelativeLayout>

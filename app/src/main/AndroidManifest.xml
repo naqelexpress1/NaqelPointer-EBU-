@@ -14,7 +14,9 @@
         </intent>
     </queries>
 
-    <uses-permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
+    <uses-permission
+        android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission
         android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
@@ -440,6 +442,7 @@
 
         <activity
             android:name=".Classes.NewBarCodeScanner"
+
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
 
@@ -1026,6 +1029,8 @@
 
         <activity android:name=".Activity.BookingCBU.BookingDetailActivity" />
 
+        <!-- <activity android:name=".Activity.GoogleBarcode.MainActivity" /> -->
+
         <!--<activity
             android:name=".PaymentGateway.StcPaymentGateway"
             android:screenOrientation="portrait"
@@ -1059,6 +1064,20 @@
             android:label="CourierRating"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".Activity.FuelModelEBU.Fuel"
+            android:label="Fuel"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".Activity.SPAsrRegularBooking.BookingList"
+            android:label="Booking List"
+            android:screenOrientation="portrait"
+           
             tools:ignore="LockedOrientationActivity" />
 
 
@@ -1323,6 +1342,10 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.DeliverysheetbyNCL"
             android:process=":naqelDeliverysheetbyNCL" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.IsFollowSequencerService"
+            android:process=":IsFollowSequencerService" />
 
     </application>
 

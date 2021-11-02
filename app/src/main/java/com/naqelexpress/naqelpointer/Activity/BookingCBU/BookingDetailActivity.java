@@ -350,6 +350,7 @@ public class BookingDetailActivity extends AppCompatActivity
             Bundle bundle = new Bundle();
             bundle.putSerializable("value", bookinglist);
             bundle.putString("class", "BookingDetailAcyivityforCBU");
+            bundle.putString("RNo", txtBookingRefNo.getText().toString());
             bundle.putInt("position", position);
             intent.putExtras(bundle);
             startActivityForResult(intent, 0);

@@ -65,6 +65,7 @@ public class PickUpActivity extends AppCompatActivity {
 
     int position;
     static String class_;
+    static String RefNo = "";
 
 
     @Override
@@ -76,12 +77,14 @@ public class PickUpActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         class_ = bundle.getString("class");
+        RefNo = "";
 
         if (class_.equals("BookingDetailAcyivity")) {
             position = bundle.getInt("position");
             bookinglist = getIntent().getParcelableArrayListExtra("value");
         } else if (class_.equals("BookingDetailAcyivityforCBU")) {
             position = bundle.getInt("position");
+            RefNo = bundle.getString("RNo");
             ArrayList<BookingModel> bookinglist = (ArrayList<BookingModel>) getIntent().getSerializableExtra("value");
             setBookingData(bookinglist.get(position));
         }

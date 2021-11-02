@@ -377,7 +377,7 @@ public class PickUpFirstFragment
             DestinationID = bookinglist.get(0).DestinationId;
             txtClientID.setText(String.valueOf(bookinglist.get(0).ClientID));
             txtWeight.setText(String.valueOf(bookinglist.get(0).Weight));
-//            txtRefNo.setText(bookinglist.get(0).);
+            txtRefNo.setText(PickUpActivity.RefNo);
             //txtRefNo.setInputType(InputType.TYPE_NULL);
         } catch (Exception e) {
             System.out.println(e.toString());

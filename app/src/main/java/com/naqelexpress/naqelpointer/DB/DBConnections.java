@@ -9557,6 +9557,8 @@ public class DBConnections
 
         ArrayList<BookingModel> bookingModelArrayList = new ArrayList<>();
         Station station = null;
+        BookingList.bookinglistwaybillno.clear();
+
         try {
             String selectQuery = "SELECT * FROM PickupSheetDetails WHERE EmployID = " + EmployID;
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
@@ -9591,7 +9593,7 @@ public class DBConnections
                     bookingModel.setMobileNo(cursor.getString(cursor.getColumnIndex("MobileNo")));
 
                     bookingModelArrayList.add(bookingModel);
-
+                    BookingList.bookinglistwaybillno.add(String.valueOf(cursor.getInt(cursor.getColumnIndex("WaybillNo"))));
                 } while (cursor.moveToNext());
             }
             cursor.close();

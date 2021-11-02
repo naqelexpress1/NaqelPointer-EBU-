@@ -46,7 +46,7 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class BookingList extends AppCompatActivity implements AlertCallback {
+public class BookingList_26102021 extends AppCompatActivity implements AlertCallback {
 
 
     private SwipeMenuListView mapListview;
@@ -56,7 +56,6 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     public static ArrayList<PickupSheetReasonModel> pickupSheetReasonModelArrayList;
     private TextView nodata;
     public static boolean isException = false;
-    static public ArrayList<String> bookinglistwaybillno;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,11 +67,8 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
 
             myBookingList = new ArrayList<>();
-            bookinglistwaybillno = new ArrayList<>();
-
             ID.clear();
             name.clear();
-            bookinglistwaybillno.clear();
 
             nodata = (TextView) findViewById(R.id.nodata);
 
@@ -135,7 +131,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                     if (result.getCount() == 0) {
                         try {
 
-                            Intent intent = new Intent(BookingList.this, BookingDetailActivity.class);
+                            Intent intent = new Intent(BookingList_26102021.this, BookingDetailActivity.class);
                             Bundle bundle = new Bundle();
                             // bundle.putE("value", (Serializable) myBookingList.get(position));
                             bundle.putParcelableArrayList("value", myBookingList);
@@ -214,7 +210,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     }
 
     private void setAdapter() {
-        adapter = new BookingListAdapter(BookingList.this, myBookingList, "BookingList");
+        adapter = new BookingListAdapter(BookingList_26102021.this, myBookingList, "BookingList");
 
         mapListview.setAdapter(adapter);
     }
@@ -278,7 +274,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
         @Override
         protected void onPreExecute() {
-            pd = new ProgressDialog(BookingList.this);
+            pd = new ProgressDialog(BookingList_26102021.this);
             pd.setTitle("Loading");
             pd.setMessage("Downloading your Booking Request ");
             pd.show();
@@ -340,8 +336,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         @Override
         protected void onPostExecute(String finalJson) {
             if (finalJson != null) {
-                //commented by ismail for checking pickupsheet data before inserting ,
-                //deleteBookingData();
+                deleteBookingData();
                 myBookingList.clear();
                 PickupSheetDetails(finalJson);
                 pd.dismiss();
@@ -462,10 +457,8 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     BookingModel instance = new BookingModel();
-                    if (bookinglistwaybillno.contains(String.valueOf(jsonObject.getInt("WaybillNo"))))
-                        continue;
-
                     try {
+
                         instance.setsNo(i + 1);
                         instance.setPickupSheetID(jsonObject.getInt("PickupSheetID"));
                         instance.setPickupsheetDetailID(jsonObject.getInt("PickupsheetDetailID"));
@@ -484,8 +477,6 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                         instance.setGoodDesc(jsonObject.getString("GoodDesc"));
                         instance.setMobileNo(jsonObject.getString("MobileNo"));
                         String latlng = jsonObject.getString("LatLng");
-
-                        bookinglistwaybillno.add(String.valueOf(jsonObject.getInt("WaybillNo")));
 
                         savemobilenointocontacts(jsonObject.getString("PhoneNo"),
                                 jsonObject.getString("MobileNo"), jsonObject.getString("ConsigneeName"),
@@ -561,7 +552,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         }
 
         if (MNos.size() > 0) {
-            Global global = new Global(BookingList.this);
+            Global global = new Global(BookingList_26102021.this);
             global.addMobileNumberintoContacts(SNo + " - ASR - " + WaybillNo, MNos, WaybillNo);
         }
     }
@@ -620,7 +611,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     }
 
     private void deleteConfirmRoute() {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(BookingList.this);
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(BookingList_26102021.this);
         builder1.setTitle("Info");
         builder1.setMessage("Do you want to delete all? ");
         builder1.setCancelable(true);
@@ -632,7 +623,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
 
                         //Global global = new Global(BookingList.this);
-                        GlobalVar.GV().alertMsgAll("", "Please wait", BookingList.this, Enum.PROGRESS_TYPE,
+                        GlobalVar.GV().alertMsgAll("", "Please wait", BookingList_26102021.this, Enum.PROGRESS_TYPE,
                                 "BookingList");
 //                        global.DeleteContact();
                         new DeleteContact().execute("");

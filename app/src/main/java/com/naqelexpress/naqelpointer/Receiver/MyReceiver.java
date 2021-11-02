@@ -10,6 +10,7 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,9 +20,11 @@ import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.CallLog;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -209,6 +212,7 @@ public class MyReceiver extends BroadcastReceiver {
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
                     public void run() {
                         // new DownloadJSON().execute();
                         try {
@@ -258,6 +262,7 @@ public class MyReceiver extends BroadcastReceiver {
 //
 //    }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getCallDetails(Context context, final DateTime CallStarttime, final DateTime Endtime) {
         stopRecording();
         StringBuffer sb = new StringBuffer();
@@ -268,8 +273,30 @@ public class MyReceiver extends BroadcastReceiver {
             return;
         }
 
-        Cursor managedCursor = context.getContentResolver().query(contacts, null,
-                null, null, CallLog.Calls.DATE + " DESC limit 1;"); //android.provider.CallLog.Calls.DATE + " DESC limit 1;"
+
+        Cursor managedCursor = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Bundle bundle = new Bundle();
+            //String selection =
+            //bundle.putString(ContentResolver.QUERY_ARG_SORT_COLUMNS,CallLog.Calls.DATE);
+            bundle.putInt(ContentResolver.QUERY_ARG_SORT_DIRECTION, ContentResolver.QUERY_SORT_DIRECTION_DESCENDING);
+            bundle.putInt(ContentResolver.QUERY_ARG_LIMIT, 1);
+            managedCursor = context.getContentResolver().query(contacts, null,
+                    bundle, null);
+        } else {
+            managedCursor = context.getContentResolver().query(contacts, null,
+                    null, null, CallLog.Calls.DATE + " DESC limit 1;"); //android.provider.CallLog.Calls.DATE + " DESC limit 1;"
+        }
+
+
+        //bundle.putString(ContentResolver.QUERY_ARG_SQL_SORT_ORDER, CallLog.Calls.DATE);
+
+
+//        Cursor managedCursor = context.getContentResolver().query(contacts, null,
+//                bundle, null);
+
+//        Cursor managedCursor = context.getContentResolver().query(contacts, null,
+//                null, null, CallLog.Calls.DATE + " DESC limit 1;"); //android.provider.CallLog.Calls.DATE + " DESC limit 1;"
 
 
         int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);

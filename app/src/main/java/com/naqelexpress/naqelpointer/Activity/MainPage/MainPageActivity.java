@@ -1182,7 +1182,7 @@ public class MainPageActivity
                                     Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
                                     startActivity(bookingList);
                                 } else {
-                                    //Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+//                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
                                     Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
                                     startActivity(bookingList);
                                 }
@@ -2403,8 +2403,12 @@ public class MainPageActivity
             InputStream input = null;
             OutputStream output = null;
             HttpURLConnection connection = null;
+            String DIRECTORY = "";
+            if (Build.VERSION.SDK_INT >= 30)
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+            else
+                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
 
-            String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
             File file = new File(DIRECTORY);
             if (!file.exists()) {
                 file.mkdirs();
@@ -2504,7 +2508,13 @@ public class MainPageActivity
                 try {
 
                     if (!isUnknownSourceEnable()) {
-                        String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+                        String DIRECTORY = "";
+                        if (Build.VERSION.SDK_INT >= 30)
+                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                                    + "/NaqelSignature/" + installaionfile;
+                        else
+                            DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+
                         File file = new File(DIRECTORY);
                         if (file.exists()) {
 //
@@ -2513,8 +2523,13 @@ public class MainPageActivity
 //                            intent1.putExtra(Intent.EXTRA_RETURN_RESULT, true);
 //                            startActivityForResult(intent1, UNINSTALL_REQUEST_CODE);
 
+                            String DIRECTORY1 = "";
+                            if (Build.VERSION.SDK_INT >= 30)
+                                DIRECTORY1 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                                        + "/NaqelSignature";
+                            else
+                                DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
 
-                            String DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
                             File toInstall = new File(DIRECTORY1, installaionfile);
 
 
@@ -2572,7 +2587,14 @@ public class MainPageActivity
         }
 
         try {
-            String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+            String DIRECTORY = "";
+            if (Build.VERSION.SDK_INT >= 30)
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath()
+                        + "/NaqelSignature/" + installaionfile;
+            else
+                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/"
+                        + installaionfile;
+
             File file = new File(DIRECTORY);
             if (file.exists()) {
                 file.delete();

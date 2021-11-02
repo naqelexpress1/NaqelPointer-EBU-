@@ -60,8 +60,25 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
-//        GlobalVar.toGoogle("21.454545","45.1520205", SplashScreenActivity.this);
+//        try {
+//            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//
+//            String DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+//            File file = new File(DIRECTORY);
+//
+//            File pdfFile = new File(folder, "naqelpointer.apk");
+//            FileOutputStream fileOutputStream = new FileOutputStream(pdfFile);
+//            if (!file.exists()) {
+//                file.mkdirs();
+//            }
+//            OutputStream output = new FileOutputStream(DIRECTORY + "/" + "naqelpointer.apk");
+//
+//        } catch (Exception e) {
+//            System.out.println(e.toString());
+//        }
 
+
+//        GlobalVar.toGoogle("21.454545","45.1520205", SplashScreenActivity.this);
 
 
 //        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);

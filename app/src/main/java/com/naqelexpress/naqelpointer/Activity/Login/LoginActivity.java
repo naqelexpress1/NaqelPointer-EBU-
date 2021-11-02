@@ -798,7 +798,14 @@ public class LoginActivity
             OutputStream output = null;
             HttpURLConnection connection = null;
 
-            String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
+            String DIRECTORY = "";
+
+
+            if (Build.VERSION.SDK_INT >= 30)
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+            else
+                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
+
             File file = new File(DIRECTORY);
             if (!file.exists()) {
                 file.mkdirs();
@@ -900,7 +907,12 @@ public class LoginActivity
                 try {
 
                     if (!isUnknownSourceEnable()) {
-                        String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+                        String DIRECTORY = "";
+                        if (Build.VERSION.SDK_INT >= 30)
+                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/"+ installaionfile;
+                        else
+                            DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+
                         File file = new File(DIRECTORY);
                         if (file.exists()) {
 
@@ -908,9 +920,12 @@ public class LoginActivity
 //                            intent1.setData(Uri.parse("package:" + app_pkg_name));
 //                            intent1.putExtra(Intent.EXTRA_RETURN_RESULT, true);
 //                            startActivityForResult(intent1, UNINSTALL_REQUEST_CODE);
+                            String DIRECTORY1 = "";
+                            if (Build.VERSION.SDK_INT >= 30)
+                                DIRECTORY1 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature";
+                            else
+                                DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
 
-
-                            String DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
                             File toInstall = new File(DIRECTORY1, installaionfile);
 
 
@@ -1648,8 +1663,14 @@ public class LoginActivity
         }
 
         try {
-            String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
-            File file = new File(DIRECTORY);
+            String DIRECTORY = "";
+            if (Build.VERSION.SDK_INT >= 30)
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+            else
+                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
+
+            //String DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
+            File file = new File(DIRECTORY + installaionfile);
             if (file.exists()) {
                 file.delete();
             }

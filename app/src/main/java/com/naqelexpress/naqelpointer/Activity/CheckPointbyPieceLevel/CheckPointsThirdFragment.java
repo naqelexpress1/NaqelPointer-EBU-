@@ -18,7 +18,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -115,11 +114,17 @@ public class CheckPointsThirdFragment
                             barcodeInfoRequest.Barcode = Long.parseLong(txtBarCode.getText().toString());
                             String jsonData = JsonSerializerDeserializer.serialize(barcodeInfoRequest, true);
                             new BringBarcodeInfo().execute(jsonData);
-                        } else
-
-                            AddNewPiece();
-
-
+                        } else {
+                            String barcode = txtBarCode.getText().toString();
+                            if (onHoldShipments.contains(barcode)) {
+                                OnLineValidation onLineValidation = new OnLineValidation();
+                                onLineValidation.setBarcode(barcode);
+                                onLineValidation.setIsNoBayanNo(1);
+                                showFlagsPopup(onLineValidation);
+                            } else {
+                                AddNewPiece();
+                            }
+                        }
                         return true;
                     }
                     return false;
@@ -127,7 +132,6 @@ public class CheckPointsThirdFragment
             });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -141,9 +145,6 @@ public class CheckPointsThirdFragment
             });
 
             initViews();
-
-
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
             //initDialog();
         }
 

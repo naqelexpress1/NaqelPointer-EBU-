@@ -19,12 +19,25 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -61,7 +74,7 @@ public class CheckPointsFirstFragment
         try {
             iCheckPoint = (ICheckPoint) context;
         } catch (ClassCastException e) {
-            Log.d("test", "test" + e.toString());
+            Log.d("test" , "test"  + e.toString());
         }
     }
 
@@ -215,6 +228,10 @@ public class CheckPointsFirstFragment
                         txtCheckPointTypeDetail.requestFocus();
                         txtCheckPointTypeDetail.setInputType(InputType.TYPE_CLASS_TEXT);
                     }
+                    //Riyam - If check point is Arrival get HV shipment to hold it if Bayan not available
+                    if (CheckPointTypeID == 1) {
+                        getOnHoldShipments();
+                    }
                 }
             });
 
@@ -275,6 +292,14 @@ public class CheckPointsFirstFragment
                     CheckPointTypeDDetailID = CheckPointTypeDDetailList.get(position);
                 }
             });
+
+            //Riyam - Hide trip ID for GTW
+             try {
+                 if (GlobalVar.getDivisionID(getContext() , GlobalVar.GV().EmployID).equals("IRS")) {
+                     llTripID.setVisibility(View.GONE);
+                 }
+             } catch (Exception e) {}
+
         }
 
         return rootView;
@@ -480,23 +505,114 @@ public class CheckPointsFirstFragment
         }
     }
 
-//    private void FetchReason() {
-//        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch Skip Reasons.",
-//                getActivity(),
-//                Enum.PROGRESS_TYPE, "SkipWaybillNoinRouteLine");
-//        NotificationApi.skipRouteLineReason(new Callback<List<SkipRouteLineSeqWaybillnoReasonModels>>() {
-//            @Override
-//            public void returnResult(List<SkipRouteLineSeqWaybillnoReasonModels> result) {
-//                System.out.println();
-//                //skipReasonList.addAll(result);
-//                //initSpinner();
-//            }
-//
-//            @Override
-//            public void returnError(String message) {
-//                //mView.showError(message);
-//                System.out.println(message);
-//            }
-//        });
-//    }
+    /*** Riyam - Getting on Hold shipments ***/
+    private void getOnHoldShipments  () {
+        if (onHoldShipments == null || onHoldShipments.size() == 0) {
+            UserME nclNoReq = new UserME();
+            nclNoReq.EmployID = GlobalVar.GV().EmployID;
+            String jsonData = JsonSerializerDeserializer.serialize(nclNoReq, true);
+            new OnHoldWaybills().execute(jsonData);
+        }
+    }
+
+    private class OnHoldWaybills extends AsyncTask<String, Void, String> {
+        private ProgressDialog progressDialog;
+        String result = "";
+        StringBuffer buffer;
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Please wait.");
+            progressDialog.setTitle("Collecting OnHold Waybills.");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "GetonHoldShipments");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+                result = String.valueOf(buffer);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String finalJson) {
+            progressDialog.dismiss();
+            super.onPostExecute(String.valueOf(finalJson));
+            if (finalJson != null) {
+
+                JSONObject jsonObject = null;
+                try {
+                    GlobalVar.GV().ShowSnackbar(rootView, "On hold shipments uploaded", GlobalVar.AlertType.Info);
+                    jsonObject = new JSONObject(finalJson);
+                    fetchOnHoldShipments(jsonObject.getJSONArray("HoldWaybills"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            } else
+                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_Notgenerate), GlobalVar.AlertType.Error);
+        }
+    }
+    private void fetchOnHoldShipments(JSONArray waybills) {
+
+        for (int i = 0; i < waybills.length(); i++) {
+            try {
+                JSONObject jsonObject1 = waybills.getJSONObject(i);
+                onHoldShipments.add(jsonObject1.getString("BarCode"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        iCheckPoint.onHoldShipments(onHoldShipments);
+    }
+    /*** Riyam - End  ***/
 }

@@ -22,7 +22,7 @@ android {
         targetSdkVersion 30
         versionName '2.7.5.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 274
+        versionCode 275
     }
     buildTypes {
 

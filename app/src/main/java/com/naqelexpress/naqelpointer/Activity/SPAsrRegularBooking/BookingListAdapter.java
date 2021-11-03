@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -118,14 +119,14 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.location.setText(item.getSPOfficeName());
             holder.mno1.setText(item.getSPMobile());
             holder.numberofwaybills.setText(String.valueOf(item.getWaybillcount()));
-            holder.mno2ll.setVisibility(View.GONE);
-            holder.clientll.setVisibility(View.GONE);
-            holder.contactll.setVisibility(View.GONE);
+            holder.mno2ll.setVisibility(View.INVISIBLE);
+            holder.clientll.setVisibility(View.INVISIBLE);
+            holder.contactll.setVisibility(View.INVISIBLE);
 
         } else {
 
-            holder.locationll.setVisibility(View.GONE);
-            holder.numberofwaybillsll.setVisibility(View.GONE);
+            holder.locationll.setVisibility(View.INVISIBLE);
+            holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
             holder.consname.setText(item.getConsigneeName());
             holder.clientname.setText(item.getClientName());
             holder.puidawbno.setText("Pu ID / AWB : " + String.valueOf(item.getWaybillNo()));
@@ -133,6 +134,22 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.mno2.setText(item.getMobileNo());
 
         }
+
+        if (item.getIsPickedup() == 1)
+            holder.attempedstatus.setText("Attempted");
+        else if (item.getIsPickedup() == 2)
+            holder.attempedstatus.setText("Picked Up");
+        else
+            holder.attempedstatus.setText("Not Attempt");
+
+        holder.ibmno1.setFocusable(false);
+        holder.ibmno1.setFocusableInTouchMode(false);
+        holder.ibwats1.setFocusable(false);
+        holder.ibwats1.setFocusableInTouchMode(false);
+        holder.ibmno2.setFocusable(false);
+        holder.ibmno2.setFocusableInTouchMode(false);
+        holder.ibwats2.setFocusable(false);
+        holder.ibwats2.setFocusableInTouchMode(false);
 
 
 //        holder.sno.setText(String.valueOf(item.getsNo()));
@@ -179,8 +196,9 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
     }
 
     class ViewHolder {
-        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills;
+        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills, attempedstatus;
         LinearLayout clientll, locationll, contactll, mno2ll, numberofwaybillsll;
+        ImageButton ibmno1, ibwats1, ibmno2, ibwats2;
 //                , waybillno, date, consname, orgstation,
 //                deststation, billtype, sno, ispickedup;
 //        ImageView islocation;
@@ -199,7 +217,14 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             clientname = (TextView) view.findViewById(R.id.clientname);
             consname = (TextView) view.findViewById(R.id.contactname);
             numberofwaybills = (TextView) view.findViewById(R.id.numberofwaybills);
+            attempedstatus = (TextView) view.findViewById(R.id.attempedstatus);
             numberofwaybillsll = (LinearLayout) view.findViewById(R.id.numberofwaybillsll);
+
+            ibmno1 = (ImageButton) view.findViewById(R.id.ibmno1);
+            ibwats1 = (ImageButton) view.findViewById(R.id.ibwats1);
+            ibmno2 = (ImageButton) view.findViewById(R.id.ibmno2);
+            ibwats2 = (ImageButton) view.findViewById(R.id.ibwats2);
+
 //            islocation = (ImageView) view.findViewById(R.id.islocation);
 //            sno = (TextView) view.findViewById(R.id.sno);
 //            ispickedup = (TextView) view.findViewById(R.id.ispickedup);

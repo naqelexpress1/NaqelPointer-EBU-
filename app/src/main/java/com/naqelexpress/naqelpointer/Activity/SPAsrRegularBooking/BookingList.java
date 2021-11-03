@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -16,10 +17,13 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
+import com.naqelexpress.naqelpointer.Activity.PickupAsrReg.PickUpActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.Global;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -55,8 +59,10 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             setContentView(R.layout.content_booking_list);
 
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
+            mapListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
             myBookingList = new ArrayList<>();
+            pickupSheetReasonModelArrayList = new ArrayList<>();
             ID.clear();
             name.clear();
             pickupSheetReasonModelArrayList.clear();
@@ -67,82 +73,23 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                 ReadfromLocal();
 
 
-           /* SwipeMenuCreator creator = new SwipeMenuCreator() {
+            mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void create(SwipeMenu menu) {
-                    int menuItemWidth = 120;
-                    // create "open" item
-                    SwipeMenuItem openItem = new SwipeMenuItem(
-                            getApplicationContext());
-                    // set item background
-                    openItem.setBackground(R.color.NaqelBlue);
-                    //(new ColorDrawable(Color.rgb(0xC9, 0xC9,0xCE)));
-                    // set item width
-                    openItem.setWidth(menuItemWidth);
-                    // set item title
-                    openItem.setTitle("Open");
-                    // set item title fontsize
-                    openItem.setTitleSize(18);
-                    // set item title font color
-                    openItem.setTitleColor(Color.WHITE);
-                    // add to menu
-                    // menu.addMenuItem(openItem);
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0" +
+                            " and WaybillNo=" +
+                            myBookingList.get(position).WaybillNo, getApplicationContext());
 
-                    // create "Deliver Later" item
-                    SwipeMenuItem deleteItem = new SwipeMenuItem(
-                            getApplicationContext());
-                    // set item background
-                    deleteItem.setBackground(R.color.NaqelRed);
-                    //(new ColorDrawable(Color.rgb(0xF9,0x3F, 0x25)));
-                    // set item width
-                    deleteItem.setWidth(menuItemWidth);
-                    // set a icon
-                    //deleteItem.setIcon(R.drawable.settings);
-                    deleteItem.setTitle("Delete");
-                    // set item title font color
-                    deleteItem.setTitleColor(Color.WHITE);
-                    // set item title fontsize
-                    deleteItem.setTitleSize(18);
-                    // add to menu
-                    // menu.addMenuItem(deleteItem);
+                    if (result.getCount() == 0) {
+                        //int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
+                        RedirectPickupActivity(position);
+                    } else
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "you picked up this item, please sync data", GlobalVar.AlertType.Error);
+                    dbConnections.close();
+
                 }
-            };
-
-            mapListview.setMenuCreator(creator);
-*/
-//            mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                @Override
-//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0" +
-//                            " and WaybillNo=" +
-//                            myBookingList.get(position).WaybillNo, getApplicationContext());
-//
-//                    if (result.getCount() == 0) {
-//                        try {
-//
-//                            Intent intent = new Intent(BookingList.this, BookingDetailActivity.class);
-//                            Bundle bundle = new Bundle();
-//                            // bundle.putE("value", (Serializable) myBookingList.get(position));
-//                            bundle.putParcelableArrayList("value", myBookingList);
-//                            int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
-//
-//                            bundle.putInt("position", pos);
-//                            bundle.putStringArrayList("name", name);
-//                            bundle.putIntegerArrayList("IDs", ID);
-//                            bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
-//                            intent.putExtras(bundle);
-//                            // startActivityForResult(intent, 0);
-//                            startActivity(intent);
-//                        } catch (Exception e) {
-//                            System.out.println(e);
-//                        }
-//                    } else
-//                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "you picked up this item, please sync data", GlobalVar.AlertType.Error);
-//                    dbConnections.close();
-//
-//                }
-//            });
+            });
 
         } catch
         (Exception ex) {
@@ -150,6 +97,28 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         }
 
 
+    }
+
+    private void RedirectPickupActivity(int pos) {
+        try {
+
+            Intent intent = new Intent(BookingList.this, PickUpActivity.class);
+            // Bundle bundle = new Bundle();
+            // bundle.putE("value", (Serializable) myBookingList.get(position));
+            intent.putExtra("value", myBookingList);
+            intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
+
+            intent.putExtra("position", pos);
+            intent.putExtra("name", name);
+            intent.putExtra("IDs", ID);
+            //  bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
+            //intent.putExtras(bundle);
+
+            startActivity(intent);
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private SearchView searchView;

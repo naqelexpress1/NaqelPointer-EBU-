@@ -15,6 +15,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:weightSum="1">
 
 
@@ -60,14 +61,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_weight=".3"
+                android:layout_weight=".4"
                 android:text="Waybill No "
                 android:textColor="#B4ADA9"
                 android:textSize="20sp"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
             <TextView
-                android:id="@+id/txtdescription"
+                android:id="@+id/txtWaybillNo"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
@@ -93,14 +94,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_weight=".3"
+                android:layout_weight=".4"
                 android:text="Description "
                 android:textColor="#B4ADA9"
                 android:textSize="20sp"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
             <TextView
-                android:id="@+id/txtWaybillNo"
+                android:id="@+id/txtdescription"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"

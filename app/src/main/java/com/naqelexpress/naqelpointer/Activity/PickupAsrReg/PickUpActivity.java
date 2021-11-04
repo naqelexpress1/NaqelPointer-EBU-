@@ -26,7 +26,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
+import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel;
+import com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.PickUp;
@@ -60,11 +62,12 @@ public class PickUpActivity extends AppCompatActivity {
     ArrayList<BookingModel> bookinglist;
 
     int position;
-    static String class_;
+    int class_;
     static String RefNo = "";
     ArrayList<String> name;
     ArrayList<Integer> IDs;
     ArrayList<PickupSheetReasonModel> pickupSheetReasonModelArrayList;
+    ArrayList<String> waybilllist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +80,23 @@ public class PickUpActivity extends AppCompatActivity {
 
         RefNo = "";
 
+        //class 0 - SP , 1 - BL
 
         position = bundle.getInt("position");
 
         bookinglist = (ArrayList<BookingModel>)
                 getIntent().getSerializableExtra("value");
-        //name = getIntent().getStringArrayListExtra("name");
+        class_ = getIntent().getIntExtra("class", 1);
         // IDs = getIntent().getIntegerArrayListExtra("IDs");
         pickupSheetReasonModelArrayList = (ArrayList<PickupSheetReasonModel>)
                 getIntent().getSerializableExtra("PRMA");
         if (pickupSheetReasonModelArrayList.size() > 0)
             fetchPickupsheetReasons();
+
+        if (class_ == 0) {
+            waybilllist =
+                    getIntent().getStringArrayListExtra("waybilllist");
+        }
         //bookinglist. add (bl.get(position));
 
 //        setBookingData(bookinglist.get(position));
@@ -104,6 +113,7 @@ public class PickUpActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
 
         TimeIn = DateTime.now();
     }
@@ -122,7 +132,7 @@ public class PickUpActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuBringData:
-                BringPickUpData();
+                //BringPickUpData();
                 return true;
             case R.id.mnuSave:
                 //SaveData();
@@ -137,11 +147,14 @@ public class PickUpActivity extends AppCompatActivity {
                         GlobalVar.ShowDialog(PickUpActivity.this, "Info", "Already Pickedup this Waybill", true);
                         return false;
                     }
-                    String division = GlobalVar.getDivision(getApplicationContext());
-                    if (division.equals("Express"))
-                        actualLocation();//Cross Validation
-                    else
-                        SaveData();
+//                    String division = GlobalVar.getDivision(getApplicationContext());
+//                    if (division.equals("Express"))
+                    actualLocation();//Cross Validation
+//                    else
+
+                    //    SaveData();
+
+//                    SaveData("");
 
                 } else
                     GlobalVar.RedirectSettings(PickUpActivity.this);
@@ -163,13 +176,19 @@ public class PickUpActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
                         PickUpFirstFragment.al = 1;
-                        SaveData();
+                        if (class_ == 0)
+                            SaveData_SP();
+                        else
+                            SaveData();
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 PickUpFirstFragment.al = 0;
-                SaveData();
+                if (class_ == 0)
+                    SaveData_SP();
+                else
+                    SaveData();
             }
         }).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -209,6 +228,111 @@ public class PickUpActivity extends AppCompatActivity {
         }
     }
 
+    private void SaveData_SP() {
+        GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+
+            requestLocation();
+        } else {
+            ActivityCompat.requestPermissions(PickUpActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+            return;
+        }
+
+        if (IsValid()) {
+
+            if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                SaveData_SP("");
+            else
+                GlobalVar.RedirectSettings(PickUpActivity.this);
+
+        }
+    }
+
+    private void SaveData_SP(String aftervalidduplicatewaybill) {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        boolean IsSaved = true;
+
+        for (BookingModel bookingList : bookinglist) {
+
+            int ClientID = 0, OriginID = 0, DestinationID = 0, PiecesCount = 0, Weight = 0, districtID = 0;
+            String RefNo = "";
+
+            int Waybillno = bookingList.getWaybillNo();
+            ClientID = bookingList.getClientID();
+            OriginID = bookingList.getFromStationID();
+            DestinationID = bookingList.getToStationID();
+
+            //PiecesCount = firstFragment.PickUpBarCodeList.size();
+            ArrayList<String> PickUpBarCodeList = new ArrayList<>();
+            for (int i = 0; i < firstFragment.PickUpBarCodeList.size(); i++) {
+                if (firstFragment.PickUpBarCodeList.get(i).contains(String.valueOf(Waybillno))) {
+                    PickUpBarCodeList.add(firstFragment.PickUpBarCodeList.get(i));
+                }
+            }
+            if (PickUpBarCodeList.size() == 0)
+                continue;
+
+//        Weight = bookinglist.get(position).getW
+            RefNo = bookinglist.get(position).getRefNo();
+
+            final PickUp pickUp = new PickUp(Waybillno,
+                    ClientID,
+                    OriginID, DestinationID,
+                    PiecesCount,
+                    Weight,
+                    DateTime.now(), DateTime.now(), RefNo,
+                    String.valueOf(Latitude), String.valueOf(Longitude), districtID);
+
+            int loadtypeid = 0;
+
+
+            updateLocation();
+
+            String appendPiececode = "";
+            for (int i = 0; i < PickUpBarCodeList.size(); i++) {
+                if (i == 0)
+                    appendPiececode = PickUpBarCodeList.get(i);
+                else
+                    appendPiececode = appendPiececode + "," + PickUpBarCodeList.get(i);
+
+            }
+
+            boolean isok = true;
+
+            if (dbConnections.UpdatepickupsheetdetailsID(Waybillno, 2)) {
+                isok = dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode);
+                if (!isok) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);
+                    return;
+                }
+            } else {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);
+
+                return;
+            }
+
+
+            dbConnections.close();
+
+        }
+
+        // if (isok) {
+        startService();
+        BookingList.isFinish = true;
+        SpWaybillGroup.isFinish = true;
+        finish();
+
+//        } else
+//            GlobalVar.GV().ShowDialog(PickUpActivity.this, "Error", "Pickup Data Not Saved Kindly try again.", true);
+
+    }
+
     private void SaveData(String aftervalidduplicatewaybill) {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
@@ -216,7 +340,15 @@ public class PickUpActivity extends AppCompatActivity {
         int ClientID = 0, OriginID = 0, DestinationID = 0, PiecesCount = 0, Weight = 0, districtID = 0;
         String RefNo = "";
 
-        final PickUp pickUp = new PickUp(Integer.parseInt(firstFragment.txtWaybillNo.getText().toString()),
+        int Waybillno = bookinglist.get(position).getWaybillNo();
+        ClientID = bookinglist.get(position).getClientID();
+        OriginID = bookinglist.get(position).getFromStationID();
+        DestinationID = bookinglist.get(position).getToStationID();
+        PiecesCount = firstFragment.PickUpBarCodeList.size();
+//        Weight = bookinglist.get(position).getW
+        RefNo = bookinglist.get(position).getRefNo();
+
+        final PickUp pickUp = new PickUp(Waybillno,
                 ClientID,
                 OriginID, DestinationID,
                 PiecesCount,
@@ -240,7 +372,7 @@ public class PickUpActivity extends AppCompatActivity {
 
         boolean isok = true;
 
-        if (dbConnections.UpdatepickupsheetdetailsID(Integer.parseInt(firstFragment.txtWaybillNo.getText().toString()), 2)) {
+        if (dbConnections.UpdatepickupsheetdetailsID(Waybillno, 2)) {
             isok = dbConnections.InsertPickUp(pickUp, getApplicationContext(), loadtypeid, firstFragment.al, appendPiececode);
             if (!isok) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Something went wrong , please save again.", GlobalVar.AlertType.Error);
@@ -254,6 +386,9 @@ public class PickUpActivity extends AppCompatActivity {
 
 
         if (isok) {
+            startService();
+            BookingList.isFinish = true;
+            finish();
 
         } else
             GlobalVar.GV().ShowDialog(PickUpActivity.this, "Error", "Pickup Data Not Saved Kindly try again.", true);
@@ -350,25 +485,22 @@ public class PickUpActivity extends AppCompatActivity {
 
 
     private boolean IsValid() {
-        boolean isValid = true;
-        if (firstFragment == null) {
-            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the WaybillNo", GlobalVar.AlertType.Error);
-            isValid = false;
-            return false;
-        }
-
+        // boolean isValid = true;
 
         if (firstFragment != null) {
-            if (firstFragment.txtWaybillNo.getText().toString().equals("")) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter the Waybill No", GlobalVar.AlertType.Error);
-                isValid = false;
+            if (firstFragment.PickUpBarCodeList.size() <= 0) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
+                //  isValid = false;
                 return false;
             }
 
-
+            /*int piecesCount = secondFragment.PickUpBarCodeList.size();
+            if (GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()) != piecesCount) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Count of pieces is not matching with piece barcodes scanned.", GlobalVar.AlertType.Error);
+                isValid = false;
+                return false;
+            }*/
         }
-
-
 
        /* if (secondFragment == null) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
@@ -376,23 +508,10 @@ public class PickUpActivity extends AppCompatActivity {
             return false;
         }
 
-        if (secondFragment != null) {
-            if (secondFragment.PickUpBarCodeList.size() <= 0) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan the piece barcodes", GlobalVar.AlertType.Error);
-                isValid = false;
-                return false;
-            }
-
-            int piecesCount = secondFragment.PickUpBarCodeList.size();
-            if (GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()) != piecesCount) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Count of pieces is not matching with piece barcodes scanned.", GlobalVar.AlertType.Error);
-                isValid = false;
-                return false;
-            }
-        }*/
+        */
 
 
-        return isValid;
+        return true;
     }
 
     @Override
@@ -431,7 +550,10 @@ public class PickUpActivity extends AppCompatActivity {
 
             bundle.putStringArrayList("name", name);
             bundle.putIntegerArrayList("IDs", IDs);
-            bundle.putString("class", "BookingDetailAcyivityforCBU");
+            bundle.putInt("class", class_);
+
+            if (class_ == 0)
+                bundle.putStringArrayList("waybilllist", waybilllist);
 
 
             switch (pos) {
@@ -495,7 +617,8 @@ public class PickUpActivity extends AppCompatActivity {
 
     public void CheckWaybillAlreadyPickedUp() {
 
-        String WaybillNo = firstFragment.txtWaybillNo.getText().toString();
+        String WaybillNo = String.valueOf(bookinglist.get(position).getWaybillNo());
+
         if (WaybillNo.length() > 7) {
             CheckWaybillAlreadyPickedUpRequest checkWaybillAlreadyPickedUpRequest = new CheckWaybillAlreadyPickedUpRequest();
             checkWaybillAlreadyPickedUpRequest.WaybillNo = Integer.parseInt(WaybillNo);
@@ -664,7 +787,7 @@ public class PickUpActivity extends AppCompatActivity {
         outState.putParcelable("currentSettings", GlobalVar.GV().currentSettings);
         outState.putInt("currentSettingsID", GlobalVar.GV().currentSettings.ID);
 
-        outState.putString("class_", class_);
+        outState.putInt("class_", class_);
     }
 
     @Override
@@ -681,7 +804,7 @@ public class PickUpActivity extends AppCompatActivity {
             GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
             GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
             GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
-            class_ = savedInstanceState.getString("class_");
+            class_ = savedInstanceState.getInt("class_");
         }
     }
 
@@ -731,4 +854,6 @@ public class PickUpActivity extends AppCompatActivity {
         }
 
     }
+
+
 }

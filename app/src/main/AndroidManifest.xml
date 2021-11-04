@@ -1087,6 +1087,13 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name=".Activity.SPbookingGroup.SpWaybillGroup"
+            android:label="Waybill Details"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

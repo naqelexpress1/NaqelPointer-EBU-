@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
@@ -150,6 +151,36 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         holder.ibmno2.setFocusableInTouchMode(false);
         holder.ibwats2.setFocusable(false);
         holder.ibwats2.setFocusableInTouchMode(false);
+
+        holder.ibmno1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GlobalVar.GV().makeCall(item.getPhoneNo(), context.getWindow().getDecorView().getRootView(), context);
+            }
+        });
+
+        holder.ibmno2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GlobalVar.GV().makeCall(item.getMobileNo(), context.getWindow().getDecorView().getRootView(), context);
+            }
+        });
+
+        holder.ibwats1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GlobalVar.GV().sendMessageToWhatsAppContact(item.getPhoneNo(), "Please provide the text , we will update this " +
+                        item.getPhoneNo(), context);
+            }
+        });
+
+        holder.ibwats2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                GlobalVar.GV().sendMessageToWhatsAppContact(item.getMobileNo(), "Please provide the text , we will update this " +
+                        item.getPhoneNo(), context);
+            }
+        });
 
 
 //        holder.sno.setText(String.valueOf(item.getsNo()));

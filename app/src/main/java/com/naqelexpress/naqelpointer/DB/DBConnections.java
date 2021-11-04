@@ -9728,6 +9728,67 @@ public class DBConnections
     }
 
     public ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+    getPickupSheetSpAsrRegDetailsDatabySpOfficeID(Context context, int EmployID, int SpofficeID) {
+
+        ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
+                bookingModelArrayList = new ArrayList<>();
+        //bookingModelArrayList = getPickupSheetSpDetailsData(context, EmployID);
+        Station station = null;
+        try {
+            String selectQuery = "SELECT * FROM PickupSheetDetails WHERE IsSPL = 1 and SPLOfficesID = " + SpofficeID + " and  EmployID = " + EmployID;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup.waybilllist.clear();
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
+                            BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
+                    bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
+                    bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
+                    bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
+                    bookingModel.setOrgCode(cursor.getString(cursor.getColumnIndex("OrgCode")));
+                    bookingModel.setDestCode(cursor.getString(cursor.getColumnIndex("DestCode")));
+                    bookingModel.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    bookingModel.setCode(cursor.getString(cursor.getColumnIndex("Code")));
+                    bookingModel.setConsigneeName(cursor.getString(cursor.getColumnIndex("ConsigneeName")));
+                    bookingModel.setRemark(cursor.getString(cursor.getColumnIndex("Remark")));
+                    bookingModel.setPickupsheetDetailID(cursor.getInt(cursor.getColumnIndex("PickupsheetDetailID")));
+                    bookingModel.setLat(cursor.getString(cursor.getColumnIndex("Lat")));
+                    bookingModel.setLng(cursor.getString(cursor.getColumnIndex("Lng")));
+                    bookingModel.setDate(cursor.getString(cursor.getColumnIndex("Date")));
+                    bookingModel.setPhoneNo(cursor.getString(cursor.getColumnIndex("PhoneNo")));
+                    bookingModel.setIsPickedup(cursor.getInt(cursor.getColumnIndex("isPickedup")));
+                    bookingModel.setEmployID(cursor.getInt(cursor.getColumnIndex("EmployID")));
+                    bookingModel.setClientName(cursor.getString(cursor.getColumnIndex("ClientName")));
+                    bookingModel.setClientID(cursor.getInt(cursor.getColumnIndex("ClientID")));
+                    bookingModel.setRefNo(cursor.getString(cursor.getColumnIndex("RefNo")));
+                    bookingModel.setGoodDesc(cursor.getString(cursor.getColumnIndex("GoodDesc")));
+                    bookingModel.setMobileNo(cursor.getString(cursor.getColumnIndex("MobileNo")));
+                    bookingModel.setSPL(cursor.getInt(cursor.getColumnIndex("IsSPL")) > 0);
+                    bookingModel.setSPLOfficesID(cursor.getInt(cursor.getColumnIndex("SPLOfficesID")));
+                    bookingModel.setSpLatLng(cursor.getString(cursor.getColumnIndex("SpLatLng")));
+                    bookingModel.setBKHeader(cursor.getString(cursor.getColumnIndex("BKHeader")));
+                    bookingModel.setSPMobile(cursor.getString(cursor.getColumnIndex("SPMobile")));
+                    bookingModel.setSPOfficeName(cursor.getString(cursor.getColumnIndex("SPOfficeName")));
+                    com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup.waybilllist.add(String.valueOf(cursor.getInt(cursor.getColumnIndex("WaybillNo"))));
+
+                    bookingModelArrayList.add(bookingModel);
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return bookingModelArrayList;
+    }
+
+    public ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
     getPickupSheetSpDetailsData(Context context, int EmployID) {
 
         ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>

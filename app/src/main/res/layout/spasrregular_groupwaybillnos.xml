@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White">
+
+
+    <TableLayout
+        android:id="@+id/tl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1">
+
+
+            <TextView
+                android:id="@+id/txtWaybillNo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".4"
+                android:text="12345"
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/txtdescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight=".7"
+                android:maxLines="1"
+                android:text="Yello Dress 1 Piece / Blue Dress 1 Piece"
+                android:textColor="#B4ADA9"
+                android:textSize="20sp"
+                android:textStyle="normal"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="8dp"
+            android:background="@color/NaqelGray" />
+
+
+    </TableLayout>
+
+
+</RelativeLayout>

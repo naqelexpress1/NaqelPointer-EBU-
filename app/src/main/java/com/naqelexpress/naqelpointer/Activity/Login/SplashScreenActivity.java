@@ -60,6 +60,9 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
+        ///String str="NQL12457852456321";
+        //String numberOnly= str.replaceAll("[^0-9]", "");
+        //System.out.println(numberOnly);
 //        try {
 //            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
 //

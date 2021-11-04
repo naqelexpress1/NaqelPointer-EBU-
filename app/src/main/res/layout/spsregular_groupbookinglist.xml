@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/White"
+    tools:context="com.naqelexpress.naqelpointer.Activity.Booking.BookingList">
+
+    <LinearLayout
+        android:id="@+id/ll1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="1"
+        tools:ignore="MissingConstraints">
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight=".4"
+            android:text="Waybill No "
+            android:textColor="#B4ADA9"
+            android:textSize="20sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight=".7"
+            android:maxLines="1"
+            android:text="Description"
+            android:textColor="#B4ADA9"
+            android:textSize="20sp"
+            android:textStyle="normal"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+    </LinearLayout>
+
+    <com.baoyz.swipemenulistview.SwipeMenuListView
+        android:id="@+id/myBookingListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/llbtm"
+        android:layout_below="@id/ll1"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:dividerHeight="3dp" />
+
+    <TextView
+        android:id="@+id/nodata"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="No Data"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:typeface="normal"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/llbtm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:weightSum="1">
+
+
+        <Button
+            android:id="@+id/pickup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_weight=".3"
+            android:background="@drawable/round"
+            android:text="Pickup"
+            android:textColor="#B4ADA9"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/exception"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight=".3"
+            android:background="@drawable/round"
+            android:text="Exception"
+            android:textColor="#B4ADA9"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+    </LinearLayout>
+
+</RelativeLayout>
+
+
+
+

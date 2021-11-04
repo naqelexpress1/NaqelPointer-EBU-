@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
 import com.naqelexpress.naqelpointer.Activity.PickupAsrReg.PickUpActivity;
+import com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.Global;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -48,7 +49,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     public static ArrayList<BookingModel> myBookingList;
     public static ArrayList<PickupSheetReasonModel> pickupSheetReasonModelArrayList;
     private TextView nodata;
-    public static boolean isException = false;
+    public static boolean isException = false, isFinish = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +62,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
             mapListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
+            isFinish = false;
             myBookingList = new ArrayList<>();
             pickupSheetReasonModelArrayList = new ArrayList<>();
             ID.clear();
@@ -102,19 +104,38 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     private void RedirectPickupActivity(int pos) {
         try {
 
-            Intent intent = new Intent(BookingList.this, PickUpActivity.class);
-            // Bundle bundle = new Bundle();
-            // bundle.putE("value", (Serializable) myBookingList.get(position));
-            intent.putExtra("value", myBookingList);
-            intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
+            if (!myBookingList.get(pos).getisSPL()) {
+                Intent intent = new Intent(BookingList.this, PickUpActivity.class);
+                // Bundle bundle = new Bundle();
+                // bundle.putE("value", (Serializable) myBookingList.get(position));
+                intent.putExtra("value", myBookingList);
+                intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
 
-            intent.putExtra("position", pos);
-            intent.putExtra("name", name);
-            intent.putExtra("IDs", ID);
-            //  bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
-            //intent.putExtras(bundle);
+                intent.putExtra("position", pos);
+                intent.putExtra("name", name);
+                intent.putExtra("IDs", ID);
+                intent.putExtra("class", 1);
+                //  bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
+                //intent.putExtras(bundle);
 
-            startActivity(intent);
+                startActivity(intent);
+            } else {
+
+                Intent intent = new Intent(BookingList.this, SpWaybillGroup.class);
+                // Bundle bundle = new Bundle();
+                // bundle.putE("value", (Serializable) myBookingList.get(position));
+                intent.putExtra("value", myBookingList);
+                intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
+
+                intent.putExtra("position", pos);
+                intent.putExtra("name", name);
+                intent.putExtra("IDs", ID);
+                //  bundle.putString("ID", String.valueOf(myBookingList.get(pos).PickupsheetDetailID));
+                //intent.putExtras(bundle);
+
+                startActivity(intent);
+            }
+
 
         } catch (Exception e) {
             System.out.println(e);
@@ -612,14 +633,16 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     @Override
     protected void onResume() {
         super.onResume();
-        if (isException)
-            setAdapter();
-        isException = false;
+//        if (isException)
+//            setAdapter();
+//        isException = false;
+        if (isFinish)
+            finish();
     }
 
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        GlobalVar.GV().EmployID = 19127;
+//        GlobalVar.GV().EmployID = 19127;
         myBookingList =
                 dbConnections.getPickupSheetSpAsrRegDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
         exitdialog();

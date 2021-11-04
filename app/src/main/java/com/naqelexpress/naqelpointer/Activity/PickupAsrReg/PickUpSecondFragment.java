@@ -262,13 +262,13 @@ public class PickUpSecondFragment
 
     private void AddNewPiece() {
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
-        if (PickUpActivity.class_.equals("BookingDetailAcyivityforCBU")) {
-            if (!txtBarCode.getText().toString().contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
-                GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
-                return;
-            }
+        //if (PickUpActivity.class_.equals("BookingDetailAcyivityforCBU")) {
+        if (!txtBarCode.getText().toString().contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
+            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
+            return;
         }
+        //}
         if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 13
                     || txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength) {

@@ -19,6 +19,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -36,6 +37,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
+import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
@@ -80,6 +82,8 @@ public class PickUpFirstFragment
     double Longitude = 0;
     ArrayList<String> name;
     ArrayList<Integer> IDs;
+    int class_;
+    ArrayList<String> waybilllist;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,7 +101,10 @@ public class PickUpFirstFragment
             position = (Integer) getArguments().get("position");
             name = getArguments().getStringArrayList("name");
             IDs = getArguments().getIntegerArrayList("IDs");
+            class_ = (Integer) getArguments().get("class");
 
+            if (class_ == 0)
+                waybilllist = getArguments().getStringArrayList("waybilllist");
 
             txtWaybillNo = (TextView) rootView.findViewById(R.id.txtWaybillNo);
 
@@ -107,6 +114,8 @@ public class PickUpFirstFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtBarcode);
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(18)});
+            txtBarCode.setInputType(InputType.TYPE_NULL);
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -118,8 +127,9 @@ public class PickUpFirstFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13
-                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
+//                    if (txtBarCode != null && txtBarCode.getText().length() == 13
+//                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
+                    if (txtBarCode.getText().length() >= 13)
                         AddNewPiece();
                 }
             });
@@ -129,11 +139,22 @@ public class PickUpFirstFragment
                 @Override
                 public void onClick(View view) {
 //                    showPopup();
-                    Exception();
+                    if (PickUpBarCodeList.size() > 0)
+                        Exception();
+                    else
+                        GlobalVar.GV().ShowSnackbar(rootView, "Please scan atleast one Piece Barcode", GlobalVar.AlertType.Error);
                 }
             });
             SetText();
 
+            LinearLayout ll_bottom = (LinearLayout) rootView.findViewById(R.id.llbtm);
+            LinearLayout ll_1 = (LinearLayout) rootView.findViewById(R.id.ll1);
+            LinearLayout ll_2 = (LinearLayout) rootView.findViewById(R.id.ll2);
+            if (class_ == 0) {
+                ll_bottom.setVisibility(View.INVISIBLE);
+                ll_1.setVisibility(View.INVISIBLE);
+                ll_2.setVisibility(View.INVISIBLE);
+            }
 
         }
 
@@ -182,16 +203,35 @@ public class PickUpFirstFragment
     private void AddNewPiece() {
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
 
-        if (!txtBarCode.getText().toString().contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
-            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
-            GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
+        if (txtBarCode.getText().toString().length() < 12) {
+            GlobalVar.GV().ShowSnackbar(rootView, "Please scan correct Piece Barcode", GlobalVar.AlertType.Warning);
             return;
         }
+        String txtBarcode = "";
+        if (class_ == 0) {
+            String str = txtBarCode.getText().toString();
+            txtBarcode = str.replaceAll("[^0-9]", "");
 
-        if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13
-                    || txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength) {
-                PickUpBarCodeList.add(0, txtBarCode.getText().toString());
+            String chr = txtBarcode.substring(0, txtBarcode.length() - 5);
+            if (!waybilllist.contains(chr)) {
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
+                return;
+            }
+        } else {
+            txtBarcode = txtBarCode.getText().toString();
+
+            if (!txtBarcode.contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
+                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
+                return;
+            }
+        }
+
+        if (!PickUpBarCodeList.contains(txtBarcode)) {
+            if (txtBarcode.length() == 13
+                    || txtBarcode.length() == GlobalVar.GV().ScanBarcodeLength) {
+                PickUpBarCodeList.add(0, txtBarcode);
                 lbTotal.setText(getString(R.string.lbCount) + PickUpBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                 txtBarCode.setText("");
@@ -274,7 +314,8 @@ public class PickUpFirstFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13 || barcode.length() == GlobalVar.GV().ScanBarcodeLength)
+                        // if (barcode.length() == 13 || barcode.length() == GlobalVar.GV().ScanBarcodeLength)
+                        if (barcode.length() >= 13)
                             txtBarCode.setText(barcode);
                     }
                 }
@@ -755,6 +796,7 @@ public class PickUpFirstFragment
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                BookingList.isFinish = true;
                 getActivity().finish();
             }
         });

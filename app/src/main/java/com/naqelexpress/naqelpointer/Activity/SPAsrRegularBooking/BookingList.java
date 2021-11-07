@@ -264,7 +264,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                 Enum.PROGRESS_TYPE, "com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList");
 
         CommonRequest commonRequest = new CommonRequest();
-
+        //GlobalVar.GV().EmployID = 19127;
         commonRequest.setEmployID(GlobalVar.GV().EmployID);
         commonRequest.setPassword(DBConnections.getUserPassword(getApplicationContext(), GlobalVar.GV().EmployID));
 
@@ -642,7 +642,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//        GlobalVar.GV().EmployID = 19127;
+        GlobalVar.GV().EmployID = 19127;
         myBookingList =
                 dbConnections.getPickupSheetSpAsrRegDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
         exitdialog();

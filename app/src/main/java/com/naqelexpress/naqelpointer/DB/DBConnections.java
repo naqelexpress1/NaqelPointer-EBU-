@@ -84,7 +84,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 158; // isFollowSeq
+    private static final int Version = 159; // isFollowSeq
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -355,7 +355,8 @@ public class DBConnections
                 "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                 " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
-                " \"TruckID\" Integer Default 0 , JsonData Text Not Null , DistrictID Integer Default 0)");
+                " \"TruckID\" Integer Default 0 , JsonData Text Not Null , DistrictID Integer Default 0 ," +
+                " SpID Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
@@ -488,6 +489,9 @@ public class DBConnections
                 "CourierLatitude TEXT NOT NULL , CourierLongitude TEXT NOT NULL   ," +
                 " FollowTime DATETIME NOT NULL , DeliverysheetID TEXT , EmployeeID int    )");
 
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpException\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"WaybillNo\" TEXT NOT NULL , sysDate TEXT , SpID Integer Default 0)");
 
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -732,7 +736,8 @@ public class DBConnections
                     "\"PieceCount\" INTEGER NOT NULL , \"Weight\" DOUBLE, \"TimeIn\" DATETIME NOT NULL , \"TimeOut\" DATETIME NOT NULL , " +
                     "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                     " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
-                    " \"TruckID\" Integer Default 0)");
+                    " \"TruckID\" Integer Default 0 , JsonData Text Not Null , DistrictID Integer Default 0 ," +
+                    "SpID Integer Default 0)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
@@ -847,6 +852,9 @@ public class DBConnections
                     "ConsLatitude TEXT NOT NULL , ConsLongitude TEXT NOT NULL , " +
                     "CourierLatitude TEXT NOT NULL , CourierLongitude TEXT NOT NULL   ," +
                     " FollowTime DATETIME NOT NULL , DeliverysheetID TEXT , EmployeeID int  )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpException\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"WaybillNo\" TEXT NOT NULL , sysDate TEXT , SpID Integer Default 0)");
 
             /*  Added By : Riyam */
             db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -1215,6 +1223,9 @@ public class DBConnections
                 db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SPMobile TEXT");
             if (!isColumnExist("PickupSheetDetails", "SPOfficeName"))
                 db.execSQL("ALTER TABLE PickupSheetDetails ADD COLUMN SPOfficeName TEXT");
+
+            if (!isColumnExist("PickUpAuto", "SpID"))
+                db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN SpID INTEGER");
 
         }
 
@@ -2018,6 +2029,7 @@ public class DBConnections
             contentValues.put("TruckID", GetTruck(context));
             contentValues.put("DistrictID", instance.DistrictID);
             contentValues.put("JsonData", JsonData);
+            contentValues.put("SpID", instance.spID);
 
 //            result = db.insert("PickUp", null, contentValues);
             result = db.insert("PickUpAuto", null, contentValues);
@@ -9837,6 +9849,8 @@ public class DBConnections
                     bookingModel.setBKHeader(cursor.getString(cursor.getColumnIndex("BKHeader")));
                     bookingModel.setSPMobile(cursor.getString(cursor.getColumnIndex("SPMobile")));
                     bookingModel.setSPOfficeName(cursor.getString(cursor.getColumnIndex("SPOfficeName")));
+                    bookingModel.setPickupCount(getSPPickupCount(cursor.getInt(cursor.getColumnIndex("SPLOfficesID")), context));
+                    bookingModel.setExceptionCount(getSPExceptionCount(context, cursor.getInt(cursor.getColumnIndex("SPLOfficesID"))));
 
                     Sno = Sno + 1;
 
@@ -10182,6 +10196,77 @@ public class DBConnections
 
         }
         return truckid;
+    }
+
+    public boolean InsertPickUpException(Context context, String WNo, int spID) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("WaybillNo", WNo);
+            contentValues.put("sysDate", GlobalVar.getDate());
+            contentValues.put("SpID", spID);
+
+//            result = db.insert("PickUp", null, contentValues);
+            result = db.insert("PickUpException", null, contentValues);
+            //db.insert("PickUpTemp", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    private int getSPPickupCount(int SpiD, Context context) {
+        int waybillcount = 0;
+
+        try {
+            String selectQuery = "SELECT Count(WaybillNo) WaybillCount FROM PickUpAuto WHERE SpID = " + SpiD + " Group by SpiD";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            int Sno = 1;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+
+                waybillcount = cursor.getInt(cursor.getColumnIndex("WaybillCount"));
+
+
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return waybillcount;
+    }
+
+    private int getSPExceptionCount(Context context, int SpID) {
+        int waybillcount = 0;
+
+        try {
+            String selectQuery = "SELECT   Count(Distinct WaybillNo) WaybillCount FROM PickUpException where SpID =  " + SpID;
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            int Sno = 1;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+
+                waybillcount = cursor.getInt(cursor.getColumnIndex("WaybillCount"));
+
+
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return waybillcount;
     }
 
 }

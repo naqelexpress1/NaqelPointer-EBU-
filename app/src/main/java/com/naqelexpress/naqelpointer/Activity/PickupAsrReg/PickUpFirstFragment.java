@@ -218,6 +218,14 @@ public class PickUpFirstFragment
                 GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
                 return;
             }
+
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            Cursor result = dbConnections.Fill("select * from PickUpAuto where WaybillNo= '" + chr + "'", getContext());
+
+            if (result.getCount() > 0) {
+                GlobalVar.GV().ShowSnackbar(rootView, "you picked up this item, please scan corrent one ", GlobalVar.AlertType.Error);
+                return;
+            }
         } else {
             txtBarcode = txtBarCode.getText().toString();
 

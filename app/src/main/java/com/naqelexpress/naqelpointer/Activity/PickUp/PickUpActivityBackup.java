@@ -209,7 +209,7 @@ public class PickUpActivityBackup extends AppCompatActivity {
                 GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()),
                 GlobalVar.GV().getDoubleFromString(firstFragment.txtWeight.getText().toString()),
                 DateTime.now(), DateTime.now(), firstFragment.txtRefNo.getText().toString(),
-                String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.districtID);
+                String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.districtID ,0);
 
         int loadtypeid = 0;
         if (firstFragment.clientdetails.size() > 0) {

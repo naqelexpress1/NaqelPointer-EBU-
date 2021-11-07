@@ -35,6 +35,24 @@ public class BookingModel implements Parcelable {
     public String SPMobile = "";
     public String SPOfficeName = "";
     public int Waybillcount = 0;
+    public int PickupCount = 0;
+    public int ExceptionCount = 0;
+
+    public int getPickupCount() {
+        return PickupCount;
+    }
+
+    public void setPickupCount(int pickupCount) {
+        PickupCount = pickupCount;
+    }
+
+    public int getExceptionCount() {
+        return ExceptionCount;
+    }
+
+    public void setExceptionCount(int exceptionCount) {
+        ExceptionCount = exceptionCount;
+    }
 
     public int getWaybillcount() {
         return Waybillcount;
@@ -150,6 +168,8 @@ public class BookingModel implements Parcelable {
         BKHeader = in.readString();
         SPMobile = in.readString();
         SPOfficeName = in.readString();
+        PickupCount = in.readInt();
+        ExceptionCount = in.readInt();
 
     }
 
@@ -354,6 +374,8 @@ public class BookingModel implements Parcelable {
         parcel.writeString(BKHeader);
         parcel.writeString(SPMobile);
         parcel.writeString(SPOfficeName);
+        parcel.writeInt(PickupCount);
+        parcel.writeInt(ExceptionCount);
 
     }
 }

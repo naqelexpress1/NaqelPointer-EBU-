@@ -287,7 +287,8 @@ public class PickUpActivity extends AppCompatActivity {
                     PiecesCount,
                     Weight,
                     DateTime.now(), DateTime.now(), RefNo,
-                    String.valueOf(Latitude), String.valueOf(Longitude), districtID);
+                    String.valueOf(Latitude), String.valueOf(Longitude), districtID
+                    , bookinglist.get(position).getSPLOfficesID());
 
             int loadtypeid = 0;
 
@@ -354,7 +355,7 @@ public class PickUpActivity extends AppCompatActivity {
                 PiecesCount,
                 Weight,
                 DateTime.now(), DateTime.now(), RefNo,
-                String.valueOf(Latitude), String.valueOf(Longitude), districtID);
+                String.valueOf(Latitude), String.valueOf(Longitude), districtID, 0);
 
         int loadtypeid = 0;
 

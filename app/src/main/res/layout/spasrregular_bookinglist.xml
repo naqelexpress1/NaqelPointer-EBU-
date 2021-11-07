@@ -463,6 +463,60 @@
 
             </LinearLayout>
 
+            <TableLayout
+                android:id="@+id/tl_sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="1"
+                tools:ignore="UselessParent">
+
+
+                <TextView
+                    android:id="@+id/totalforpickup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight=".5"
+                    android:gravity="end"
+                    android:text="Total for PU : 5"
+                    android:textColor="@color/NaqelBlue"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/pickedup"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight=".5"
+                    android:gravity="end"
+                    android:text="Picked Up : 2"
+                    android:textColor="#FC5A1A"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/exception"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:layout_weight=".5"
+                    android:gravity="end"
+                    android:text="Exception : 3"
+                    android:textColor="#FC5A1A"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    tools:ignore="HardcodedText" />
+
+            </TableLayout>
+
         </TableLayout>
 
     </LinearLayout>

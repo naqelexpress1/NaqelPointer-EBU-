@@ -9,6 +9,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -123,7 +124,10 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.mno2ll.setVisibility(View.INVISIBLE);
             holder.clientll.setVisibility(View.INVISIBLE);
             holder.contactll.setVisibility(View.INVISIBLE);
-
+            holder.tableLayout.setVisibility(View.VISIBLE);
+            holder.totalpickwaybill.setText("Total for PU :" + String.valueOf(item.getWaybillcount()));
+            holder.pickedupcount.setText("Picked Up :" + String.valueOf(item.getPickupCount()));
+            holder.exceptioncount.setText("Exception :"+ String.valueOf(item.getExceptionCount()));
         } else {
 
             holder.locationll.setVisibility(View.INVISIBLE);
@@ -133,7 +137,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.puidawbno.setText("Pu ID / AWB : " + String.valueOf(item.getWaybillNo()));
             holder.mno1.setText(item.getPhoneNo());
             holder.mno2.setText(item.getMobileNo());
-
+            holder.tableLayout.setVisibility(View.INVISIBLE);
         }
 
         if (item.getIsPickedup() == 1)
@@ -227,15 +231,22 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
     }
 
     class ViewHolder {
-        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills, attempedstatus;
+        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills, attempedstatus,
+                totalpickwaybill, pickedupcount, exceptioncount;
         LinearLayout clientll, locationll, contactll, mno2ll, numberofwaybillsll;
         ImageButton ibmno1, ibwats1, ibmno2, ibwats2;
+        TableLayout tableLayout;
 //                , waybillno, date, consname, orgstation,
 //                deststation, billtype, sno, ispickedup;
 //        ImageView islocation;
         //TextView panel;
 
         public ViewHolder(View view) {
+            tableLayout = (TableLayout) view.findViewById(R.id.tl_sp);
+            totalpickwaybill = (TextView) view.findViewById(R.id.totalforpickup);
+            pickedupcount = (TextView) view.findViewById(R.id.pickedup);
+            exceptioncount = (TextView) view.findViewById(R.id.exception);
+
             byPickup = (TextView) view.findViewById(R.id.byPickup);
             puidawbno = (TextView) view.findViewById(R.id.puidawbno);
             location = (TextView) view.findViewById(R.id.location);

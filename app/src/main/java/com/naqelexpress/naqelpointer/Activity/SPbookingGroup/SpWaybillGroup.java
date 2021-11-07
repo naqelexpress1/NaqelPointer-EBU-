@@ -226,7 +226,7 @@ public class SpWaybillGroup extends AppCompatActivity {
 
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//        GlobalVar.GV().EmployID = 19127;
+        GlobalVar.GV().EmployID = 19127;
         int officeID = bookinglist.get(position).getSPLOfficesID();
         bookinglist.clear();
         bookinglist =
@@ -303,6 +303,7 @@ public class SpWaybillGroup extends AppCompatActivity {
                             Notes = notes.getText().toString();
                         JSONArray jsonArray = new JSONArray();
 
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
                         for (BookingModel bookingModel : bookinglist) {
                             JSONObject jsonObject = new JSONObject();
                             try {
@@ -324,11 +325,15 @@ public class SpWaybillGroup extends AppCompatActivity {
 
                                 jsonArray.put(jsonObject);
 
+                                dbConnections.InsertPickUpException(getApplicationContext(), String.valueOf(bookingModel.getWaybillNo()),
+                                        bookingModel.getSPLOfficesID());
 
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
+                        dbConnections
+                                .close();
                         String jsonData = jsonArray.toString();
 
                         new SavePickupException().execute(jsonData);

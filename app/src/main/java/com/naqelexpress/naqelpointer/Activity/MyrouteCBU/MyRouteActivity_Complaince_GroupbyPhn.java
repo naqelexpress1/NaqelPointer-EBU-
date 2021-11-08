@@ -239,6 +239,16 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         checkCourierDailyRouteID(false, 1);
         GetPlannedLocation(); //please uncomment in live
         IstotalLocationcount();
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        Cursor result = dbConnections.Fill("select * from SkipRouteSequencer ", getApplicationContext());
+
+        if (result.getCount() > 0) {
+            deleteConfirmRoute_SkipRoute();
+
+        }
+        result.close();
+        dbConnections.close();
         //MyRouteCompliance1();
         //deleteConfirmRoute();
 
@@ -2298,5 +2308,44 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             alertDialog.dismissWithAnimation();
             alertDialog = null;
         }
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (progressDialog != null && progressDialog.isShowing()) {
+            Toast.makeText(getApplicationContext(), "Please Dont Press Home/Recent App button , Data will be loss", Toast.LENGTH_SHORT).show();
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            dbConnections.InsertSkipRouteSequncer(getApplicationContext());
+            dbConnections.close();
+
+        }
+    }
+
+    private void deleteConfirmRoute_SkipRoute() {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_Complaince_GroupbyPhn.this);
+        builder1.setTitle("Warning");
+        builder1.setMessage("You killed app , while loading fully , please delete and reolaod again ");
+        builder1.setCancelable(false);
+
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        GlobalVar.GV().myRouteShipmentList.clear();
+
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        dbConnections.clearAllCourierDailyRoute(getApplicationContext());
+                        //  dbConnections.DeleteAllSuggestLocation(getApplicationContext());
+                        new DeleteContact().execute("");
+                        dbConnections.DeleteSkipRouteData(getApplicationContext());
+                        // dbConnections.DeleteAllPlannedLocation(getApplicationContext());
+                        dbConnections.close();
+
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
     }
 }

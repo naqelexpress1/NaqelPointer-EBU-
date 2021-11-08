@@ -275,8 +275,10 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                         System.out.println();
                         deleteBookingData();
                         myBookingList.clear();
-                        myBookingList = result.PickupSheet;
-                        pickupSheetReasonModelArrayList = result.MissingReason;
+                        if (result.PickupSheet.size() > 0)
+                            myBookingList = result.PickupSheet;
+                        if (result.MissingReason.size() > 0)
+                            pickupSheetReasonModelArrayList = result.MissingReason;
                         PickupSheetDetails();
                     }
 
@@ -642,7 +644,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        GlobalVar.GV().EmployID = 19127;
+//        GlobalVar.GV().EmployID = 19127;
         myBookingList =
                 dbConnections.getPickupSheetSpAsrRegDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
         exitdialog();

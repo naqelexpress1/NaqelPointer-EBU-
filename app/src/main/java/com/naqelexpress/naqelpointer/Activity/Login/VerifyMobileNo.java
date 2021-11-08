@@ -69,11 +69,16 @@ public class VerifyMobileNo extends AppCompatActivity {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             Cursor result = dbConnections.Fill("select * from UserME where EmployID = " + GlobalVar.GV().EmployID, getApplicationContext());
+
             if (result.getCount() > 0) {
                 result.moveToFirst();
 
                 HashMap<String, String> temp = new HashMap<>();
                 int ismobilnoverified = result.getInt(result.getColumnIndex("IsMobileNoVerified"));
+                mobileno.setText(result.getString(result.getColumnIndex("MobileNo")));
+                mobileno.setKeyListener(null);
+                countrycode.setText(result.getString(result.getColumnIndex("CountryCode")));
+                countrycode.setKeyListener(null);
                 if (ismobilnoverified == 1) {
 //                    Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
 //                    startActivity(intent);

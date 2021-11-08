@@ -84,7 +84,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 159; // isFollowSeq
+    private static final int Version = 160; // isFollowSeq
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -493,6 +493,9 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpException\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"WaybillNo\" TEXT NOT NULL , sysDate TEXT , SpID Integer Default 0)");
 
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"SkipRouteSequencer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"isSkip\" Integer NOT NULL )");
+
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
                 "(\"ID\" INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -890,6 +893,9 @@ public class DBConnections
                     "(\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
                     " \"Process\"  INTEGER NOT NULL ," +
                     " \"UploadDate\"  DATETIME NOT NULL)");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"SkipRouteSequencer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"isSkip\" Integer NOT NULL )");
 
             /*  END -  Riyam */
 
@@ -2623,6 +2629,7 @@ public class DBConnections
             db.delete("MyRouteActionActivity", null, null);
             db.delete("DuplicateCustomer", null, null);
             db.delete("UpdateLastSeqNo", null, null);
+            //db.delete("SkipRouteSequencer", null, null);
 
 //            GlobalVar.deleteContactRawID(ContactDetails(context), context);
             db.close();
@@ -4348,7 +4355,7 @@ public class DBConnections
 
             db.delete("TripPlanDetails", "date(CTime) <? And IsSync  =?", args);
             db.delete("AtDestination", "date(CTime) <? And IsSync  =?", args);
-
+            db.execSQL("delete  from PickUpException where sysDate != '" + GlobalVar.getDate() + "'");
 
             db.close();
 
@@ -9692,12 +9699,19 @@ public class DBConnections
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 
+            int sNo = 0;
+            if (bookingModelArrayList.size() > 0)
+                sNo = bookingModelArrayList.get(bookingModelArrayList.size() - 1).getsNo();
+
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
+
                     com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
                             BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
-                    bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    // bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    sNo = sNo + 1;
+                    bookingModel.setsNo(sNo);
                     bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
                     bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
                     bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
@@ -10267,6 +10281,31 @@ public class DBConnections
             e.printStackTrace();
         }
         return waybillcount;
+    }
+
+
+    public boolean InsertSkipRouteSequncer(Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("isSkip", 1);
+
+//            result = db.insert("PickUp", null, contentValues);
+            result = db.insert("SkipRouteSequencer", null, contentValues);
+            //db.insert("PickUpTemp", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
+    }
+
+    public void DeleteSkipRouteData(Context context) {
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        db.execSQL("delete from SkipRouteSequencer");
+        db.close();
     }
 
 }

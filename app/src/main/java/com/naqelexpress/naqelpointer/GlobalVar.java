@@ -105,7 +105,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU 275 - 30-10-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "SPASR test - 08-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

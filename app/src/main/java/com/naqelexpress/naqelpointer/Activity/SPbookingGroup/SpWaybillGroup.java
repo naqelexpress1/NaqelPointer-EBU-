@@ -226,7 +226,7 @@ public class SpWaybillGroup extends AppCompatActivity {
 
     public void ReadfromLocal() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        GlobalVar.GV().EmployID = 19127;
+//        GlobalVar.GV().EmployID = 19127;
         int officeID = bookinglist.get(position).getSPLOfficesID();
         bookinglist.clear();
         bookinglist =

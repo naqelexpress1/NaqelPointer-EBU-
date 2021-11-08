@@ -909,7 +909,7 @@ public class LoginActivity
                     if (!isUnknownSourceEnable()) {
                         String DIRECTORY = "";
                         if (Build.VERSION.SDK_INT >= 30)
-                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/"+ installaionfile;
+                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/" + installaionfile;
                         else
                             DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
 
@@ -1255,8 +1255,8 @@ public class LoginActivity
                     instance.EmployName = getUserMEDataResult.EmployName;
                     instance.EmployFName = getUserMEDataResult.EmployFName;
                     instance.MobileNo = getUserMEDataResult.MobileNo;
-                    if (!GlobalVar.GV().LoginVariation && !GlobalVar.GV().IsTerminalApp)
-                        instance.MobileNo = PNo;
+                    //if (!GlobalVar.GV().LoginVariation && !GlobalVar.GV().IsTerminalApp)
+                    //    instance.MobileNo = PNo;
                     instance.StationCode = getUserMEDataResult.StationCode;
                     instance.StationName = getUserMEDataResult.StationName;
                     instance.StationFName = getUserMEDataResult.StationFName;

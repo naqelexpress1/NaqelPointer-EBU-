@@ -116,18 +116,20 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
 
         holder.byPickup.setText(String.valueOf(item.getBKHeader()));
 
+        holder.sno.setText(String.valueOf(item.getsNo()));
         if (item.getisSPL()) {
             holder.puidawbno.setText("Pu ID / AWB : " + item.getPickupSheetID());
             holder.location.setText(item.getSPOfficeName());
             holder.mno1.setText(item.getSPMobile());
             holder.numberofwaybills.setText(String.valueOf(item.getWaybillcount()));
+            holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
             holder.mno2ll.setVisibility(View.INVISIBLE);
             holder.clientll.setVisibility(View.INVISIBLE);
             holder.contactll.setVisibility(View.INVISIBLE);
             holder.tableLayout.setVisibility(View.VISIBLE);
             holder.totalpickwaybill.setText("Total for PU :" + String.valueOf(item.getWaybillcount()));
             holder.pickedupcount.setText("Picked Up :" + String.valueOf(item.getPickupCount()));
-            holder.exceptioncount.setText("Exception :"+ String.valueOf(item.getExceptionCount()));
+            holder.exceptioncount.setText("Exception :" + String.valueOf(item.getExceptionCount()));
         } else {
 
             holder.locationll.setVisibility(View.INVISIBLE);
@@ -232,7 +234,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
 
     class ViewHolder {
         TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills, attempedstatus,
-                totalpickwaybill, pickedupcount, exceptioncount;
+                totalpickwaybill, pickedupcount, exceptioncount, sno;
         LinearLayout clientll, locationll, contactll, mno2ll, numberofwaybillsll;
         ImageButton ibmno1, ibwats1, ibmno2, ibwats2;
         TableLayout tableLayout;
@@ -244,6 +246,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         public ViewHolder(View view) {
             tableLayout = (TableLayout) view.findViewById(R.id.tl_sp);
             totalpickwaybill = (TextView) view.findViewById(R.id.totalforpickup);
+            sno = (TextView) view.findViewById(R.id.sno);
             pickedupcount = (TextView) view.findViewById(R.id.pickedup);
             exceptioncount = (TextView) view.findViewById(R.id.exception);
 

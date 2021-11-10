@@ -10308,4 +10308,12 @@ public class DBConnections
         db.close();
     }
 
+    public void DeletePickupAuto(Context context) {
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        db.execSQL("delete from PickUpAuto");
+        db.execSQL("delete from PickUpDetailAuto");
+        db.execSQL("delete from PickUpException");
+        db.close();
+    }
+
 }

@@ -207,6 +207,7 @@ public class PickUpFirstFragment
             GlobalVar.GV().ShowSnackbar(rootView, "Please scan correct Piece Barcode", GlobalVar.AlertType.Warning);
             return;
         }
+
         String txtBarcode = "";
         if (class_ == 0) {
             String str = txtBarCode.getText().toString();
@@ -227,7 +228,9 @@ public class PickUpFirstFragment
                 return;
             }
         } else {
-            txtBarcode = txtBarCode.getText().toString();
+            String str = txtBarCode.getText().toString();
+            txtBarcode = str.replaceAll("[^0-9]", "");
+            //txtBarcode = txtBarCode.getText().toString();
 
             if (!txtBarcode.contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);

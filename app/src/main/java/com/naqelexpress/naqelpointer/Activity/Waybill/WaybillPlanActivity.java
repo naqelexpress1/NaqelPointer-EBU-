@@ -1051,7 +1051,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                         new Intent(WaybillPlanActivity.this,
                                 com.naqelexpress.naqelpointer.service.IsFollowSequencerService.class));
             }
-            //  GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
+//              GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
         } else
             GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Something went wrong," +
                     "Please try again", true);

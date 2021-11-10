@@ -15,6 +15,7 @@
 
 
         <TextView
+            android:id="@+id/t1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
@@ -26,13 +27,14 @@
             tools:ignore="HardcodedText,RtlHardcoded" />
 
         <TextView
+            android:id="@+id/t2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="8dp"
             android:layout_weight=".7"
             android:maxLines="1"
-            android:text="Description"
+            android:text="Client Name"
             android:textColor="#B4ADA9"
             android:textSize="20sp"
             android:textStyle="normal"
@@ -63,6 +65,18 @@
         android:textStyle="bold"
         android:typeface="normal"
         android:visibility="gone" />
+
+    <CheckBox
+        android:id="@+id/bulkexception"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/llbtm"
+        android:layout_gravity="start"
+        android:text="Bulk Status"
+        android:textColor="#B4ADA9"
+        android:textSize="15sp"
+        android:visibility="gone"
+        tools:ignore="HardcodedText,RtlHardcoded" />
 
     <LinearLayout
         android:id="@+id/llbtm"

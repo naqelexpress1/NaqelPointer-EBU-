@@ -105,7 +105,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "SPASR test - 08-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "SPASR Bug Fixed - 1 - 10-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -4404,6 +4404,45 @@ public class GlobalVar {
         activity.startActivity(intent);
 
 
+    }
+
+    public String getLocationMsg(Context context, String Waybillno, String ClientName) {
+        final String locationMsgAr = context.getString(R.string.customerLocationMsg1Ar) + "\n" +
+                context.getString(R.string.customerLocationMsg2Ar) + " " +
+                Waybillno + " " +
+                context.getString(R.string.customerLocationMsg3Ar) + " " +
+                ClientName;
+        final String locationMsgEn = context.getString(R.string.customerLocationMsg1En) + "\n" +
+                context.getString(R.string.customerLocationMsg2En) + " " +
+                Waybillno + " " +
+                context.getString(R.string.customerLocationMsg3En) + " " +
+                ClientName;
+        final String infoTrackLink = context.getString(R.string.infotrackLocationLink) + Waybillno;
+        return locationMsgAr + "\n\n" + locationMsgEn + "\n\n" + infoTrackLink;
+    }
+
+    public String getFrontDoorMsg(Context context, String Waybillno, String ClientName) {
+        final String frontDoorMsgAr = context.getString(R.string.frontDoorMsg1Ar) + "\n" +
+                context.getString(R.string.frontDoorMsg2Ar) + " " +
+                Waybillno + " " +
+                context.getString(R.string.frontDoorMsg3Ar) + " " +
+                ClientName;
+        final String frontDoorMsgEn = context.getString(R.string.frontDoorMsg1En) + "\n" +
+                context.getString(R.string.frontDoorMsg2En) + " " +
+                Waybillno + " " +
+                context.getString(R.string.frontDoorMsg3Ar) + " " +
+                ClientName;
+        return frontDoorMsgAr + "\n\n" + frontDoorMsgEn;
+    }
+
+    public String getCsSupportMsg(Context context) {
+        final String csSupportMsgAr = context.getString(R.string.csSupportMsg1Ar) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        final String csSupportMsgMsgEn = context.getString(R.string.csSupportMsg1En) + "\n\n" +
+                GlobalVar.getCSPhoneNumber() + "\n" +
+                GlobalVar.getCSEmail();
+        return csSupportMsgAr + "\n\n" + csSupportMsgMsgEn;
     }
 
 

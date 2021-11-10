@@ -112,7 +112,7 @@ public class WaybillGroupAdapter extends BaseAdapter implements Filterable {
         final BookingModel item = getItem(position);
 
         holder.txtWaybillNo.setText(String.valueOf(item.getWaybillNo()));
-        holder.txtdescription.setText(String.valueOf(item.getGoodDesc()));
+        holder.txtdescription.setText(String.valueOf(item.getClientName()));
 
         final int acceptposition = position;
 

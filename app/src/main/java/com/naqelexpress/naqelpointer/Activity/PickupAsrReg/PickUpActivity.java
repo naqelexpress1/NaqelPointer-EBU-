@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel;
+import com.naqelexpress.naqelpointer.Activity.SPbookingException.SpWaybillException;
 import com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -149,10 +150,11 @@ public class PickUpActivity extends AppCompatActivity {
                     }
 //                    String division = GlobalVar.getDivision(getApplicationContext());
 //                    if (division.equals("Express"))
-                    actualLocation();//Cross Validation
-//                    else
-
-                    //    SaveData();
+//                        actualLocation();//Cross Validation
+                    if (class_ == 0)
+                        SaveData_SP();
+                    else
+                        SaveData();
 
 //                    SaveData("");
 
@@ -246,17 +248,19 @@ public class PickUpActivity extends AppCompatActivity {
         if (IsValid()) {
 
             if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
-                SaveData_SP("");
+                SaveData_SP("", true);
             else
                 GlobalVar.RedirectSettings(PickUpActivity.this);
 
         }
     }
 
-    private void SaveData_SP(String aftervalidduplicatewaybill) {
+    private void SaveData_SP(String aftervalidduplicatewaybill, boolean isFinish) {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         boolean IsSaved = true;
+
+        ArrayList<String> wlist = new ArrayList<>();
 
         for (BookingModel bookingList : bookinglist) {
 
@@ -275,8 +279,10 @@ public class PickUpActivity extends AppCompatActivity {
                     PickUpBarCodeList.add(firstFragment.PickUpBarCodeList.get(i));
                 }
             }
-            if (PickUpBarCodeList.size() == 0)
+            if (PickUpBarCodeList.size() == 0) {
+                wlist.add(String.valueOf(Waybillno));
                 continue;
+            }
 
 //        Weight = bookinglist.get(position).getW
             RefNo = bookinglist.get(position).getRefNo();
@@ -323,15 +329,27 @@ public class PickUpActivity extends AppCompatActivity {
 
         }
 
-        // if (isok) {
         startService();
-        BookingList.isFinish = true;
-        SpWaybillGroup.isFinish = true;
-        finish();
 
+        if (isFinish) {
+
+            isFinish();
+        } else {
+            Intent intent = new Intent(PickUpActivity.this, SpWaybillException.class);
+            intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
+            intent.putExtra("waybilllist", wlist);
+            intent.putExtra("value", bookinglist);
+            startActivityForResult(intent, 100);
+        }
 //        } else
 //            GlobalVar.GV().ShowDialog(PickUpActivity.this, "Error", "Pickup Data Not Saved Kindly try again.", true);
 
+    }
+
+    private void isFinish() {
+        BookingList.isFinish = true;
+        SpWaybillGroup.isFinish = true;
+        finish();
     }
 
     private void SaveData(String aftervalidduplicatewaybill) {
@@ -495,6 +513,13 @@ public class PickUpActivity extends AppCompatActivity {
                 return false;
             }
 
+
+            if (class_ == 0) {
+                if (waybilllist.size() > firstFragment.PickUpBarCodeList.size()) {
+                    pcikupwaybillcountMismatch();
+                    return false;
+                }
+            }
             /*int piecesCount = secondFragment.PickUpBarCodeList.size();
             if (GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()) != piecesCount) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Count of pieces is not matching with piece barcodes scanned.", GlobalVar.AlertType.Error);
@@ -527,6 +552,19 @@ public class PickUpActivity extends AppCompatActivity {
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
+            }
+        } else if (requestCode == 100 && resultCode == RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    if (extras.containsKey("isFinish")) {
+                        boolean finish = extras.getBoolean("isFinish");
+                        if (finish) {
+                            isFinish();
+                        }
+                    }
+                }
+
             }
         } else {
             for (Fragment fragment : getSupportFragmentManager().getFragments()) {
@@ -854,6 +892,35 @@ public class PickUpActivity extends AppCompatActivity {
             IDs.add(pickupSheetReasonModel.getID());
         }
 
+    }
+
+
+    private void pcikupwaybillcountMismatch() {
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(PickUpActivity.this);
+        builder1.setTitle("Info");
+        builder1.setMessage("You collected less shipments than it was bookied.Are you sure to continue with saving  carrent data?");
+        builder1.setCancelable(true);
+
+        builder1.setPositiveButton(
+                "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                        if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                            SaveData_SP("", false);
+                    }
+                });
+
+        builder1.setNegativeButton(
+                "No",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
     }
 
 

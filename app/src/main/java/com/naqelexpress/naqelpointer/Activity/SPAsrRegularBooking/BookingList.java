@@ -74,21 +74,27 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             if (savedInstanceState == null)
                 ReadfromLocal();
 
+//            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+//            dbConnections.DeletePickupAuto(getApplicationContext());
+//            dbConnections.close();
 
             mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0" +
-                            " and WaybillNo=" +
-                            myBookingList.get(position).WaybillNo, getApplicationContext());
+                    if (!myBookingList.get(position).getisSPL()) {
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0" +
+                                " and WaybillNo=" +
+                                myBookingList.get(position).WaybillNo, getApplicationContext());
 
-                    if (result.getCount() == 0) {
-                        //int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
-                        RedirectPickupActivity(position);
+                        if (result.getCount() == 0) {
+                            //int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
+                            RedirectPickupActivity(position);
+                        } else
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "you picked up this item, please sync data", GlobalVar.AlertType.Error);
+                        dbConnections.close();
                     } else
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "you picked up this item, please sync data", GlobalVar.AlertType.Error);
-                    dbConnections.close();
+                        RedirectPickupActivity(position);
 
                 }
             });

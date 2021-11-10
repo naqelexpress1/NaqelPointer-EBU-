@@ -1094,6 +1094,13 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name=".Activity.SPbookingException.SpWaybillException"
+            android:label="Please apply Exception status of remaining shipments"
+            android:screenOrientation="portrait"
+            android:theme="@style/myDialog"
+            tools:ignore="LockedOrientationActivity,NewApi" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

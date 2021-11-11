@@ -30,11 +30,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -63,7 +61,6 @@ import com.naqelexpress.naqelpointer.NCLBulk.INclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
-import com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
@@ -90,7 +87,7 @@ import java.util.Locale;
 import Error.ErrorReporter;
 
 //Used By GWT (IRS)
-public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener {
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity, IAPICallListener {
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -108,9 +105,9 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
 
-         if (!isValidOnlineValidationFile()) {
-             getOnlineValidation();
-          }
+        if (!isValidOnlineValidationFile()) {
+            getOnlineValidation();
+        }
 
         setContentView(R.layout.nclshipment);
         TimeIn = DateTime.now();
@@ -1407,33 +1404,35 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         boolean isValid;
 
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclGWT , getApplicationContext());
+        isValid = dbConnections.isValidOnlineValidationFile(GlobalVar.NclGWT, getApplicationContext());
         if (isValid)
             return true;
         return false;
     }
 
     @Override
-    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+    public void onNCLGenerated(String NCLNo, int NCLDestStationID, List<Integer> allowedDestStations) {
         try {
-            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
-        } catch (Exception ex) {}
+            secondFragment.onNCLGenerated(NCLNo, NCLDestStationID, allowedDestStations);
+        } catch (Exception ex) {
+        }
     }
 
-   @Override
-   public void onCallComplete(boolean hasError, String errorMessage) {
-         try {
-             if (hasError)
-                 ErrorAlertOnlineValidation("Failed Loading Validation File" ,  errorMessage);
-             else
-                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-         } catch (Exception e) {}
-   }
+    @Override
+    public void onCallComplete(boolean hasError, String errorMessage) {
+        try {
+            if (hasError)
+                ErrorAlertOnlineValidation("Failed Loading Validation File", errorMessage);
+            else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
+        } catch (Exception e) {
+        }
+    }
 
-   public void getOnlineValidation () {
-       APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
-       apiCall.getOnlineValidationDataGWT(GlobalVar.NclGWT);
-   }
+    public void getOnlineValidation() {
+        APICall apiCall = new APICall(getApplicationContext(), NclShipmentActivity.this, this);
+        apiCall.getOnlineValidationDataGWT(GlobalVar.NclGWT);
+    }
 
     /********* Riyam - END  *********/
 

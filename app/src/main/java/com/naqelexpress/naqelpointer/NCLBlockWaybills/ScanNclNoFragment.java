@@ -49,16 +49,16 @@ public class ScanNclNoFragment extends Fragment {
 
     public static EditText txtOrgin, txtDestination;
     private View rootView;
-    private EditText etOriginFacility , etDestFacility;
-    SpinnerDialog destSpinnerDialog , destFacilitySpinnerDialog;
-    CheckBox checkMix;
+    private EditText etOriginFacility, etDestFacility;
+    SpinnerDialog destSpinnerDialog, destFacilitySpinnerDialog;
+    static CheckBox checkMix;
     Button btngenerate;
     public int OriginID = 0, DestinationID = 0;
     Button onholdshipments;
     private INclShipmentActivity iNclShipmentActivity;
 
 
-    public int  OriginFacilityID = 0 , DestinationFacilityID = 0;
+    public int OriginFacilityID = 0, DestinationFacilityID = 0;
 
     private ArrayList<String> facilityList = new ArrayList<>();
     private List<Integer> facilityIDList = new ArrayList<>();
@@ -68,11 +68,11 @@ public class ScanNclNoFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-         super.onAttach(context);
+        super.onAttach(context);
         try {
             iNclShipmentActivity = (INclShipmentActivity) context;
         } catch (ClassCastException e) {
-            Log.d("test" , TAG + " " + e.toString());
+            Log.d("test", TAG + " " + e.toString());
         }
     }
 
@@ -87,27 +87,27 @@ public class ScanNclNoFragment extends Fragment {
 
             try {
 
-            //Get OnHold Shipments without user interaction
-            UserME nclNoReq = new UserME();
-            nclNoReq.EmployID = GlobalVar.GV().EmployID;
+                //Get OnHold Shipments without user interaction
+                UserME nclNoReq = new UserME();
+                nclNoReq.EmployID = GlobalVar.GV().EmployID;
 
-            OnHoldNCL(nclNoReq);
+                OnHoldNCL(nclNoReq);
 
-            txtOrgin = (EditText) rootView.findViewById(R.id.txtOrgin);
-            txtOrgin.setInputType(InputType.TYPE_NULL);
-            OriginID = GlobalVar.GV().StationID;
+                txtOrgin = (EditText) rootView.findViewById(R.id.txtOrgin);
+                txtOrgin.setInputType(InputType.TYPE_NULL);
+                OriginID = GlobalVar.GV().StationID;
 
-            // Display logged in facility
-                  DBConnections dbConnections = new DBConnections(getContext() , null);
-                  OriginFacilityID = dbConnections.getUserFacilityID(getContext() , GlobalVar.GV().EmployID);
-                  FacilityStatus facilityStatus = dbConnections.getFacility(getContext() , OriginFacilityID);
-                  etOriginFacility = rootView.findViewById(R.id.et_Orgin_facility);
-                  etOriginFacility.setText(facilityStatus.Code + " : " + facilityStatus.Name.toUpperCase());
-                  etOriginFacility.setInputType(InputType.TYPE_NULL);
+                // Display logged in facility
+                DBConnections dbConnections = new DBConnections(getContext(), null);
+                OriginFacilityID = dbConnections.getUserFacilityID(getContext(), GlobalVar.GV().EmployID);
+                FacilityStatus facilityStatus = dbConnections.getFacility(getContext(), OriginFacilityID);
+                etOriginFacility = rootView.findViewById(R.id.et_Orgin_facility);
+                etOriginFacility.setText(facilityStatus.Code + " : " + facilityStatus.Name.toUpperCase());
+                etOriginFacility.setInputType(InputType.TYPE_NULL);
 
-              } catch (Exception e) {
-                  Log.d("test" , TAG + "" + e.toString());
-              }
+            } catch (Exception e) {
+                Log.d("test", TAG + "" + e.toString());
+            }
 
             txtDestination = (EditText) rootView.findViewById(R.id.txtDestination);
             txtDestination.setInputType(InputType.TYPE_NULL);
@@ -151,8 +151,6 @@ public class ScanNclNoFragment extends Fragment {
             });
 
 
-
-
             if (GlobalVar.GV().IsEnglish())
                 destSpinnerDialog = new SpinnerDialog(getActivity(), StationNameList, "Select or Search Destination", R.style.DialogAnimations_SmileWindow);
             else
@@ -190,7 +188,7 @@ public class ScanNclNoFragment extends Fragment {
                     NclNoRequest nclNoReq = new NclNoRequest();
                     nclNoReq.OrginID = OriginID;
                     nclNoReq.DestinationID = DestinationID;
-                    nclNoReq.OriginStationFacilityID =  OriginFacilityID;
+                    nclNoReq.OriginStationFacilityID = OriginFacilityID;
                     nclNoReq.DestinationStationFacilityID = DestinationFacilityID;
                     nclNoReq.IsMix = checkMix.isChecked();
                     GenerateNclNo(nclNoReq);
@@ -199,7 +197,6 @@ public class ScanNclNoFragment extends Fragment {
             onholdshipments.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
 
 
                     UserME nclNoReq = new UserME();
@@ -228,10 +225,10 @@ public class ScanNclNoFragment extends Fragment {
             facilityIDList.clear();
             facilityList.clear();
 
-            int facilityCount = dbConnections.getCount("Facility" , "Station = " + destStationID , getContext());
+            int facilityCount = dbConnections.getCount("Facility", "Station = " + destStationID, getContext());
             Cursor result = null;
 
-            if (facilityCount == 0 ) {
+            if (facilityCount == 0) {
                 result = dbConnections.Fill("select * from Facility", getContext());
 
             } else {
@@ -256,12 +253,12 @@ public class ScanNclNoFragment extends Fragment {
             dbConnections.close();
             txtOrgin.setText(GlobalVar.GV().GetStationByID(GlobalVar.GV().StationID, StationNameList, StationList));
         } catch (Exception e) {
-            Log.d("test" , TAG + " " + e.toString());
+            Log.d("test", TAG + " " + e.toString());
         }
     }
 
 
-    private void bindSpinner () {
+    private void bindSpinner() {
         if (destFacilitySpinnerDialog != null) {
             destFacilitySpinnerDialog.bindOnSpinerListener(new OnSpinerItemClick() {
                 @Override
@@ -416,7 +413,7 @@ public class ScanNclNoFragment extends Fragment {
                 nclShipmentActivity.NclNo = noResult.NclNo;
                 nclShipmentActivity.destList = noResult.DestinationList;
                 nclShipmentActivity.IsMixed = checkMix.isChecked();
-                iNclShipmentActivity.onNCLGenerated(noResult.NclNo , noResult.NCLDestStationID , noResult.AllowedDestStations);
+                iNclShipmentActivity.onNCLGenerated(noResult.NclNo, noResult.NCLDestStationID, noResult.AllowedDestStations);
                 GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.ncl_GenerateNclNo) + " : " + noResult.NclNo, GlobalVar.AlertType.Info);
 
             } else

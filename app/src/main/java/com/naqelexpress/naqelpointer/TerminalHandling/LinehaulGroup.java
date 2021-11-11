@@ -39,7 +39,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d("test" , "Linhul");
+        Log.d("test", "Linhul");
         setContentView(R.layout.linehaulgroup);
 
         //countDownTimer = new MyCountDownTimer(startTime, interval);
@@ -88,7 +88,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         operationalcity = bundle.getStringArrayList("operationalcity");
 
         group = bundle.getString("group");
-        Log.d("test" , "Linhul group " + group);
+        Log.d("test", "Linhul group " + group);
 
     }
 
@@ -174,7 +174,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
 
                 break;
             case R.id.shipmentarrrivedatdest:
-                    fetchgroup("8");
+                fetchgroup("8");
                 break;
 //            case R.id.group3:
 //                fetchgroup("4");
@@ -186,7 +186,7 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
                     Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.llgroup5:
-                    fetchgroup("5");
+                fetchgroup("5");
                 break;
             case R.id.ncl:
                 if (GlobalVar.getDivision(getApplicationContext()).equals("IRS")) {
@@ -245,7 +245,6 @@ public class LinehaulGroup extends AppCompatActivity implements View.OnClickList
         bundle.putStringArrayList("city", city);
         bundle.putStringArrayList("operationalcity", operationalcity);
         bundle.putString("group", "Group " + group);
-
 
 
         Intent intent = new Intent(this, TerminalHandling.class);

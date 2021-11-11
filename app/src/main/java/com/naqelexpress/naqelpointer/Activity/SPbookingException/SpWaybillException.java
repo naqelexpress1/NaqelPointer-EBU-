@@ -66,6 +66,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
     public static HashSet<String> exceptionIDs;
     public static HashMap<String, String> exceptionHashmap;
     boolean isChecked = false;
+    ArrayList<BookingModel> rmlist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         exceptionHashmap = new HashMap<>();
 
         CheckBox bulkexception = (CheckBox) findViewById(R.id.bulkexception);
-
+        bulkexception.setVisibility(View.VISIBLE);
         bulkexception.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -114,6 +115,9 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         bookinglist = (ArrayList<BookingModel>)
                 getIntent().getSerializableExtra("value");
 //
+        rmlist = (ArrayList<BookingModel>)
+                getIntent().getSerializableExtra("blist");
+
         pickupSheetReasonModelArrayList = (ArrayList<PickupSheetReasonModel>)
                 getIntent().getSerializableExtra("PRMA");
 
@@ -309,11 +313,20 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         Iterator<String> exceptionID = exceptionIDs.iterator();
-
+        boolean isloop = false;
+        int eID = 0;
+        if (exceptionIDs.size() != waybilllist.size()) {
+            crreateAlert("Please select all Reasons or use Bulk option to save", false);
+            return;
+        }
         while (exceptionID.hasNext()) {
+
+
             String[] hasStrings = exceptionID.next().toString().split("_");
             int wNo = Integer.parseInt(hasStrings[0]);
-            int eID = Integer.parseInt(hasStrings[1]);
+            eID = Integer.parseInt(hasStrings[1]);
+
+
             BookingModel bookingModel = new BookingModel();
 
             for (BookingModel bm : bookinglist) {
@@ -327,8 +340,6 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
 
 
                 jsonObject.put("EmployID", GlobalVar.GV().EmployID);
-
-
                 jsonObject.put("Latitude", String.valueOf(Latitude));
                 jsonObject.put("Longitude", String.valueOf(Longitude));
                 jsonObject.put("Notes", Notes);
@@ -349,6 +360,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
                 e.printStackTrace();
             }
         }
+
         dbConnections
                 .close();
         String jsonData = jsonArray.toString();
@@ -358,12 +370,83 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
     }
 
 
+    private void BulkException() {
+
+        requestLocation();
+
+
+        String Notes = "";
+
+        JSONArray jsonArray = new JSONArray();
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        // Iterator<String> exceptionID = exceptionIDs.iterator();
+        boolean isloop = false;
+        int eID = 0;
+        for (BookingModel bookingModel : rmlist) {
+
+
+            if (!isloop) {
+                String first = exceptionIDs.iterator().next();
+                String[] firstStrings = first.split("_");
+                eID = Integer.parseInt(firstStrings[1]);
+                isloop = true;
+            }
+
+
+            //  BookingModel bookingModel = new BookingModel();
+
+//            for (BookingModel bm : bookinglist) {
+//                if (wNo == bm.getWaybillNo()) {
+//                    bookingModel = bm;
+//                    break;
+//                }
+//            }
+            JSONObject jsonObject = new JSONObject();
+            try {
+
+
+                jsonObject.put("EmployID", GlobalVar.GV().EmployID);
+                jsonObject.put("Latitude", String.valueOf(Latitude));
+                jsonObject.put("Longitude", String.valueOf(Longitude));
+                jsonObject.put("Notes", Notes);
+                jsonObject.put("PickupExceptionID", eID);
+                jsonObject.put("PSDID", bookingModel.getPickupsheetDetailID());
+                jsonObject.put("PSID", bookingModel.getPickupSheetID());
+                jsonObject.put("StationID", GlobalVar.GV().StationID);
+                jsonObject.put("TimeIn", DateTime.now());
+                jsonObject.put("UserID", GlobalVar.GV().UserID);
+                jsonObject.put("WaybillNo", bookingModel.getWaybillNo());
+
+                jsonArray.put(jsonObject);
+
+                dbConnections.InsertPickUpException(getApplicationContext(), String.valueOf(bookingModel.getWaybillNo()),
+                        bookingModel.getSPLOfficesID());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        dbConnections
+                .close();
+        String jsonData = jsonArray.toString();
+
+        new SavePickupException().execute(jsonData);
+
+    }
+
     @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pickup:
-                Exception();
+                if (!isChecked)
+
+                    Exception();
+                else
+                    BulkException();
 
                 break;
             case R.id.exception:
@@ -450,7 +533,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
             if (finalJson != null) {
                 try {
                     JSONObject jsonObject = new JSONObject(finalJson);
-                    crreateAlert(jsonObject.getString("ErrorMessage"));
+                    crreateAlert(jsonObject.getString("ErrorMessage"), true);
                     if (!jsonObject.getBoolean("HasError")) {
                         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
@@ -480,7 +563,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
     }
 
 
-    private void crreateAlert(String msg) {
+    private void crreateAlert(String msg, final boolean isFinish) {
         final android.app.AlertDialog.Builder builder =
                 new android.app.AlertDialog.Builder(SpWaybillException.this);
         builder.setTitle(msg);
@@ -489,14 +572,18 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //BookingList.isFinish = true;
-                Intent intent = new Intent();
-                // String result = rawResult.getContents();
-                //Log.d("test", "result " + result);
-                intent.putExtra("isFinish", true);
-                setResult(RESULT_OK, intent);
+                if (isFinish) {
+                    //BookingList.isFinish = true;
+                    Intent intent = new Intent();
+                    // String result = rawResult.getContents();
+                    //Log.d("test", "result " + result);
+                    intent.putExtra("isFinish", true);
+                    setResult(RESULT_OK, intent);
 
-                finish();
+                    finish();
+                } else {
+                    dialog.dismiss();
+                }
             }
         });
 

@@ -145,7 +145,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
                         if (barcodeValidation.isValid) {
                             boolean hasFlag = checkWaybillFlags(barcode);
-                            if (hasFlag)
+                            if (hasFlag && !com.naqelexpress.naqelpointer.NCLBlockWaybills.ScanNclNoFragment.checkMix.isChecked())
                                 showFlagsPopup(getOnLineValidationPiece(barcode));
                             else
                                 AddNewPieceTest(pieceDetail);

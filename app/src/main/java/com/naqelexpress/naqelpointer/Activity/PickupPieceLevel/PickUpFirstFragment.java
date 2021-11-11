@@ -88,6 +88,10 @@ public class PickUpFirstFragment
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
             txtWaybillNo.addTextChangedListener(textWatcher);
             txtWaybillNo.setKeyListener(null);
+            txtWaybillNo.setClickable(true);
+            txtWaybillNo.setFocusable(true);
+            txtWaybillNo.setInputType(InputType.TYPE_NULL);
+
             txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);

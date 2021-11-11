@@ -22,6 +22,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,34 +93,64 @@ public class DeliverySheetThirdFragment
                 dbConnections.deleteDenied(getContext());
             }
 
-            txtBarCode.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
+            if (!GlobalVar.GV().getDeviceName().contains("TC25") && !GlobalVar.GV().getDeviceName().contains("TC26"))
+                txtBarCode.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
 
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && (txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
-                        if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
-                            GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
-                            GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
-                            txtBarCode.setText("");
-                            return;
-                        }
-                        if (!pieceDenied.contains(txtBarCode.getText().toString()))
-                            new GetWaybillInfo().execute(txtBarCode.getText().toString());
-                        else {
-                            GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
-                            ShowAlertMessage("ON HOLD WAYBILL CONTACT YOU SUPERVISOR");
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (txtBarCode != null && (txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
+                            if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+                                GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
+                                txtBarCode.setText("");
+                                return;
+                            }
+                            if (!pieceDenied.contains(txtBarCode.getText().toString()))
+                                new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                            else {
+                                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                                ShowAlertMessage("ON HOLD WAYBILL CONTACT YOU SUPERVISOR");
+                            }
                         }
                     }
+                });
+
+            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackPressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (txtBarCode != null && (txtBarCode.getText().length() == 13
+                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
+                            if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                                GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
+                                GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
+                                txtBarCode.setText("");
+                                return true;
+                            }
+                            if (!pieceDenied.contains(txtBarCode.getText().toString()))
+                                new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                            else {
+                                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                                ShowAlertMessage("ON HOLD WAYBILL CONTACT YOU SUPERVISOR");
+                            }
+                        }
+                        return true;
+                    }
+                    return false;
                 }
             });
-
             intent = new Intent(this.getContext(), NewBarCodeScanner.class);
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
@@ -510,5 +541,20 @@ public class DeliverySheetThirdFragment
         }
 
 
+    }
+
+
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 }

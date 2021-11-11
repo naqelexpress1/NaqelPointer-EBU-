@@ -261,6 +261,7 @@ public class PickUpActivity extends AppCompatActivity {
         boolean IsSaved = true;
 
         ArrayList<String> wlist = new ArrayList<>();
+        ArrayList<BookingModel> blist = new ArrayList<>();
 
         for (BookingModel bookingList : bookinglist) {
 
@@ -280,6 +281,7 @@ public class PickUpActivity extends AppCompatActivity {
                 }
             }
             if (PickUpBarCodeList.size() == 0) {
+                blist.add(bookingList);
                 wlist.add(String.valueOf(Waybillno));
                 continue;
             }
@@ -338,6 +340,7 @@ public class PickUpActivity extends AppCompatActivity {
             Intent intent = new Intent(PickUpActivity.this, SpWaybillException.class);
             intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
             intent.putExtra("waybilllist", wlist);
+            intent.putExtra("blist", blist);
             intent.putExtra("value", bookinglist);
             startActivityForResult(intent, 100);
         }

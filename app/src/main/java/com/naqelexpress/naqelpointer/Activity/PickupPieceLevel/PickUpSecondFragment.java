@@ -21,6 +21,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,15 +80,19 @@ public class PickUpSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setKeyListener(null);
-            // txtBarCode.setFocusable(true);
+//            txtBarCode.setKeyListener(null);
+
+
+            txtBarCode.setClickable(true);
+            txtBarCode.setFocusable(true);
+            txtBarCode.setInputType(InputType.TYPE_NULL);
             // txtBarCode.setFocusableInTouchMode(true);
 
-
+//
 //            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
 //                @Override
 //                public boolean onKey(View view, int i, KeyEvent keyEvent) {
-//                  //  GlobalVar.hideKeyboardFrom(rootView.getContext(), rootView.getRootView());
+//                    GlobalVar.hideKeyboardFrom(rootView.getContext(), rootView.getRootView());
 //                    return false;
 //                }
 //            });
@@ -225,7 +230,7 @@ public class PickUpSecondFragment
     @Override
     public void onStop() {
         super.onStop();
-       // isAppOnTop();
+        // isAppOnTop();
     }
 
     @Override

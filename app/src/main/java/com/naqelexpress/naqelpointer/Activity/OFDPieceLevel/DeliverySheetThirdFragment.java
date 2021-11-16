@@ -205,7 +205,7 @@ public class DeliverySheetThirdFragment
         adapter = new DataAdapter(PieceBarCodeWaybill);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        initSwipe();
+        //initSwipe();
     }
 
     @Override
@@ -243,7 +243,7 @@ public class DeliverySheetThirdFragment
             }
 
             @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int direction) {
                 final int position = viewHolder.getAdapterPosition();
 
                 if (direction == ItemTouchHelper.LEFT) {
@@ -254,6 +254,8 @@ public class DeliverySheetThirdFragment
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int which) {
                                     adapter.removeItem(position);
+                                    ///String piece = viewHolder.g
+                                    PieceBarCodeList.remove(position);
                                     lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
                                 }
                             })

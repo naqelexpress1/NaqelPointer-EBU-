@@ -36,6 +36,10 @@ import com.squareup.okhttp.Response;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 
 public class SplashScreenActivity
@@ -59,6 +63,12 @@ public class SplashScreenActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
+
+
+        Calendar mCalendar = new GregorianCalendar();
+        TimeZone mTimeZone = mCalendar.getTimeZone();
+        int mGMTOffset = mTimeZone.getRawOffset();
+        System.out.printf("GMT offset is %s hours", TimeUnit.HOURS.convert(mGMTOffset, TimeUnit.MILLISECONDS));
 
         ///String str="NQL12457852456321";
         //String numberOnly= str.replaceAll("[^0-9]", "");
@@ -261,7 +271,7 @@ public class SplashScreenActivity
 //                        com.naqelexpress.naqelpointer.service.DeviceActivity.class));
 
 
-        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) { //DateTime Validate
+        if (GlobalVar.ValidateAutomacticDate_Splashscreen(getApplicationContext())) { //DateTime Validate
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             dbConnections.InsertDomain_ForDelService(getApplicationContext());

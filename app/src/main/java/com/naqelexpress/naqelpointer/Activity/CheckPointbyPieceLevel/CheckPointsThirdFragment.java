@@ -284,12 +284,14 @@ public class CheckPointsThirdFragment
 //    }
 
     private void AddNewPiece() {
-        if (!GlobalVar.GV().isValidBarcodeCons(txtBarCode.getText().toString())) {
+
+    /*    if (!GlobalVar.GV().isValidBarcodeCons(txtBarCode.getText().toString())) {
             GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             return;
-        }
+        }*/
+
         if (BarCodeList.size() == 50) {
             ErrorAlert("Kindly save Scanned Data and Scan again...", 1);
             return;

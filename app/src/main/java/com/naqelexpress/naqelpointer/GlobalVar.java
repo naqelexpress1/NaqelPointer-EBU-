@@ -90,6 +90,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -105,7 +106,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU isMix - 11-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU RMValidation - 11-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -2938,7 +2939,7 @@ public class GlobalVar {
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public static boolean ValidateAutomacticDate(Context context) {
+    public static boolean ValidateAutomacticDate_Splashscreen(Context context) {
 
         //return true;
         if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
@@ -2950,9 +2951,10 @@ public class GlobalVar {
                     android.provider.Settings.System.getInt(context.getContentResolver(),
                             Settings.Global.AUTO_TIME_ZONE, 0); // 1 means Enabled
         } else {
-            android.provider.Settings.System.getInt(context.getContentResolver(),
+            isValidAutoTimeZone = android.provider.Settings.System.getInt(context.getContentResolver(),
                     Settings.System.AUTO_TIME_ZONE, 0); // 1 means Enabled
         }
+
         if (isValidAutoTimeZone == 1) {
             int isvalidAutotime = 0;
             if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -2964,7 +2966,68 @@ public class GlobalVar {
                         Settings.System.AUTO_TIME, 0); // 1 means Enabled
             }
             if (isvalidAutotime == 1) {
+
                 return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
+    public static boolean ValidateAutomacticDate(Context context) {
+
+        //return true;
+//        if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
+//            return true;
+
+        int isValidAutoTimeZone = 0;
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            isValidAutoTimeZone =
+                    android.provider.Settings.System.getInt(context.getContentResolver(),
+                            Settings.Global.AUTO_TIME_ZONE, 0); // 1 means Enabled
+        } else {
+            isValidAutoTimeZone = android.provider.Settings.System.getInt(context.getContentResolver(),
+                    Settings.System.AUTO_TIME_ZONE, 0); // 1 means Enabled
+        }
+
+        if (isValidAutoTimeZone == 1) {
+            int isvalidAutotime = 0;
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+
+                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
+                        Settings.Global.AUTO_TIME, 0); // 1 means Enabled
+            } else {
+                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
+                        Settings.System.AUTO_TIME, 0); // 1 means Enabled
+            }
+            if (isvalidAutotime == 1) {
+
+                String timeZone = GetLastLoggedinUserTimeZone(context);
+                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy hh:mm"); //dd-MMM-yyyy hh:mm:ss z
+                sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
+                System.out.println(sdf.format(calendar.getTime()));
+
+                Calendar calendar1 = Calendar.getInstance();
+                SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MMM-yyyy hh:mm"); //dd-MMM-yyyy hh:mm:ss z
+                System.out.println(sdf1.format(calendar1.getTime()));
+
+
+                if (sdf.format(calendar.getTime()).equals(sdf1.format(calendar1.getTime()))) {
+
+                    return true;
+//                    TimeZone tz = TimeZone.getTimeZone(timeZone);
+//                    Calendar mCalendar = new GregorianCalendar();
+//                    TimeZone mTimeZone = mCalendar.getTimeZone();
+//                    String devicetZ = mTimeZone.getID();
+//                    if (timeZone.equals(devicetZ))
+//                        return true;
+//                    else
+//                        return false;
+                } else
+                    return false;
             }
 
         }
@@ -2976,7 +3039,7 @@ public class GlobalVar {
     public static void RedirectSettings(final Activity activity) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Info")
-                .setMessage("Kindly Enable Automatic Network Provider DateTime & TimeZone")
+                .setMessage("Kindly Enable Automatic Network Provider DateTime & Correct TimeZone")
                 .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
@@ -4445,5 +4508,25 @@ public class GlobalVar {
         return csSupportMsgAr + "\n\n" + csSupportMsgMsgEn;
     }
 
+
+    public static String GetLastLoggedinUserTimeZone(Context context) {
+        String TimeZone = "";
+
+
+        DBConnections dbConnections = new DBConnections(context, null);
+
+        Cursor result = dbConnections.Fill("select TimeZone from UserME order by id desc Limit 1 ", context);
+        if (result.getCount() > 0) {
+
+            result.moveToFirst();
+            TimeZone = result.getString(result.getColumnIndex("TimeZone"));
+
+
+        }
+        dbConnections.close();
+        result.close();
+
+        return TimeZone;
+    }
 
 }

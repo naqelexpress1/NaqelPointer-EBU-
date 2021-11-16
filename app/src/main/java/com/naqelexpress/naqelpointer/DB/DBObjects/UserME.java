@@ -22,6 +22,7 @@ public class UserME {
     public int DisableEnabletxtBox = 1;
     public int CountryID = 0;
     public String CountryCode;
+    public String TimeZone;
 
     public UserME() {
         StatusID = 1;

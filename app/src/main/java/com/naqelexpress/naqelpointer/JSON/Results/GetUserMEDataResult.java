@@ -28,6 +28,7 @@ public class GetUserMEDataResult
     public int CountryID = 0;
     public String CountryCode;
     public String PhoneNo = "";
+    public String TimeZone = "";
 
 
     public GetUserMEDataResult(String finalJson) {
@@ -36,7 +37,7 @@ public class GetUserMEDataResult
             jsonObject = new JSONObject(finalJson);
             ID = Integer.parseInt(jsonObject.getString("ID"));
             EmployID = Integer.parseInt(jsonObject.getString("EmployID"));
-            Password = "" ; // jsonObject.getString("Password");
+            Password = ""; // jsonObject.getString("Password");
             StationID = Integer.parseInt(jsonObject.getString("StationID"));
             RoleMEID = Integer.parseInt(jsonObject.getString("RoleMEID"));
             StatusID = Integer.parseInt(jsonObject.getString("StatusID"));
@@ -56,6 +57,7 @@ public class GetUserMEDataResult
             DisableEnabletxtBox = jsonObject.getInt("DisableEnabletxtBox");
             CountryID = jsonObject.getInt("CountryID");
             CountryCode = jsonObject.getString("CountryCode");
+            TimeZone = jsonObject.getString("TimeZone");
 
             HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
             ErrorMessage = jsonObject.getString("ErrorMessage");

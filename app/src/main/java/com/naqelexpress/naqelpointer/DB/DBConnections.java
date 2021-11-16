@@ -84,7 +84,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 160; // isFollowSeq
+    private static final int Version = 161; // TimeZone
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -112,7 +112,7 @@ public class DBConnections
                 "\"StationName\" TEXT, \"StationFName\" TEXT,\"Division\" TEXT DEFAULT 0 ," +
                 "\"UserTypeID\"  INTEGER NOT NULL,\"Date\"  TEXT ,\"Menu\"  INTEGER  DEFAULT 0 ,  \"TruckID\" INTEGER DEFAULT 0," +
                 " UpdateMenu Integer Default 0 , DisableEnabletxtBox Integer Default 1 ," +
-                "CountryID Interger , CountryCode TEXT , IsMobileNoVerified Integer Default 0)");
+                "CountryID Interger , CountryCode TEXT , IsMobileNoVerified Integer Default 0,TimeZone TEXT)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserLogs\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE , \"UserID\" INTEGER NOT NULL , \"SuperVisorID\" INTEGER NOT NULL, \"IsSync\" BOOL NOT NULL , \"LogTypeID\" INTEGER NOT NULL , \"CTime\" DATETIME NOT NULL , \"MachineID\" TEXT , \"Remarks\" TEXT)");
         db.execSQL("CREATE TABLE IF NOT EXISTS \"UserMeLogin\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE ," +
@@ -1232,6 +1232,8 @@ public class DBConnections
 
             if (!isColumnExist("PickUpAuto", "SpID"))
                 db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN SpID INTEGER");
+            if (!isColumnExist("UserME", "TimeZone"))
+                db.execSQL("ALTER TABLE UserME ADD COLUMN TimeZone TEXT");
 
         }
 
@@ -1514,6 +1516,8 @@ public class DBConnections
             contentValues.put("DisableEnabletxtBox", instance.DisableEnabletxtBox);
             contentValues.put("CountryID", instance.CountryID);
             contentValues.put("CountryCode", instance.CountryCode);
+            contentValues.put("TimeZone", instance.TimeZone);
+
             result = db.insert("UserME", null, contentValues);
             db.close();
 
@@ -1899,8 +1903,10 @@ public class DBConnections
             contentValues.put("WaybillNo", instance.WaybillNo);
             contentValues.put("ReceiverName", instance.ReceiverName);
             contentValues.put("PiecesCount", instance.PiecesCount);
-            contentValues.put("TimeIn", instance.TimeIn.toString());
-            contentValues.put("TimeOut", instance.TimeOut.toString());
+//            contentValues.put("TimeIn", instance.TimeIn.toString());
+//            contentValues.put("TimeOut", instance.TimeOut.toString());
+            contentValues.put("TimeIn", DateTime.now().toString());
+            contentValues.put("TimeOut", DateTime.now().toString());
             contentValues.put("EmployID", instance.EmployID);
             contentValues.put("StationID", instance.StationID);
             contentValues.put("IsPartial", instance.IsPartial);
@@ -2021,8 +2027,10 @@ public class DBConnections
             contentValues.put("ToStationID", instance.ToStationID);
             contentValues.put("PieceCount", instance.PieceCount);
             contentValues.put("Weight", instance.Weight);
-            contentValues.put("TimeIn", instance.TimeIn.toString());
-            contentValues.put("TimeOut", instance.TimeOut.toString());
+            //contentValues.put("TimeIn", instance.TimeIn.toString());
+            // contentValues.put("TimeOut", instance.TimeOut.toString());
+            contentValues.put("TimeIn", DateTime.now().toString());
+            contentValues.put("TimeOut", DateTime.now().toString());
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("UserID", instance.UserID);
             contentValues.put("StationID", instance.StationID);
@@ -2160,8 +2168,10 @@ public class DBConnections
             ContentValues contentValues = new ContentValues();
 //            contentValues.put("ID", maxID + 1);
             contentValues.put("WaybillNo", intstance.WaybillNo);
-            contentValues.put("TimeIn", String.valueOf(intstance.TimeIn));
-            contentValues.put("TimeOut", String.valueOf(intstance.TimeOut));
+//            contentValues.put("TimeIn", String.valueOf(intstance.TimeIn));
+//            contentValues.put("TimeOut", String.valueOf(intstance.TimeOut));
+            contentValues.put("TimeIn", DateTime.now().toString());
+            contentValues.put("TimeOut", DateTime.now().toString());
             contentValues.put("UserID", intstance.UserID);
             contentValues.put("IsSync", intstance.IsSync);
             contentValues.put("StationID", intstance.StationID);
@@ -2695,7 +2705,7 @@ public class DBConnections
             contentValues.put("CourierID", instance.CourierID);
             contentValues.put("UserID", instance.UserID);
             contentValues.put("IsSync", instance.IsSync);
-            contentValues.put("CTime", instance.CTime.toString());
+            contentValues.put("CTime", DateTime.now().toString());
             contentValues.put("PieceCount", instance.PieceCount);
             contentValues.put("TruckID", instance.TruckID);
             contentValues.put("WaybillCount", instance.WaybillCount);
@@ -2787,8 +2797,10 @@ public class DBConnections
             ContentValues contentValues = new ContentValues();
             contentValues.put("ReceiverName", instance.ReceiverName);
             contentValues.put("PiecesCount", instance.PiecesCount);
-            contentValues.put("TimeIn", instance.TimeIn.toString());
-            contentValues.put("TimeOut", instance.TimeOut.toString());
+//            contentValues.put("TimeIn", instance.TimeIn.toString());
+//            contentValues.put("TimeOut", instance.TimeOut.toString());
+            contentValues.put("TimeIn", DateTime.now().toString());
+            contentValues.put("TimeOut", DateTime.now().toString());
             contentValues.put("UserID", instance.UserID);
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("StationID", instance.StationID);
@@ -2876,7 +2888,8 @@ public class DBConnections
             contentValues.put("TotalPieces", instance.TotalPieces);
             contentValues.put("EmployID", instance.EmployID);
             contentValues.put("UserID", instance.UserID);
-            contentValues.put("CTime", instance.CTime.toString());
+            //contentValues.put("CTime", instance.CTime.toString());
+            contentValues.put("CTime", DateTime.now().toString());
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("StationID", instance.StationID);
             contentValues.put("HHD", instance.HHD);
@@ -7983,7 +7996,8 @@ public class DBConnections
             contentValues.put("CourierID", instance.CourierID);
             contentValues.put("UserID", instance.UserID);
             contentValues.put("IsSync", instance.IsSync);
-            contentValues.put("CTime", instance.CTime.toString());
+            //contentValues.put("CTime", instance.CTime.toString());
+            contentValues.put("CTime", DateTime.now().toString());
             contentValues.put("PieceCount", instance.PieceCount);
             contentValues.put("TruckID", instance.TruckID);
             contentValues.put("StationID", instance.StationID);

@@ -1269,6 +1269,7 @@ public class LoginActivity
 
                     instance.DisableEnabletxtBox = getUserMEDataResult.DisableEnabletxtBox;
                     instance.TruckID = truckID;
+                    instance.TimeZone = getUserMEDataResult.TimeZone;
 
 
 //                    dbConnections.close();

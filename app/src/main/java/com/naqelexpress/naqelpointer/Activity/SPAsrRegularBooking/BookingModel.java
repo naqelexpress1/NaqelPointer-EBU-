@@ -162,7 +162,8 @@ public class BookingModel implements Parcelable {
         RefNo = in.readString();
         GoodDesc = in.readString();
         MobileNo = in.readString();
-        IsSPL = in.readBoolean();
+//        IsSPL = in.readBoolean();
+        IsSPL = in.readByte() != 0;
         SPLOfficesID = in.readInt();
         SpLatLng = in.readString();
         BKHeader = in.readString();
@@ -368,7 +369,8 @@ public class BookingModel implements Parcelable {
         parcel.writeString(RefNo);
         parcel.writeString(GoodDesc);
         parcel.writeString(MobileNo);
-        parcel.writeBoolean(IsSPL);
+        parcel.writeByte((byte) (IsSPL ? 1 : 0));
+//        parcel.writeBoolean(IsSPL);
         parcel.writeInt(SPLOfficesID);
         parcel.writeString(SpLatLng);
         parcel.writeString(BKHeader);

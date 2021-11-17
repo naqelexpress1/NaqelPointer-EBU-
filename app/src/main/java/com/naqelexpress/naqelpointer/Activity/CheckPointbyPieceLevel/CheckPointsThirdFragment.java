@@ -292,6 +292,10 @@ public class CheckPointsThirdFragment
             return;
         }*/
 
+        if (!GlobalVar.ValidateAutomacticDate(getContext())) {
+            GlobalVar.RedirectSettings(getActivity());
+            return;
+        }
         if (BarCodeList.size() == 50) {
             ErrorAlert("Kindly save Scanned Data and Scan again...", 1);
             return;

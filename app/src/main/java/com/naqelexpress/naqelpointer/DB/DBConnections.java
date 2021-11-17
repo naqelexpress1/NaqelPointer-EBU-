@@ -5586,7 +5586,8 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("EmployID", instance.EmployID);
-            contentValues.put("Date", instance.Date.toString());
+            //contentValues.put("Date", instance.Date.toString());DateTime.now()
+            contentValues.put("Date", DateTime.now().toString());
             contentValues.put("CheckPointTypeID", instance.CheckPointTypeID);
             contentValues.put("IsSync", instance.IsSync);
             contentValues.put("Latitude", instance.Latitude);
@@ -5736,7 +5737,8 @@ public class DBConnections
 
             contentValues.put("NclNo", instance.NclNo);
             contentValues.put("UserID", instance.UserID);
-            contentValues.put("Date", instance.Date.toString());
+            // contentValues.put("Date", instance.Date.toString());
+            contentValues.put("Date", DateTime.now().toString());
             contentValues.put("PieceCount", instance.PieceCount);
             contentValues.put("WaybillCount", instance.WaybillCount);
             contentValues.put("IsSync", instance.IsSync);
@@ -9944,6 +9946,14 @@ public class DBConnections
 
                 } while (cursor.moveToNext());
             }
+            if (pickupSheetReasonModelArrayList.size() > 0) {
+                PickupSheetReasonModel bookingModel = new PickupSheetReasonModel();
+                BookingList.name.add(0, "                                 ");
+                BookingList.ID.add(0, 0);
+                bookingModel.setID(0);
+                bookingModel.setName("                                 ");
+                pickupSheetReasonModelArrayList.add(0, bookingModel);
+            }
             cursor.close();
             db.close();
         } catch (SQLiteException e) {
@@ -10328,6 +10338,34 @@ public class DBConnections
         db.execSQL("delete from PickUpDetailAuto");
         db.execSQL("delete from PickUpException");
         db.close();
+    }
+
+
+    public ArrayList<String> getNotPickedupList(String WNo, Context context) {
+        ArrayList<String> stringArrayList = new ArrayList<>();
+
+        try {
+            String selectQuery = "SELECT WaybillNo  FROM PickUpAuto WHERE WaybillNo in( " + WNo + " )";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor cursor = db.rawQuery(selectQuery, null);
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                do {
+                    stringArrayList.add(cursor.getString(cursor.getColumnIndex("WaybillNo")));
+                }
+                while (cursor.moveToNext());
+
+
+            }
+            cursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        return stringArrayList;
     }
 
 }

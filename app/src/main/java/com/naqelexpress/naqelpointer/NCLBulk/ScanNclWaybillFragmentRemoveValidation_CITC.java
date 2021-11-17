@@ -293,6 +293,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
     private void AddPiece(PieceDetail pieceDetail) {
+        if (!GlobalVar.ValidateAutomacticDate(getContext())) {
+            GlobalVar.RedirectSettings(getActivity());
+            return;
+        }
+
         if (!isduplicate.contains(pieceDetail.Barcode)) {
             // if (pieceDetail.Barcode.length() == 13) {
 

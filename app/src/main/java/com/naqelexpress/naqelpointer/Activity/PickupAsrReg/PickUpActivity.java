@@ -139,14 +139,16 @@ public class PickUpActivity extends AppCompatActivity {
                 //SaveData();
 
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
-                    String waybillno = firstFragment.txtWaybillNo.getText().toString();
-                    DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-                    Cursor result = dbConnections.Fill("select * from PickUpAuto Where WaybillNo = '" + waybillno + "'",
-                            getApplicationContext());
-                    if (result.getCount() > 0) {
+                    if (class_ != 0) {
+                        String waybillno = firstFragment.txtWaybillNo.getText().toString();
+                        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                        Cursor result = dbConnections.Fill("select * from PickUpAuto Where WaybillNo = '" + waybillno + "'",
+                                getApplicationContext());
+                        if (result.getCount() > 0) {
 
-                        GlobalVar.ShowDialog(PickUpActivity.this, "Info", "Already Pickedup this Waybill", true);
-                        return false;
+                            GlobalVar.ShowDialog(PickUpActivity.this, "Info", "Already Pickedup this Waybill", true);
+                            return false;
+                        }
                     }
 //                    String division = GlobalVar.getDivision(getApplicationContext());
 //                    if (division.equals("Express"))
@@ -168,6 +170,16 @@ public class PickUpActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.mnuBringData);
+        item.setVisible(false);
+        MenuItem getdistrict = menu.findItem(R.id.getdistrict);
+        getdistrict.setVisible(false);
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     private void actualLocation() {
@@ -902,7 +914,7 @@ public class PickUpActivity extends AppCompatActivity {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(PickUpActivity.this);
         builder1.setTitle("Info");
         builder1.setMessage("You collected less shipments than it was bookied.Are you sure to continue with saving  carrent data?");
-        builder1.setCancelable(true);
+        builder1.setCancelable(false);
 
         builder1.setPositiveButton(
                 "Yes",

@@ -118,7 +118,7 @@ public class WaybillExceptionAdapter extends BaseAdapter {
         final SpinAdapter adapter = new SpinAdapter(context,
                 android.R.layout.simple_spinner_item,
                 pickupSheetReasonModels);
-
+        holder.spinner.setBackgroundResource(android.R.drawable.spinner_dropdown_background);
         holder.spinner.setAdapter(adapter); // Set the custom adapter to the spinner
         holder.spinner.setSelection(0, false);
         // You can create an anonymous listener to handle the event when is selected an spinner item

@@ -136,6 +136,9 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.clientll.setVisibility(View.INVISIBLE);
             holder.contactll.setVisibility(View.INVISIBLE);
             holder.tableLayout.setVisibility(View.VISIBLE);
+            holder.ibwats1.setVisibility(View.INVISIBLE);
+            holder.ibwats2.setVisibility(View.INVISIBLE);
+
             holder.totalpickwaybill.setText("Total for PU :" + String.valueOf(item.getWaybillcount()));
             holder.pickedupcount.setText("Picked Up :" + String.valueOf(item.getPickupCount()));
             holder.exceptioncount.setText("Exception :" + String.valueOf(item.getExceptionCount()));
@@ -204,18 +207,23 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         holder.locationll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Location location = GlobalVar.getLastKnownLocation(context.getApplicationContext());
-                if (item.getisSPL()) {
-                    if (item.getSpLatLng() != null && item.getSpLatLng().length() > 0) {
-                        String latlng[] = item.getSpLatLng().split(",");
-                        GlobalVar.toGoogle(latlng[0], latlng[1], context, location);
-                    }
-                } else {
-                    if (item.Lat != null && item.Lat.length() > 0) {
+                if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".")) {
+                    Location location = GlobalVar.getLastKnownLocation(context.getApplicationContext());
+//                if (item.getisSPL()) {
+//                    if (item.getSpLatLng() != null && item.getSpLatLng().length() > 0) {
+//                        String latlng[] = item.getSpLatLng().split(",");
+//                        GlobalVar.toGoogle(latlng[0], latlng[1], context, location);
+//                    }
+//                } else {
+//                    if (item.Lat != null && item.Lat.length() > 0) {
+//
+//                        GlobalVar.toGoogle(item.Lat, item.Lng, context, location);
+//                    }
+//                }
 
-                        GlobalVar.toGoogle(item.Lat, item.Lng, context, location);
-                    }
-                }
+                    GlobalVar.toGoogle(item.Lat, item.Lng, context, location);
+                } else
+                    alertforcommon("Error", "Invalid Location");
 
             }
         });
@@ -337,6 +345,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         final TextView frontofthedoor = (TextView) layout.findViewById(R.id.frontofthedoor);
         final TextView cssupport = (TextView) layout.findViewById(R.id.cssupport);
         final TextView resndotp = (TextView) layout.findViewById(R.id.resendotp);
+        resndotp.setVisibility(View.GONE);
 
         final String arabic = "عزيزي العميل, n\n  رجاء قم بمشاركة موقعك على الرابط المرفق أدناه لنقوم بتوصيل شحنتك.(" + " " + Waybillno
                 + ") من)" + ClientName;
@@ -352,7 +361,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
                     GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, GlobalVar.GV().getLocationMsg(context.getApplicationContext(),
                             Waybillno, ClientName), context.getApplicationContext());
                 else
-                    alertforcommon();
+                    alertforcommon("Has Location", "This Shipment already has Location , kindly please start to deliver");
 
                 popup.dismiss();
             }
@@ -395,12 +404,12 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
     }
 
-    private void alertforcommon() {
+    private void alertforcommon(String title, String message) {
         SweetAlertDialog eDialog = new SweetAlertDialog(context, SweetAlertDialog.WARNING_TYPE);
 
         eDialog.setCancelable(true);
-        eDialog.setTitleText("Has Location");
-        eDialog.setContentText("This Shipment already has Location , kindly please start to deliver");
+        eDialog.setTitleText(title);
+        eDialog.setContentText(message);
         eDialog.show();
 
     }

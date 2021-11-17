@@ -106,7 +106,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU RMValidation - 11-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "SPASR Changes - 17-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -116,7 +116,7 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = false; //For EBU true only
+    public boolean LoginVariation = true; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1

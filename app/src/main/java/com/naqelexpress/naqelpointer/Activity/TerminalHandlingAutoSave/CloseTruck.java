@@ -95,7 +95,11 @@ public class CloseTruck extends AppCompatActivity implements View.OnClickListene
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                ConfirmationtoCompleteLoad();
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                    ConfirmationtoCompleteLoad();
+                else
+                    GlobalVar.RedirectSettings(CloseTruck.this);
+
 
                 return true;
 

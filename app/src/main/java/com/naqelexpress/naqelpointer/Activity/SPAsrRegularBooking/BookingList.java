@@ -641,11 +641,11 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     @Override
     protected void onResume() {
         super.onResume();
-//        if (isException)
-//            setAdapter();
-//        isException = false;
         if (isFinish)
-            finish();
+            ReadfromLocal();
+
+//        if (isFinish)
+//            finish();
     }
 
     public void ReadfromLocal() {

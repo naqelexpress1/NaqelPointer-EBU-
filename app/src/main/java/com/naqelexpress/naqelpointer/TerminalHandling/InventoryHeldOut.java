@@ -189,6 +189,11 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
 //            return;
 //        }
 
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(InventoryHeldOut.this);
+            return;
+        }
+
         if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -402,6 +407,12 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
 
 
     private void SaveData(int clear) { //43 heldin , 44 heldout
+
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(InventoryHeldOut.this);
+            return;
+        }
+
 
         if (delrtoreq.size() == 0) {
             ErrorAlert("Kindly Scan atleast one Piece Barcode");

@@ -184,6 +184,11 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
 
     private void AddNewPiece() {
 
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(TripArrviedatDestbyNCL.this);
+            return;
+        }
+
 //        if (!isncl.contains(txtBarCode.getText().toString())) {
 //            ErrorAlert("This Ncl(" + txtBarCode.getText().toString() + ") not in this Trip(" + trips.get("TripCode") + ")");
 //            //return;
@@ -731,8 +736,13 @@ public class TripArrviedatDestbyNCL extends AppCompatActivity implements View.On
                         txtBarCode.requestFocus();
                         txtBarCode.setText("");
                     } else {
-                        tripID = Integer.parseInt(txtBarCode.getText().toString());
-                        new SaveTriptoServer().execute("");
+                        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                            tripID = Integer.parseInt(txtBarCode.getText().toString());
+                            new SaveTriptoServer().execute("");
+                        } else
+                            GlobalVar.RedirectSettings(TripArrviedatDestbyNCL.this);
+
+
                     }
                     return true;
                 }

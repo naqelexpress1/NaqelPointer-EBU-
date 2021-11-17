@@ -270,6 +270,7 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
         //isConnected();
 //        isNetworkAvailable();
 
+
         if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -923,6 +924,11 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
 
 
     private void SaveData(int clear) { //43 heldin , 44 heldout
+
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(InventoryControl_LocalValidationbyNCL.this);
+            return;
+        }
 
         if (delrtoreq.size() == 0) {
             ErrorAlert("Info",

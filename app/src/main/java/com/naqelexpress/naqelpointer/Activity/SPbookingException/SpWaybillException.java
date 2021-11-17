@@ -108,7 +108,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         Button cancel = (Button) findViewById(R.id.exception);
         cancel.setText("Cancel");
         cancel.setOnClickListener(this);
-
+        setFinishOnTouchOutside(false);
 
 //        position = bundle.getInt("position");
 //
@@ -320,6 +320,17 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
             return;
         }
         while (exceptionID.hasNext()) {
+            String[] hasStrings = exceptionID.next().toString().split("_");
+
+            eID = Integer.parseInt(hasStrings[1]);
+
+            if (eID == 0) {
+                crreateAlert("Please select all Reasons or use Bulk option to save", false);
+                return;
+            }
+        }
+
+        while (exceptionID.hasNext()) {
 
 
             String[] hasStrings = exceptionID.next().toString().split("_");
@@ -372,6 +383,10 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
 
     private void BulkException() {
 
+        if (exceptionIDs.size() == 0) {
+            crreateAlert("Please select any one reason", false);
+            return;
+        }
         requestLocation();
 
 
@@ -394,6 +409,11 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
                 isloop = true;
             }
 
+            if (eID == 0) {
+                crreateAlert("Please select any one Reasons ", false);
+                exceptionIDs.clear();
+                return;
+            }
 
             //  BookingModel bookingModel = new BookingModel();
 
@@ -567,7 +587,7 @@ public class SpWaybillException extends AppCompatActivity implements View.OnClic
         final android.app.AlertDialog.Builder builder =
                 new android.app.AlertDialog.Builder(SpWaybillException.this);
         builder.setTitle(msg);
-
+        builder.setCancelable(false);
 
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

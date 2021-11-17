@@ -260,6 +260,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     private void AddNewPiece() {
 
+//        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+//            GlobalVar.RedirectSettings(InventoryControl_LocalValidation_oneByOne.this);
+//            return;
+//        }
+
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
@@ -841,6 +846,10 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
     private void SaveData(int clear) { //43 heldin , 44 heldout
 
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(InventoryControl_LocalValidation_oneByOne.this);
+            return;
+        }
         if (delrtoreq.size() == 0) {
             ErrorAlert("Info",
                     "Kindly Scan atleast one Piece Barcode"

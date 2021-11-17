@@ -263,10 +263,14 @@ public class TripArrviedatDest extends AppCompatActivity implements View.OnClick
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                if (ncl.size() > 0)
-                    new SaveTriptoServer().execute("");
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                    if (ncl.size() > 0)
+                        new SaveTriptoServer().execute("");
+                    else
+                        ShowAlertMessage("Kindly scan at least one.", 1);
+
                 else
-                    ShowAlertMessage("Kindly scan at least one.", 1);
+                    GlobalVar.RedirectSettings(TripArrviedatDest.this);
 
 
                 return true;

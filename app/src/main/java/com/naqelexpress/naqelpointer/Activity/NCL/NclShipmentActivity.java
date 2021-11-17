@@ -131,7 +131,10 @@ public class NclShipmentActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                SaveData();
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                    SaveData();
+                else
+                    GlobalVar.RedirectSettings(NclShipmentActivity.this);
                 return true;
             case R.id.print:
                 if (IsValid())

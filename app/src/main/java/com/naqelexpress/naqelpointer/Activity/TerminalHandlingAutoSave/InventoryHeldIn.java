@@ -182,7 +182,10 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 //            ErrorAlert("Info", "Kindly save the Data and Scan Again");
 //            return;
 //        }
-
+        if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            GlobalVar.RedirectSettings(InventoryHeldIn.this);
+            return;
+        }
 
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
             lbTotal.setText(txtBarCode.getText().toString());

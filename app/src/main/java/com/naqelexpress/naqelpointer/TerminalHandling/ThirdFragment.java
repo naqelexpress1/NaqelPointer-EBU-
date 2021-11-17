@@ -350,6 +350,11 @@ public class ThirdFragment extends Fragment {
 
     private void AddNewPiece() {
 
+        if (!GlobalVar.ValidateAutomacticDate(getContext())) {
+            GlobalVar.RedirectSettings(getActivity());
+            return;
+        }
+
         if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
             txtBarCode.requestFocus();
             txtBarCode.setText("");
@@ -478,6 +483,7 @@ public class ThirdFragment extends Fragment {
 
     private void SaveData() {
 
+
         DBConnections dbConnections = new DBConnections(getContext(), null);
         String Comments = "";
         if (FirstFragment.CheckPointTypeID == 18) {
@@ -520,6 +526,11 @@ public class ThirdFragment extends Fragment {
     }
 
     private void ErrorAlert(final String title, String message, final int clear) {
+        if (!GlobalVar.ValidateAutomacticDate(getContext())) {
+            GlobalVar.RedirectSettings(getActivity());
+            return;
+        }
+
         AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);

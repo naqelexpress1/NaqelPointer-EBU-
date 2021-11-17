@@ -223,6 +223,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
     private void AddPieceTest(PieceDetail pieceDetail) {
 
+        if (!GlobalVar.ValidateAutomacticDate(getContext())) {
+            GlobalVar.RedirectSettings(getActivity());
+            return;
+        }
+
         isduplicate.add(pieceDetail.Barcode);
         PiecesCount = PiecesCount + 1;
         PieceCodeList.add(0, new PieceDetail(pieceDetail.Barcode, pieceDetail.Waybill, pieceDetail.Weight));

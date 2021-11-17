@@ -61,7 +61,12 @@ public class NSScanShipmentActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                SaveData();
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                    SaveData();
+                else
+                    GlobalVar.RedirectSettings(NSScanShipmentActivity.this);
+
+
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

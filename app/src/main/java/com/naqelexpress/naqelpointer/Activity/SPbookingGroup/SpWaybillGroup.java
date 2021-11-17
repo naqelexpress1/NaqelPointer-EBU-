@@ -12,10 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,12 +22,12 @@ import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
 import com.naqelexpress.naqelpointer.Activity.PickupAsrReg.PickUpActivity;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel;
+import com.naqelexpress.naqelpointer.Activity.SPbookingException.SpWaybillException;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -260,6 +257,72 @@ public class SpWaybillGroup extends AppCompatActivity {
 
     private void Exception() {
 
+        String wnos = waybilllist.toString();
+        wnos
+                = wnos.replace("[", "")
+                .replace("]", "")
+                .replace(" ", "");
+
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        ArrayList<String> WaybillList = dbConnections.getNotPickedupList(wnos, getApplicationContext());
+        if (WaybillList.size() == bookinglist.size())
+            crreateAlert("There is no pending shipments for Exception");
+        else if (WaybillList.size() == 0)
+            redirectException(waybilllist, 0);
+        else if (WaybillList.size() > 0) {
+            ArrayList<String> wlist = new ArrayList<>();
+            wlist.addAll(waybilllist);
+            wlist.removeAll(WaybillList);
+            redirectException(wlist, 1);
+        }
+
+    }
+
+    private void redirectException(ArrayList<String> WaybillList, int noCondition) {
+        ArrayList<BookingModel> blist = new ArrayList<>();
+        if (noCondition == 1) {
+            for (String Wno : WaybillList) {
+                for (BookingModel bookingModel : bookinglist) {
+                    if (bookingModel.getWaybillNo() == Integer.parseInt(Wno)) {
+                        blist.add(bookingModel);
+                        break;
+                    }
+                }
+            }
+        } else
+            blist.addAll(bookinglist);
+
+        Intent intent = new Intent(SpWaybillGroup.this, SpWaybillException.class);
+        intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
+        intent.putExtra("waybilllist", WaybillList);
+        intent.putExtra("blist", blist);
+        intent.putExtra("value", bookinglist);
+        startActivityForResult(intent, 100);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    if (extras.containsKey("isFinish")) {
+                        boolean finish = extras.getBoolean("isFinish");
+                        if (finish) {
+                            BookingList.isFinish = true;
+                            finish();
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+
+  /*  private void Exception() {
+
         requestLocation();
 
         android.app.AlertDialog.Builder builderSingle = new android.app.AlertDialog.Builder(SpWaybillGroup.this);
@@ -352,7 +415,7 @@ public class SpWaybillGroup extends AppCompatActivity {
             }
         });
         builderSingle.show();
-    }
+    }*/
 
     private class SavePickupException extends AsyncTask<String, Void, String> {
         String result = "";
@@ -450,6 +513,7 @@ public class SpWaybillGroup extends AppCompatActivity {
 
             pd.dismiss();
         }
+
     }
 
 

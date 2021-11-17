@@ -264,10 +264,13 @@ public class TripDetails extends AppCompatActivity implements View.OnClickListen
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.mnuSave:
-                if (isncl.size() > 0 || trips.get("AdHoc").equals("1"))
-                    new SaveTriptoServer().execute("");
+                if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
+                    if (isncl.size() > 0 || trips.get("AdHoc").equals("1"))
+                        new SaveTriptoServer().execute("");
+                    else
+                        ShowAlertMessage("Kindly scan at least one.", 0);
                 else
-                    ShowAlertMessage("Kindly scan at least one.", 0);
+                    GlobalVar.RedirectSettings(TripDetails.this);
 
 
                 return true;

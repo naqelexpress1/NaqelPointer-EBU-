@@ -88,10 +88,7 @@ public class ScanNclNoFragment extends Fragment {
             try {
 
                 //Get OnHold Shipments without user interaction
-                UserME nclNoReq = new UserME();
-                nclNoReq.EmployID = GlobalVar.GV().EmployID;
 
-                OnHoldNCL(nclNoReq);
 
                 txtOrgin = (EditText) rootView.findViewById(R.id.txtOrgin);
                 txtOrgin.setInputType(InputType.TYPE_NULL);
@@ -121,6 +118,11 @@ public class ScanNclNoFragment extends Fragment {
             onholdshipments = (Button) rootView.findViewById(R.id.onholdshipments);
             onholdshipments.setVisibility(View.VISIBLE);
             //if (savedInstanceState == null) {
+
+            UserME nclNoReq = new UserME();
+            nclNoReq.EmployID = GlobalVar.GV().EmployID;
+            OnHoldNCL(nclNoReq);
+
 
             GetStationList();
             pieceDenied.clear();
@@ -203,6 +205,16 @@ public class ScanNclNoFragment extends Fragment {
                     nclNoReq.EmployID = GlobalVar.GV().EmployID;
 
                     OnHoldNCL(nclNoReq);
+
+                   /* else {
+                        try {
+                            NclShipmentActivity nclShipmentActivity = new NclShipmentActivity();
+                            nclShipmentActivity.FetchHighValueShipments();
+                            onholdshipments.setText(String.valueOf(pieceDenied.size()) + " HV Shipments ");
+                        } catch (Exception e) {
+                            System.out.println(e);
+                        }
+                    }*/
                 }
             });
 
@@ -432,6 +444,7 @@ public class ScanNclNoFragment extends Fragment {
 
             progressDialog = new ProgressDialog(getActivity());
             //progressDialog.setMax(100);
+            progressDialog.setCancelable(false);
             progressDialog.setMessage("Please wait.");
             progressDialog.setTitle("Collecting OnHold Waybills.");
             progressDialog.show();

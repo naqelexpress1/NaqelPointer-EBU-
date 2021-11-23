@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.NCLBlockWaybills;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,10 +17,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -57,13 +61,18 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclWaybillDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
+import com.naqelexpress.naqelpointer.Models.WaybillNoBarcodeModels;
 import com.naqelexpress.naqelpointer.NCLBulk.INclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
+import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
+import com.naqelexpress.naqelpointer.utils.FetchHVAlarmApi;
 
 import org.joda.time.DateTime;
 
@@ -85,9 +94,11 @@ import java.util.List;
 import java.util.Locale;
 
 import Error.ErrorReporter;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 //Used By GWT (IRS)
-public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity, IAPICallListener {
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity, IAPICallListener,
+        AlertCallback {
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -96,8 +107,11 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     public static String NclNo = "0";
     public boolean IsMixed;
     public List<Integer> destList = new ArrayList<>();
-
+    static SweetAlertDialog alertDialog;
     private static final String TAG = "NclShipmentActivity";
+    private AlertCallback alertCallback;
+
+    List<WaybillNoBarcodeModels> HvShipmentList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,11 +157,14 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+
+        if (GlobalVar.GetLastLoginEmployCountryID(getApplicationContext()) == 3)
+            FetchHighValueShipments();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.print, menu);
+        inflater.inflate(R.menu.gtwnclmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -170,10 +187,15 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 //            case R.id.mnuSave:
 //                SaveData();
 //                return true;
+//            case R.id.print:
+//                if (IsValid())
+//                    askPermission();
+//                return true;
+
             case R.id.print:
-                if (IsValid())
-                    askPermission();
+                FetchHighValueShipments();
                 return true;
+
 
             default:
                 return super.onOptionsItemSelected(item);
@@ -900,6 +922,35 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         return isValid;
     }
 
+    @Override
+    public void returnOk(int ok, Activity activity) {
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        exitdialog();
+
+                    }
+                });
+
+            }
+        });
+    }
+
+    @Override
+    public void returnCancel(int cancel, SweetAlertDialog alertDialog) {
+        this.alertDialog = alertDialog;
+    }
+
+    private void exitdialog() {
+        if (alertDialog != null) {
+            alertDialog.dismissWithAnimation();
+            alertDialog = null;
+        }
+    }
+
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -1436,4 +1487,37 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
 
     /********* Riyam - END  *********/
 
+
+    //Fetch HV alarms
+    public void FetchHighValueShipments() {
+        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch HV Shipments.",
+                NclShipmentActivity.this,
+                Enum.PROGRESS_TYPE, "NclShipmentActivity");
+
+
+        FetchHVAlarmApi.FetchUAEHVShipments(new Callback<List<WaybillNoBarcodeModels>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void returnResult(List<WaybillNoBarcodeModels> result) {
+                System.out.println();
+                HvShipmentList.clear();
+                HvShipmentList.addAll(result);
+                secondFragment.hvshipments.clear();
+
+//                String json = new Gson().toJson(result);
+//                ArrayList a = new Gson().fromJson(json, ArrayList.class);
+
+                for (WaybillNoBarcodeModels hvShipmentList : HvShipmentList)
+                    secondFragment.hvshipments.add(hvShipmentList.getBarCode());
+                //firstFragment.onholdshipments.setText(String.valueOf(firstFragment.pieceDenied.size()) + " HV Shipments ");
+                exitdialog();
+            }
+
+            @Override
+            public void returnError(String message) {
+                //mView.showError(message);
+                System.out.println(message);
+            }
+        });
+    }
 }

@@ -10368,4 +10368,22 @@ public class DBConnections
         return stringArrayList;
     }
 
+    public void deleteOnlineValidationfile(Context context) {
+
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+
+        try {
+
+            db.execSQL("delete from OnlineValidation");
+            db.execSQL("delete from OnlineValidationOffset"); // added new
+            db.execSQL("delete from OnLineValidationFileDetails ");
+
+        } catch (Exception e) {
+
+
+        }
+        db.close();
+
+    }
 }

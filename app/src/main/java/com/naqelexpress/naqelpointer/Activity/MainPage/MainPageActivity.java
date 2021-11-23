@@ -342,6 +342,19 @@ public class MainPageActivity
             dbConnections.DeleteAllSyncData(getApplicationContext());
             dbConnections.deleteDenied(getApplicationContext());
         }
+        Cursor resultOnlineValidationfile = dbConnections.Fill("select ValidDate from RtoReq Limit 1", getApplicationContext());
+        if (resultOnlineValidationfile.getCount() > 0) {
+            resultOnlineValidationfile.moveToFirst();
+            String upto = "Upto : " + resultOnlineValidationfile.getString(resultOnlineValidationfile.getColumnIndex("ValidDate")) + " 15:00"; //16:30
+            if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
+                if (!GlobalVar.GV().IsAllowtoScan(upto.replace("Upto : ", ""))) { //validupto.getText().toString()
+
+                    dbConnections.deleteOnlineValidationfile(getApplicationContext());
+                }
+            }
+        }
+
+        resultOnlineValidationfile.close();
 
         btnSignOut = (FloatingActionButton) findViewById(R.id.btnSignOut);
 

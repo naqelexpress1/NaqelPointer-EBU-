@@ -88,7 +88,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
 
     private final static String TAG = "ScanNclWaybillFragmentRemoveValidation_CITC";
-
+    public static ArrayList<String> hvshipments = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -158,7 +158,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                                     , barcode, getContext());
                             if (onLineValidationLocal != null) { //use new validation file
                                 boolean hasFlag = checkWaybillFlags(barcode);
-                                if (hasFlag && !ScanNclNoFragment.checkMix.isChecked())
+                                if (hasFlag)
                                     showFlagsPopup(getOnLineValidationPiece(barcode));
                                 else
                                     AddNewPiece(pieceDetail);
@@ -519,6 +519,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 }
             }
 
+            if (hvshipments.contains(barcode)) {
+                Log.d("test", "No Byan");
+                onLineValidation.setisHV(true);
+                hasFlag = true;
+            }
+
             onLineValidation.setBarcode(barcode);
             onLineValidationList.add(onLineValidation);
 
@@ -716,36 +722,36 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     tvManifestBody.setText("Waybill " + onLineValidation.getWaybillNo() + " is not manifested yet.");
                 }
 
+                if (!ScanNclNoFragment.checkMix.isChecked())
+                    if (onLineValidation.getIsDestNotBelongToNcl() == 1) {
 
-                if (onLineValidation.getIsDestNotBelongToNcl() == 1) {
+                        String stationName = "";
+                        try {
+                            Station station = null;
+                            station = dbConnections.getStationByID(onLineValidation.getWaybillDestID(), getContext());
 
-                    String stationName = "";
-                    try {
-                        Station station = null;
-                        station = dbConnections.getStationByID(onLineValidation.getWaybillDestID(), getContext());
+                            if (station != null)
+                                stationName = station.Name;
+                            else
+                                Log.d("test", TAG + " Station is null");
 
-                        if (station != null)
-                            stationName = station.Name;
-                        else
-                            Log.d("test", TAG + " Station is null");
+                        } catch (Exception e) {
+                            Log.d("test", TAG + "" + e.toString());
+                        }
 
-                    } catch (Exception e) {
-                        Log.d("test", TAG + "" + e.toString());
+                        LinearLayout llDifDest = dialogView.findViewById(R.id.ll_ncl_wrong_dest);
+                        llDifDest.setVisibility(View.VISIBLE);
+
+                        TextView tvNclHeader = dialogView.findViewById(R.id.tv_ncl_header);
+                        tvNclHeader.setText("NCL Destination");
+
+                        TextView tvNclBody = dialogView.findViewById(R.id.tv_ncl_body);
+                        tvNclBody.setText("Piece destination (" + stationName + ") doesn’t belong to NCL.");
+
+                        // add on click listener
+                        radioGroupCheckListener(dialogView, btnConfirm);
+
                     }
-
-                    LinearLayout llDifDest = dialogView.findViewById(R.id.ll_ncl_wrong_dest);
-                    llDifDest.setVisibility(View.VISIBLE);
-
-                    TextView tvNclHeader = dialogView.findViewById(R.id.tv_ncl_header);
-                    tvNclHeader.setText("NCL Destination");
-
-                    TextView tvNclBody = dialogView.findViewById(R.id.tv_ncl_body);
-                    tvNclBody.setText("Piece destination (" + stationName + ") doesn’t belong to NCL.");
-
-                    // add on click listener
-                    radioGroupCheckListener(dialogView, btnConfirm);
-
-                }
 
 
                 if (onLineValidation.getIsStopped() == 1) {
@@ -775,6 +781,18 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
                 }
 
+                if (onLineValidation.getisHV()) {
+                    LinearLayout llStopShipment = dialogView.findViewById(R.id.ll_hv);
+                    llStopShipment.setVisibility(View.VISIBLE);
+
+                    TextView tvStopShipmentHeader = dialogView.findViewById(R.id.tv_hv_header);
+                    tvStopShipmentHeader.setText("HV Shipment");
+
+                    TextView tvStopShipmentBody = dialogView.findViewById(R.id.tv_hv_body);
+                    tvStopShipmentBody.setText("This is HV Shipment ");
+
+                }
+
                 final android.app.AlertDialog alertDialog = dialogBuilder.create();
                 alertDialog.show();
 
@@ -785,11 +803,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         if (alertDialog != null && alertDialog.isShowing()) {
                             alertDialog.dismiss();
 
-                            if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged) {
+                            if (onLineValidation.getIsDestNotBelongToNcl() == 1 && !isDestChanged && !ScanNclNoFragment.checkMix.isChecked()) {
                                 GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 GlobalVar.GV().ShowSnackbar(rootView, "Shipment destination not belong to NCL.Scan won't be recorded", GlobalVar.AlertType.Warning);
                                 txtBarcode.getText().clear();
-                            } else if (onLineValidation.getIsDestNotBelongToNcl() == 1 && isDestChanged) {
+                            } else if (onLineValidation.getIsDestNotBelongToNcl() == 1 && isDestChanged && !ScanNclNoFragment.checkMix.isChecked()) {
 
                                 PieceDetail pieceDetail = new PieceDetail();
                                 pieceDetail.Barcode = onLineValidation.getBarcode();

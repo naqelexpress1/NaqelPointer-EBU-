@@ -65,6 +65,7 @@ import com.naqelexpress.naqelpointer.JSON.Results.CheckPointTypeResult;
 import com.naqelexpress.naqelpointer.JSON.Results.GetShipmentForPickingResult;
 import com.naqelexpress.naqelpointer.Models.Enum.Enum;
 import com.naqelexpress.naqelpointer.Models.Request.AlertRequest;
+import com.naqelexpress.naqelpointer.NCLBlockWaybills.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
@@ -106,7 +107,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "SPASR Changes - 17-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "GTW - UAE HV Alarm - 23-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -116,7 +117,7 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = true; //For EBU true only
+    public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
     public boolean IsTerminalApp = false; //For TH onlyre
     public int AppIDForTH = 0; //for TH only 1
@@ -4141,6 +4142,10 @@ public class GlobalVar {
             alertCallback = new Fuel();
         else if (classname.equals("com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList"))
             alertCallback = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList();
+        else if (classname.equals("NclShipmentActivity"))
+            alertCallback = new NclShipmentActivity();
+        else if (classname.equals("com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity"))
+            alertCallback = new NclShipmentActivity();
     }
 
     public void CommonProgessAlertMessageActivity(String title, String msg,
@@ -4527,6 +4532,22 @@ public class GlobalVar {
         result.close();
 
         return TimeZone;
+    }
+
+    public static int GetLastLoginEmployCountryID(Context context) {
+
+        int CountryID = 0;
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select CountryID from UserME  order by ID desc Limit 1", context);
+        if (result != null && result.getCount() > 0) {
+            result.moveToFirst();
+            CountryID = Integer.parseInt(result.getString(result.getColumnIndex("CountryID")));
+
+        }
+        dbConnections.close();
+        if (result != null)
+            result.close();
+        return CountryID;
     }
 
 }

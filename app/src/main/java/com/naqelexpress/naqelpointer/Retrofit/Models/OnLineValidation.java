@@ -12,22 +12,28 @@ public class OnLineValidation extends DefaultResult {
     private int NoOfAttempts;
     private int IsMultiPiece;
     private int IsStopped;
-    private int IsRTORequest;
-    private int IsDeliveryRequest;
+    private int IsRTORequest = 0;
+    private int IsDeliveryRequest = 0;
     private int IsRelabel;
     private int IsWrongDest;
     private int IsDestNotBelongToNcl;
     private int IsPiecesAvailable = 1;
     private int IsConflict;
     private int IsManifested = 1;
-    private int IsCITCComplaint;
+    private int IsCITCComplaint = 0;
     private int WaybillNo;
     private int IsNoBayanNo;
     private boolean IsNotInFile;
     private boolean IsDestChanged;
+    private boolean isHV;
 
+    public boolean getisHV() {
+        return isHV;
+    }
 
-
+    public void setisHV(boolean HV) {
+        isHV = HV;
+    }
 
     public void setID(int ID) {
         this.ID = ID;

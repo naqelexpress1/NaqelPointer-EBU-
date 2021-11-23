@@ -572,6 +572,9 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
 
         OnLineValidation onLineValidation = getOnLineValidation(barcode);
+        onLineValidation.setIsCITCComplaint(0);
+        onLineValidation.setIsRTORequest(0);
+        onLineValidation.setIsDeliveryRequest(0);
         boolean rtoreq = false;
         boolean ismatch = false;
 
@@ -1825,13 +1828,16 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     onLineValidation.setIsStopped(1);
                 }
 
-                if (onLineValidationLocal.getIsRTORequest() == 1) {
-                    onLineValidation.setIsRTORequest(1);
-                }
 
-                if (onLineValidationLocal.getIsDeliveryRequest() == 1) {
-                    onLineValidation.setIsDeliveryRequest(1);
-                }
+                //Commented by Ismail
+
+//                if (onLineValidationLocal.getIsRTORequest() == 1) {
+//                    onLineValidation.setIsRTORequest(1);
+//                }
+//
+//                if (onLineValidationLocal.getIsDeliveryRequest() == 1) {
+//                    onLineValidation.setIsDeliveryRequest(1);
+//                }
 
                 if (onLineValidationLocal.getIsRelabel() == 1) {
                     onLineValidation.setIsRelabel(1);

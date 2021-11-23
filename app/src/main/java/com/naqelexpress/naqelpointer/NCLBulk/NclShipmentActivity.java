@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.NCLBulk;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -17,10 +18,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintJob;
 import android.print.PrintManager;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -58,12 +62,17 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Ncl;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NclDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Models.Enum.Enum;
+import com.naqelexpress.naqelpointer.Models.WaybillNoBarcodeModels;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.callback.AlertCallback;
+import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.service.NclService;
 import com.naqelexpress.naqelpointer.service.NclServiceBulk;
 import com.naqelexpress.naqelpointer.service.PrintJobMonitorService;
+import com.naqelexpress.naqelpointer.utils.FetchHVAlarmApi;
 
 import org.joda.time.DateTime;
 
@@ -85,9 +94,10 @@ import java.util.List;
 import java.util.Locale;
 
 import Error.ErrorReporter;
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 //Used By TH - Courier
-public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity , IAPICallListener { //AsyncTaskCompleteListener
+public class NclShipmentActivity extends AppCompatActivity implements INclShipmentActivity, IAPICallListener, AlertCallback { //AsyncTaskCompleteListener
 
     ScanNclNoFragment firstFragment;
     ScanNclWaybillFragmentRemoveValidation_CITC secondFragment;
@@ -99,6 +109,8 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     public List<Integer> destList = new ArrayList<>();
 
     private static final String TAG = "NclShipmentActivity";
+    List<WaybillNoBarcodeModels> HvShipmentList = new ArrayList<>();
+    static SweetAlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,19 +123,19 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         bundle = getIntent().getExtras();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-       try {
-           String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+        try {
+            String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
 
 
-           if (division.equals("Courier")) {
-               if (!isValidValidationFile()) {
-                   getOnlineValidation();
-               }
-           }
+            if (division.equals("Courier")) {
+                if (!isValidValidationFile()) {
+                    getOnlineValidation();
+                }
+            }
 
-       } catch (Exception e) {
+        } catch (Exception e) {
 
-       }
+        }
 
 
         setSupportActionBar(toolbar);
@@ -157,11 +169,14 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+
+        if (GlobalVar.GetLastLoginEmployCountryID(getApplicationContext()) == 3)
+            FetchHighValueShipments();
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.print, menu);
+        inflater.inflate(R.menu.gtwnclmenu, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -183,8 +198,9 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
                 return true;
 
             case R.id.print:
-                if (IsValid())
-                    askPermission();
+//                if (IsValid())
+//                    askPermission();
+                FetchHighValueShipments();
                 return true;
 
             default:
@@ -714,7 +730,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             ncl.StationID = GlobalVar.GV().StationID;
             ncl.AppVersion = GlobalVar.GV().AppVersion;
             ncl.Latitude = String.valueOf(Latitude);
-            ncl.Longitude = String.valueOf(Longitude) ;
+            ncl.Longitude = String.valueOf(Longitude);
 
 
             String Origin[] = ScanNclNoFragment.txtOrgin.getText().toString().split(":");
@@ -727,7 +743,7 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             ncl.IsSync = false;
 
             for (int i = 0; i < ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.size(); i++) {
-                ScanNclWaybillFragmentRemoveValidation_CITC.PieceDetail pieceDetail =  ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i);
+                ScanNclWaybillFragmentRemoveValidation_CITC.PieceDetail pieceDetail = ScanNclWaybillFragmentRemoveValidation_CITC.PieceCodeList.get(i);
                 ncl.ncldetails.add(i,
                         new NclDetail(pieceDetail.Barcode, 0));
 //                ncl.ncldetails.add(i,
@@ -800,7 +816,6 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         }
         return isValid;
     }
-
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -1063,11 +1078,11 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         boolean isValid;
         try {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            isValid = dbConnections.isValidValidationFile(GlobalVar.NclArrivalTH , getApplicationContext());
+            isValid = dbConnections.isValidValidationFile(GlobalVar.NclArrivalTH, getApplicationContext());
             if (isValid)
                 return true;
         } catch (Exception ex) {
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
         return false;
     }
@@ -1087,12 +1102,13 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
         alertDialog.show();
     }
 
-   @Override
-    public void onNCLGenerated(String NCLNo , int NCLDestStationID , List<Integer> allowedDestStations) {
+    @Override
+    public void onNCLGenerated(String NCLNo, int NCLDestStationID, List<Integer> allowedDestStations) {
         try {
-            secondFragment.onNCLGenerated(NCLNo , NCLDestStationID , allowedDestStations);
-        } catch (Exception ex) {}
-     }
+            secondFragment.onNCLGenerated(NCLNo, NCLDestStationID, allowedDestStations);
+        } catch (Exception ex) {
+        }
+    }
 
 
  /*   @Override
@@ -1109,10 +1125,11 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
     public void onCallComplete(boolean hasError, String errorMessage) {
         try {
             if (hasError)
-                ErrorAlertOnlineValidation("Server Issue" , "Kindly Try Again \n \n " + errorMessage);
+                ErrorAlertOnlineValidation("Server Issue", "Kindly Try Again \n \n " + errorMessage);
             else
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "File uploaded successfully", GlobalVar.AlertType.Info);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
     }
 
     public double Latitude = 0;
@@ -1126,13 +1143,13 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
                 Longitude = location.getLongitude();
             }
         } catch (Exception ex) {
-            Log.d("test" , TAG + "" + ex.toString());
+            Log.d("test", TAG + "" + ex.toString());
         }
     }
 
-    private void getOnlineValidation (){
-        APICall apiCall = new APICall(getApplicationContext() , NclShipmentActivity.this , this);
-        apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH , 0 , 1);
+    private void getOnlineValidation() {
+        APICall apiCall = new APICall(getApplicationContext(), NclShipmentActivity.this, this);
+        apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH, 0, 1);
     }
 
 
@@ -1383,5 +1400,66 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             }
         }
     } */
+
+    public void FetchHighValueShipments() {
+        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch HV Shipments.",
+                NclShipmentActivity.this,
+                Enum.PROGRESS_TYPE, "com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity");
+
+
+        FetchHVAlarmApi.FetchUAEHVShipments(new Callback<List<WaybillNoBarcodeModels>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void returnResult(List<WaybillNoBarcodeModels> result) {
+                System.out.println();
+                HvShipmentList.clear();
+                HvShipmentList.addAll(result);
+                secondFragment.hvshipments.clear();
+
+//                String json = new Gson().toJson(result);
+//                ArrayList a = new Gson().fromJson(json, ArrayList.class);
+
+                for (WaybillNoBarcodeModels hvShipmentList : HvShipmentList)
+                    secondFragment.hvshipments.add(hvShipmentList.getBarCode());
+                //firstFragment.onholdshipments.setText(String.valueOf(firstFragment.pieceDenied.size()) + " HV Shipments ");
+                exitdialog();
+            }
+
+            @Override
+            public void returnError(String message) {
+                //mView.showError(message);
+                System.out.println(message);
+            }
+        });
+    }
+
+    @Override
+    public void returnOk(int ok, Activity activity) {
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Handler handler = new Handler(Looper.getMainLooper());
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        exitdialog();
+
+                    }
+                });
+
+            }
+        });
+    }
+
+    @Override
+    public void returnCancel(int cancel, SweetAlertDialog alertDialog) {
+        this.alertDialog = alertDialog;
+    }
+
+    private void exitdialog() {
+        if (alertDialog != null) {
+            alertDialog.dismissWithAnimation();
+            alertDialog = null;
+        }
+    }
 
 }

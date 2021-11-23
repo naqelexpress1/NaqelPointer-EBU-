@@ -10,6 +10,7 @@ import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.Models.Request.NotificationRequest;
 import com.naqelexpress.naqelpointer.Models.Request.PickupSheetSPASRRegResult;
 import com.naqelexpress.naqelpointer.Models.SkipRouteLineSeqWaybillnoReasonModels;
+import com.naqelexpress.naqelpointer.Models.WaybillNoBarcodeModels;
 import com.naqelexpress.naqelpointer.Retrofit.Request.OnlineValidationRequest;
 import com.naqelexpress.naqelpointer.Retrofit.Response.RetrofitCallResponse;
 
@@ -64,4 +65,8 @@ public interface IPointerAPI {
     //Pickupsheet Deatails SPASRReg
     @POST("PickupsheetDetailsSpAsrReg")
     Observable<PickupSheetSPASRRegResult> PickupsheetDetailsSpAsrReg(@Body CommonRequest commonRequest);
+
+    @POST("GetUAEHVAlarmWaybills")
+    Observable<List<WaybillNoBarcodeModels>> GetUAEHVAlarmWaybills();
+
 }

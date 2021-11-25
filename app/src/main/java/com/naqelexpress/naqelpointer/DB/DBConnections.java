@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.DB;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9642,7 +9643,7 @@ public class DBConnections
     //SpASRRegular
     public void insertPickupsheetDetails_SPASRREGData(ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
             BookingModel>
-                                                              bookingModelList, Context context) {
+                                                              bookingModelList, Context context, Activity activity) {
 
         // deleteDistrictData(context);
         String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
@@ -9656,7 +9657,7 @@ public class DBConnections
         //db.getWritableDatabase();
         db.beginTransaction();
         SQLiteStatement stmt = db.compileStatement(sql);
-
+        int sNo = 1;
         for (com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel booking :
                 bookingModelList) {
             stmt.bindString(1, String.valueOf(booking.getPickupSheetID()));
@@ -9677,13 +9678,16 @@ public class DBConnections
             stmt.bindString(16, String.valueOf(booking.getClientID()));
             stmt.bindString(17, String.valueOf(booking.getClientName()));
             stmt.bindString(18, String.valueOf(booking.getIsPickedup()));
-            stmt.bindString(19, String.valueOf(booking.getsNo()));
+            // stmt.bindString(19, String.valueOf(booking.getsNo()));
+            stmt.bindString(19, String.valueOf(sNo));
             stmt.bindString(20, String.valueOf(booking.getRefNo()));
             stmt.bindString(21, String.valueOf(booking.getGoodDesc()));
             stmt.bindString(22, String.valueOf(booking.getMobileNo()));
-            if (booking.getisSPL())
+            String sName = "ASR";
+            if (booking.getisSPL()) {
                 stmt.bindString(23, "1");
-            else
+                sName = "SPL";
+            } else
                 stmt.bindString(23, "0");
             stmt.bindString(24, String.valueOf(booking.getSPLOfficesID()));
             stmt.bindString(25, String.valueOf(booking.getSpLatLng()));
@@ -9691,6 +9695,15 @@ public class DBConnections
             stmt.bindString(27, String.valueOf(booking.getSPMobile()));
             stmt.bindString(28, String.valueOf(booking.getSPOfficeName()));
 
+            try {
+                if (!booking.getisSPL())
+                    GlobalVar.savemobilenointocontacts(String.valueOf(booking.getPhoneNo()),
+                            String.valueOf(booking.getMobileNo()), sName,
+                            String.valueOf(sNo), String.valueOf(booking.getWaybillNo()), activity);
+                sNo = sNo + 1;
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
 
             stmt.execute();
             //long entryID = stmt.executeInsert();
@@ -9706,18 +9719,17 @@ public class DBConnections
 
         ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
                 bookingModelArrayList = new ArrayList<>();
-        bookingModelArrayList = getPickupSheetSpDetailsData(context, EmployID);
+
+
         Station station = null;
         try {
-            String selectQuery = "SELECT * FROM PickupSheetDetails WHERE IsSPL <> 1 and  EmployID = " + EmployID;
+            String selectQuery = "SELECT * FROM PickupSheetDetails WHERE IsSPL <> 1 and  EmployID = " + EmployID + " order by SNo";
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
                     SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cursor = db.rawQuery(selectQuery, null);
 
             int sNo = 0;
-            if (bookingModelArrayList.size() > 0)
-                sNo = bookingModelArrayList.get(bookingModelArrayList.size() - 1).getsNo();
 
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
@@ -9725,9 +9737,10 @@ public class DBConnections
 
                     com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
                             BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
-                    // bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
-                    sNo = sNo + 1;
-                    bookingModel.setsNo(sNo);
+
+                    bookingModel.setsNo(cursor.getInt(cursor.getColumnIndex("SNo")));
+                    //sNo = sNo + 1;
+                    //bookingModel.setsNo(sNo);
                     bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
                     bookingModel.setFromStationID(cursor.getInt(cursor.getColumnIndex("FromStationID")));
                     bookingModel.setToStationID(cursor.getInt(cursor.getColumnIndex("ToStationID")));
@@ -9763,6 +9776,12 @@ public class DBConnections
             }
             cursor.close();
             db.close();
+
+            if (bookingModelArrayList.size() > 0)
+                sNo = bookingModelArrayList.get(bookingModelArrayList.size() - 1).getsNo();
+
+            bookingModelArrayList.addAll(getPickupSheetSpDetailsData(context, EmployID, sNo));
+
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
@@ -9831,7 +9850,7 @@ public class DBConnections
     }
 
     public ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
-    getPickupSheetSpDetailsData(Context context, int EmployID) {
+    getPickupSheetSpDetailsData(Context context, int EmployID, int Sno) {
 
         ArrayList<com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel>
                 bookingModelArrayList = new ArrayList<>();
@@ -9844,12 +9863,13 @@ public class DBConnections
                     SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cursor = db.rawQuery(selectQuery, null);
-            int Sno = 1;
+            //int Sno = 1;
             if (cursor != null && cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 do {
                     com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.
                             BookingModel bookingModel = new com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel();
+                    Sno = Sno + 1;
                     bookingModel.setsNo(Sno);
                     bookingModel.setWaybillcount(cursor.getInt(cursor.getColumnIndex("WaybillCount")));
                     bookingModel.setPickupSheetID(cursor.getInt(cursor.getColumnIndex("PickupSheetID")));
@@ -9882,7 +9902,6 @@ public class DBConnections
                     bookingModel.setPickupCount(getSPPickupCount(cursor.getInt(cursor.getColumnIndex("SPLOfficesID")), context));
                     bookingModel.setExceptionCount(getSPExceptionCount(context, cursor.getInt(cursor.getColumnIndex("SPLOfficesID"))));
 
-                    Sno = Sno + 1;
 
                     bookingModelArrayList.add(bookingModel);
 

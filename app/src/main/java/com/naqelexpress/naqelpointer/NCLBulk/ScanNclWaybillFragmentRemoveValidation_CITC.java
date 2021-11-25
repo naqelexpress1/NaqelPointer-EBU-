@@ -423,7 +423,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
         try {
             DBConnections dbConnections = new DBConnections(getContext(), null);
-            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getContext());
+
 
             Cursor delreq = dbConnections.Fill("select * from DeliverReq where ReqType = 1 Limit 1", getContext());
             if (delreq.getCount() > 0) {
@@ -437,11 +437,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             }
 
-
+            Cursor cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 3 ", getContext());
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 txtCitcCount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
-            }
+            } else
+                txtCitcCount.setVisibility(View.GONE);
 
             cursor.close();
             dbConnections.close();
@@ -551,6 +552,12 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             GlobalVar.RedirectSettings(getActivity());
             return;
         }
+        if (hvshipments.contains(barcode)) {
+            GlobalVar.ShowDialog(getActivity(), "HV Shipment", "This is HV Shipment", true);
+            GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
+        }
+
+
         checkFlagsUsingNCLData(barcode);
 
     }

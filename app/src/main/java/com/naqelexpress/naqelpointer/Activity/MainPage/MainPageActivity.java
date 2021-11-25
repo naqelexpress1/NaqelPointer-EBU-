@@ -1195,8 +1195,8 @@ public class MainPageActivity
                                     Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
                                     startActivity(bookingList);
                                 } else {
-//                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
-                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
+                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+//                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
                                     startActivity(bookingList);
                                 }
                             } else {

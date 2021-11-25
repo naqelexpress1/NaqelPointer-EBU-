@@ -107,7 +107,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "GTW - UAE HV Alarm - 23-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "TH UAE HVAlarm 25-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -119,8 +119,8 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
     //
@@ -213,6 +213,7 @@ public class GlobalVar {
     public ArrayList<CheckPendingCODResult> checkPendingCODList;
     public ArrayList<String> optimizedOutOfDeliveryShipmentList;
     public ArrayList<CheckPointTypeResult> checkPointTypeResultsList;
+
 
     private void Init() {
         GlobalVar.GV().MachineID = GlobalVar.GV().getManufacturerSerialNumber();
@@ -4145,7 +4146,7 @@ public class GlobalVar {
         else if (classname.equals("NclShipmentActivity"))
             alertCallback = new NclShipmentActivity();
         else if (classname.equals("com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity"))
-            alertCallback = new NclShipmentActivity();
+            alertCallback = new com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity();
     }
 
     public void CommonProgessAlertMessageActivity(String title, String msg,
@@ -4550,4 +4551,27 @@ public class GlobalVar {
         return CountryID;
     }
 
+    public static void savemobilenointocontacts(String phoneno, String mno, String savename, String SNo, String WaybillNo,
+                                                Activity activity) {
+        ArrayList<String> MNos = new ArrayList<>();
+        if (!phoneno.equals("null") && phoneno != null && !phoneno.equals("0")
+                && phoneno.length() > 0)
+
+            MNos.add(phoneno);
+
+
+        if (!mno.equals("null") && mno != null &&
+                !mno.equals("0") && mno.length() > 0) {
+
+            MNos.add(mno);
+        }
+
+        String sname = "";
+        if (savename.equals("ASR"))
+            sname = "ASR";
+        if (MNos.size() > 0) {
+            Global global = new Global(activity);
+            global.addMobileNumberintoContacts(SNo + " - " + sname + " - " + WaybillNo, MNos, WaybillNo);
+        }
+    }
 }

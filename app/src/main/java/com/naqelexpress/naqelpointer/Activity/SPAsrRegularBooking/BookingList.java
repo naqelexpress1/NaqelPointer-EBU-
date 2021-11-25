@@ -573,7 +573,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             if (myBookingList.size() > 0)
-                dbConnections.insertPickupsheetDetails_SPASRREGData(myBookingList, getApplicationContext());
+                dbConnections.insertPickupsheetDetails_SPASRREGData(myBookingList, getApplicationContext(), BookingList.this);
 
             if (pickupSheetReasonModelArrayList.size() > 0)
                 dbConnections.insertPickupsheetReasonData(pickupSheetReasonModelArrayList, getApplicationContext());
@@ -763,6 +763,8 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         }
 
     }
+
+
 }
 
 

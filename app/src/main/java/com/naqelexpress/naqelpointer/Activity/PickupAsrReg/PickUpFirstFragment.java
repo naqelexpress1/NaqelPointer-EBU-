@@ -139,6 +139,7 @@ public class PickUpFirstFragment
                 @Override
                 public void onClick(View view) {
 //                    showPopup();
+                    isASRAddPieceManually();
                     if (PickUpBarCodeList.size() > 0)
                         Exception();
                     else
@@ -199,6 +200,12 @@ public class PickUpFirstFragment
         return rootView;
     }
 
+    private void isASRAddPieceManually() {
+        if (class_ == 1) {
+            PickUpBarCodeList.clear();
+            PickUpBarCodeList.add(String.valueOf(bookinglist.get(position).getWaybillNo()) + "00001");
+        }
+    }
 
     private void AddNewPiece() {
         GlobalVar.hideKeyboardFrom(getContext(), rootView);

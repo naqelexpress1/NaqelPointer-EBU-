@@ -38,6 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList;
+import com.naqelexpress.naqelpointer.Activity.CBM.CBM;
 import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
@@ -107,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "TH UAE HVAlarm 25-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU SpAsr Final Test - 28-11-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -117,13 +118,13 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = false; //For EBU true only
+    public boolean LoginVariation = true; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
-    //
+
 
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
@@ -4147,6 +4148,8 @@ public class GlobalVar {
             alertCallback = new NclShipmentActivity();
         else if (classname.equals("com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity"))
             alertCallback = new com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity();
+        else if (classname.equals("CBM"))
+            alertCallback = new CBM();
     }
 
     public void CommonProgessAlertMessageActivity(String title, String msg,
@@ -4500,6 +4503,18 @@ public class GlobalVar {
                 context.getString(R.string.frontDoorMsg2En) + " " +
                 Waybillno + " " +
                 context.getString(R.string.frontDoorMsg3Ar) + " " +
+                ClientName;
+        return frontDoorMsgAr + "\n\n" + frontDoorMsgEn;
+    }
+
+    public String getFrontDoorMsgAsrPickup(String WaybillNo, String ClientName) {
+        String armsg1 = "مرحبا , مندوب ناقل وصل الى موقعك لاستلام شحنتكم ";
+        String armsg2 = "من";
+        final String frontDoorMsgAr = armsg1 +
+                WaybillNo + " " + armsg2 + " " +
+                ClientName;
+        final String frontDoorMsgEn = "Hello! NAQEL courier has arrived at your front door to pick up Return shipment" +
+                WaybillNo + " for " +
                 ClientName;
         return frontDoorMsgAr + "\n\n" + frontDoorMsgEn;
     }

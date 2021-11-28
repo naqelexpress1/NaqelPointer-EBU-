@@ -374,7 +374,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
 //                        + " " + txtWaybillNo.getText().toString() + getString(R.string.doorPredefinedMsg1)
 //                        + txtShipperName.getText().toString() + getString(R.string.doorPredefinedMsg2)
 //                        + txtWaybillNo.getText().toString() + "\n\n\n" + arabic, getApplicationContext());
-                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, GlobalVar.GV().getFrontDoorMsg(context.getApplicationContext(),
+                GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, GlobalVar.GV().getFrontDoorMsgAsrPickup(
                         Waybillno, ClientName), context.getApplicationContext());
                 popup.dismiss();
             }

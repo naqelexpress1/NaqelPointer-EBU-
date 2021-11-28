@@ -2,9 +2,11 @@ package com.naqelexpress.naqelpointer.Retrofit;
 
 import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
+import com.naqelexpress.naqelpointer.Models.FuelSupplierTypeModels;
 import com.naqelexpress.naqelpointer.Models.FuelTypeModels;
 import com.naqelexpress.naqelpointer.Models.NotificationModels;
 import com.naqelexpress.naqelpointer.Models.RatingModel;
+import com.naqelexpress.naqelpointer.Models.Request.CBMRequest;
 import com.naqelexpress.naqelpointer.Models.Request.CommonRequest;
 import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.Models.Request.NotificationRequest;
@@ -68,5 +70,12 @@ public interface IPointerAPI {
 
     @POST("GetUAEHVAlarmWaybills")
     Observable<List<WaybillNoBarcodeModels>> GetUAEHVAlarmWaybills();
+
+    @POST("SumbitCBM")
+    Observable<CommonResult> SumbitCBM(@Body CBMRequest cbmRequest);
+
+    //Fetch Fuel Type
+    @GET("FetchFuelSupplierType")
+    Observable<FuelSupplierTypeModels> FetchFuelSupplierType();
 
 }

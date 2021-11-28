@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.FuelModelEBU;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.Enum.Enum;
-import com.naqelexpress.naqelpointer.Models.FuelTypeModels;
+import com.naqelexpress.naqelpointer.Models.FuelSupplierTypeModels;
 import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
@@ -39,9 +40,12 @@ public class Fuel
     private AlertCallback alertCallback;
     Observable<Boolean> observable;
     EditText odometer, fuleprice, liters;
-    Spinner fueltype;
-    List<FuelTypeModels> fuelTypeModelsList = new ArrayList<>();
-    int isSelectedReasonID = 0;
+    Spinner fueltype, suppliertype;
+    //List<FuelTypeModels> fuelTypeModelsList = new ArrayList<>();
+    List<com.naqelexpress.naqelpointer.Models.FuelTypeModel.FuelType> fuelTypeModelsList = new ArrayList<>();
+    List<com.naqelexpress.naqelpointer.Models.FuelTypeModel.SupplierType> supplierTypeList = new ArrayList<>();
+    FuelSupplierTypeModels fuelSupplierTypeModelsList = new FuelSupplierTypeModels();
+    int isSelectedReasonID = 0, supplierID = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -55,7 +59,8 @@ public class Fuel
         fuleprice = (EditText) findViewById(R.id.fuleprice);
         fueltype = (Spinner) findViewById(R.id.fueltype);
         fueltype.setOnItemSelectedListener(this);
-
+        suppliertype = (Spinner) findViewById(R.id.suppliertype);
+        suppliertype.setOnItemSelectedListener(this);
         liters = (EditText) findViewById(R.id.liters);
 
 
@@ -68,7 +73,7 @@ public class Fuel
 //    }
 
 
-    private void FetchReason() {
+  /*  private void FetchReason() {
         GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch Fuel Type.", Fuel.this,
                 Enum.PROGRESS_TYPE, "Fuel");
 
@@ -77,6 +82,28 @@ public class Fuel
             public void returnResult(List<FuelTypeModels> result) {
                 System.out.println();
                 fuelTypeModelsList.addAll(result);
+                initSpinner();
+            }
+
+            @Override
+            public void returnError(String message) {
+                //mView.showError(message);
+                System.out.println(message);
+            }
+        });
+    }*/
+
+    private void FetchReason() {
+        GlobalVar.GV().alertMsgAll("Info", "Please wait to fetch Fuel Type.", Fuel.this,
+                Enum.PROGRESS_TYPE, "Fuel");
+
+        ExpFuelApi.FetchFuelSupplierType(new Callback<FuelSupplierTypeModels>() {
+            @Override
+            public void returnResult(FuelSupplierTypeModels result) {
+                System.out.println();
+                fuelTypeModelsList.addAll(result.FuelType);
+                supplierTypeList.addAll(result.SupplierType);
+                //fuelSupplierTypeModelsList.addAll(result);
                 initSpinner();
             }
 
@@ -137,6 +164,16 @@ public class Fuel
         // Step 3: Tell the spinner about our adapter
         fueltype.setAdapter(spinnerArrayAdapter);
         spinnerArrayAdapter.notifyDataSetChanged();
+
+        ArrayAdapter suppliertypeadapter = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_item,
+                utilities.SupplierModelstoList(supplierTypeList));
+
+        // Step 3: Tell the spinner about our adapter
+        suppliertype.setAdapter(suppliertypeadapter);
+        suppliertypeadapter.notifyDataSetChanged();
+
+
         exitdialog();
 
     }
@@ -217,7 +254,8 @@ public class Fuel
         fuelRequest.setFuelTypeID(isSelectedReasonID);
         fuelRequest.setLitres(liters.getText().toString());
         fuelRequest.setOdometer(odometer.getText().toString());
-        fuelRequest.setTruckId(DBConnections.GetTruckID(GlobalVar.GV().EmployID , getApplicationContext()));
+        fuelRequest.setTruckId(DBConnections.GetTruckID(GlobalVar.GV().EmployID, getApplicationContext()));
+        fuelRequest.setFuelSupplierID(supplierID);
 
         return fuelRequest;
     }
@@ -300,9 +338,20 @@ public class Fuel
     }
 
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        isSelectedReasonID = (int) fuelTypeModelsList.get(i).getID();
+
+        switch (adapterView.getId()) {
+            case R.id.fueltype:
+                isSelectedReasonID = (int) fuelTypeModelsList.get(i).getID();
+                break;
+            case R.id.suppliertype:
+                supplierID = (int) supplierTypeList.get(i).getID();
+                break;
+
+        }
+
 
     }
 

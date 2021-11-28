@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.utils;
 
 import com.naqelexpress.naqelpointer.Models.CommonResult;
+import com.naqelexpress.naqelpointer.Models.FuelSupplierTypeModels;
 import com.naqelexpress.naqelpointer.Models.FuelTypeModels;
 import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.callback.Callback;
@@ -53,6 +54,37 @@ public class ExpFuelApi {
                 .subscribe(new Observer<List<FuelTypeModels>>() {
                     @Override
                     public void onNext(List<FuelTypeModels> users) {
+
+                        callback.returnResult(users);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                        System.out.println("");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        callback.returnError(e.getMessage()
+                        );
+                    }
+
+
+                });
+    }
+
+    public static void FetchFuelSupplierType(final Callback<FuelSupplierTypeModels> callback) {
+
+        NetworkingUtils.getUserApiInstance()
+
+                .FetchFuelSupplierType()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<FuelSupplierTypeModels>() {
+                    @Override
+                    public void onNext(FuelSupplierTypeModels users) {
 
                         callback.returnResult(users);
                     }

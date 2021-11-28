@@ -8,9 +8,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -142,7 +141,68 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
             }
         });
 
-        txtBarcode.addTextChangedListener(new TextWatcher() {
+        txtBarcode.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    //finish();
+                    onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+
+                    if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength
+                            || txtBarcode.getText().length() == 13) {
+                        String result = txtBarcode.getText().toString();
+                        if (!GlobalVar.GV().isValidBarcode(result)) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+                            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                            txtBarcode.setText("");
+                            return false;
+                        }
+
+
+                        // To show onlineValidation warning if any
+                        boolean isConflict = !scannedBarCode.contains(result);
+                        if (division.equals("Courier")) {
+                            onlineValidation(result, isConflict);
+                        }
+
+
+                        if (!GlobalVar.GV().isValidBarcode(result)) {
+                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                                    "Wrong Barcode", GlobalVar.AlertType.Warning);
+                            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                            txtBarcode.setText("");
+                            return false;
+                        }
+
+
+                        if (scannedBarCode.contains(result)) {
+                            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                            if (!ScanbyDevice.contains(result))
+                                ScanbyDevice.add(result);
+
+                        } else {
+                            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                            if (!ConflictBarcode.contains(result))
+                                ConflictBarcode.add(result);
+
+                            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                                conflict(result);
+                        }
+                        txtBarcode.setText("");
+                        doaction();
+                    }
+
+                    return true;
+                }
+                return false;
+            }
+        });
+
+     /*   txtBarcode.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
@@ -153,7 +213,8 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength || txtBarcode.getText().length() == 13) {
+                if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength
+                        || txtBarcode.getText().length() == 13) {
                     String result = txtBarcode.getText().toString();
                     if (!GlobalVar.GV().isValidBarcode(result)) {
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
@@ -171,7 +232,8 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
 
                     if (!GlobalVar.GV().isValidBarcode(result)) {
-                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                                "Wrong Barcode", GlobalVar.AlertType.Warning);
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                         txtBarcode.setText("");
                         return;
@@ -195,7 +257,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     doaction();
                 }
             }
-        });
+        });*/
 
     }
 

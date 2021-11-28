@@ -9,7 +9,15 @@ public class FuelRequest {
     private int FuelTypeID;
     private int TruckId;
     private int EmployID;
+    private int FuelSupplierID;
 
+    public int getFuelSupplierID() {
+        return FuelSupplierID;
+    }
+
+    public void setFuelSupplierID(int fuelSupplierID) {
+        FuelSupplierID = fuelSupplierID;
+    }
 
     public String getOdometer() {
         return Odometer;

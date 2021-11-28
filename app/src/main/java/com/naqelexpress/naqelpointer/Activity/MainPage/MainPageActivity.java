@@ -58,6 +58,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation.ArrivedatDestination;
 import com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB.AtOrigin;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingList;
+import com.naqelexpress.naqelpointer.Activity.CBM.CBM;
 import com.naqelexpress.naqelpointer.Activity.CheckCOD.CODCheckingActivity;
 import com.naqelexpress.naqelpointer.Activity.CheckPointbyPieceLevel.CheckPointsActivity;
 import com.naqelexpress.naqelpointer.Activity.CourierKPIEBU.CourierKpi;
@@ -520,11 +521,12 @@ public class MainPageActivity
             cellIcon = new int[5];
         } else if (devision.equals("Express")) {
             if (menu == 0) {
-                cellTitle = new String[19];
-                cellIcon = new int[19];//18
+                cellTitle = new String[20];
+                cellIcon = new int[20];//18
+
             } else {
-                cellTitle = new String[24];
-                cellIcon = new int[24];
+                cellTitle = new String[25];
+                cellIcon = new int[25];
             }
         }
 
@@ -601,6 +603,7 @@ public class MainPageActivity
                 cellTitle[21] = "KPI";//CBU 7
                 cellTitle[22] = "InCab CheckList";//CBU 7
                 cellTitle[23] = "Fuel Model";//CBU 7
+                cellTitle[24] = "CBM";//CBU 7
             } else {
 
                 cellTitle[0] = getResources().getString(R.string.BookingList);//11
@@ -622,6 +625,7 @@ public class MainPageActivity
                 cellTitle[16] = "KPI";//CBU 7
                 cellTitle[17] = "InCab CheckList";//CBU 7
                 cellTitle[18] = "Fuel Model";//CBU 7
+                cellTitle[19] = "CBM";//CBU 7
             }
 
             if (menu == 1) {
@@ -650,6 +654,7 @@ public class MainPageActivity
                 itemposition.put(21, 26);
                 itemposition.put(22, 27);
                 itemposition.put(23, 31);
+                itemposition.put(24, 32);
             } else {
                 itemposition.put(0, 11);
                 itemposition.put(1, 5); //18
@@ -670,6 +675,7 @@ public class MainPageActivity
                 itemposition.put(16, 26);
                 itemposition.put(17, 27);
                 itemposition.put(18, 31);
+                itemposition.put(19, 32);
                 // itemposition.put(18, 11);
             }
 
@@ -741,6 +747,7 @@ public class MainPageActivity
                 cellIcon[21] = R.drawable.customclearence; //CBU
                 cellIcon[22] = R.drawable.car; //CBU
                 cellIcon[23] = R.drawable.fuel; //CBU
+                cellIcon[24] = R.drawable.acceptjob; //CBU
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -762,6 +769,7 @@ public class MainPageActivity
                 cellIcon[16] = R.drawable.customclearence; //CBU
                 cellIcon[17] = R.drawable.car; //CBU
                 cellIcon[18] = R.drawable.fuel; //CBU
+                cellIcon[19] = R.drawable.acceptjob; //CBU
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
@@ -1432,6 +1440,19 @@ public class MainPageActivity
                                     Fuel.class);
 //
                             startActivity(fuel);
+                        } else {
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    , true);
+                        }
+
+                        break;
+                    case 32:
+                        if (VersionMatct()) {
+                            Intent cbm = new Intent(getApplicationContext(),
+                                    CBM.class);
+//
+                            startActivity(cbm);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
                                     "Kindly Update our Latest Version.(Logout and Login again)"

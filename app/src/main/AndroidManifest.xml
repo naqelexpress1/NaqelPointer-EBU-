@@ -1101,6 +1101,13 @@
             android:theme="@style/myDialog"
             tools:ignore="LockedOrientationActivity,NewApi" />
 
+        <activity
+            android:name=".Activity.CBM.CBM"
+            android:label="CBM"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

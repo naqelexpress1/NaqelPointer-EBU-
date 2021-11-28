@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerInParent="true"
+    android:padding="5dp">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/btnsubmit">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="20dp">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Enter Waybill"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+            <EditText
+                android:id="@+id/txtwaybillno"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Enter Length"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+            <EditText
+                android:id="@+id/txtlength"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Enter Width"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+            <EditText
+                android:id="@+id/txtwidth"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:gravity="center"
+                android:text="Enter Height"
+                android:textColor="#000000"
+                android:textSize="18sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+            <EditText
+                android:id="@+id/txtheight"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:background="@drawable/border"
+                android:gravity="center"
+                android:inputType="numberDecimal"
+                android:text=""
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="normal"
+                android:typeface="monospace" />
+
+
+        </TableLayout>
+    </ScrollView>
+
+    <Button
+        android:layout_margin="10dp"
+        android:id="@+id/btnsubmit"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bluebutton"
+        android:gravity="center"
+        android:onClick="onSubmit"
+        android:text="Submit"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="normal"
+        android:typeface="monospace" />
+</RelativeLayout>

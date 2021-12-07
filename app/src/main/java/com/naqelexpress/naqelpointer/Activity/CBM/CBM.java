@@ -64,10 +64,10 @@ public class CBM extends AppCompatActivity implements AlertCallback {
                 String msg = result.getErrorMessage();
                 if (result.getHasError())
                     GlobalVar.GV().alertMsgAll("Info", msg, CBM.this,
-                            Enum.SUCCESS_TYPE, "CBM");
+                            Enum.NORMAL_TYPE, "CBM");
                 else
                     GlobalVar.GV().alertMsgAll("Info", msg, CBM.this,
-                            Enum.NORMAL_TYPE, "CBM");
+                            Enum.SUCCESS_TYPE, "CBM");
                 exitdialog();
 
             }
@@ -87,24 +87,25 @@ public class CBM extends AppCompatActivity implements AlertCallback {
         String txtheight = txtHeight.getText().toString();
         String txtlength = txtLength.getText().toString();
         String txtwidth = txtWidth.getText().toString();
+        String wNo = txtWNo.getText().toString();
         CBMRequest cbmRequest = new CBMRequest();
         cbmRequest.setisValid(false);
-
-        if (txtheight.length() > 0 && Double.parseDouble(txtheight) > 0)
-            if (txtlength.length() > 0 && Double.parseDouble(txtlength) > 0)
-                if (txtwidth.length() > 0 && Double.parseDouble(txtwidth) > 0) {
-                    cbmRequest.setEmployID(GlobalVar.GetEmployID(getApplicationContext()));
-                    cbmRequest.setHeight(Double.parseDouble(txtheight));
-                    cbmRequest.setLength(Double.parseDouble(txtlength));
-                    cbmRequest.setWidth(Double.parseDouble(txtwidth));
-                    cbmRequest.setisValid(true);
-                } else
-                    GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Width", true);
+        if (wNo.length() > 0 && Double.parseDouble(wNo) > 0)
+            if (txtheight.length() > 0 && Double.parseDouble(txtheight) > 0)
+                if (txtlength.length() > 0 && Double.parseDouble(txtlength) > 0)
+                    if (txtwidth.length() > 0 && Double.parseDouble(txtwidth) > 0) {
+                        cbmRequest.setEmployID(GlobalVar.GetEmployID(getApplicationContext()));
+                        cbmRequest.setWaybillNo(Integer.parseInt(wNo));
+                        cbmRequest.setHeight(Double.parseDouble(txtheight));
+                        cbmRequest.setLength(Double.parseDouble(txtlength));
+                        cbmRequest.setWidth(Double.parseDouble(txtwidth));
+                        cbmRequest.setisValid(true);
+                    } else
+                        GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Width", true);
+                else
+                    GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Length", true);
             else
-                GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Length", true);
-        else
-            GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Height", true);
-
+                GlobalVar.ShowDialog(CBM.this, "Error", "Please enter Valid Height", true);
 
 
         return cbmRequest;

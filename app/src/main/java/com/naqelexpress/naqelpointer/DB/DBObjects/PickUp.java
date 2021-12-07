@@ -23,6 +23,7 @@ public class PickUp {
     public String CurrentVersion = GlobalVar.GV().AppVersion;
     public int DistrictID = 0;
     public int spID = 0;
+    public int EnteredPieceCount = 0;
 
     public PickUp(int ID) {
         this.ID = ID;
@@ -30,7 +31,7 @@ public class PickUp {
 
     public PickUp(int waybillNo, int clientID, int fromStationID, int toStationID, int pieceCount,
                   double weight, DateTime timeIn, DateTime timeOut, String refNo,
-                  String latitude, String longitude, int DistrictID, int spID) {
+                  String latitude, String longitude, int DistrictID, int spID, int EnteredPieceCount) {
         WaybillNo = waybillNo;
         ClientID = clientID;
         FromStationID = fromStationID;
@@ -44,5 +45,6 @@ public class PickUp {
         Longitude = longitude;
         this.DistrictID = DistrictID;
         this.spID = spID;
+        this.EnteredPieceCount = EnteredPieceCount;
     }
 }

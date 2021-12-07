@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU SpAsr Final Test - 28-11-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU AsrChanges 06-12-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -118,10 +118,10 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = true; //For EBU true only
+    public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
 
@@ -129,7 +129,7 @@ public class GlobalVar {
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
     public static boolean ManualType = false;
-    public static String WaybillNoStartSeries = "8"; //812345679
+    public static String WaybillNoStartSeries = "81"; //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -4588,5 +4588,36 @@ public class GlobalVar {
             Global global = new Global(activity);
             global.addMobileNumberintoContacts(SNo + " - " + sname + " - " + WaybillNo, MNos, WaybillNo);
         }
+    }
+
+//    public boolean isEightorNine(String WaybillNo)
+//    {
+//
+//        if (WaybillNo.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(WaybillNo.substring(0, 1))) {
+//            //txtBarCode.setText(barcode.substring(0, 8));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
+//
+//
+//    }
+
+    public static void onBackpressed(final Activity activity, String title, String msg) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(title)
+                .setMessage(msg)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        activity.finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 }

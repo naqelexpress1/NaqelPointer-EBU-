@@ -207,7 +207,7 @@ public class PickUpActivity extends AppCompatActivity {
                     GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()),
                     GlobalVar.GV().getDoubleFromString(firstFragment.txtWeight.getText().toString()),
                     TimeIn, DateTime.now(), firstFragment.txtRefNo.getText().toString(),
-                    String.valueOf(Latitude), String.valueOf(Longitude), 0 , 0);
+                    String.valueOf(Latitude), String.valueOf(Longitude), 0 , 0,0);
 
             int loadtypeid = 0;
             if (firstFragment.clientdetails.size() > 0) {

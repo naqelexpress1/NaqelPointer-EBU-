@@ -590,20 +590,21 @@ public class MainPageActivity
                 cellTitle[9] = getResources().getString(R.string.NotDeliveredActivity);//CBU 4
                 cellTitle[10] = "Night Stock";//19
                 cellTitle[11] = getResources().getString(R.string.WaybillMeasurementActivity); //6
-                cellTitle[12] = "Sync Trip";//19
-                cellTitle[13] = "Incident";//19
+                cellTitle[12] = "CBM";//24
+                cellTitle[13] = "Sync Trip";//19
+                cellTitle[14] = "Incident";//19
                 //cellTitle[14] = "Suggest DS";//18
-                cellTitle[14] = getResources().getString(R.string.CODChecking);//CBU 8
-                cellTitle[15] = getResources().getString(R.string.PendingCOD);//CBU 9
-                cellTitle[16] = "Contacts";//16
-                cellTitle[17] = "Hisory";//13
-                cellTitle[18] = getResources().getString(R.string.SettingsActivity);//CBU 7
-                cellTitle[19] = "Change Password";//CBU 7
-                cellTitle[20] = "Chat";//CBU 7
-                cellTitle[21] = "KPI";//CBU 7
-                cellTitle[22] = "InCab CheckList";//CBU 7
-                cellTitle[23] = "Fuel Model";//CBU 7
-                cellTitle[24] = "CBM";//CBU 7
+                cellTitle[15] = getResources().getString(R.string.CODChecking);//CBU 8
+                cellTitle[16] = getResources().getString(R.string.PendingCOD);//CBU 9
+                cellTitle[17] = "Contacts";//16
+                cellTitle[18] = "Hisory";//13
+                cellTitle[19] = getResources().getString(R.string.SettingsActivity);//CBU 7
+                cellTitle[20] = "Change Password";//CBU 7
+                cellTitle[21] = "Chat";//CBU 7
+                cellTitle[22] = "KPI";//CBU 7
+                cellTitle[23] = "InCab CheckList";//CBU 7
+                cellTitle[24] = "Fuel Model";//CBU 7
+
             } else {
 
                 cellTitle[0] = getResources().getString(R.string.BookingList);//11
@@ -614,18 +615,19 @@ public class MainPageActivity
                 cellTitle[5] = getResources().getString(R.string.MultiDeliveryActivity);
                 cellTitle[6] = getResources().getString(R.string.NotDeliveredActivity);//CBU 4
                 cellTitle[7] = getResources().getString(R.string.WaybillMeasurementActivity); //6
-                cellTitle[8] = "Incident";//19
-                cellTitle[9] = getResources().getString(R.string.CODChecking);//CBU 8
-                cellTitle[10] = getResources().getString(R.string.PendingCOD);//CBU 9
-                cellTitle[11] = "Contacts";//16
-                cellTitle[12] = "Hisory";//13
-                cellTitle[13] = getResources().getString(R.string.SettingsActivity);//CBU 7
-                cellTitle[14] = "Change Password";//CBU 7
-                cellTitle[15] = "Chat";//CBU 7
-                cellTitle[16] = "KPI";//CBU 7
-                cellTitle[17] = "InCab CheckList";//CBU 7
-                cellTitle[18] = "Fuel Model";//CBU 7
-                cellTitle[19] = "CBM";//CBU 7
+                cellTitle[8] = "CBM";//CBU 7
+                cellTitle[9] = "Incident";//19
+                cellTitle[10] = getResources().getString(R.string.CODChecking);//CBU 8
+                cellTitle[11] = getResources().getString(R.string.PendingCOD);//CBU 9
+                cellTitle[12] = "Contacts";//16
+                cellTitle[13] = "Hisory";//13
+                cellTitle[14] = getResources().getString(R.string.SettingsActivity);//CBU 7
+                cellTitle[15] = "Change Password";//CBU 7
+                cellTitle[16] = "Chat";//CBU 7
+                cellTitle[17] = "KPI";//CBU 7
+                cellTitle[18] = "InCab CheckList";//CBU 7
+                cellTitle[19] = "Fuel Model";//CBU 7
+
             }
 
             if (menu == 1) {
@@ -641,20 +643,21 @@ public class MainPageActivity
                 itemposition.put(9, 4);
                 itemposition.put(10, 21);
                 itemposition.put(11, 6);
-                itemposition.put(12, 22);
-                itemposition.put(13, 20);
+                itemposition.put(12, 32);
+                itemposition.put(13, 22);
+                itemposition.put(14, 20);
                 // itemposition.put(14, 19);
-                itemposition.put(14, 8);
-                itemposition.put(15, 9);
-                itemposition.put(16, 16);
-                itemposition.put(17, 13);
-                itemposition.put(18, 7);
-                itemposition.put(19, 24);
-                itemposition.put(20, 25);
-                itemposition.put(21, 26);
-                itemposition.put(22, 27);
-                itemposition.put(23, 31);
-                itemposition.put(24, 32);
+                itemposition.put(15, 8);
+                itemposition.put(16, 9);
+                itemposition.put(17, 16);
+                itemposition.put(18, 13);
+                itemposition.put(19, 7);
+                itemposition.put(20, 24);
+                itemposition.put(21, 25);
+                itemposition.put(22, 26);
+                itemposition.put(23, 27);
+                itemposition.put(24, 31);
+
             } else {
                 itemposition.put(0, 11);
                 itemposition.put(1, 5); //18
@@ -668,14 +671,15 @@ public class MainPageActivity
                 itemposition.put(9, 8);
                 itemposition.put(10, 9);
                 itemposition.put(11, 16);
-                itemposition.put(12, 13);
-                itemposition.put(13, 7);
-                itemposition.put(14, 24);
-                itemposition.put(15, 25);
-                itemposition.put(16, 26);
-                itemposition.put(17, 27);
-                itemposition.put(18, 31);
-                itemposition.put(19, 32);
+                itemposition.put(12, 32);
+                itemposition.put(13, 13);
+                itemposition.put(14, 7);
+                itemposition.put(15, 24);
+                itemposition.put(16, 25);
+                itemposition.put(17, 26);
+                itemposition.put(18, 27);
+                itemposition.put(19, 31);
+
                 // itemposition.put(18, 11);
             }
 
@@ -733,21 +737,22 @@ public class MainPageActivity
 
                 cellIcon[10] = R.drawable.delivery; //CBU
                 cellIcon[11] = R.drawable.waybillmeasurement; //CBU
-                cellIcon[12] = R.drawable.datasync; //CBU
-                cellIcon[13] = R.drawable.delivery; //CBU
+                cellIcon[12] = R.drawable.bluebox; //CBU
+                cellIcon[13] = R.drawable.datasync; //CBU
+                cellIcon[14] = R.drawable.delivery; //CBU
                 // cellIcon[14] = R.drawable.delivery; //CBU
-                cellIcon[14] = R.drawable.money; //CBU
+                cellIcon[15] = R.drawable.money; //CBU
                 //cellIcon[16] = R.drawable.maplist; //CBU
-                cellIcon[15] = R.drawable.pendingcod; //CBU
-                cellIcon[16] = R.drawable.contacts; //CBU
-                cellIcon[17] = R.drawable.pendingdata; //CBU
-                cellIcon[18] = R.drawable.settings; //CBU
-                cellIcon[19] = R.drawable.contacts; //CBU
+                cellIcon[16] = R.drawable.pendingcod; //CBU
+                cellIcon[17] = R.drawable.contacts; //CBU
+                cellIcon[18] = R.drawable.pendingdata; //CBU
+                cellIcon[19] = R.drawable.settings; //CBU
                 cellIcon[20] = R.drawable.contacts; //CBU
-                cellIcon[21] = R.drawable.customclearence; //CBU
-                cellIcon[22] = R.drawable.car; //CBU
-                cellIcon[23] = R.drawable.fuel; //CBU
-                cellIcon[24] = R.drawable.acceptjob; //CBU
+                cellIcon[21] = R.drawable.contacts; //CBU
+                cellIcon[22] = R.drawable.customclearence; //CBU
+                cellIcon[23] = R.drawable.car; //CBU
+                cellIcon[24] = R.drawable.fuel; //CBU
+
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -762,14 +767,15 @@ public class MainPageActivity
                 cellIcon[9] = R.drawable.money; //CBU
                 cellIcon[10] = R.drawable.pendingcod; //CBU
                 cellIcon[11] = R.drawable.contacts; //CBU
-                cellIcon[12] = R.drawable.pendingdata; //CBU
-                cellIcon[13] = R.drawable.settings; //CBU
-                cellIcon[14] = R.drawable.contacts; //CBU
+                cellIcon[12] = R.drawable.bluebox; //CBU
+                cellIcon[13] = R.drawable.pendingdata; //CBU
+                cellIcon[14] = R.drawable.settings; //CBU
                 cellIcon[15] = R.drawable.contacts; //CBU
-                cellIcon[16] = R.drawable.customclearence; //CBU
-                cellIcon[17] = R.drawable.car; //CBU
-                cellIcon[18] = R.drawable.fuel; //CBU
-                cellIcon[19] = R.drawable.acceptjob; //CBU
+                cellIcon[16] = R.drawable.contacts; //CBU
+                cellIcon[17] = R.drawable.customclearence; //CBU
+                cellIcon[18] = R.drawable.car; //CBU
+                cellIcon[19] = R.drawable.fuel; //CBU
+
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
@@ -1203,8 +1209,8 @@ public class MainPageActivity
                                     Intent bookingList = new Intent(getApplicationContext(), BookingList.class);
                                     startActivity(bookingList);
                                 } else {
-                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
-//                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
+//                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.BookingCBU.BookingList.class);
+                                    Intent bookingList = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList.class);
                                     startActivity(bookingList);
                                 }
                             } else {
@@ -1362,7 +1368,7 @@ public class MainPageActivity
                     case 25:
                         if (VersionMatct()) {
                             Intent chat = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(chat);
+                           // startActivity(chat);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                     , true);

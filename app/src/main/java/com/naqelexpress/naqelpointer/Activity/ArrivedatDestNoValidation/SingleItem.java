@@ -6,9 +6,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,20 +48,40 @@ public class SingleItem extends Fragment {
                 palletbarcode = (EditText) rootView.findViewById(R.id.palletbarcode);
                 palletbarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-                palletbarcode.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
+//                palletbarcode.addTextChangedListener(new TextWatcher() {
+//                    @Override
+//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                    }
+//
+//                    @Override
+//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                    }
+//
+//                    @Override
+//                    public void afterTextChanged(Editable s) {
+//                        if (palletbarcode != null && palletbarcode.getText().length() >= 13)
+////                            ValidatePallet(palletbarcode.getText().toString());
+//                            setBarcode();
+//                    }
+//                });
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
+                palletbarcode.setOnKeyListener(new View.OnKeyListener() {
+                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                        // If the event is a key-down event on the "enter" button
+                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+                            return true;
+                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                            //finish();
+                            GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+                            return true;
+                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    @Override
-                    public void afterTextChanged(Editable s) {
-                        if (palletbarcode != null && palletbarcode.getText().length() >= 13)
+                            if (palletbarcode != null && palletbarcode.getText().length() >= 13)
 //                            ValidatePallet(palletbarcode.getText().toString());
-                            setBarcode();
+                                setBarcode();
+                            return true;
+                        }
+                        return false;
                     }
                 });
             }

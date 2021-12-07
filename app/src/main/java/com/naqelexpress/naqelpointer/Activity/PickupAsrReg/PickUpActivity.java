@@ -308,7 +308,7 @@ public class PickUpActivity extends AppCompatActivity {
                     Weight,
                     DateTime.now(), DateTime.now(), RefNo,
                     String.valueOf(Latitude), String.valueOf(Longitude), districtID
-                    , bookinglist.get(position).getSPLOfficesID());
+                    , bookinglist.get(position).getSPLOfficesID(), 0);
 
             int loadtypeid = 0;
 
@@ -388,7 +388,8 @@ public class PickUpActivity extends AppCompatActivity {
                 PiecesCount,
                 Weight,
                 DateTime.now(), DateTime.now(), RefNo,
-                String.valueOf(Latitude), String.valueOf(Longitude), districtID, 0);
+                String.valueOf(Latitude), String.valueOf(Longitude), districtID, 0,
+                Integer.parseInt(firstFragment.txtCollectedPiece.getText().toString()));
 
         int loadtypeid = 0;
 
@@ -530,10 +531,15 @@ public class PickUpActivity extends AppCompatActivity {
 
 
             if (class_ == 0) {
+                if (firstFragment.txtCollectedPiece.getText().toString().length() == 0
+                        || Integer.parseInt(firstFragment.txtCollectedPiece.getText().toString()) <= 0)
+                    return false;
+
                 if (waybilllist.size() > firstFragment.PickUpBarCodeList.size()) {
                     pcikupwaybillcountMismatch();
                     return false;
                 }
+
             }
             /*int piecesCount = secondFragment.PickUpBarCodeList.size();
             if (GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()) != piecesCount) {

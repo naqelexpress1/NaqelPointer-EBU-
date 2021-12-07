@@ -85,7 +85,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 161; // TimeZone
+    private static final int Version = 163; // TimeZone
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -357,7 +357,7 @@ public class DBConnections
                 "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                 " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
                 " \"TruckID\" Integer Default 0 , JsonData Text Not Null , DistrictID Integer Default 0 ," +
-                " SpID Integer Default 0)");
+                " SpID Integer Default 0 , CollectedPiece Integer Default 0)");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
@@ -540,7 +540,8 @@ public class DBConnections
                 ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
                 "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
                 "RefNo TEXT , GoodDesc TEXT , MobileNo TEXT," +
-                "IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT    )");
+                "IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT ," +
+                "CONSTRAINT pid UNIQUE (PickupsheetDetailID)   )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -741,7 +742,7 @@ public class DBConnections
                     "\"IsSync\" BOOL NOT NULL , \"UserID\" INTEGER NOT NULL , \"StationID\" INTEGER NOT NULL , \"RefNo\" TEXT, \"Latitude\"" +
                     " TEXT, \"CurrentVersion\" TEXT NOT NULL, \"Longitude\" TEXT ,\"LoadTypeID\" INTEGER NOT NULL,\"AL\" INTEGER DEFAULT 0," +
                     " \"TruckID\" Integer Default 0 , JsonData Text Not Null , DistrictID Integer Default 0 ," +
-                    "SpID Integer Default 0)");
+                    "SpID Integer Default 0 , CollectedPiece Integer Default 0)");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickUpDetailAuto\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , \"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"PickUpID\" INTEGER NOT NULL )");
 
@@ -930,7 +931,8 @@ public class DBConnections
                     ", Lat TEXT   , Lng TEXT    , Date TEXT    , PhoneNo TEXT   ," +
                     "isPickedup INTEGER   , EmployID INTEGER   , ClientName TEXT    ,  ClientID INTEGER ," +
                     "RefNo TEXT , GoodDesc TEXT  ,  MobileNo TEXT, " +
-                    " IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT)");
+                    " IsSPL BOOL, SPLOfficesID  Int , SpLatLng TEXT , BKHeader TEXT , SPMobile Text , SPOfficeName TEXT," +
+                    "CONSTRAINT pid UNIQUE (PickupsheetDetailID) )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
@@ -1235,12 +1237,36 @@ public class DBConnections
                 db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN SpID INTEGER");
             if (!isColumnExist("UserME", "TimeZone"))
                 db.execSQL("ALTER TABLE UserME ADD COLUMN TimeZone TEXT");
+            if (!isColumnExist("PickUpAuto", "CollectedPiece"))
+                db.execSQL("ALTER TABLE PickUpAuto ADD COLUMN CollectedPiece INTEGER");
+
+            if (!isUniqueConstraint("PickupSheetDetails", "pid", db))
+                db.execSQL("CREATE UNIQUE INDEX pid ON PickupSheetDetails(PickupsheetDetailID)");
 
         }
 
 
     }
 
+
+    private boolean isUniqueConstraint(String tablename, String constraintname, SQLiteDatabase db) {
+        boolean isConstraint = false;
+        String selectQuery = "select count(*) cnt from sqlite_master where tbl_name ='" + tablename + "' and sql like '%" + constraintname + "%'";
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+
+
+            isConstraint = cursor.getInt(cursor.getColumnIndex("cnt")) > 0 ? true : false;
+
+
+        }
+        cursor.close();
+        // db.close();
+
+        return isConstraint;
+    }
 
     public Cursor getStationID(int EmployID, Context context) {
         // int StationID = 0;
@@ -2045,6 +2071,7 @@ public class DBConnections
             contentValues.put("DistrictID", instance.DistrictID);
             contentValues.put("JsonData", JsonData);
             contentValues.put("SpID", instance.spID);
+            contentValues.put("CollectedPiece", instance.EnteredPieceCount);
 
 //            result = db.insert("PickUp", null, contentValues);
             result = db.insert("PickUpAuto", null, contentValues);
@@ -4370,6 +4397,7 @@ public class DBConnections
             db.delete("TripPlanDetails", "date(CTime) <? And IsSync  =?", args);
             db.delete("AtDestination", "date(CTime) <? And IsSync  =?", args);
             db.execSQL("delete  from PickUpException where sysDate != '" + GlobalVar.getDate() + "'");
+            // db.delete("PickupSheetDetails", "date(Date) <? ", args);
 
             db.close();
 
@@ -6443,6 +6471,45 @@ public class DBConnections
         db.endTransaction();
 
         db.close();
+    }
+
+    public void insertCAFBulk(JSONArray deliveryReq, Context context) {
+
+            String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO ) values (?, ?, ?, ? , ? , ?);";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            //db.getWritableDatabase();
+            db.beginTransaction();
+            SQLiteStatement stmt = db.compileStatement(sql);
+
+            for (int i = 0; i < deliveryReq.length(); i++) {
+                //generate some values
+                try {
+
+                    JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
+                    String insdate[] = jsonObject1.getString("InsertedDate").split("T");
+                    stmt.bindString(1, String.valueOf(jsonObject1.getInt("WaybillNo")));
+                    stmt.bindString(2, jsonObject1.getString("BarCode"));
+                    stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
+                    stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
+                    stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
+                    String NCLNo = "0";
+                    if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
+                        NCLNo = jsonObject1.getString("NCLNO");
+                    stmt.bindString(6, NCLNo);
+
+                    long entryID = stmt.executeInsert();
+                    stmt.clearBindings();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+            db.close();
+
     }
 
     public boolean InsertRtoReq(int waybillno, String barcode, String ValidDate, Context context) {
@@ -9547,7 +9614,7 @@ public class DBConnections
                                                      bookingModelList, Context context) {
 
         // deleteDistrictData(context);
-        String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
+        String sql = "insert OR IGNORE into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
                 "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
                 "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc , MobileNo" +
                 " ) values (?, ?, ?, ?, ?,?, ?, ?, ?, ?,?, ?, ?, ?, ? ,?,?,?,?,?,? ,?);";
@@ -9646,7 +9713,7 @@ public class DBConnections
                                                               bookingModelList, Context context, Activity activity) {
 
         // deleteDistrictData(context);
-        String sql = "insert into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
+        String sql = "insert  OR IGNORE into PickupSheetDetails (PickupSheetID, FromStationID, ToStationID, OrgCode , DestCode," +
                 "WaybillNo, Code ,ConsigneeName ,Remark, PickupsheetDetailID," +
                 "Lat, Lng , Date, PhoneNo , EmployID  ,ClientID, ClientName, isPickedup , SNo , RefNo , GoodDesc , MobileNo," +
                 "IsSPL , SPLOfficesID , SpLatLng , BKHeader , SPMobile , SPOfficeName " +
@@ -10003,6 +10070,19 @@ public class DBConnections
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             // db.delete("CourierDailyRoute", null, null);
             db.delete("PickupSheetDetails", null, null);
+            db.delete("PickupSheetReason", null, null);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+
+    }
+
+    public void deletePickupsheetReasonData(Context context) {
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            // db.delete("CourierDailyRoute", null, null);
+
             db.delete("PickupSheetReason", null, null);
             db.close();
         } catch (SQLiteException e) {

@@ -26,6 +26,24 @@ public class OnLineValidation extends DefaultResult {
     private boolean IsNotInFile;
     private boolean IsDestChanged;
     private boolean isHV;
+    private int IsCAFRequest = 0;
+
+    public boolean setisHV() {
+        return isHV;
+    }
+
+    public void setHV(boolean HV) {
+        isHV = HV;
+    }
+
+    public int getIsCAFRequest() {
+        return IsCAFRequest;
+    }
+
+    public void setIsCAFRequest(int isCAFRequest) {
+        IsCAFRequest = isCAFRequest;
+    }
+
 
     public boolean getisHV() {
         return isHV;

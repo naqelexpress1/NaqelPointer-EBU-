@@ -74,7 +74,7 @@ public class PickUpFirstFragment
     boolean flag_thread = false;
     public DataAdapter adapter;
     static int al = 0;
-    EditText txtBarCode;
+    EditText txtBarCode, txtCollectedPiece;
     public ArrayList<String> PickUpBarCodeList = new ArrayList<>();
     private RecyclerView recyclerView;
 
@@ -96,7 +96,7 @@ public class PickUpFirstFragment
             LayoutInflater lf = getActivity().getLayoutInflater();
             rootView = lf.inflate(R.layout.spasrregular_booking, container, false);
 
-
+            txtCollectedPiece = (EditText) rootView.findViewById(R.id.txtPiecesCount);
             bookinglist = (ArrayList<BookingModel>) getArguments().get("value");
             position = (Integer) getArguments().get("position");
             name = getArguments().getStringArrayList("name");
@@ -110,7 +110,13 @@ public class PickUpFirstFragment
 
 
             txtdescription = (TextView) rootView.findViewById(R.id.txtdescription);
-
+            txtdescription.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (txtdescription != null && txtdescription.getText().toString().length() > 0)
+                        GlobalVar.ShowDialog(getActivity(), "", txtdescription.getText().toString(), true);
+                }
+            });
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtBarcode);

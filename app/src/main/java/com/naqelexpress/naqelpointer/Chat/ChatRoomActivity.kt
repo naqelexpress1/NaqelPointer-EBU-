@@ -45,23 +45,24 @@ class ChatRoomActivity : AppCompatActivity() {
         //subscribeToRoom(RoomsListActivity.Roomobj.roomobj)
 
 
-        currentUser.subscribeToRoom(
+        if (roomId != null) {
+            currentUser.subscribeToRoom(
                 roomId = roomId,
                 listeners = RoomListeners(onUserJoined = { message ->
 
 
                 },
-                        onMessage = { message ->
-                            Log.d("TAG", message.text)
-                            list.add(message)
-                            //adapter.notifyDataSetChanged()
-                            adapter.addMessage(message)
+                    onMessage = { message ->
+                        message.text?.let { Log.d("TAG", it) }
+                        list.add(message)
+                        //adapter.notifyDataSetChanged()
+                        adapter.addMessage(message)
 
-                            subscribeToRoom()
-                        },
-                        onErrorOccurred = { error ->
-                            Log.d("TAG", error.toString())
-                        }
+                        subscribeToRoom()
+                    },
+                    onErrorOccurred = { error ->
+                        Log.d("TAG", error.toString())
+                    }
                 ),
                 messageLimit = 20, // Optional
                 callback = { subscription ->
@@ -72,7 +73,8 @@ class ChatRoomActivity : AppCompatActivity() {
                     subscription.run { }
                     Log.d("TAG", subscription.toString())
                 }
-        )
+            )
+        }
 
         //subscribeToRoom()
 
@@ -80,7 +82,8 @@ class ChatRoomActivity : AppCompatActivity() {
             if (edit_text.text.isNotEmpty()) {
 
 
-                currentUser.sendMessage(
+                if (roomId != null) {
+                    currentUser.sendMessage(
                         roomId = roomId,
                         // room = RoomsListActivity.Roomobj.roomobj,
                         messageText = edit_text.text.toString(),
@@ -100,7 +103,8 @@ class ChatRoomActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                )
+                    )
+                }
             }
         }
     }

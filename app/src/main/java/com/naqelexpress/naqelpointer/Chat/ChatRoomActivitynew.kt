@@ -57,7 +57,8 @@ class ChatRoomActivitynew : AppCompatActivity() {
 //                }
 //        )
 
-        currentUser.subscribeToRoom(
+        if (roomId != null) {
+            currentUser.subscribeToRoom(
                 roomId = roomId,
                 consumer = { event: RoomEvent ->
                     when (event) {
@@ -90,11 +91,13 @@ class ChatRoomActivitynew : AppCompatActivity() {
                     // You should terminate the subscription with subscription.unsubscribe()
                     // when it is no longer needed
                 }
-        )
+            )
+        }
 
         button_send.setOnClickListener {
             if (edit_text.text.isNotEmpty()) {
-                currentUser.sendMessage(
+                if (roomId != null) {
+                    currentUser.sendMessage(
                         roomId = roomId,
                         messageText = edit_text.text.toString(),
                         callback = { result ->
@@ -111,7 +114,8 @@ class ChatRoomActivitynew : AppCompatActivity() {
                                 }
                             }
                         }
-                )
+                    )
+                }
             }
         }
     }

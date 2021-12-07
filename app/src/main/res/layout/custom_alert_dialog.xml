@@ -2,8 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/White">
+    android:background="@color/White"
+    android:orientation="vertical">
 
     <!--android:paddingBottom="80dp"-->
     <ScrollView
@@ -78,14 +78,14 @@
                 android:id="@+id/ll_not_manifested"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_not_manifested_header"
@@ -121,14 +121,14 @@
                 android:id="@+id/ll_no_bayan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_no_bayan_header"
@@ -159,20 +159,19 @@
             </LinearLayout>
 
 
-
             <!--CITC Shipment Complaint -->
             <LinearLayout
                 android:id="@+id/ll_citc_complaint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_citc_header"
@@ -202,20 +201,62 @@
 
             </LinearLayout>
 
+            <!-- CAF -->
+            <LinearLayout
+                android:id="@+id/ll_caf_complaint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_caf_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_caf_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
             <!--NCL Wrong Dest -->
             <LinearLayout
                 android:id="@+id/ll_ncl_wrong_dest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_ncl_header"
@@ -249,9 +290,9 @@
                         android:id="@+id/rg_change_dest"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
                         android:gravity="center"
                         android:orientation="horizontal"
-                        android:layout_marginBottom="10dp"
                         android:visibility="gone">
 
                         <RadioButton
@@ -271,16 +312,16 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:checked="false"
-                            android:visibility="gone"
-                            android:text="Discard" />
+                            android:text="Discard"
+                            android:visibility="gone" />
                     </RadioGroup>
                 </LinearLayout>
 
                 <com.toptoche.searchablespinnerlibrary.SearchableSpinner
                     android:id="@+id/spinner_ncl_destinations"
                     style="@style/spinner_style"
-                    android:visibility="gone"
-                    android:drawSelectorOnTop="true"/>
+                    android:drawSelectorOnTop="true"
+                    android:visibility="gone" />
 
                 <View
                     android:layout_width="match_parent"
@@ -295,22 +336,22 @@
                 android:id="@+id/ll_wrong_dest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_wrong_dest_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="Wrong Destination"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -318,8 +359,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
-                        android:text="Wrong destination."
                         android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Wrong destination."
                         android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
@@ -340,22 +381,22 @@
                 android:id="@+id/ll_no_attempts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_no_attempts_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="Number Of Attempts"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -364,12 +405,11 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/hint_txt_color"
                         android:text="1"
+                        android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
                 </LinearLayout>
-
 
 
                 <View
@@ -384,15 +424,15 @@
                 android:id="@+id/ll_ds_validation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
 
                     <TextView
@@ -400,8 +440,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="DS Validation"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -410,8 +450,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/hint_txt_color"
                         android:text="Shipment not beling to employee."
+                        android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -430,23 +470,23 @@
                 android:id="@+id/ll_is_multi_piece"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_multiPiece_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="Multi Piece"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -454,8 +494,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
-                        android:text="Please check pieces."
                         android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Please check pieces."
                         android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
@@ -472,8 +512,8 @@
                         android:id="@+id/rg_multi_piece"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center"
                         android:layout_marginBottom="10dp"
+                        android:gravity="center"
                         android:orientation="horizontal"
                         android:visibility="gone">
 
@@ -510,14 +550,14 @@
                 android:id="@+id/ll_is_stop_shipment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_stop_shipment_header"
@@ -551,22 +591,22 @@
                 android:id="@+id/ll_is_rto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_rto_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="RTO Request"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -574,8 +614,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
-                        android:text="RTO Request."
                         android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="RTO Request."
                         android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
@@ -595,23 +635,23 @@
                 android:id="@+id/ll_is_delivery_req"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_delivery_req_header"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="Delivery Request"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -620,13 +660,12 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/hint_txt_color"
                         android:text="Delivery Request."
+                        android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
 
                 </LinearLayout>
-
 
 
                 <View
@@ -643,15 +682,15 @@
                 android:id="@+id/ll_is_relabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
 
                     <TextView
@@ -659,8 +698,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/sf_pro_text_medium"
-                        android:textColor="@color/txt_color"
                         android:text="Re-Label"
+                        android:textColor="@color/txt_color"
                         android:textSize="16.7sp" />
 
                     <TextView
@@ -669,8 +708,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="11.7dp"
                         android:fontFamily="@font/sf_pro_text_regular"
-                        android:textColor="@color/hint_txt_color"
                         android:text="Re-Label."
+                        android:textColor="@color/hint_txt_color"
                         android:textSize="14sp" />
 
                 </LinearLayout>
@@ -688,14 +727,14 @@
                 android:id="@+id/ll_hv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_margin="16.7dp">
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tv_hv_header"

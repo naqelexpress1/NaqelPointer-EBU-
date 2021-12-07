@@ -116,6 +116,20 @@
 
         </LinearLayout>
 
+        <EditText
+            android:id="@+id/txtPiecesCount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+
+            android:ems="10"
+            android:gravity="center"
+            android:hint="Collected Piece"
+            android:imeOptions="actionDone"
+            android:inputType="number"
+            android:maxLength="2"
+            tools:ignore="HardcodedText" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

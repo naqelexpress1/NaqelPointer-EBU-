@@ -36,10 +36,9 @@ import com.squareup.okhttp.Response;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 
 public class SplashScreenActivity
@@ -65,25 +64,27 @@ public class SplashScreenActivity
         setContentView(R.layout.splashscreen);
 
 
-        Calendar mCalendar = new GregorianCalendar();
-        TimeZone mTimeZone = mCalendar.getTimeZone();
-        int mGMTOffset = mTimeZone.getRawOffset();
-        System.out.printf("GMT offset is %s hours", TimeUnit.HOURS.convert(mGMTOffset, TimeUnit.MILLISECONDS));
+//        Calendar mCalendar = new GregorianCalendar();
+//        TimeZone mTimeZone = mCalendar.getTimeZone();
+//        int mGMTOffset = mTimeZone.getRawOffset();
+//        System.out.printf("GMT offset is %s hours", TimeUnit.HOURS.convert(mGMTOffset, TimeUnit.MILLISECONDS));
+//
+//        checkPermission();
 
         ///String str="NQL12457852456321";
         //String numberOnly= str.replaceAll("[^0-9]", "");
         //System.out.println(numberOnly);
 //        try {
-//            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+//            File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS);
 //
-//            String DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+//            String DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/NaqelSignature/";
 //            File file = new File(DIRECTORY);
-//
-//            File pdfFile = new File(folder, "naqelpointer.apk");
-//            FileOutputStream fileOutputStream = new FileOutputStream(pdfFile);
 //            if (!file.exists()) {
 //                file.mkdirs();
 //            }
+//           // File pdfFile = new File(folder, "naqelpointer.apk");
+//           // FileOutputStream fileOutputStream = new FileOutputStream(pdfFile);
+//
 //            OutputStream output = new FileOutputStream(DIRECTORY + "/" + "naqelpointer.apk");
 //
 //        } catch (Exception e) {
@@ -649,7 +650,7 @@ public class SplashScreenActivity
 
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                    new String[]{WRITE_EXTERNAL_STORAGE},
                                     5
                             );
                         }
@@ -720,7 +721,7 @@ public class SplashScreenActivity
 //                        startActivity(intent);
                         ActivityCompat.requestPermissions(
                                 SplashScreenActivity.this,
-                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE},
                                 8
                         );
 
@@ -779,7 +780,7 @@ public class SplashScreenActivity
                         } else {
                             ActivityCompat.requestPermissions(
                                     SplashScreenActivity.this,
-                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    new String[]{WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE},
                                     8
                             );
                         }
@@ -978,5 +979,44 @@ public class SplashScreenActivity
 
     }
 
+    /*private boolean checkPermission() {
+        if (SDK_INT >= 30) {
+            if (!Environment.isExternalStorageManager())
+                requestPermission();
+            return false;
+        } else {
+            int result = ContextCompat.checkSelfPermission(SplashScreenActivity.this, READ_EXTERNAL_STORAGE);
+            int result1 = ContextCompat.checkSelfPermission(SplashScreenActivity.this, WRITE_EXTERNAL_STORAGE);
+            return result == PackageManager.PERMISSION_GRANTED && result1 == PackageManager.PERMISSION_GRANTED;
+        }
+    }
 
+    private void requestWriteAllPermission() {
+        if (SDK_INT >= 30) {
+            try {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+                intent.addCategory("android.intent.category.DEFAULT");
+                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+                startActivityForResult(intent, 2296);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2296) {
+            if (SDK_INT >= Build.VERSION_CODES.R) {
+                if (Environment.isExternalStorageManager()) {
+                    // perform action when allow permission success
+                } else {
+                    Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    }*/
 }

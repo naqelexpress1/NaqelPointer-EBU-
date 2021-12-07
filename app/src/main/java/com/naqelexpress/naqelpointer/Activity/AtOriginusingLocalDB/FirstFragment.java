@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -74,6 +75,23 @@ public class FirstFragment extends Fragment {
                 });
 
 
+//                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                        // If the event is a key-down event on the "enter" button
+//                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                            return true;
+//                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                            //finish();
+//                            onBackpressed();
+//                            return true;
+//                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                            setTxtWaybillNo();
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
                 //Selectedwaybilldetails.clear();
 
                 swipeMenuListView = (SwipeMenuListView) rootView.findViewById(R.id.pieceslist);
@@ -172,4 +190,19 @@ public class FirstFragment extends Fragment {
         }
     }
 
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit PickUp")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
 }

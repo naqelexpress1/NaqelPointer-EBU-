@@ -16,9 +16,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,7 +68,26 @@ public class DeliverySheetThirdFragment
 
             txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-            txtBarCode.addTextChangedListener(new TextWatcher() {
+            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        //finish();
+                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                            setBarcode();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+        /*    txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -85,7 +103,7 @@ public class DeliverySheetThirdFragment
                     if (txtBarCode != null && txtBarCode.getText().length() >= 13)
                         setBarcode();
                 }
-            });
+            });*/
 
             intent = new Intent(this.getContext(), NewBarCodeScanner.class);
 

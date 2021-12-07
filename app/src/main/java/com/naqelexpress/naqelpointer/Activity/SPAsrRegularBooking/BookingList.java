@@ -279,7 +279,8 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                     @Override
                     public void returnResult(PickupSheetSPASRRegResult result) {
                         System.out.println();
-                        deleteBookingData();
+//                        deleteBookingData();
+                        deletePickupsheetReasonData();
                         myBookingList.clear();
                         if (result.PickupSheet.size() > 0)
                             myBookingList = result.PickupSheet;
@@ -711,6 +712,13 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.clearAllPickupsheetData(getApplicationContext());
 
+        dbConnections.close();
+    }
+
+    private void deletePickupsheetReasonData() {
+        myBookingList.clear();
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        dbConnections.deletePickupsheetReasonData(getApplicationContext());
         dbConnections.close();
     }
 

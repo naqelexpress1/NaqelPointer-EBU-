@@ -244,10 +244,10 @@ public class OptimiseMap extends AppCompatActivity implements OnMapReadyCallback
                     //    double latitude = location.getLatitude();
 
 
-                    if (position != 0){
+                    if (position != 0) {
                         //commented by ismail because couriers are miss use
-                        custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));}
-                    else
+                        custom_alert((Integer) marker.getTag(), Integer.parseInt(marker.getSnippet()));
+                    } else
                         GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "This is Starting Point.", GlobalVar.AlertType.Error);
 //                    Location location = GlobalVar.getLastKnownLocation(getApplicationContext());
 

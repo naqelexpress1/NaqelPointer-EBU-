@@ -72,6 +72,8 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
 
+import static android.os.Build.VERSION.SDK_INT;
+
 public class LoginActivity
         extends AppCompatActivity {
     // DBConnections dbConnections;
@@ -311,6 +313,13 @@ public class LoginActivity
 
     public void Login(View view) throws ParseException {
 
+        if (SDK_INT >= 30) {
+            if (!Environment.isExternalStorageManager()) {
+                requestWriteAllPermission();
+                return;
+            }
+        }
+
         GlobalVar.GV().UserPassword = txtPassword.getText().toString();
 
 //        if (!GlobalVar.GV().LoginVariation && !GlobalVar.GV().IsTerminalApp) {
@@ -366,6 +375,7 @@ public class LoginActivity
     }
 
     private void LoginIntoOpenMainPage() {
+
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         String empID = txtEmployID.getText().toString();
         String Password = txtPassword.getText().toString();
@@ -802,9 +812,9 @@ public class LoginActivity
 
 
             if (Build.VERSION.SDK_INT >= 30)
-                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/NaqelSignature";
             else
-                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
+                DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
 
             File file = new File(DIRECTORY);
             if (!file.exists()) {
@@ -909,7 +919,7 @@ public class LoginActivity
                     if (!isUnknownSourceEnable()) {
                         String DIRECTORY = "";
                         if (Build.VERSION.SDK_INT >= 30)
-                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/" + installaionfile;
+                            DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/NaqelSignature/" + installaionfile;
                         else
                             DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/" + installaionfile;
 
@@ -922,7 +932,7 @@ public class LoginActivity
 //                            startActivityForResult(intent1, UNINSTALL_REQUEST_CODE);
                             String DIRECTORY1 = "";
                             if (Build.VERSION.SDK_INT >= 30)
-                                DIRECTORY1 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature";
+                                DIRECTORY1 = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/NaqelSignature";
                             else
                                 DIRECTORY1 = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature";
 
@@ -1663,10 +1673,11 @@ public class LoginActivity
             return;
         }
 
+
         try {
             String DIRECTORY = "";
             if (Build.VERSION.SDK_INT >= 30)
-                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + "/NaqelSignature/";
+                DIRECTORY = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).getPath() + "/NaqelSignature/";
             else
                 DIRECTORY = Environment.getExternalStorageDirectory().getPath() + "/NaqelSignature/";
 
@@ -1846,6 +1857,17 @@ public class LoginActivity
                 }
                 break;
             }
+            case 2296:
+                if (SDK_INT >= Build.VERSION_CODES.R) {
+                    if (Environment.isExternalStorageManager()) {
+
+                    } else {
+//                        Toast.makeText(this, "Allow permission for storage access!", Toast.LENGTH_SHORT).show();
+                        GlobalVar.ShowDialog(LoginActivity.this, "Warning", "Allow permission for storage access!", true);
+                    }
+
+                }
+                break;
         }
     }
 
@@ -1875,5 +1897,23 @@ public class LoginActivity
         alertDialog.show();
     }
 
+    private void requestWriteAllPermission() {
+        if (SDK_INT >= 30) {
+            try {
+                Uri uri = Uri.parse("package:" + BuildConfig.APPLICATION_ID);
+                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri);
+                startActivityForResult(intent, 2296);
+
+//                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+//                intent.addCategory("android.intent.category.DEFAULT");
+//                intent.setData(Uri.parse(String.format("package:%s", getApplicationContext().getPackageName())));
+//                startActivityForResult(intent, 2296);
+            } catch (Exception e) {
+                Intent intent = new Intent();
+                intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivityForResult(intent, 2296);
+            }
+        }
+    }
 
 }

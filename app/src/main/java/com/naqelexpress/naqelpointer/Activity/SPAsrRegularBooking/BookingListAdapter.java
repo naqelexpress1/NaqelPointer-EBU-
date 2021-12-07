@@ -129,6 +129,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         if (item.getisSPL()) {
             holder.puidawbno.setText("Pu ID / AWB : " + item.getPickupSheetID());
             holder.location.setText(item.getSPOfficeName());
+
             holder.mno1.setText(item.getSPMobile());
             holder.numberofwaybills.setText(String.valueOf(item.getWaybillcount()));
             holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
@@ -153,6 +154,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.mno2.setText(item.getMobileNo());
             holder.tableLayout.setVisibility(View.INVISIBLE);
         }
+
 
         if (item.getIsPickedup() == 1)
             holder.attempedstatus.setText("Attempted");
@@ -227,6 +229,9 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
 
             }
         });
+
+        if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains("."))
+            holder.location.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.marker, 0);
 
         //GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
 

@@ -37,8 +37,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
                     android:layout_marginTop="40dp"
+                    android:layout_marginRight="10dp"
                     app:cardCornerRadius="5dp"
                     app:cardElevation="5dp"
                     app:cardUseCompatPadding="true">
@@ -121,6 +121,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
                                     android:layout_weight="0.33"
+                                    android:clickable="false"
                                     android:text="@string/NotDelivered"
                                     android:textColor="@color/NaqelBlue"
                                     android:textSize="10sp" />
@@ -132,6 +133,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_gravity="center"
                                     android:layout_weight="0.33"
+                                    android:clickable="false"
                                     android:text="to Google"
                                     android:textColor="@color/NaqelBlue"
                                     android:textSize="10sp"

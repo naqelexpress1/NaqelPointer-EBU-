@@ -67,7 +67,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
     HashMap<String, String> trips = new HashMap<>();
-    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount;
+    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount, cafcount;
     private EditText txtBarCode;//, txtbinlocation;
     Button bringdatawaybillattempt;
 
@@ -77,6 +77,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     public ArrayList<String> iscitcshipments = new ArrayList<>();
     public ArrayList<String> isrtoReq = new ArrayList<>();
     public ArrayList<String> isHeldout = new ArrayList<>();
+    public ArrayList<String> iscafshipments = new ArrayList<>();
     private String division;
 
 
@@ -112,6 +113,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         lbTotal = (TextView) findViewById(R.id.lbTotal);
         citccount = (TextView) findViewById(R.id.citccount);
+        cafcount = (TextView) findViewById(R.id.cafcount);
         delreqcount = (TextView) findViewById(R.id.delreqcount);
         rtoreqcount = (TextView) findViewById(R.id.rtoreqcount);
 
@@ -333,6 +335,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
             WaybillAttempt = "No Data";
+
 
         if (isrtoReq.contains(txtBarCode.getText().toString())) {
 
@@ -585,6 +588,9 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
             WaybillAttempt = "No Data";
 
+        if (iscafshipments.contains(txtBarCode.getText().toString()))
+            onLineValidation.setIsCAFRequest(1);
+
         if (isrtoReq.contains(txtBarCode.getText().toString())) {
             onLineValidation.setIsRTORequest(1);
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
@@ -779,6 +785,16 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 cursor.moveToFirst();
                 do {
                     iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                } while (cursor.moveToNext());
+            }
+
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 4 and BarCode='" + Barcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                iscafshipments.clear();
+                cursor.moveToFirst();
+                do {
+                    iscafshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
                 } while (cursor.moveToNext());
             }
 
@@ -1204,6 +1220,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                             if (rtolength > 0) {
                                 dbConnections.insertReqBulk(rtoreq, getApplicationContext());
                             }
+
+                            JSONArray caf = jsonObject.getJSONArray("CAF");
+
+                            if (caf.length() > 0)
+                                dbConnections.insertCAFBulk(caf, getApplicationContext());
 
 
                             Cursor delreq = dbConnections.Fill("select * from RtoReq", getApplicationContext());
@@ -1749,6 +1770,12 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 citccount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
             }
 
+            cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 4 ", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                cafcount.setText("CAF Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
+            }
+
             cursor.close();
             result.close();
             dbConnections.close();
@@ -1951,6 +1978,28 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
                     TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_citc_body);
                     tvDeliveryRequestBody.setText("The Shipment has a CITC Complaint.");
+                }
+
+                if (onlineValidation.getIsCITCComplaint() == 1) {
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complaint);
+                    llDeliveryReq.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_citc_header);
+                    tvDeliveryRequestHeader.setText("CITC Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_citc_body);
+                    tvDeliveryRequestBody.setText("The Shipment has a CITC Complaint.");
+                }
+
+                if (onlineValidation.getIsCAFRequest() == 1) {
+                    LinearLayout llcaf = dialogView.findViewById(R.id.ll_caf_complaint);
+                    llcaf.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_caf_header);
+                    tvDeliveryRequestHeader.setText("CAF Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_caf_body);
+                    tvDeliveryRequestBody.setText("The Shipment has a CAF Complaint.");
                 }
 
                    /* if (pieceDetails.getIsRelabel() == 1) {

@@ -163,6 +163,7 @@ public class PickUp extends Service {
                     pickUpRequest.al = result.getInt(result.getColumnIndex("AL"));
                     pickUpRequest.TruckID = result.getInt(result.getColumnIndex("TruckID"));
                     pickUpRequest.DistrictID = result.getInt(result.getColumnIndex("DistrictID"));
+                    pickUpRequest.CollectedPiece = result.getInt(result.getColumnIndex("CollectedPiece"));
 
                     String piececodes[];
                     int index = 0;

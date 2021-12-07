@@ -16,9 +16,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +61,8 @@ public class PickUpSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.addTextChangedListener(new TextWatcher() {
+
+           /* txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -78,7 +77,7 @@ public class PickUpSecondFragment
                             || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
                         AddNewPiece();
                 }
-            });
+            });*/
 
             txtBarCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
@@ -162,8 +161,10 @@ public class PickUpSecondFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13 || barcode.length() == GlobalVar.GV().ScanBarcodeLength)
+                        if (barcode.length() == 13 || barcode.length() == GlobalVar.GV().ScanBarcodeLength) {
                             txtBarCode.setText(barcode);
+                            AddNewPiece();
+                        }
 //                        GlobalVar.GV().MakeSound(GlobalVar.GV().context, R.raw.barcodescanned);
 //                        if (txtBarCode.getText().toString().length() > 12)
 //                            AddNewPiece();

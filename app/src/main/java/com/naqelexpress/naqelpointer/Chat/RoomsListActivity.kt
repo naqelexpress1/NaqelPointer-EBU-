@@ -27,7 +27,7 @@ class RoomsListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rooms_list)
 
-        userid = intent.getStringExtra("extra")
+        userid = intent.getStringExtra("extra").toString()
         initRecyclerView()
         initChatManager()
         dialog = ProgressDialog.progressDialog(this)

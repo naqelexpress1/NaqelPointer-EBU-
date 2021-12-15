@@ -85,7 +85,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 163; // TimeZone
+    private static final int Version = 164; // TimeZone
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -127,7 +127,7 @@ public class DBConnections
                 "\"StationID\" INTEGER NOT NULL , \"IsPartial\" BOOL NOT NULL  DEFAULT 0, \"Latitude\" TEXT, \"Longitude\" TEXT ," +
                 " \"TotalReceivedAmount\" DOUBLE NOT NULL , \"CashAmount\" DOUBLE NOT NULL DEFAULT 0, \"POSAmount\" DOUBLE NOT NULL DEFAULT 0 ," +
                 " \"IsSync\" BOOL NOT NULL,\"AL\" INTEGER DEFAULT 0 , Barcode Text , IqamaID Text , PhoneNo Text , IqamaName Text," +
-                "DeliverySheetID Integer , OTPNo Integer )");
+                "DeliverySheetID Integer , OTPNo Integer , PosResult Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"OnDeliveryDetail\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"BarCode\" TEXT NOT NULL , \"IsSync\" BOOL NOT NULL , \"DeliveryID\" INTEGER NOT NULL )");
@@ -184,7 +184,7 @@ public class DBConnections
                 "\"OnDeliveryDate\" DATETIME ,\"POS\" INTEGER Default 0 ,\"Notification\" INTEGER Default 0 ," +
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
                 " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger, IsScan Integer Default 0 , IsNotDelivered Default 0 , CustomDuty Integer" +
-                ", IsOtp Integer , AreaWaypoints TEXT )");
+                ", IsOtp Integer , AreaWaypoints TEXT , PosResult Text )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -1243,6 +1243,12 @@ public class DBConnections
             if (!isUniqueConstraint("PickupSheetDetails", "pid", db))
                 db.execSQL("CREATE UNIQUE INDEX pid ON PickupSheetDetails(PickupsheetDetailID)");
 
+            if (!isColumnExist("MyRouteShipments", "PosResult"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN PosResult TEXT ");
+
+            if (!isColumnExist("OnDelivery", "PosResult"))
+                db.execSQL("ALTER TABLE OnDelivery ADD COLUMN PosResult Text");
+
         }
 
 
@@ -1916,12 +1922,13 @@ public class DBConnections
 
         long result = 0;
         int DsID = 0;
+        String PosResult = "";
 
         Cursor ds = Fill("select * from MyRouteShipments where ItemNo = '" + instance.WaybillNo + "' Limit 1", context);
         if (ds.getCount() > 0) {
             ds.moveToFirst();
             DsID = ds.getInt(ds.getColumnIndex("DeliverySheetID"));
-
+            PosResult = ds.getString(ds.getColumnIndex("PosResult"));
         }
         ds.close();
         try {
@@ -1950,6 +1957,7 @@ public class DBConnections
             contentValues.put("IqamaName", IqamaName);
             contentValues.put("DeliverySheetID", DsID);
             contentValues.put("OTPNo", Otpno);
+            contentValues.put("PosResult", PosResult);
 
 
             result = db.insert("OnDelivery", null, contentValues);
@@ -6475,40 +6483,40 @@ public class DBConnections
 
     public void insertCAFBulk(JSONArray deliveryReq, Context context) {
 
-            String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO ) values (?, ?, ?, ? , ? , ?);";
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            //db.getWritableDatabase();
-            db.beginTransaction();
-            SQLiteStatement stmt = db.compileStatement(sql);
+        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO ) values (?, ?, ?, ? , ? , ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        //db.getWritableDatabase();
+        db.beginTransaction();
+        SQLiteStatement stmt = db.compileStatement(sql);
 
-            for (int i = 0; i < deliveryReq.length(); i++) {
-                //generate some values
-                try {
+        for (int i = 0; i < deliveryReq.length(); i++) {
+            //generate some values
+            try {
 
-                    JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
-                    String insdate[] = jsonObject1.getString("InsertedDate").split("T");
-                    stmt.bindString(1, String.valueOf(jsonObject1.getInt("WaybillNo")));
-                    stmt.bindString(2, jsonObject1.getString("BarCode"));
-                    stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
-                    stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
-                    stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
-                    String NCLNo = "0";
-                    if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
-                        NCLNo = jsonObject1.getString("NCLNO");
-                    stmt.bindString(6, NCLNo);
+                JSONObject jsonObject1 = deliveryReq.getJSONObject(i);
+                String insdate[] = jsonObject1.getString("InsertedDate").split("T");
+                stmt.bindString(1, String.valueOf(jsonObject1.getInt("WaybillNo")));
+                stmt.bindString(2, jsonObject1.getString("BarCode"));
+                stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
+                stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
+                stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
+                String NCLNo = "0";
+                if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
+                    NCLNo = jsonObject1.getString("NCLNO");
+                stmt.bindString(6, NCLNo);
 
-                    long entryID = stmt.executeInsert();
-                    stmt.clearBindings();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                long entryID = stmt.executeInsert();
+                stmt.clearBindings();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
 
-            db.setTransactionSuccessful();
-            db.endTransaction();
+        }
 
-            db.close();
+        db.setTransactionSuccessful();
+        db.endTransaction();
+
+        db.close();
 
     }
 
@@ -10480,6 +10488,21 @@ public class DBConnections
 
         } catch (Exception e) {
 
+
+        }
+        db.close();
+
+    }
+
+    public void update_SoftPOSDataintoMyRouteShipments(Context context, String Waybill, String PosResult) {
+        String args[] = {String.valueOf(Waybill)};
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+        try {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("PosResult ", PosResult);
+            db.update("MyRouteShipments", contentValues, "ItemNo=?", args);
+        } catch (SQLiteException e) {
 
         }
         db.close();

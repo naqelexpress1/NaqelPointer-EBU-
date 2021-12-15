@@ -578,6 +578,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         onLineValidation.setIsCITCComplaint(0);
         onLineValidation.setIsRTORequest(0);
         onLineValidation.setIsDeliveryRequest(0);
+        onLineValidation.setIsCAFRequest(0);
         boolean rtoreq = false;
         boolean ismatch = false;
 
@@ -1980,16 +1981,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     tvDeliveryRequestBody.setText("The Shipment has a CITC Complaint.");
                 }
 
-                if (onlineValidation.getIsCITCComplaint() == 1) {
-                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complaint);
-                    llDeliveryReq.setVisibility(View.VISIBLE);
 
-                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_citc_header);
-                    tvDeliveryRequestHeader.setText("CITC Complaint");
-
-                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_citc_body);
-                    tvDeliveryRequestBody.setText("The Shipment has a CITC Complaint.");
-                }
 
                 if (onlineValidation.getIsCAFRequest() == 1) {
                     LinearLayout llcaf = dialogView.findViewById(R.id.ll_caf_complaint);

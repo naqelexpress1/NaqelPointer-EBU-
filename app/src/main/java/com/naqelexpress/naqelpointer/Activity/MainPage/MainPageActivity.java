@@ -1368,7 +1368,7 @@ public class MainPageActivity
                     case 25:
                         if (VersionMatct()) {
                             Intent chat = new Intent(getApplicationContext(), MainActivity.class);
-                           // startActivity(chat);
+                            // startActivity(chat);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                     , true);

@@ -51,6 +51,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     private TextView nodata;
     public static boolean isException = false, isFinish = false;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         try {
@@ -60,6 +61,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             setContentView(R.layout.content_booking_list);
 
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
+            mapListview.setDivider(getResources().getDrawable(R.drawable.blue_button_background));
             mapListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
             isFinish = false;

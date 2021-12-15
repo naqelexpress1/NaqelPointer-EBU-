@@ -75,6 +75,19 @@ public class FacilityLogin
 
             if (savedInstanceState != null)
                 setSavedInstance(savedInstanceState);
+
+//            String division = GlobalVar.getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+//            if (GlobalVar.GV().IsTerminalApp || division.equals("IRS")) {
+//                Intent intent = new Intent(getApplicationContext(), MainPageActivity.class);
+//                startActivity(intent);
+//                finish();
+//            } else {
+//                Intent intent = new Intent(getApplicationContext(), VerifyMobileNo.class);
+//                startActivity(intent);
+//                finish();
+//            }
+
+
         } catch (Exception e) {
             System.out.println(e.toString());
         }

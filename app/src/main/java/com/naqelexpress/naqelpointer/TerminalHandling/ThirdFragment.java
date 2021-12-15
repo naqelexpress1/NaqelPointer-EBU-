@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -378,6 +379,8 @@ public class ThirdFragment extends Fragment {
 //            return;
 //        }
 
+        String Barcode = txtBarCode.getText().toString();
+        OnLineValidation onLineValidation = isValidation(Barcode);
 
         if (TerminalHandling.group.equals("Group 1")) {
             boolean rtoreq = false;
@@ -478,6 +481,7 @@ public class ThirdFragment extends Fragment {
         if (Barcodes.size() == 20) {
             SaveData();
         }
+        showDialog(onLineValidation, Barcode);
         requestfocus();
     }
 
@@ -792,6 +796,8 @@ public class ThirdFragment extends Fragment {
                     onLineValidation.setIsRelabel(1);
                     isValid = false;
                 }
+
+
             }
 
 
@@ -926,5 +932,140 @@ public class ThirdFragment extends Fragment {
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    public void showDialog(OnLineValidation onlineValidation, String Barcode) {
+        try {
+            if (onlineValidation != null) {
+
+
+                final android.app.AlertDialog.Builder dialogBuilder
+                        = new android.app.AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Piece Barcode  #" + Barcode);
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+
+                if (onlineValidation.getIsRTORequest() == 1) {
+                    LinearLayout llRto = dialogView.findViewById(R.id.ll_is_rto);
+                    llRto.setVisibility(View.VISIBLE);
+
+                    TextView tvRTOHeader = dialogView.findViewById(R.id.tv_rto_header);
+                    tvRTOHeader.setText("RTO Request");
+
+                    TextView tvRTOBody = dialogView.findViewById(R.id.tv_rto_body);
+                    tvRTOBody.setText("The Shipment has RTO Request.");
+                }
+
+                if (onlineValidation.getIsDeliveryRequest() == 1) {
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_is_delivery_req);
+                    llDeliveryReq.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_delivery_req_header);
+                    tvDeliveryRequestHeader.setText("Delivery Request");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_delivery_req_body);
+                    tvDeliveryRequestBody.setText("The Shipment has Delivery Request.");
+                }
+
+                if (onlineValidation.getIsCITCComplaint() == 1) {
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complaint);
+                    llDeliveryReq.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_citc_header);
+                    tvDeliveryRequestHeader.setText("CITC Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_citc_body);
+                    tvDeliveryRequestBody.setText("The Shipment has CITC Complaint.");
+                }
+
+
+                if (onlineValidation.getIsCAFRequest() == 1) {
+                    LinearLayout llcaf = dialogView.findViewById(R.id.ll_caf_complaint);
+                    llcaf.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_caf_header);
+                    tvDeliveryRequestHeader.setText("CAF Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_caf_body);
+                    tvDeliveryRequestBody.setText("The Shipment has CAF.");
+                }
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                if (onlineValidation.getIsCAFRequest() == 1 || onlineValidation.getIsCITCComplaint() == 1 ||
+                        onlineValidation.getIsDeliveryRequest() == 1 || onlineValidation.getIsRTORequest() == 1) {
+                    alertDialog.show();
+                    GlobalVar.MakeSound(getContext(), R.raw.rto);
+                }
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                            txtBarCode.setText("");
+                        }
+                    }
+                });
+
+
+            }
+
+        } catch (Exception e) {
+            Log.d("test", "showDialog " + e.toString());
+        }
+    }
+
+
+    private OnLineValidation isValidation(String barcode) {
+        OnLineValidation onLineValidation = new OnLineValidation();
+        onLineValidation.setIsCITCComplaint(0);
+        onLineValidation.setIsRTORequest(0);
+        onLineValidation.setIsDeliveryRequest(0);
+        onLineValidation.setIsCAFRequest(0);
+        try {
+
+
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode=" +
+                    "'" + barcode + "'", getContext());
+
+            if (cursor.getCount() > 0)
+                onLineValidation.setIsDeliveryRequest(1);
+
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 and BarCode='" + barcode + "'", getContext());
+            if (cursor.getCount() > 0)
+                onLineValidation.setIsCITCComplaint(1);
+
+            cursor = dbConnections.Fill("select * from RtoReq  where BarCode='" + barcode + "'", getContext());
+            if (cursor.getCount() > 0)
+                onLineValidation.setIsRTORequest(1);
+
+            cursor = dbConnections.Fill("select * from  DeliverReq where ReqType = 4 and BarCode='" + barcode + "'", getContext());
+            if (cursor.getCount() > 0)
+                onLineValidation.setIsCAFRequest(1);
+
+
+            cursor.close();
+
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+
+        }
+        return onLineValidation;
     }
 }

@@ -30,6 +30,7 @@ public class OnDeliveryRequest {
     public String IqamaName = "";
     public int DeliverySheetID = 0;
     public int OTPNo = 0;
+    public String POSResult = "";
     //    public String ReceiptNo ;
 //    public int StopPointsID ;
     public List<OnDeliveryDetailRequest> OnDeliveryDetailRequestList;

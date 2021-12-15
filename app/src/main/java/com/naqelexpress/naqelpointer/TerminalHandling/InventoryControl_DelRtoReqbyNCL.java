@@ -26,7 +26,9 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.InputFilter;
 import android.text.InputType;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,6 +36,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
@@ -44,6 +47,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -70,7 +74,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
     HashMap<String, String> trips = new HashMap<>();
-    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount;
+    TextView lbTotal, delreqcount, rtoreqcount, inserteddate, validupto, citccount, cafcount;
     private EditText txtBarCode;//, txtbinlocation;
     public ArrayList<String> inventorycontrol = new ArrayList<>();
     public ArrayList<String> isdeliveryReq = new ArrayList<>();
@@ -79,6 +83,9 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
     public ArrayList<String> isHeldout = new ArrayList<>();
     public ArrayList<String> isNclDelReq = new ArrayList<>();
     public ArrayList<String> isNclCitc = new ArrayList<>();
+
+    public ArrayList<String> isCAFReq = new ArrayList<>();
+    public ArrayList<String> isNCLCAFReq = new ArrayList<>();
 
     private RecyclerView recyclerView;
     private DataAdapter adapter;
@@ -96,6 +103,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         citccount = (TextView) findViewById(R.id.citccount);
         delreqcount = (TextView) findViewById(R.id.delreqcount);
         rtoreqcount = (TextView) findViewById(R.id.rtoreqcount);
+        cafcount = (TextView) findViewById(R.id.cafcount);
 
         inserteddate = (TextView) findViewById(R.id.inserteddate);
         validupto = (TextView) findViewById(R.id.validupto);
@@ -420,8 +428,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             }
         }*/
 
-
-        GetPieceInfoByScanning(txtBarCode.getText().toString());
+        OnLineValidation onLineValidation = GetPieceInfoByScanning(txtBarCode.getText().toString());
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
@@ -445,10 +452,10 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                 initViews();
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
             }
-            ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ")" +
-                    " is Request for RTO ", 0, txtBarCode.getText().toString());
+//            ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ")" +
+//                    " is Request for RTO ", 0, txtBarCode.getText().toString());
             // return;
         }
 
@@ -467,14 +474,14 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                 initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarCode.getText().toString() + ") has CITC Complaint \n" +
-                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+//                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarCode.getText().toString() + ") has CITC Complaint \n" +
+//                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                 //  return;
             } else {
 
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+//                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
                 //return;
             }
         }
@@ -497,11 +504,11 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                         initViews();
-                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+//                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                     }
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
-                    // return;
+//                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
+//                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                    // return;
                 } else {
 
                     if (!isHeldout.contains(txtBarCode.getText().toString())) {
@@ -517,15 +524,15 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                         initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
-                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
-                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+//                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
+//                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     } else {
                         popup = true;
                         //GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
-                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+//                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery " +
+//                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                         // return;
                     }
                 }
@@ -549,14 +556,14 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
                     initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+//                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
+//                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                 } else {
                     popup = true;
-                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//                    GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
+//                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
+//                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
                     // return;
                 }
             }
@@ -597,19 +604,21 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             }
         }*/
 
-        if (!popup && !WaybillAttempt.equals("No Data")) {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-            ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
-                    "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
-        }
+//        if (!popup && !WaybillAttempt.equals("No Data")) {
+//            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
+//            ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
+//                    "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+//        }
 
-        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
+        showDialog(onLineValidation, txtBarCode.getText().toString());
         txtBarCode.setText("");
         txtBarCode.requestFocus();
 
         if (delrtoreq.size() == 20) {
             SaveData(2);
         }
+
 
     }
 
@@ -2008,7 +2017,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
     String WaybillAttempt = "19127";
 
-    private void GetPieceInfoByScanning(String PieceBarcode) {
+  /*  private void GetPieceInfoByScanning(String PieceBarcode) {
         WaybillAttempt = "19127";
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
@@ -2084,6 +2093,109 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             e.printStackTrace();
         }
 
+    }*/
+
+    private OnLineValidation GetPieceInfoByScanning(String PieceBarcode) {
+        WaybillAttempt = "19127";
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+
+        OnLineValidation onLineValidation = new OnLineValidation();
+        onLineValidation.setIsCITCComplaint(0);
+        onLineValidation.setIsRTORequest(0);
+        onLineValidation.setIsDeliveryRequest(0);
+        onLineValidation.setIsCAFRequest(0);
+
+        try {
+
+            isdeliveryReq.clear();
+            isNclDelReq.clear();
+            iscitcshipments.clear();
+            isNclCitc.clear();
+            isrtoReq.clear();
+
+
+            Cursor cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 1 and BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                onLineValidation.setIsDeliveryRequest(1);
+                cursor.moveToFirst();
+                do {
+
+                    isdeliveryReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor = dbConnections.Fill("select * from DeliverReq where ReqType = 3 and BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                onLineValidation.setIsCITCComplaint(1);
+                cursor.moveToFirst();
+                do {
+
+                    iscitcshipments.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNclCitc.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor = dbConnections.Fill("select * from RtoReq  where BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                onLineValidation.setIsRTORequest(1);
+                isrtoReq.clear();
+                // isNclDelReq.clear();
+                cursor.moveToFirst();
+                do {
+
+                    isrtoReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    // if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                    //     isNclDelReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor = dbConnections.Fill("select * from  DeliverReq where ReqType = 4 and BarCode='" + PieceBarcode + "'", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                onLineValidation.setIsCAFRequest(1);
+                isCAFReq.clear();
+                isNCLCAFReq.clear();
+                // isNclDelReq.clear();
+                cursor.moveToFirst();
+                do {
+
+                    isCAFReq.add(cursor.getString(cursor.getColumnIndex("BarCode")));
+                    if (cursor.getString(cursor.getColumnIndex("NCLNO")).length() > 0)
+                        isNCLCAFReq.add(cursor.getString(cursor.getColumnIndex("NCLNO")));
+
+                } while (cursor.moveToNext());
+            }
+
+            cursor.close();
+
+            Cursor result1 = dbConnections.Fill("select Sum(Attempt) Attempt  from WaybillAttempt where BarCode='" + PieceBarcode + "'", getApplicationContext());
+
+
+            if (result1.getCount() > 0) {
+                result1.moveToFirst();
+                WaybillAttempt = String.valueOf(result1.getInt(result1.getColumnIndex("Attempt")));
+            } else
+                WaybillAttempt = "No Data";
+
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+            GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Somthing went wrong, kindly scan again",
+                    GlobalVar.AlertType.Error);
+            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarCode.setText("");
+            txtBarCode.requestFocus();
+            e.printStackTrace();
+        }
+
+        return onLineValidation;
     }
 
     private void ReadFromLocal(Cursor result, DBConnections dbConnections) {
@@ -2127,6 +2239,12 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 
                 citccount.setText("CITC Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
 
+            }
+
+            cursor = dbConnections.Fill("select count(*) total from DeliverReq where ReqType = 4 ", getApplicationContext());
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                cafcount.setText("CAF Count : " + String.valueOf(cursor.getString(cursor.getColumnIndex("total"))));
             }
 
             cursor.close();
@@ -2367,5 +2485,115 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
         }
 
 
+    }
+
+    public void showDialog(OnLineValidation onlineValidation, String Barcode) {
+        try {
+            if (onlineValidation != null) {
+
+
+                final android.app.AlertDialog.Builder dialogBuilder
+                        = new android.app.AlertDialog.Builder(InventoryControl_DelRtoReqbyNCL.this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                View dialogView = inflater.inflate(R.layout.custom_alert_dialog, null);
+                dialogBuilder.setView(dialogView);
+                dialogBuilder.setCancelable(false);
+
+                TextView tvBarcode = dialogView.findViewById(R.id.tv_barcode);
+                tvBarcode.setText("Barcode #" + Barcode);
+
+
+                Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
+                btnConfirm.setVisibility(View.VISIBLE);
+                btnConfirm.setText("OK");
+
+//                boolean isplay = false;
+                if (onlineValidation.getIsRTORequest() == 1) {
+//                    GlobalVar.MakeSound(getApplicationContext(), R.raw.rto);
+//                    isplay = true;
+                    LinearLayout llRto = dialogView.findViewById(R.id.ll_is_rto);
+                    llRto.setVisibility(View.VISIBLE);
+
+                    TextView tvRTOHeader = dialogView.findViewById(R.id.tv_rto_header);
+                    tvRTOHeader.setText("RTO Request");
+
+                    TextView tvRTOBody = dialogView.findViewById(R.id.tv_rto_body);
+                    tvRTOBody.setText("Counts : " + String.valueOf(isrtoReq.size()));
+                }
+
+                if (onlineValidation.getIsDeliveryRequest() == 1) {
+//                    if (!isplay)
+//                        GlobalVar.MakeSound(getApplicationContext(), R.raw.delivery);
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_is_delivery_req);
+                    llDeliveryReq.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_delivery_req_header);
+                    tvDeliveryRequestHeader.setText("Delivery Request");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_delivery_req_body);
+                    tvDeliveryRequestBody.setText("Counts : " + String.valueOf(isdeliveryReq.size()));
+                }
+
+                if (onlineValidation.getIsCITCComplaint() == 1) {
+//                    if (!isplay)
+//                        GlobalVar.MakeSound(getApplicationContext(), R.raw.rto);
+                    LinearLayout llDeliveryReq = dialogView.findViewById(R.id.ll_citc_complaint);
+                    llDeliveryReq.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_citc_header);
+                    tvDeliveryRequestHeader.setText("CITC Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_citc_body);
+                    tvDeliveryRequestBody.setText("Counts : " + String.valueOf(iscitcshipments.size()));
+                }
+
+
+                if (onlineValidation.getIsCAFRequest() == 1) {
+                    LinearLayout llcaf = dialogView.findViewById(R.id.ll_caf_complaint);
+                    llcaf.setVisibility(View.VISIBLE);
+
+                    TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_caf_header);
+                    tvDeliveryRequestHeader.setText("CAF Complaint");
+
+                    TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_caf_body);
+                    tvDeliveryRequestBody.setText("Counts : " + String.valueOf(isCAFReq.size()));
+                }
+
+
+                LinearLayout llcaf = dialogView.findViewById(R.id.ll_no_attempts);
+                llcaf.setVisibility(View.VISIBLE);
+
+                TextView tvDeliveryRequestHeader = dialogView.findViewById(R.id.tv_no_attempts_header);
+                tvDeliveryRequestHeader.setText("Waybill Attempt");
+
+                TextView tvDeliveryRequestBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
+                tvDeliveryRequestBody.setText("Counts : " + WaybillAttempt);
+
+
+                final android.app.AlertDialog alertDialog = dialogBuilder.create();
+                if (onlineValidation.getIsCAFRequest() == 1 || onlineValidation.getIsCITCComplaint() == 1 ||
+                        onlineValidation.getIsDeliveryRequest() == 1 || onlineValidation.getIsRTORequest() == 1) {
+                    alertDialog.show();
+                    GlobalVar.MakeSound(getApplicationContext(), R.raw.rto);
+                } else
+                    GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+
+                btnConfirm.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // To avoid leaked window
+                        if (alertDialog != null && alertDialog.isShowing()) {
+                            alertDialog.dismiss();
+                            txtBarCode.setText("");
+                        }
+                    }
+                });
+
+
+            }
+
+        } catch (Exception e) {
+            Log.d("test", "showDialog " + e.toString());
+        }
     }
 }

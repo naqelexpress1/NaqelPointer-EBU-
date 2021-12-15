@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU AsrChanges 06-12-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU-ASR Map Visible 14-12-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -120,16 +120,15 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
-
 
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
     public static boolean ManualType = false;
-    public static String WaybillNoStartSeries = "81"; //812345679
+    public static String WaybillNoStartSeries = "8"; //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -4620,4 +4619,64 @@ public class GlobalVar {
         alertDialog.show();
 
     }
+
+    public boolean isCAF(String Barcode, Context context) {
+        boolean isCaf = false;
+        DBConnections dbConnections = new DBConnections(context, null);
+        try {
+
+            // Delivery Req
+            Cursor cursor = dbConnections.Fill("select count(BarCode) total from DeliverReq where ReqType = 4 " +
+                    "and BarCode='" + Barcode + "'", context);
+
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                isCaf = cursor.getInt(cursor.getColumnIndex("total")) > 0;
+
+            }
+            cursor.close();
+            dbConnections.close();
+
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return isCaf;
+
+    }
+
+    //App is installed or not
+    public static boolean appInstalledOrNot(Context context, String uri) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void downloadUpdate(String url, Activity activity) {
+        String googleDriveAppPackageName = "com.google.android.apps.docs";
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        if (isAppInstalled(activity, googleDriveAppPackageName)) {
+            browserIntent.setPackage(googleDriveAppPackageName);
+        }
+        activity.startActivity(browserIntent);
+    }
+
+    private static boolean isAppInstalled(Context context, String packageName) {
+        PackageManager pm = context.getPackageManager();
+        try {
+            pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+            return pm.getApplicationInfo(packageName, 0).enabled;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

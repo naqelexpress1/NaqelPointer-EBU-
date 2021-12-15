@@ -315,6 +315,14 @@ public class DeliverySheetThirdFragment
     }
 
     private void AddNewPiece(String WaybillNo) {
+
+        if (GlobalVar.GV().AppIDForTH == 1) {
+            if (GlobalVar.GV().isCAF(txtBarCode.getText().toString(), getContext())) {
+                GlobalVar.ShowDialog(getActivity(), "CAF Complaint", "The Shipment has a CAF Complaint.", true);
+                GlobalVar.MakeSound(this.getContext(), R.raw.barcodescanned);
+            }
+        }
+
         if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
             if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
                 PieceBarCodeWaybill.add(0, txtBarCode.getText().toString() + "-" + WaybillNo);

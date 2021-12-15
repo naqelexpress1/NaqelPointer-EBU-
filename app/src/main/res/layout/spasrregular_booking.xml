@@ -13,9 +13,10 @@
         android:layout_margin="10dp">
 
         <LinearLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="invisible"
+            android:visibility="gone"
             android:weightSum="1">
 
 
@@ -168,14 +169,46 @@
     </TableLayout>
 
     <android.support.v7.widget.RecyclerView
-
         android:id="@+id/card_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/llbtm"
+        android:layout_height="wrap_content"
         android:layout_below="@id/btnOpenCamera"
         android:layout_margin="8dp"
         android:scrollbars="vertical" />
+
+    <Button
+        android:id="@+id/btnOpenCamera"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@id/tl"
+
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:background="@drawable/camera"
+        tools:ignore="HardcodedText,NotSibling" />
+
+    <TableLayout
+        android:id="@+id/tlv"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_above="@id/llbtm"
+        android:layout_below="@id/card_recycler_view"
+        android:visibility="visible">
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="1dp"
+            tools:ignore="MissingConstraints" />
+    </TableLayout>
 
     <LinearLayout
         android:id="@+id/llbtm"
@@ -196,6 +229,7 @@
             android:text="Resend QR"
             android:textColor="#B4ADA9"
             android:textSize="15sp"
+            android:visibility="gone"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
         <Button
@@ -212,16 +246,4 @@
             tools:ignore="HardcodedText,RtlHardcoded" />
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnOpenCamera"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_below="@id/tl"
-
-        android:layout_centerHorizontal="true"
-        android:layout_margin="8dp"
-        android:background="@drawable/camera"
-        tools:ignore="HardcodedText,NotSibling" />
-
 </RelativeLayout>

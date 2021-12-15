@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.text.Html;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +19,6 @@ import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.TableLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -126,33 +128,74 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         holder.byPickup.setText(String.valueOf(item.getBKHeader()));
 
         holder.sno.setText(String.valueOf(item.getsNo()));
+
+
         if (item.getisSPL()) {
+
+
+            if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".")
+                    && Double.parseDouble(item.Lat) > 0)
+                holder.location.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.marker, 0);
+            else
+                holder.location.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+
+
             holder.puidawbno.setText("Pu ID / AWB : " + item.getPickupSheetID());
             holder.location.setText(item.getSPOfficeName());
 
             holder.mno1.setText(item.getSPMobile());
-            holder.numberofwaybills.setText(String.valueOf(item.getWaybillcount()));
-            holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
-            holder.mno2ll.setVisibility(View.INVISIBLE);
-            holder.clientll.setVisibility(View.INVISIBLE);
-            holder.contactll.setVisibility(View.INVISIBLE);
-            holder.tableLayout.setVisibility(View.VISIBLE);
-            holder.ibwats1.setVisibility(View.INVISIBLE);
-            holder.ibwats2.setVisibility(View.INVISIBLE);
+            //holder.numberofwaybills.setText(String.valueOf(item.getWaybillcount()));
+            //holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
+            holder.mno2ll.setVisibility(View.GONE);
+            holder.clientll.setVisibility(View.GONE);
+            holder.contactll.setVisibility(View.GONE);
+            // holder.tableLayout.setVisibility(View.VISIBLE);
+            holder.ibwats1.setVisibility(View.GONE);
+            holder.ibwats2.setVisibility(View.GONE);
 
-            holder.totalpickwaybill.setText("Total for PU :" + String.valueOf(item.getWaybillcount()));
+            holder.totalpickwaybill.setVisibility(View.VISIBLE);
+            holder.pickedupcount.setVisibility(View.VISIBLE);
+            holder.exceptioncount.setVisibility(View.VISIBLE);
+
+            String tpkCount = "Total for PU :" + String.valueOf(item.getWaybillcount());
+            // holder.totalpickwaybill.setText("Total for PU :" + String.valueOf(item.getWaybillcount()));
+            SpannableString content = new SpannableString(tpkCount);
+            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+            holder.totalpickwaybill.setText(content);
             holder.pickedupcount.setText("Picked Up :" + String.valueOf(item.getPickupCount()));
             holder.exceptioncount.setText("Exception :" + String.valueOf(item.getExceptionCount()));
         } else {
 
-            // holder.locationll.setVisibility(View.INVISIBLE);
-            holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
+            holder.locationll.setVisibility(View.GONE);
+            //holder.numberofwaybillsll.setVisibility(View.INVISIBLE);
             holder.consname.setText(item.getConsigneeName());
             holder.clientname.setText(item.getClientName());
-            holder.puidawbno.setText("Pu ID / AWB : " + String.valueOf(item.getWaybillNo()));
+
+            if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".") &&
+                    Double.parseDouble(item.Lat) > 0)
+                holder.consname.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.marker, 0);
+            else
+                holder.consname.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+
+            String first = "Pu ID / AWB : ";
+            String next = "<font color='#003E7E'>" + String.valueOf(item.getWaybillNo()) + "</font>";
+            holder.puidawbno.setText(Html.fromHtml(first + next));
+
+            //holder.puidawbno.setText("Pu ID / AWB : " + String.valueOf(item.getWaybillNo()));
             holder.mno1.setText(item.getPhoneNo());
             holder.mno2.setText(item.getMobileNo());
-            holder.tableLayout.setVisibility(View.INVISIBLE);
+
+            holder.clientname.setVisibility(View.VISIBLE);
+            holder.consname.setVisibility(View.VISIBLE);
+            holder.mno2.setVisibility(View.VISIBLE);
+            holder.clientll.setVisibility(View.VISIBLE);
+            holder.contactll.setVisibility(View.VISIBLE);
+            holder.mno2ll.setVisibility(View.VISIBLE);
+
+            holder.totalpickwaybill.setVisibility(View.GONE);
+            holder.pickedupcount.setVisibility(View.GONE);
+            holder.exceptioncount.setVisibility(View.GONE);
+            // holder.tableLayout.setVisibility(View.INVISIBLE);
         }
 
 
@@ -162,6 +205,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             holder.attempedstatus.setText("Picked Up");
         else
             holder.attempedstatus.setText("Not Attempt");
+
 
         holder.ibmno1.setFocusable(false);
         holder.ibmno1.setFocusableInTouchMode(false);
@@ -209,7 +253,7 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
         holder.locationll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".")) {
+                if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".") && Double.parseDouble(item.Lat) > 0) {
                     Location location = GlobalVar.getLastKnownLocation(context.getApplicationContext());
 //                if (item.getisSPL()) {
 //                    if (item.getSpLatLng() != null && item.getSpLatLng().length() > 0) {
@@ -230,8 +274,30 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             }
         });
 
-        if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains("."))
-            holder.location.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.marker, 0);
+        holder.contactll.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (item.Lat != null && !item.Lat.equals("null") && item.Lat.length() > 1 && item.Lat.contains(".") && Double.parseDouble(item.Lat) > 0) {
+                    Location location = GlobalVar.getLastKnownLocation(context.getApplicationContext());
+//                if (item.getisSPL()) {
+//                    if (item.getSpLatLng() != null && item.getSpLatLng().length() > 0) {
+//                        String latlng[] = item.getSpLatLng().split(",");
+//                        GlobalVar.toGoogle(latlng[0], latlng[1], context, location);
+//                    }
+//                } else {
+//                    if (item.Lat != null && item.Lat.length() > 0) {
+//
+//                        GlobalVar.toGoogle(item.Lat, item.Lng, context, location);
+//                    }
+//                }
+
+                    GlobalVar.toGoogle(item.Lat, item.Lng, context, location);
+                } else
+                    alertforcommon("Error", "Invalid Location");
+
+            }
+        });
+
 
         //GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
 
@@ -279,18 +345,18 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
     }
 
     class ViewHolder {
-        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, numberofwaybills, attempedstatus,
-                totalpickwaybill, pickedupcount, exceptioncount, sno;
-        LinearLayout clientll, locationll, contactll, mno2ll, numberofwaybillsll;
+        TextView byPickup, puidawbno, location, mno1, mno2, consname, clientname, attempedstatus,
+                totalpickwaybill, pickedupcount, exceptioncount, sno;//, numberofwaybills;
+        LinearLayout clientll, locationll, contactll, mno2ll; //, numberofwaybillsll;
         ImageButton ibmno1, ibwats1, ibmno2, ibwats2;
-        TableLayout tableLayout;
+        //TableLayout tableLayout;
 //                , waybillno, date, consname, orgstation,
 //                deststation, billtype, sno, ispickedup;
 //        ImageView islocation;
         //TextView panel;
 
         public ViewHolder(View view) {
-            tableLayout = (TableLayout) view.findViewById(R.id.tl_sp);
+            //tableLayout = (TableLayout) view.findViewById(R.id.tl_sp);
             totalpickwaybill = (TextView) view.findViewById(R.id.totalforpickup);
             sno = (TextView) view.findViewById(R.id.sno);
             pickedupcount = (TextView) view.findViewById(R.id.pickedup);
@@ -307,9 +373,9 @@ public class BookingListAdapter extends BaseAdapter implements Filterable {
             mno2 = (TextView) view.findViewById(R.id.mno2);
             clientname = (TextView) view.findViewById(R.id.clientname);
             consname = (TextView) view.findViewById(R.id.contactname);
-            numberofwaybills = (TextView) view.findViewById(R.id.numberofwaybills);
+            // numberofwaybills = (TextView) view.findViewById(R.id.numberofwaybills);
             attempedstatus = (TextView) view.findViewById(R.id.attempedstatus);
-            numberofwaybillsll = (LinearLayout) view.findViewById(R.id.numberofwaybillsll);
+            // numberofwaybillsll = (LinearLayout) view.findViewById(R.id.numberofwaybillsll);
 
             ibmno1 = (ImageButton) view.findViewById(R.id.ibmno1);
             ibwats1 = (ImageButton) view.findViewById(R.id.ibwats1);

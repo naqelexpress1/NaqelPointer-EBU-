@@ -37,6 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inspector.PropertyReader;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -47,6 +48,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.Activity.DigitalSign.Signature;
+import com.naqelexpress.naqelpointer.ApplicationController;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -62,18 +64,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Objects;
+import java.util.Properties;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 import static android.app.Activity.RESULT_OK;
 
-public class DeliverySecondFragment extends Fragment implements TextWatcher {
+public class DeliverySecondFragment extends Fragment implements TextWatcher, View.OnClickListener {
 
     View rootView;
-    EditText txtPOS , txtCash;
-    TextView lbTotal , tvPaymentStatusHeader ,tvPaymentStatusBody ;
+    EditText txtPOS, txtCash;
+    TextView lbTotal, tvPaymentStatusHeader, tvPaymentStatusBody;
     public EditText txtReceiverName, txtotpno;
 
     //Added by Ismail
@@ -93,6 +98,9 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
     int signmand = 0;
     boolean Isnootp = false;
     CheckBox otpcheckbox;
+    private Properties properties;
+    private PropertyReader propertyReader;
+    static String posResult = "";
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -111,6 +119,13 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             tvPaymentStatusHeader.setVisibility(View.VISIBLE);
             tvPaymentStatusBody.setVisibility(View.VISIBLE);
 
+            Button btnSoftPOS = (Button) rootView.findViewById(R.id.softpos);
+            btnSoftPOS.setOnClickListener(this);
+            if (getResources().getBoolean(R.bool.isSoftPOS))
+                btnSoftPOS.setEnabled(true);
+            else
+                GlobalVar.ShowDialog(getActivity(), "", "POS Not Activate", true);
+
             txtPOS.addTextChangedListener(this);
             if (DeliveryFirstFragment.IsCODtextboxEnable == 1) {
                 txtCash.setKeyListener(null);
@@ -120,7 +135,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
 
             getPaymentStatus();
 
-           Button validatepayment = (Button) rootView.findViewById(R.id.validatepayament);
+            Button validatepayment = (Button) rootView.findViewById(R.id.validatepayament);
             validatepayment.setVisibility(View.VISIBLE);
             validatepayment.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -337,6 +352,28 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         dialog.show();
     }
 
+    public void softposbtn(View v) {
+
+
+    }
+
+    @Override
+    public void onClick(View v) {
+
+
+        if (v.getId() == R.id.softpos) {
+            if (!GlobalVar.appInstalledOrNot(getActivity(), ApplicationController.getPOSAppPackageName())) {
+                GlobalVar.ShowDialog(getActivity(), "", "SoftPOS application not installed",
+                        true);
+
+                return;
+            }
+
+            fetchRegistartionDetails();
+
+        }
+    }
+
     public class signature extends View {
 
         private static final float STROKE_WIDTH = 5f;
@@ -541,7 +578,94 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
                     }
                 }
             }
+        } else if (requestCode == ApplicationController.getPOS_FETCH_REGISTRATION_DETAILS() && resultCode == RESULT_OK) {
+            String status = data.getStringExtra("status");
+            //val response = data?.getStringExtra("data")
+            if (!status.equals("Success")) {
+                startRegistration();
+            }
+        } else if (requestCode == ApplicationController.getPOS_SOFTPOS_REGISTRATION_CODE() && resultCode == RESULT_OK) {
+            String status = data.getStringExtra("status");
+            String result = data.getStringExtra("result");
+            if (status.equalsIgnoreCase("Success")) {
+                // device registered successfully
+            } else {
+                // device registration failed
+                try {
+                    JSONObject resultJSONObject = new JSONObject(result);
+                    int errorCode = resultJSONObject.optInt("code");
+                    String errorMessage = resultJSONObject.optString("message");
+                    GlobalVar.ShowDialog(getActivity(), "Error", errorMessage + ",Please try again.", true);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        } else if (requestCode == ApplicationController.getPOS_PAYMENT_REQUEST_CODE() && resultCode == RESULT_OK) {
+            String status = data.getStringExtra("status");
+            try {
+                byte[] bytes = data.getStringExtra("result").getBytes("UTF-8");
+                System.out.println("wait");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            if (status.equals("Aborted")) {
+                String reason = data.getStringExtra("reason");
+                int errorCode = data.getIntExtra("errorCode", 0);
+                if (errorCode == 1030) {
+                    String urlForUpdateApp = data.getStringExtra("app_url");
+                    GlobalVar.downloadUpdate(urlForUpdateApp, getActivity());
+                    // proceed with url for download softpos app
+                } else if (errorCode == 1031) {
+                    String urlForPinAppUpdate = data.getStringExtra("pin_app_url");
+                    // proceed with url for download pin app
+                    GlobalVar.downloadUpdate(urlForPinAppUpdate, getActivity());
+                } else {
+                    GlobalVar.ShowDialog(getActivity(), "", reason, true);
+                    ;
+                }
+            } else {
+                if (status.equals("Approved") || status.equals("Declined")) {
+                    String result = data.getStringExtra("result");
+                    StringBuilder stringBuilder = new StringBuilder();
+                    try {
+                        if (result != null) {
+                            posResult = result;
+                            updatePosResult(result);
+                        } else {
+                            if (status != null) {
+                                Log.d("Transaaction : ", status);
+                            } else {
+                                Log.d("Transaaction : ", "Something wrong");
+                            }
+                        }
+                    } catch (Exception e) {
+                        if (status != null) {
+                            Log.d("Transaaction : ", status);
+                        } else {
+                            Log.d("Transaaction : ", "Something wrong");
+                        }
+                    }
+                } else {
+                    String reason = data.getStringExtra("reason");
+                    if (reason != null) {
+                        Log.d("Transaction : ", status + " Reason : " + reason);
+                    } else {
+                        Log.d("Transaction : ", status + " Reason : Unknown");
+                    }
+
+                }
+
+            }
         }
+    }
+
+    private void updatePosResult(String result) {
+        DBConnections dbConnections = new DBConnections(getContext(), null);
+        dbConnections.update_SoftPOSDataintoMyRouteShipments(Objects.requireNonNull(getContext()),
+                DeliveryFirstFragment.txtWaybillNo.getText().toString(),
+                result);
+        dbConnections.close();
     }
 
     EditText iqamaid, phoneno, receivername;
@@ -701,7 +825,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
         });*/
         alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "Payment Gateway", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                new ValidatePayment().execute(jsonObject.toString(), "1" , "false");
+                new ValidatePayment().execute(jsonObject.toString(), "1", "false");
                 dialog.dismiss();
             }
         });
@@ -742,13 +866,12 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
     }
 
 
-
-    public void getPaymentStatus () {
+    public void getPaymentStatus() {
         final JSONObject jsonObject = new JSONObject();
 
         try {
             jsonObject.put("WaybillNo", Integer.parseInt(DeliveryFirstFragment.txtWaybillNo.getText().toString()));
-            new ValidatePayment().execute(jsonObject.toString(), "1" , "true");
+            new ValidatePayment().execute(jsonObject.toString(), "1", "true");
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -851,10 +974,10 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
                             tvPaymentStatusBody.setText(jsonObject.getString("ErrorMessage"));
 
                         } else {
-                        new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
-                                .setTitleText("Info")
-                                .setContentText(jsonObject.getString("ErrorMessage"))
-                                .show();
+                            new SweetAlertDialog(getActivity(), SweetAlertDialog.ERROR_TYPE)
+                                    .setTitleText("Info")
+                                    .setContentText(jsonObject.getString("ErrorMessage"))
+                                    .show();
                         }
 
                     } else {
@@ -882,5 +1005,37 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher {
             }
             progressDialog.dismiss();
         }
+    }
+
+
+    private void fetchRegistartionDetails() {
+        Intent fetchRegistrationDetails = new Intent();
+        fetchRegistrationDetails.setAction("geidea.net.softpos.REGISTRATION_STATUS");
+        fetchRegistrationDetails.setType("text/plain");
+        Intent shareIntent = Intent.createChooser(fetchRegistrationDetails, null);
+        startActivityForResult(shareIntent, ApplicationController.getPOS_FETCH_REGISTRATION_DETAILS());
+    }
+
+    private void startRegistration() {
+        //String terminalID = termin; // replace this with your terminal ID
+        Intent registrationIntent = new Intent();
+        registrationIntent.setAction("geidea.net.softpos.REGISTRATION");
+        registrationIntent.setType("text/plain");
+        registrationIntent.putExtra("TRSM_ID", ApplicationController.getPOS_TerminalID());
+        registrationIntent.putExtra("TMS_PLATFORM", "Ascert");
+        Intent shareIntent = Intent.createChooser(registrationIntent, null);
+        startActivityForResult(shareIntent, ApplicationController.getPOS_SOFTPOS_REGISTRATION_CODE());
+    }
+
+    private void startPurchase() {
+        String orderID = "191272";
+        String amount = "0.10";
+        Intent paymentIntent = new Intent();
+        paymentIntent.setAction("geidea.net.softpos.PURCHASE");
+        paymentIntent.putExtra(Intent.EXTRA_TEXT, amount);
+        paymentIntent.putExtra("ORDER_ID", orderID); // optional field
+        paymentIntent.setType("text/plain");
+        Intent shareIntent = Intent.createChooser(paymentIntent, null);
+        startActivityForResult(shareIntent, ApplicationController.getPOS_PAYMENT_REQUEST_CODE());
     }
 }

@@ -32,10 +32,18 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingList;
 import com.naqelexpress.naqelpointer.Activity.SPAsrRegularBooking.BookingModel;
@@ -65,7 +73,8 @@ import java.util.Calendar;
 import static android.app.Activity.RESULT_OK;
 
 public class PickUpFirstFragment
-        extends Fragment implements DatePickerDialog.OnDateSetListener {
+        extends Fragment implements DatePickerDialog.OnDateSetListener,
+        OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     View rootView;
     public TextView txtdescription;
     public static TextView txtWaybillNo, lbTotal;
@@ -84,6 +93,9 @@ public class PickUpFirstFragment
     ArrayList<Integer> IDs;
     int class_;
     ArrayList<String> waybilllist;
+    private GoogleMap mMap;
+    Marker now;
+    SupportMapFragment mapFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,6 +115,24 @@ public class PickUpFirstFragment
             IDs = getArguments().getIntegerArrayList("IDs");
             class_ = (Integer) getArguments().get("class");
 
+//            mapFragment = (SupportMapFragment) getSupportFragmentManager()
+//                    .findFragmentById(R.id.map);
+
+//            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+
+            mapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(this);
+            }
+
+            mapFragment.getMapAsync(this);
+            mapFragment.getMapAsync(this);
+
+            if (bookinglist.get(position).getisSPL()) {
+                TableLayout tl = (TableLayout) rootView.findViewById(R.id.tlv);
+                tl.setVisibility(View.GONE);
+            }
             if (class_ == 0)
                 waybilllist = getArguments().getStringArrayList("waybilllist");
 
@@ -718,6 +748,47 @@ public class PickUpFirstFragment
         }
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return false;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        try {
+            mMap = googleMap;
+            GlobalVar.GV().ChangeMapSettings(mMap, getActivity(), rootView);
+            requestLocation();
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
+            now = mMap.addMarker(new MarkerOptions().position(GlobalVar.GV().currentLocation)
+                    .icon(icon)
+                    .title(getString(R.string.MyLocation)));
+
+            mMap.getUiSettings().setMapToolbarEnabled(true);
+
+            ShowShipmentMarker();
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private void ShowShipmentMarker() {
+        if (bookinglist.get(position).getLat().length() > 3 && bookinglist.get(position).getLng().length() > 3
+        ) {
+            LatLng latLng = new LatLng(GlobalVar.GV().getDoubleFromString(bookinglist.get(position).getLat()),
+                    GlobalVar.GV().getDoubleFromString(bookinglist.get(position).getLng()));
+            BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.deliverymarker);
+            mMap.addMarker(new MarkerOptions()
+                    .position(latLng)
+                    .icon(icon)
+                    .title(String.valueOf(bookinglist.get(position).getWaybillNo())));
+            mMap.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) getActivity());
+        }
+//        else
+//            mapFragment.getView().setVisibility(View.GONE);
+    }
+
     private class SavePickupException extends AsyncTask<String, Void, String> {
         String result = "";
         StringBuffer buffer;
@@ -828,4 +899,5 @@ public class PickUpFirstFragment
         android.app.AlertDialog dialog1 = builder.create();
         dialog1.show();
     }
+
 }

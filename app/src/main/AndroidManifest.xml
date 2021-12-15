@@ -8,7 +8,7 @@
         <package android:name="com.google.android.apps.maps" />
         <package android:name="com.whatsapp" />
         <package android:name="com.google.firebase" />
-
+        <package android:name="geidea.net.softpos" />
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>

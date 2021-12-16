@@ -280,7 +280,8 @@ public class DeliveryThirdFragment extends Fragment {
 
                     GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this Waybill/OFD Scan,kindly please contact supervisor?")
+                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this OFD/Delivered," +
+                            "kindly please contact supervisor?")
 //                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialogInterface, int which) {

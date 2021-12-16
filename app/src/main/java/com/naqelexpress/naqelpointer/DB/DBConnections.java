@@ -65,6 +65,7 @@ import com.naqelexpress.naqelpointer.Models.RatingModel;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidationGWT;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnlineValidationOffset;
+import com.naqelexpress.naqelpointer.utils.RestartService;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -85,7 +86,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 164; // TimeZone
+    private static final int Version = 165; // TimeZone
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -496,6 +497,9 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"SkipRouteSequencer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"isSkip\" Integer NOT NULL )");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"isResync\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "ResyncTable TEXT , isResync Integer  )");
 
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -940,6 +944,9 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS \"CourierRating\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT " +
                     "NOT NULL  UNIQUE , " +
                     "\"EmployID\" INT NOT NULL , \"Rating\"  TEXT )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"isResync\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "ResyncTable TEXT , isResync Integer  )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -10507,5 +10514,69 @@ public class DBConnections
         }
         db.close();
 
+    }
+
+    public void isResync(Context context, String isResync) {
+        try {
+            if (isResync == null)
+                return;
+            String[] splitdate = isResync.split(",");
+            if (splitdate.length < 2)
+                return;
+
+            String deliveryQuery = "SELECT *  FROM isResync WHERE ResyncTable = 'OnDelivery' ";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            Cursor deliverycursor = db.rawQuery(deliveryQuery, null);
+            if (deliverycursor != null && deliverycursor.getCount() > 0) {
+                deliverycursor.moveToFirst();
+
+                int isResyncCount = deliverycursor.getInt(deliverycursor.getColumnIndex("isResync"));
+                if (Integer.parseInt(splitdate[2]) != isResyncCount) {
+                    Resync_onDelivery(splitdate[0], splitdate[1]);
+                    RestartService.RestartOnDeliveryService(context);
+                }
+            } else {
+                Resync_onDelivery(splitdate[0], splitdate[1]);
+                Resync_InsertOnDelivery(context, Integer.parseInt(splitdate[2]));
+                RestartService.RestartOnDeliveryService(context);
+            }
+            deliverycursor.close();
+            db.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void Resync_InsertOnDelivery(Context context, int ResyncCount) {
+        Long result = null;
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("ResyncTable", "OnDelivery");
+            contentValues.put("isResync", ResyncCount);
+
+            result = db.insert("isResync", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+    }
+
+    private void Resync_onDelivery(String d1, String d2) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            db.execSQL("update OnDelivery set Issync = 0 where Timein between '" + d1 + "' and '" + d2 + "'");
+
+        } catch (Exception e) {
+            //GlobalVar.GV().ShowSnackbar(rootView, e.getMessage(), GlobalVar.AlertType.Error)
+        }
+        db.close();
     }
 }

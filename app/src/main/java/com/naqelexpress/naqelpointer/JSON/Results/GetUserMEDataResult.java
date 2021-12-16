@@ -61,6 +61,7 @@ public class GetUserMEDataResult
 
             HasError = Boolean.parseBoolean(jsonObject.getString("HasError"));
             ErrorMessage = jsonObject.getString("ErrorMessage");
+            isResync = jsonObject.getString("isResync");
         } catch (JSONException e) {
             e.printStackTrace();
         }

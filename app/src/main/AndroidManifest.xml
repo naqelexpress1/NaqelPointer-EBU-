@@ -9,10 +9,12 @@
         <package android:name="com.whatsapp" />
         <package android:name="com.google.firebase" />
         <package android:name="geidea.net.softpos" />
+
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
+
 
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
@@ -53,7 +55,8 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
     <uses-permission
         android:name="android.permission.WRITE_SETTINGS"

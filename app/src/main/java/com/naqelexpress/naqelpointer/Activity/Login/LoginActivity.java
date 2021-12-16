@@ -1252,7 +1252,7 @@ public class LoginActivity
 
                 if (!getUserMEDataResult.HasError) {
                     // if (GlobalVar.GV().dbConnections != null) {
-
+                    dbConnections.isResync(getApplicationContext(), getUserMEDataResult.isResync);
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;

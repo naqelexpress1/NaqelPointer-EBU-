@@ -583,7 +583,8 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             //val response = data?.getStringExtra("data")
             if (!status.equals("Success")) {
                 startRegistration();
-            }
+            } else
+                startPurchase();
         } else if (requestCode == ApplicationController.getPOS_SOFTPOS_REGISTRATION_CODE() && resultCode == RESULT_OK) {
             String status = data.getStringExtra("status");
             String result = data.getStringExtra("result");
@@ -625,7 +626,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
                     ;
                 }
             } else {
-                if (status.equals("Approved") || status.equals("Declined")) {
+                if (status.equals("Approved")) { //|| status.equals("Declined")
                     String result = data.getStringExtra("result");
                     StringBuilder stringBuilder = new StringBuilder();
                     try {

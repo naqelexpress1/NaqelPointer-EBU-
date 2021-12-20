@@ -12,16 +12,15 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Activity.BookingCBU.PickupSheetReasonModel;
 import com.naqelexpress.naqelpointer.Activity.PickupAsrReg.PickUpActivity;
 import com.naqelexpress.naqelpointer.Activity.SPbookingGroup.SpWaybillGroup;
@@ -40,10 +39,10 @@ import java.util.ArrayList;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class BookingList extends AppCompatActivity implements AlertCallback {
+public class BookingList extends AppCompatActivity implements AlertCallback, BookingListAdapter.FilterListener {
 
 
-    private SwipeMenuListView mapListview;
+    private RecyclerView mapListview;
     private BookingListAdapter adapter;
     //public ArrayList<Booking> myBookingList;
     public static ArrayList<BookingModel> myBookingList;
@@ -58,11 +57,12 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 
 
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.content_booking_list);
+            setContentView(R.layout.content_booking_list_spasr);
 
-            mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
-            mapListview.setDivider(getResources().getDrawable(R.drawable.blue_button_background));
-            mapListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+            mapListview = (RecyclerView) findViewById(R.id.myBookingListView);
+            mapListview.setLayoutManager(new LinearLayoutManager(this));
+            // mapListview.setDivider(getResources().getDrawable(R.drawable.blue_button_background));
+//            mapListview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 
             isFinish = false;
             myBookingList = new ArrayList<>();
@@ -71,7 +71,9 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
             name.clear();
             pickupSheetReasonModelArrayList.clear();
 
+
             nodata = (TextView) findViewById(R.id.nodata);
+            //setAdapter();
 
             if (savedInstanceState == null)
                 ReadfromLocal();
@@ -80,7 +82,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 //            dbConnections.DeletePickupAuto(getApplicationContext());
 //            dbConnections.close();
 
-            mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+           /* mapListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     if (!myBookingList.get(position).getisSPL()) {
@@ -99,7 +101,7 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
                         RedirectPickupActivity(position);
 
                 }
-            });
+            });*/
 
         } catch
         (Exception ex) {
@@ -200,9 +202,10 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
     }
 
     private void setAdapter() {
-        adapter = new BookingListAdapter(BookingList.this, myBookingList, "BookingList");
+        adapter = new BookingListAdapter(BookingList.this, myBookingList, "BookingList", this);
 
         mapListview.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -284,8 +287,10 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 //                        deleteBookingData();
                         deletePickupsheetReasonData();
                         myBookingList.clear();
-                        if (result.PickupSheet.size() > 0)
+                        if (result.PickupSheet.size() > 0) {
                             myBookingList = result.PickupSheet;
+
+                        }
                         if (result.MissingReason.size() > 0)
                             pickupSheetReasonModelArrayList = result.MissingReason;
                         PickupSheetDetails();
@@ -575,8 +580,11 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         try {
 
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            if (myBookingList.size() > 0)
+            if (myBookingList.size() > 0) {
                 dbConnections.insertPickupsheetDetails_SPASRREGData(myBookingList, getApplicationContext(), BookingList.this);
+                SaveintoContacts();
+            }
+
 
             if (pickupSheetReasonModelArrayList.size() > 0)
                 dbConnections.insertPickupsheetReasonData(pickupSheetReasonModelArrayList, getApplicationContext());
@@ -656,8 +664,10 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
 //        GlobalVar.GV().EmployID = 19127;
         myBookingList =
                 dbConnections.getPickupSheetSpAsrRegDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
-        exitdialog();
+
+
         if (myBookingList.size() > 0) {
+
             setAdapter();
             nodata.setVisibility(View.GONE);
 
@@ -666,7 +676,21 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         } else
             nodata.setVisibility(View.VISIBLE);
 
+        exitdialog();
 
+    }
+
+    private void SaveintoContacts() {
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        ArrayList<BookingModel> myBookingList = dbConnections.getPickupSheetSpAsrRegDetailsData(getApplicationContext(), GlobalVar.GV().EmployID);
+        for (BookingModel booking : myBookingList) {
+            if (!booking.getisSPL()) {
+                String sName = "ASR";
+                GlobalVar.savemobilenointocontacts(String.valueOf(booking.getPhoneNo()),
+                        String.valueOf(booking.getMobileNo()), sName,
+                        String.valueOf(booking.getsNo()), String.valueOf(booking.getWaybillNo()), BookingList.this);
+            }
+        }
     }
 
     private void deleteConfirmRoute() {
@@ -722,6 +746,26 @@ public class BookingList extends AppCompatActivity implements AlertCallback {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.deletePickupsheetReasonData(getApplicationContext());
         dbConnections.close();
+    }
+
+    @Override
+    public void onItemSelected(BookingModel bookingModel, int position) {
+        position = bookingModel.sNo - 1;
+        if (!myBookingList.get(position).getisSPL()) {
+            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+            Cursor result = dbConnections.Fill("select * from PickUpAuto where IsSync = 0" +
+                    " and WaybillNo=" +
+                    myBookingList.get(position).WaybillNo, getApplicationContext());
+
+            if (result.getCount() == 0) {
+                //int pos = Integer.parseInt(((TextView) view.findViewById(R.id.sno)).getText().toString()) - 1;
+                RedirectPickupActivity(position);
+            } else
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "you picked up this item, please sync data", GlobalVar.AlertType.Error);
+            dbConnections.close();
+        } else
+            RedirectPickupActivity(position);
+
     }
 
     public class DeleteContact extends AsyncTask<String, String, String> {

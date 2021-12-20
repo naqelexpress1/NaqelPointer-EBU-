@@ -27,6 +27,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputFilter;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -121,12 +122,15 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
 
             Button btnSoftPOS = (Button) rootView.findViewById(R.id.softpos);
             btnSoftPOS.setOnClickListener(this);
-            if (getResources().getBoolean(R.bool.isSoftPOS))
+            if (getResources().getBoolean(R.bool.isSoftPOS)) {
                 btnSoftPOS.setEnabled(true);
-            else
-                GlobalVar.ShowDialog(getActivity(), "", "POS Not Activate", true);
-
+                txtPOS.setInputType(InputType.TYPE_NULL);
+            } else {
+                txtPOS.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                //GlobalVar.ShowDialog(getActivity(), "", "POS Not Activate", true);
+            }
             txtPOS.addTextChangedListener(this);
+
             if (DeliveryFirstFragment.IsCODtextboxEnable == 1) {
                 txtCash.setKeyListener(null);
             }
@@ -206,6 +210,8 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             String asd = DeliveryFirstFragment.txtBillingType.getText().toString();
             boolean pos = GlobalVar.getPOS(getContext());
             TextView tv = (TextView) rootView.findViewById(R.id.nopos);
+            if (GlobalVar.GV().isFortesting)
+                pos = true;
             if (!pos) {
                 tv.setVisibility(View.VISIBLE);
 
@@ -584,7 +590,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             if (!status.equals("Success")) {
                 startRegistration();
             } else
-                startPurchase();
+                startPurchase(DeliveryFirstFragment.txtWaybillNo.getText().toString());
         } else if (requestCode == ApplicationController.getPOS_SOFTPOS_REGISTRATION_CODE() && resultCode == RESULT_OK) {
             String status = data.getStringExtra("status");
             String result = data.getStringExtra("result");
@@ -1028,12 +1034,23 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
         startActivityForResult(shareIntent, ApplicationController.getPOS_SOFTPOS_REGISTRATION_CODE());
     }
 
-    private void startPurchase() {
-        String orderID = "191272";
-        String amount = "0.10";
+    private void startPurchase(String orderID) {
+//        String orderID = "191272";
+        double camount = DeliveryFirstFragment.codAmount;
+        if (txtCash.getText().toString().length() != 0)
+            camount = DeliveryFirstFragment.codAmount - Double.parseDouble(txtCash.getText().toString());
+
+        if (camount <= 0) {
+            GlobalVar.ShowDialog(getActivity(), "", "Please enter correct Amount ", true);
+            return;
+        }
+
+        //  double amount = DeliveryFirstFragment.codAmount - camount;
+        //String amount = "0.10";
+        txtPOS.setText(String.valueOf(camount));
         Intent paymentIntent = new Intent();
         paymentIntent.setAction("geidea.net.softpos.PURCHASE");
-        paymentIntent.putExtra(Intent.EXTRA_TEXT, amount);
+        paymentIntent.putExtra(Intent.EXTRA_TEXT, String.valueOf(camount));
         paymentIntent.putExtra("ORDER_ID", orderID); // optional field
         paymentIntent.setType("text/plain");
         Intent shareIntent = Intent.createChooser(paymentIntent, null);

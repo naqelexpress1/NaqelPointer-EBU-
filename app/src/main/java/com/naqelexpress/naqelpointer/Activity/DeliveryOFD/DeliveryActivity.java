@@ -305,6 +305,10 @@ public class DeliveryActivity extends AppCompatActivity {
         if (result.getCount() > 0) {
             result.moveToFirst();
             boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+
+            if (GlobalVar.GV().isFortesting)
+                isdelivered = false;
+
             if (!isdelivered) {
                 boolean isupdatedelivered = result.getInt(result.getColumnIndex("UpdateDeliverScan")) > 0;
                 if (isupdatedelivered) {
@@ -476,7 +480,6 @@ public class DeliveryActivity extends AppCompatActivity {
             isValid = false;
             return isValid;
         }
-
 
 
         if (secondFragment != null) {

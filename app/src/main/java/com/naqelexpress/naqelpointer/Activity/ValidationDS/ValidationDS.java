@@ -124,9 +124,9 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     GlobalVar.GV().askPermission(ValidationDS.this, GlobalVar.PermissionType.Camera);
                 } else {
                     if (waybilldetails.size() > 0) {
-                        scannedBarCode.clear();
-                        ScanbyDevice.clear();
-                        ConflictBarcode.clear();
+//                        scannedBarCode.clear();
+//                        ScanbyDevice.clear();
+//                        ConflictBarcode.clear();
                         Bundle bundle = new Bundle();
                         Intent intent = new Intent(ValidationDS.this.getApplicationContext(), NewBarCodeScannerForVS.class);
                         bundle.putSerializable("scannedBarCode", scannedBarCode);
@@ -152,50 +152,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength
-                            || txtBarcode.getText().length() == 13) {
-                        String result = txtBarcode.getText().toString();
-                        if (!GlobalVar.GV().isValidBarcode(result)) {
-                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
-                            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                            txtBarcode.setText("");
-                            return false;
-                        }
-
-
-                        // To show onlineValidation warning if any
-                        boolean isConflict = !scannedBarCode.contains(result);
-                        if (division.equals("Courier")) {
-                            onlineValidation(result, isConflict);
-                        }
-
-
-                        if (!GlobalVar.GV().isValidBarcode(result)) {
-                            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
-                                    "Wrong Barcode", GlobalVar.AlertType.Warning);
-                            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                            txtBarcode.setText("");
-                            return false;
-                        }
-
-
-                        if (scannedBarCode.contains(result)) {
-                            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                            if (!ScanbyDevice.contains(result))
-                                ScanbyDevice.add(result);
-
-                        } else {
-                            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                            if (!ConflictBarcode.contains(result))
-                                ConflictBarcode.add(result);
-
-                            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
-                                conflict(result);
-                        }
-                        txtBarcode.setText("");
-                        doaction();
-                    }
-
+                    validateBarcode();
                     return true;
                 }
                 return false;
@@ -259,6 +216,54 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
             }
         });*/
 
+    }
+
+    private boolean validateBarcode() {
+        if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength
+                || txtBarcode.getText().length() == 13) {
+
+            String result = txtBarcode.getText().toString();
+            if (!GlobalVar.GV().isValidBarcode(result)) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                txtBarcode.setText("");
+                return false;
+            }
+
+
+            // To show onlineValidation warning if any
+            boolean isConflict = !scannedBarCode.contains(result);
+            if (division.equals("Courier")) {
+                onlineValidation(result, isConflict);
+            }
+
+
+            if (!GlobalVar.GV().isValidBarcode(result)) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                        "Wrong Barcode", GlobalVar.AlertType.Warning);
+                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                txtBarcode.setText("");
+                return false;
+            }
+
+
+            if (scannedBarCode.contains(result)) {
+                GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                if (!ScanbyDevice.contains(result))
+                    ScanbyDevice.add(result);
+
+            } else {
+                GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                if (!ConflictBarcode.contains(result))
+                    ConflictBarcode.add(result);
+
+                if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                    conflict(result);
+            }
+            txtBarcode.setText("");
+            doaction();
+        }
+        return true;
     }
 
     public void conflict(String Barcode) {
@@ -625,20 +630,27 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                 if (data != null) {
                     Bundle extras = data.getExtras();
                     if (extras != null) {
-                        if (extras.containsKey("scannedBarCode")) {
-                            scannedBarCode.clear();
-                            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+//                        if (extras.containsKey("scannedBarCode")) {
+//                            scannedBarCode.clear();
+//                            scannedBarCode = (ArrayList<String>) extras.getSerializable("scannedBarCode");
+//
+//                        }
+//                        if (extras.containsKey("ScanbyDevice")) {
+//                            ScanbyDevice.clear();
+//                            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
+//
+//                        }
+//                        if (extras.containsKey("ConflictBarcode")) {
+//                            ConflictBarcode.clear();
+//                            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
+//
+//                        }
+                        try {
+                            txtBarcode.setText(extras.getString("barcode"));
 
-                        }
-                        if (extras.containsKey("ScanbyDevice")) {
-                            ScanbyDevice.clear();
-                            ScanbyDevice = (ArrayList<String>) extras.getSerializable("ScanbyDevice");
-
-                        }
-                        if (extras.containsKey("ConflictBarcode")) {
-                            ConflictBarcode.clear();
-                            ConflictBarcode = (ArrayList<String>) extras.getSerializable("ConflictBarcode");
-
+                            validateBarcode();
+                        } catch (Exception e) {
+                            System.out.println();
                         }
                     }
 

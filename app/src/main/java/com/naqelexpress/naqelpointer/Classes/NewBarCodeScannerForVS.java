@@ -53,6 +53,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
     private String division;
 
     BarcodeCapture barcodeCapture;
+    String barcode = "";
 
     @Override
     public void onCreate(Bundle state) {
@@ -129,7 +130,9 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
 
         barcodeCapture.stopScanning();
+        this.barcode = barcode.displayValue;
         handleResult(barcode.displayValue);
+
     }
 
     @Override
@@ -184,30 +187,31 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
         String result = rawResult;
 
         // To show onlineValidation warning if any
-        boolean isConflict = !scannedBarCode.contains(result);
-        if (division.equals("Courier")) {
-            onlineValidation(result, isConflict);
-        }
-
-        if (scannedBarCode.contains(result)) {
-            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-            if (!ScanbyDevice.contains(result)) {
-                ScanbyDevice.add(result);
-                onBackPressed();
-            }
-            // mScannerView.resumeCameraPreview(this);
-
-        } else {
-            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            if (!ConflictBarcode.contains(result))
-                ConflictBarcode.add(result);
-
-            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
-                conflict(result);
-
-        }
+//        boolean isConflict = !scannedBarCode.contains(result);
+//        if (division.equals("Courier")) {
+//            onlineValidation(result, isConflict);
+//        }
+//
+//        if (scannedBarCode.contains(result)) {
+//            GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+//            if (!ScanbyDevice.contains(result)) {
+//                ScanbyDevice.add(result);
+//                onBackPressed();
+//            }
+//            // mScannerView.resumeCameraPreview(this);
+//
+//        } else {
+//            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//            if (!ConflictBarcode.contains(result))
+//                ConflictBarcode.add(result);
+//
+//            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+//                conflict(result);
+//
+//        }
 
         // mScannerView.resumeCameraPreview(this);
+        onBackPressed();
     }
 
 
@@ -345,7 +349,7 @@ public class NewBarCodeScannerForVS extends AppCompatActivity
 
         barcodeCapture.stopScanning();
         Intent intent = new Intent();
-        intent.putExtra("test", "test");
+        intent.putExtra("barcode", barcode);
         intent.putExtra("scannedBarCode", scannedBarCode);
         intent.putExtra("ScanbyDevice", ScanbyDevice);
         intent.putExtra("ConflictBarcode", ConflictBarcode);

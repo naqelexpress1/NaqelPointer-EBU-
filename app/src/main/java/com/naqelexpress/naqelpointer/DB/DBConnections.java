@@ -9778,10 +9778,10 @@ public class DBConnections
             stmt.bindString(28, String.valueOf(booking.getSPOfficeName()));
 
             try {
-                if (!booking.getisSPL())
-                    GlobalVar.savemobilenointocontacts(String.valueOf(booking.getPhoneNo()),
-                            String.valueOf(booking.getMobileNo()), sName,
-                            String.valueOf(sNo), String.valueOf(booking.getWaybillNo()), activity);
+//                if (!booking.getisSPL())
+//                    GlobalVar.savemobilenointocontacts(String.valueOf(booking.getPhoneNo()),
+//                            String.valueOf(booking.getMobileNo()), sName,
+//                            String.valueOf(sNo), String.valueOf(booking.getWaybillNo()), activity);
                 sNo = sNo + 1;
             } catch (Exception e) {
                 System.out.println(e.toString());
@@ -10177,7 +10177,8 @@ public class DBConnections
     public boolean InsertPickupSheetMnos(String name, String Mno, int rawid, Context context) {
         long result = 0;
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
             ContentValues contentValues = new ContentValues();
             contentValues.put("Name", name);
             contentValues.put("MobileNo", Mno);
@@ -10185,6 +10186,7 @@ public class DBConnections
             result = db.insert("PickupsheetMobileNo", null, contentValues);
             db.close();
         } catch (SQLiteException e) {
+            System.out.println(e);
 
         }
         return result != -1;

@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU-ASR Map Visible 14-12-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU-ASR/VDS Changes 20-12-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

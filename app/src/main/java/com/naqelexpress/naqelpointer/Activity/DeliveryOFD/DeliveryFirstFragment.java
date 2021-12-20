@@ -85,6 +85,7 @@ public class DeliveryFirstFragment
     boolean signrequired = false;
     static int al = 0;
     public static String Lat = "0", Longi = "0";
+    public static double codAmount = 0;
 
 
     @Override
@@ -97,6 +98,7 @@ public class DeliveryFirstFragment
 
             Lat = "0";
             Longi = "0";
+            codAmount = 0;
 
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             actualLocation.setVisibility(View.GONE);
@@ -447,6 +449,9 @@ public class DeliveryFirstFragment
 
         result.moveToFirst();
         boolean isdelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
+        if (GlobalVar.GV().isFortesting)
+            isdelivered = false;
+
         if (!isdelivered) {
             JSONObject jsonObject = new JSONObject();
             try {
@@ -501,6 +506,7 @@ public class DeliveryFirstFragment
                 WaybillDetailsResult waybillDetailsResult = new WaybillDetailsResult(jsonObject.toString());
 
                 txtBillingType.setText(getResources().getString(R.string.txtBillingType) + waybillDetailsResult.BillingType);
+                codAmount = waybillDetailsResult.CODAmount;
                 txtCODAmount.setText(getResources().getString(R.string.txtCODAmount) + waybillDetailsResult.CODAmount);
                 txtWeight.setText(getResources().getString(R.string.txtWeight) + waybillDetailsResult.Weight);
                 txtPiecesCount.setText(getResources().getString(R.string.txtPiecesCount) + waybillDetailsResult.PiecesCount);

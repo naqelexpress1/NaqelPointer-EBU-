@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -46,13 +45,10 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.CongisneeUpdatedNoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CongisneeUpdatedNoResult;
-import com.naqelexpress.naqelpointer.Models.CourierNotesModels;
 import com.naqelexpress.naqelpointer.Models.IsFollowSequncerModel;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.service.CourierNotesService;
 import com.naqelexpress.naqelpointer.service.IsFollowSequencerService;
 
-import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,7 +63,7 @@ import java.net.URL;
 import Error.ErrorReporter;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class WaybillPlanActivity extends AppCompatActivity
+public class WaybillPlanActivity_bf_CourierNotesChanges extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     Marker now;
@@ -84,7 +80,6 @@ public class WaybillPlanActivity extends AppCompatActivity
     public double Latitude = 0;
     public double Longitude = 0;
     int position;
-    EditText txtNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,10 +112,6 @@ public class WaybillPlanActivity extends AppCompatActivity
             //txtShipmentAmount = findViewById(R.id.txtShipmentAmount);
             txtCDAmount = findViewById(R.id.tv_cd_body);
             txtTotalAmount = findViewById(R.id.tv_total_amount_body);
-            txtNotes = (EditText) findViewById(R.id.txtnotes);
-
-            if (GlobalVar.GV().GetDivision(getApplicationContext()))
-                txtNotes.setVisibility(View.VISIBLE);
 
             AppCompatImageButton btnCallMobile, btnCallMobile1, btnWhatsApp, btnWhatsApp1, sms, sms1;
             btnCallMobile = (AppCompatImageButton) findViewById(R.id.btnCall);
@@ -135,14 +126,14 @@ public class WaybillPlanActivity extends AppCompatActivity
             btnCallMobile.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    GlobalVar.GV().makeCall(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity_bf_CourierNotesChanges.this);
                     // GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
                 }
             });
             btnCallMobile1.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    GlobalVar.GV().makeCall(txtPhoneNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
+                    GlobalVar.GV().makeCall(txtPhoneNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity_bf_CourierNotesChanges.this);
                     //GlobalVar.GV().makeCallAwaya(txtMobileNo.getTag().toString(), getWindow().getDecorView().getRootView(), WaybillPlanActivity.this);
                 }
             });
@@ -258,7 +249,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             if (ConsigneeLatitude.length() == 0)
                 togoogle.setVisibility(View.GONE);
 
-            spinnerDialog = new ConsingeeMobileSpinnerDialog(WaybillPlanActivity.this, txtPhoneNo.getText().toString(),
+            spinnerDialog = new ConsingeeMobileSpinnerDialog(WaybillPlanActivity_bf_CourierNotesChanges.this, txtPhoneNo.getText().toString(),
                     txtMobileNo.getText().toString(), getWindow().getDecorView().getRootView());
 
             if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -270,7 +261,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
 
             } else {
-                ActivityCompat.requestPermissions(WaybillPlanActivity.this,
+                ActivityCompat.requestPermissions(WaybillPlanActivity_bf_CourierNotesChanges.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         1);
                 finish();
@@ -321,22 +312,6 @@ public class WaybillPlanActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        MenuItem item = menu.findItem(R.id.save);
-
-        if (GlobalVar.GV().GetDivision(getApplicationContext())) {
-            item.setEnabled(true);
-            //    item.getIcon().setAlpha(255);
-        } else {
-            // disabled
-            item.setEnabled(false);
-//            item.getIcon().setAlpha(130);
-        }
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
@@ -355,10 +330,6 @@ public class WaybillPlanActivity extends AppCompatActivity
                 return true;
             case R.id.UpdatedConsigneeNo:
                 PrepareGetConsigneeUpdatedNo(GlobalVar.GV().EmployID, Integer.parseInt(myRouteShipments.ItemNo));
-            case R.id.save:
-                insertCourierNotes();
-
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -472,7 +443,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     public void onMapReady(GoogleMap googleMap) {
         try {
             mMap = googleMap;
-            GlobalVar.GV().ChangeMapSettings(mMap, WaybillPlanActivity.this, getWindow().getDecorView().getRootView());
+            GlobalVar.GV().ChangeMapSettings(mMap, WaybillPlanActivity_bf_CourierNotesChanges.this, getWindow().getDecorView().getRootView());
 
             BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.currentlocation);
             now = mMap.addMarker(new MarkerOptions().position(GlobalVar.GV().currentLocation)
@@ -495,7 +466,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                     .position(latLng)
                     .icon(icon)
                     .title(txtWaybillNo.getText().toString()));
-            mMap.setOnMarkerClickListener(WaybillPlanActivity.this);
+            mMap.setOnMarkerClickListener(WaybillPlanActivity_bf_CourierNotesChanges.this);
         }
 //        else
 //            mapFragment.getView().setVisibility(View.GONE);
@@ -635,7 +606,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         });
 
 
-        popup = new PopupWindow(WaybillPlanActivity.this);
+        popup = new PopupWindow(WaybillPlanActivity_bf_CourierNotesChanges.this);
         popup.setContentView(layout);
         popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popup.setWidth(WindowManager.LayoutParams.MATCH_PARENT);
@@ -704,7 +675,7 @@ public class WaybillPlanActivity extends AppCompatActivity
         protected void onPreExecute() {
             super.onPreExecute();
             GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
-            progressDialog = ProgressDialog.show(WaybillPlanActivity.this,
+            progressDialog = ProgressDialog.show(WaybillPlanActivity_bf_CourierNotesChanges.this,
                     "Please wait.", "Your Request has been process, kindly be patient  ", true);
         }
 
@@ -775,12 +746,12 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                     if (jsonObject.getInt("ID") == 103) {
 
-                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                        new SweetAlertDialog(WaybillPlanActivity_bf_CourierNotesChanges.this, SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("Name"))
                                 .show();
                     } else {
-                        new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                        new SweetAlertDialog(WaybillPlanActivity_bf_CourierNotesChanges.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("Info")
                                 .setContentText(jsonObject.getString("Name"))
                                 .show();
@@ -792,7 +763,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                 }
             } else {
-                new SweetAlertDialog(WaybillPlanActivity.this, SweetAlertDialog.ERROR_TYPE)
+                new SweetAlertDialog(WaybillPlanActivity_bf_CourierNotesChanges.this, SweetAlertDialog.ERROR_TYPE)
                         .setTitleText("Info")
                         .setContentText("something went wrong/check your Internet/server is busy,kindly try again later")
                         .show();
@@ -824,7 +795,7 @@ public class WaybillPlanActivity extends AppCompatActivity
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(WaybillPlanActivity.this, "Please wait.", "Checking for updates ..", true);
+            progressDialog = ProgressDialog.show(WaybillPlanActivity_bf_CourierNotesChanges.this, "Please wait.", "Checking for updates ..", true);
             // TODO : Update to production link
             DomainURL = GlobalVar.GV().NaqelPointerAPILink + "GetUpdatedConsigneeNo";
         }
@@ -978,7 +949,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                         returnIntent.putExtra("result", "refreshdata");
                         setResult(Activity.RESULT_OK, returnIntent);
                         finish();
-                        WaybillPlanActivity.super.onBackPressed();
+                        WaybillPlanActivity_bf_CourierNotesChanges.super.onBackPressed();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
@@ -1077,42 +1048,14 @@ public class WaybillPlanActivity extends AppCompatActivity
             mMap.getUiSettings().setMapToolbarEnabled(true);
             if (!GlobalVar.isMyServiceRunning(IsFollowSequencerService.class, getApplicationContext())) {
                 startService(
-                        new Intent(WaybillPlanActivity.this,
-                                com.naqelexpress.naqelpointer.service.IsFollowSequencerService.class));
+                        new Intent(WaybillPlanActivity_bf_CourierNotesChanges.this,
+                                IsFollowSequencerService.class));
             }
 //              GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
         } else
-            GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Something went wrong," +
+            GlobalVar.ShowDialog(WaybillPlanActivity_bf_CourierNotesChanges.this, "Info", "Something went wrong," +
                     "Please try again", true);
     }
 
-    private boolean insertCourierNotes() {
-        if (txtNotes.getText().toString().length() > 1) {
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            CourierNotesModels courierNotesModels = new CourierNotesModels();
-            courierNotesModels.setWaybillNo(Integer.parseInt(txtWaybillNo.getText().toString()));
-            courierNotesModels.setDeliverySheetID(dbConnections.GetDeliverysheetIDbyWNo(getApplicationContext(),
-                    Integer.parseInt(txtWaybillNo.getText().toString())));
-            courierNotesModels.setTimeIn(new DateTime().toString());
-            courierNotesModels.setUserID(GlobalVar.GV().EmployID);
-            courierNotesModels.setNotes(txtNotes.getText().toString());
-            boolean isnotesaved = dbConnections.insertCourierNotes(getApplicationContext(), courierNotesModels);
-            if (isnotesaved) {
-                GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Your Notes Sucessfully Saved.", true);
-                if (!GlobalVar.isMyServiceRunning(CourierNotesService.class, getApplicationContext())) {
-                    startService(
-                            new Intent(WaybillPlanActivity.this,
-                                    com.naqelexpress.naqelpointer.service.CourierNotesService.class));
-                }
-            }
-            dbConnections.close();
-
-            return isnotesaved;
-        } else
-            GlobalVar.ShowDialog(WaybillPlanActivity.this, "Error", "Please enter Notes.", true);
-
-        return false;
-
-    }
 
 }

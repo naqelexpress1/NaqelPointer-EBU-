@@ -65,7 +65,7 @@ public class BookingListAdapter extends
 
     @Override
     public int getItemCount() {
-        return  itemListFiltered.size();
+        return itemListFiltered.size();
     }
 
     protected static class ViewHolderItems {
@@ -134,7 +134,10 @@ public class BookingListAdapter extends
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
             holder.totalpickwaybill.setText(content);
             holder.pickedupcount.setText("Picked Up :" + String.valueOf(item.getPickupCount()));
+            holder.pickedupcount.setTextColor(context.getResources().getColor(R.color.color_green));
+            //int excount = item.getWaybillcount() -  item.getPickupCount();
             holder.exceptioncount.setText("Exception :" + String.valueOf(item.getExceptionCount()));
+
         } else {
 
             holder.locationll.setVisibility(View.GONE);
@@ -680,15 +683,18 @@ public class BookingListAdapter extends
         customerlocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ConsigneeLatitude != null && ConsigneeLatitude.length() == 0)
+                if (ConsigneeLatitude != null && !ConsigneeLatitude.equals("null") && ConsigneeLatitude.length() > 1
+                        && ConsigneeLatitude.contains(".") && Double.parseDouble(ConsigneeLatitude) > 0
+                ) //&& ConsigneeLatitude != null && ConsigneeLatitude.length() == 0
 //                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, getString(R.string.watsappPredefinedMsg)
 //                            + " " + txtWaybillNo.getText().toString() + getString(R.string.watsappPredefinedMsg1)
 //                            + txtShipperName.getText().toString() + "\n\n\n" + arabic + getString(R.string.watsappPredefinedMsg2)
 //                            + txtWaybillNo.getText().toString(), getApplicationContext());
-                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, GlobalVar.GV().getLocationMsg(context.getApplicationContext(),
-                            Waybillno, ClientName), context.getApplicationContext());
-                else
                     alertforcommon("Has Location", "This Shipment already has Location , kindly please start to deliver");
+
+                else
+                    GlobalVar.GV().sendMessageToWhatsAppContact(mobileno, GlobalVar.GetLocationWatsMsg(context.getApplicationContext(),
+                            Waybillno, ClientName), context.getApplicationContext());
 
                 popup.dismiss();
             }

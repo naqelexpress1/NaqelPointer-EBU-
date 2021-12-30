@@ -252,10 +252,12 @@ public class LoginActivity
             Cursor result = dbConnections.Fill("select * from Truck", getApplicationContext());
             if (result.getCount() == 0) {
                 try {
-                    JSONObject jsonObject = new JSONObject();
-                    //jsonObject.put("StationID", GlobalVar.GV().StationID);
-                    //jsonObject.put("Function", function);
-                    new BringTruckData().execute(jsonObject.toString());
+
+//                    JSONObject jsonObject = new JSONObject();
+//                    //jsonObject.put("StationID", GlobalVar.GV().StationID);
+//                    //jsonObject.put("Function", function);
+//                    new BringTruckData().execute(jsonObject.toString());
+//                    FetchTruckID();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1129,8 +1131,10 @@ public class LoginActivity
         getUserMEDataRequest.Passowrd = Password;
         getUserMEDataRequest.AppTypeID = GlobalVar.VersionCode(getApplicationContext());
 
-        if (GlobalVar.GV().LoginVariation)
+        if (GlobalVar.GV().LoginVariation) {
             getUserMEDataRequest.Odometer = Integer.parseInt(odometer.getText().toString());
+            getUserMEDataRequest.TruckID = truckID;
+        }
 
 
         try {
@@ -1184,8 +1188,9 @@ public class LoginActivity
 
                 String function = "GetUserMEData"; //CBU division BringDeliverySheetbyOFDPiece
 //                String function = "BringMyRouteShipments";
-                if (!GetDivision())
-                    function = "GetUserMEData"; //EBU Divison
+                //if (!GetDivision())
+                if (GlobalVar.GV().LoginVariation)
+                    function = "GetUserMEDataforEBU"; //EBU Divison
 
                 //  if (GlobalVar.GV().isFortesting)
                 //       function = "BringDeliverySheetbyOFDPiece_ExcludeRoute";
@@ -1716,7 +1721,8 @@ public class LoginActivity
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringTruck");
+                //URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringTruck");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringTruckbyStation");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -1880,10 +1886,11 @@ public class LoginActivity
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (fun == 0) {
-                            JSONObject jsonObject = new JSONObject();
-                            //jsonObject.put("StationID", GlobalVar.GV().StationID);
-                            //jsonObject.put("Function", function);
-                            new BringTruckData().execute(jsonObject.toString());
+//                            JSONObject jsonObject = new JSONObject();
+//                            //jsonObject.put("StationID", GlobalVar.GV().StationID);
+//                            //jsonObject.put("Function", function);
+//                            new BringTruckData().execute(jsonObject.toString());
+                            FetchTruckID();
                         }
                         dialog.dismiss();
                     }
@@ -1916,4 +1923,23 @@ public class LoginActivity
         }
     }
 
+    private void FetchTruckID() {
+        if (txtEmployID.getText().toString().length() > 0) {
+            JSONObject jsonObject = new JSONObject();
+            try {
+                jsonObject.put("EmployID", txtEmployID.getText().toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //jsonObject.put("Function", function);
+            new BringTruckData().execute(jsonObject.toString());
+        } else {
+            GlobalVar.ShowDialog(LoginActivity.this, "Error", "Please enter EmployID", true);
+            ;
+        }
+    }
+
+    public void BringTruckData(View view) {
+        FetchTruckID();
+    }
 }

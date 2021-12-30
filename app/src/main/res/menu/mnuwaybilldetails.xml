@@ -28,4 +28,9 @@
         android:title="@string/not_delivered"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/save"
+        android:title="Save"
+        app:showAsAction="never" />
+
 </menu>

@@ -254,7 +254,8 @@ public class Fuel
         fuelRequest.setFuelTypeID(isSelectedReasonID);
         fuelRequest.setLitres(liters.getText().toString());
         fuelRequest.setOdometer(odometer.getText().toString());
-        fuelRequest.setTruckId(DBConnections.GetTruckID(GlobalVar.GV().EmployID, getApplicationContext()));
+       //fuelRequest.setTruckId(DBConnections.GetTruckID(GlobalVar.GV().EmployID, getApplicationContext()));
+        fuelRequest.setTruckId(DBConnections.GetTruckIDbyLastLoggedin(getApplicationContext()));
         fuelRequest.setFuelSupplierID(supplierID);
 
         return fuelRequest;

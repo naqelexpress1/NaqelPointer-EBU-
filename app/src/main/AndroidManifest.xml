@@ -271,6 +271,31 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".Activity.MyRouteCBUPaperless.MyRouteActivity_PaperlessDS"
+            android:label="My Route"
+            android:screenOrientation="portrait"
+            android:theme="@style/myroute.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".Activity.PaperLessDSSummary.PaperLessDSSummary" />
+        <activity android:name=".Activity.PaperLessDSSummary.RouteHistory" />
+
+        <activity android:name=".Activity.MyRouteCBUPaperless.RouteMap" />
+        <activity android:name=".Activity.MyRouteCBUPaperless.RouteMap_byDistrict" />
+        <activity android:name=".Activity.MyRouteCBUPaperless.OptimiseMap" />
+        <activity android:name=".Activity.MyRouteCBUPaperless.OptimiseMapbyDistrict" />
+        <activity android:name=".Activity.MyRouteCBUPaperless.MapMovingOnCurLatLng" />
+
         <!--
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
@@ -1275,6 +1300,10 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.DeviceActivity"
             android:process=":naqelDeviceActivity" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.CourierNotesService"
+            android:process=":CourierNotesService" />
 
 
         <receiver

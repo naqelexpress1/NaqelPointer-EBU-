@@ -223,6 +223,14 @@ public class History extends Activity {
                 new Intent(History.this,
                         com.naqelexpress.naqelpointer.service.NotDelivery.class));
 
+        if (GetDivision()) {
+
+            stopService(
+                    new Intent(History.this,
+                            com.naqelexpress.naqelpointer.service.CourierNotesService.class));
+
+        }
+
     }
 
     String ManualFunction = "";
@@ -849,6 +857,14 @@ public class History extends Activity {
             startService(
                     new Intent(History.this,
                             com.naqelexpress.naqelpointer.service.signature.class));
+        }
+
+        if (GetDivision()) {
+
+            startService(
+                    new Intent(History.this,
+                            com.naqelexpress.naqelpointer.service.CourierNotesService.class));
+
         }
     }
 

@@ -148,9 +148,10 @@ public class NotDeliveredActivity
             }
 
             boolean IsSaved = true;
+
             NotDelivered notDelivered = new NotDelivered(firstFragment.txtWaybillNo.getText().toString(), 0,
                     TimeIn, DateTime.now(), String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.ReasonID,
-                    firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId, Barcode);
+                    firstFragment.txtNotes.getText().toString(), firstFragment.subReasonId, Barcode  );
 
             Cursor result = dbConnections.Fill("select * from MyRouteShipments where ItemNo = '" +
                     firstFragment.txtWaybillNo.getText().toString() + "' and HasComplaint = 1", getApplicationContext());

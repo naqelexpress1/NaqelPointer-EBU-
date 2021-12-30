@@ -19,7 +19,8 @@ import java.util.ArrayList;
  */
 
 
-public class ContactAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements RecyclerView.OnItemTouchListener {
+public class ContactAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements RecyclerView.OnItemTouchListener {
     private ArrayList<ListItem> items;
     private OnItemClickListener mListener;
     GestureDetector mGestureDetector;

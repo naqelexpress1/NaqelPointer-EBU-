@@ -23,6 +23,7 @@ public class NotDelivered {
     public String DeviceToken = "";
     public int DeliveryStatusReasonID = 0;
     public String Barcode = "";
+    public int DeliverySheetID = 0;
 
     public List<NotDeliveredDetail> NotDeliveredDetails;
 
@@ -47,5 +48,6 @@ public class NotDelivered {
         Notes = notes;
         this.DeliveryStatusReasonID = DeliveryStatusReasonID;
         this.Barcode = barcode;
+//        DeliverySheetID = dsid;
     }
 }

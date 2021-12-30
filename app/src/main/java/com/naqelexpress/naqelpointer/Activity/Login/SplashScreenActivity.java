@@ -63,7 +63,6 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
-
 //        Calendar mCalendar = new GregorianCalendar();
 //        TimeZone mTimeZone = mCalendar.getTimeZone();
 //        int mGMTOffset = mTimeZone.getRawOffset();

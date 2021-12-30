@@ -100,6 +100,12 @@ public class MyRouteShipments implements Parcelable {
     public String AreaData = "";
     public int isOtp;
     public String AreaWaypoints = "";
+    public String KMOut = "";
+    public String RouteName = "";
+    public String PlateNumber = "";
+    public String TruckName = "";
+    public String POSName = "";
+    public String IqamaNo = "";
 
     public MyRouteShipments() {
 
@@ -271,6 +277,14 @@ public class MyRouteShipments implements Parcelable {
                 instance.IsPlan = jsonObject.getInt("IsPlan");
                 instance.isOtp = jsonObject.getInt("IsOtp");
 
+                instance.KMOut = jsonObject.getString("KMOut");
+                instance.RouteName = jsonObject.getString("RouteName");
+                instance.PlateNumber = jsonObject.getString("PlateNumber");
+                instance.TruckName = jsonObject.getString("TruckName");
+                instance.POSName = jsonObject.getString("POSName");
+                instance.IqamaNo = jsonObject.getString("IqamaNo");
+
+
                 if (i == 0)
                     instance.AreaWaypoints = MyRouteActivity_Complaince_GroupbyPhn.AreaData;
                 else
@@ -435,6 +449,13 @@ public class MyRouteShipments implements Parcelable {
         DsOrderNo = in.readInt();
         CustomDuty = in.readDouble();
         isOtp = in.readInt();
+        KMOut = in.readString();
+        RouteName = in.readString();
+        PlateNumber = in.readString();
+        TruckName = in.readString();
+        POSName = in.readString();
+        IqamaNo = in.readString();
+
     }
 
     public static final Creator<MyRouteShipments> CREATOR = new Creator<MyRouteShipments>() {
@@ -677,6 +698,13 @@ public class MyRouteShipments implements Parcelable {
         parcel.writeInt(DsOrderNo);
         parcel.writeDouble(CustomDuty);
         parcel.writeInt(isOtp);
+        parcel.writeString(KMOut);
+        parcel.writeString(RouteName);
+        parcel.writeString(PlateNumber);
+        parcel.writeString(TruckName);
+        parcel.writeString(POSName);
+        parcel.writeString(IqamaNo);
+
     }
 
     public enum UpdateType {

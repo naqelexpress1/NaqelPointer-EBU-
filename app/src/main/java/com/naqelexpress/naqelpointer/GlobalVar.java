@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU-ASR/VDS Changes 20-12-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU-ASR FinalTest 28-12-2021"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -156,7 +156,7 @@ public class GlobalVar {
 
     public boolean isneedOtp = true;
 
-    public boolean isFortesting = false;
+    public boolean isFortesting = true;
     public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;
@@ -3379,8 +3379,8 @@ public class GlobalVar {
     }
 
     public boolean GetDivision(Context context) {
-        if (GlobalVar.GV().EmployID == 19127)
-            return false;
+//        if (GlobalVar.GV().EmployID == 19127)
+//            return false;
         String division = GlobalVar.GV().getDivisionID(context, GlobalVar.GV().EmployID);
         if (division.equals("Express"))
             return false;
@@ -4677,6 +4677,187 @@ public class GlobalVar {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public static String GetLocationWatsMsg(Context context, String WaybillNo, String ClientName) {
+        String armsg1 = "مرحبا , أنا مندوب شركة ناقل الرجاء مشاركة الموقع عبر الرابط التالي:  ";
+        String armsg2 = "من اجل استلام الشحنة ";
+        String armsg3 = "من";
+        String armsg4 = "للاسترجاع";
+        final String locationMsgAr = armsg1 + "\n" +
+                context.getString(R.string.infotrackLocationLink) + " " + armsg2 + " " +
+                WaybillNo + " " + armsg3 + " " +
+
+                ClientName + " " + armsg4;
+
+        final String locationMsgEn = "Hello! This is NAQEL courier. Please share your location " +
+                "for picking up Return Shipment " + "\n" +
+
+                WaybillNo + " for " +
+                ClientName + " using Link: " + context.getString(R.string.infotrackLocationLink);
+
+
+        return locationMsgAr + "\n\n" + locationMsgEn;
+
+
+    }
+
+    public static HashMap<String, String> getDSSummaryData(Context context) {
+        HashMap<String, String> hashMap = new HashMap<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
+                "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
+                "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
+                " , Count(ItemNo) WBCount , Count(b.WayBillNo) BarCodeCount , SUM(mr.CODAmount) tCoD " +
+                ",SUM(CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
+                " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
+                " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
+
+
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            hashMap.put("DeliverySheetID", String.valueOf(result.getInt(result.getColumnIndex("DeliverySheetID"))));
+            hashMap.put("EmployName", result.getString(result.getColumnIndex("EmployName")));
+            hashMap.put("IqamaNo", result.getString(result.getColumnIndex("IqamaNo")));
+            hashMap.put("MobileNo", result.getString(result.getColumnIndex("MobileNo")));
+            hashMap.put("RouteName", result.getString(result.getColumnIndex("RouteName")));
+            hashMap.put("PlateNumber", result.getString(result.getColumnIndex("PlateNumber")));
+            hashMap.put("TruckName", result.getString(result.getColumnIndex("TruckName")));
+            hashMap.put("DsDate", result.getString(result.getColumnIndex("DsDate")));
+            hashMap.put("KMOUT", result.getString(result.getColumnIndex("KMOut")));
+            hashMap.put("POSName", result.getString(result.getColumnIndex("POSName")));
+            hashMap.put("WBCount", String.valueOf(result.getInt(result.getColumnIndex("WBCount"))));
+            hashMap.put("BarCodeCount", String.valueOf(result.getInt(result.getColumnIndex("BarCodeCount"))));
+            hashMap.put("tCoD", String.valueOf(result.getString(result.getColumnIndex("tCoD"))));
+            hashMap.put("tCDAmount", String.valueOf(result.getString(result.getColumnIndex("tCDAmount"))));
+            hashMap.put("DWCount", String.valueOf(result.getInt(result.getColumnIndex("DWCount"))));
+            hashMap.put("NTWCount", String.valueOf(result.getInt(result.getColumnIndex("NTWCount"))));
+            hashMap.put("isDone", "1");
+        } else
+            hashMap.put("isDone", "0");
+
+
+        result.close();
+        dbConnections.close();
+        return hashMap;
+
+    }
+
+    public static ArrayList<HashMap<String, String>> getAllDeliveredWaybills(Context context) {
+        ArrayList<HashMap<String, String>> hashMap = new ArrayList();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select od.WaybillNo from onDelivery od " +
+                " Inner Join MyRouteShipments mr on od.WaybillNo = mr.ItemNo and od.DeliverySheetID = mr.DeliverySheetID  ", context);
+
+        int i = 1;
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("WaybillNo", String.valueOf(result.getInt(result.getColumnIndex("WaybillNo"))));
+                hm.put("WStatus", "Delivered");
+                hm.put("Remarks", "");
+                hm.put("isPaid", "");
+                hm.put("isDone", "1");
+                hm.put("SNo", String.valueOf(i));
+                hm.put("Color", "#05932C");
+                i = i + 1;
+                hashMap.add(hm);
+            } while (result.moveToNext());
+        }
+//        else {
+//            HashMap<String, String> hm = new HashMap<>();
+//            hm.put("isDone", "0");
+//            hashMap.add(hm);
+//        }
+
+        result.close();
+        dbConnections.close();
+        return hashMap;
+
+    }
+
+    public static ArrayList<HashMap<String, String>> getAllNotDeliveredWaybills(Context context) {
+        ArrayList<HashMap<String, String>> hashMap = new ArrayList();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select nd.WaybillNo , ds.Name , CASE WHEN Ispaid = 1 THEN 'PAID' WHEN Ispaid = 2 THEN 'A' " +
+                " ELSE 'NOT PAID' end Status , CASE WHEN cn.Notes is null THEN 'Not Avail' ELSE  cn.Notes  END Notes " +
+                " from notdelivered nd inner join DeliveryStatus ds on ds.ID = nd.DeliveryStatusID " +
+                " inner join MyrouteShipments mr on mr.ItemNo  = nd.WaybillNo and  nd.DeliverySheetID  = mr.DeliverySheetID " +
+                " Left Join CourierNotes cn on cn.DeliverySheetID = mr.DeliverySheetID  and cn.WaybillNo = mr.ItemNo " +
+                " and cn.ID in (Select MAx(ID) from CourierNotes tcn where cn.DeliverySheetID = tcn.DeliverySheetID  and cn.WaybillNo = tcn.WaybillNo )" +
+                " Left Join OnDelivery od on od.WaybillNo  = nd.WaybillNo and  nd.DeliverySheetID  = od.DeliverySheetID " +
+                " Where nd.ID in (Select MAX(dnd.ID) from notdelivered dnd where dnd.WaybillNo  = nd.WaybillNo   ) " +
+                " and od.ID is null  ", context);
+
+        int i = 1;
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("WaybillNo", String.valueOf(result.getInt(result.getColumnIndex("WaybillNo"))));
+                hm.put("WStatus", String.valueOf(result.getString(result.getColumnIndex("Name"))));
+                hm.put("Remarks", String.valueOf(result.getString(result.getColumnIndex("Notes"))));
+                hm.put("isPaid", String.valueOf(result.getString(result.getColumnIndex("Status"))));
+                hm.put("isDone", "1");
+                hm.put("SNo", String.valueOf(i));
+                hm.put("Color", "#EB303A");
+                i = i + 1;
+                hashMap.add(hm);
+            } while (result.moveToNext());
+        }
+//        else {
+//            HashMap<String, String> hm = new HashMap<>();
+//            hm.put("isDone", "0");
+//            hashMap.add(hm);
+//        }
+
+        result.close();
+        dbConnections.close();
+        return hashMap;
+
+    }
+
+    public static ArrayList<HashMap<String, String>> getAllNotAttemptedWaybills(Context context) {
+        ArrayList<HashMap<String, String>> hashMap = new ArrayList();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select mr.ItemNo WaybillNo , '' Name, " +
+                "CASE WHEN Ispaid = 1 THEN 'PAID' WHEN Ispaid = 2 THEN 'A' ELSE 'NOT PAID' end Status  from Myrouteshipments mr " +
+                " left join OnDelivery od on od.WaybillNo = mr.ItemNo and od.DeliverySheetID = mr.DeliverySheetID " +
+                " left join notdelivered nd  on  mr.ItemNo  = nd.WaybillNo and  nd.DeliverySheetID  = mr.DeliverySheetID" +
+
+                " where od.ID is null and nd.ID is null ", context);
+
+        int i = 1;
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                HashMap<String, String> hm = new HashMap<>();
+                hm.put("WaybillNo", String.valueOf(result.getInt(result.getColumnIndex("WaybillNo"))));
+                hm.put("WStatus", String.valueOf(result.getString(result.getColumnIndex("Name"))));
+                hm.put("Remarks", String.valueOf(result.getString(result.getColumnIndex("Name"))));
+                hm.put("isPaid", String.valueOf(result.getString(result.getColumnIndex("Status"))));
+                hm.put("isDone", "1");
+                hm.put("SNo", String.valueOf(i));
+                hm.put("Color", "#EB303A");
+                i = i + 1;
+                hashMap.add(hm);
+            } while (result.moveToNext());
+        }
+//        else {
+//            HashMap<String, String> hm = new HashMap<>();
+//            hm.put("isDone", "0");
+//            hashMap.add(hm);
+//        }
+
+        result.close();
+        dbConnections.close();
+        return hashMap;
+
     }
 
 }

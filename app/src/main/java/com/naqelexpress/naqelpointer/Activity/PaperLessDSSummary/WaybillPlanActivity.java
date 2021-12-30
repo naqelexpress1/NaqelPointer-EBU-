@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.Activity.Waybill;
+package com.naqelexpress.naqelpointer.Activity.PaperLessDSSummary;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,7 +25,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -39,6 +38,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
+import com.naqelexpress.naqelpointer.Activity.Waybill.ConsigneeAddressTranslationActivity;
 import com.naqelexpress.naqelpointer.Classes.ConsingeeMobileSpinnerDialog;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -46,13 +46,10 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.CongisneeUpdatedNoRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.CongisneeUpdatedNoResult;
-import com.naqelexpress.naqelpointer.Models.CourierNotesModels;
 import com.naqelexpress.naqelpointer.Models.IsFollowSequncerModel;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.service.CourierNotesService;
 import com.naqelexpress.naqelpointer.service.IsFollowSequencerService;
 
-import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -75,16 +72,13 @@ public class WaybillPlanActivity extends AppCompatActivity
             txtPODType, txtPhoneNo, txtCDAmount, txtTotalAmount;
     TextView lbPODType;
     ConsingeeMobileSpinnerDialog spinnerDialog;
-    //Button btnDelivered, btnNotDeliverd, btnCall;
     private Bundle bundle;
     MyRouteShipments myRouteShipments;
     String ConsigneeLatitude, ConsigneeLongitude;
     SupportMapFragment mapFragment;
-    //    MapFragment mapFragment;
     public double Latitude = 0;
     public double Longitude = 0;
     int position;
-    EditText txtNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +93,6 @@ public class WaybillPlanActivity extends AppCompatActivity
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
-//            mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
             mapFragment.getMapAsync(this);
 
@@ -117,10 +110,6 @@ public class WaybillPlanActivity extends AppCompatActivity
             //txtShipmentAmount = findViewById(R.id.txtShipmentAmount);
             txtCDAmount = findViewById(R.id.tv_cd_body);
             txtTotalAmount = findViewById(R.id.tv_total_amount_body);
-            txtNotes = (EditText) findViewById(R.id.txtnotes);
-
-            if (GlobalVar.GV().GetDivision(getApplicationContext()))
-                txtNotes.setVisibility(View.VISIBLE);
 
             AppCompatImageButton btnCallMobile, btnCallMobile1, btnWhatsApp, btnWhatsApp1, sms, sms1;
             btnCallMobile = (AppCompatImageButton) findViewById(R.id.btnCall);
@@ -280,10 +269,6 @@ public class WaybillPlanActivity extends AppCompatActivity
             System.out.println(e);
         }
 
-//        if (!GlobalVar.GV().checkPermission(WaybillPlanActivity.this, GlobalVar.PermissionType.AccessFindLocation)) {
-//            GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.NeedLocationPermision), GlobalVar.AlertType.Error);
-//            GlobalVar.GV().askPermission(WaybillPlanActivity.this, GlobalVar.PermissionType.AccessFindLocation);
-//        }
     }
 
     private void setSavedInstance(Bundle savedInstanceState) {
@@ -321,22 +306,6 @@ public class WaybillPlanActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-
-        MenuItem item = menu.findItem(R.id.save);
-
-        if (GlobalVar.GV().GetDivision(getApplicationContext())) {
-            item.setEnabled(true);
-            //    item.getIcon().setAlpha(255);
-        } else {
-            // disabled
-            item.setEnabled(false);
-//            item.getIcon().setAlpha(130);
-        }
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
@@ -355,10 +324,6 @@ public class WaybillPlanActivity extends AppCompatActivity
                 return true;
             case R.id.UpdatedConsigneeNo:
                 PrepareGetConsigneeUpdatedNo(GlobalVar.GV().EmployID, Integer.parseInt(myRouteShipments.ItemNo));
-            case R.id.save:
-                insertCourierNotes();
-
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -1078,7 +1043,7 @@ public class WaybillPlanActivity extends AppCompatActivity
             if (!GlobalVar.isMyServiceRunning(IsFollowSequencerService.class, getApplicationContext())) {
                 startService(
                         new Intent(WaybillPlanActivity.this,
-                                com.naqelexpress.naqelpointer.service.IsFollowSequencerService.class));
+                                IsFollowSequencerService.class));
             }
 //              GlobalVar.toGoogle(ConsigneeLatitude, ConsigneeLongitude, WaybillPlanActivity.this, location);
         } else
@@ -1086,33 +1051,5 @@ public class WaybillPlanActivity extends AppCompatActivity
                     "Please try again", true);
     }
 
-    private boolean insertCourierNotes() {
-        if (txtNotes.getText().toString().length() > 1) {
-            DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-            CourierNotesModels courierNotesModels = new CourierNotesModels();
-            courierNotesModels.setWaybillNo(Integer.parseInt(txtWaybillNo.getText().toString()));
-            courierNotesModels.setDeliverySheetID(dbConnections.GetDeliverysheetIDbyWNo(getApplicationContext(),
-                    Integer.parseInt(txtWaybillNo.getText().toString())));
-            courierNotesModels.setTimeIn(new DateTime().toString());
-            courierNotesModels.setUserID(GlobalVar.GV().EmployID);
-            courierNotesModels.setNotes(txtNotes.getText().toString());
-            boolean isnotesaved = dbConnections.insertCourierNotes(getApplicationContext(), courierNotesModels);
-            if (isnotesaved) {
-                GlobalVar.ShowDialog(WaybillPlanActivity.this, "Info", "Your Notes Sucessfully Saved.", true);
-                if (!GlobalVar.isMyServiceRunning(CourierNotesService.class, getApplicationContext())) {
-                    startService(
-                            new Intent(WaybillPlanActivity.this,
-                                    com.naqelexpress.naqelpointer.service.CourierNotesService.class));
-                }
-            }
-            dbConnections.close();
-
-            return isnotesaved;
-        } else
-            GlobalVar.ShowDialog(WaybillPlanActivity.this, "Error", "Please enter Notes.", true);
-
-        return false;
-
-    }
 
 }

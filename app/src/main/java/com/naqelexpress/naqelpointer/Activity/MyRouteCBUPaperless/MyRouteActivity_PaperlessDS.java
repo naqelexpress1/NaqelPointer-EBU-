@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.Activity.MyrouteCBU;
+package com.naqelexpress.naqelpointer.Activity.MyRouteCBUPaperless;
 
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -35,14 +35,7 @@ import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.google.gson.Gson;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingPlanActivity;
-import com.naqelexpress.naqelpointer.Activity.PaperLessDSSummary.PaperLessDSSummary;
-import com.naqelexpress.naqelpointer.Activity.PaperLessDSSummary.RouteHistory;
 import com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity;
-import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
-import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMap;
-import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMapbyDistrict;
-import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
-import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_byDistrict;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
@@ -73,10 +66,10 @@ import java.util.Iterator;
 import Error.ErrorReporter;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
-public class MyRouteActivity_Complaince_GroupbyPhn
-        extends AppCompatActivity implements RouteListAdapterGroupbyPNo.RouteAdapterListener, AlertCallback {
+public class MyRouteActivity_PaperlessDS
+        extends AppCompatActivity implements RouteListAdapterPaperlessDS.RouteAdapterListener, AlertCallback {
     private RecyclerView mapListview;
-    private RouteListAdapterGroupbyPNo adapter;
+    private RouteListAdapterPaperlessDS adapter;
     Button btnStartTrip, btnCloseTrip;
     TextView txtStartTrip, txtCloseTrip, txtplannedlocationcount, txttoltallocationcount;
     public static ArrayList<Location> places = new ArrayList<>();//96346
@@ -118,9 +111,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         mapListview.setLayoutManager(mLayoutManager);
         lastseqstoptime = (TextView) findViewById(R.id.laststopseqtime);
 
-        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                "CourierKpi", this);
-        mapListview.setAdapter(adapter);
+        setAdapter();
+
 
         whiteNotificationBar(mapListview);
 
@@ -321,15 +313,17 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                         GlobalVar.GV().LoadMyRouteShipments_RouteOpt("ItemNo", true, getApplicationContext()
                                 , getWindow().getDecorView().getRootView());
 
-                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                                "CourierKpi", this);
-                        mapListview.setAdapter(adapter);
-
+//                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+//                                "CourierKpi", this);
+//                        mapListview.setAdapter(adapter);
+                        setAdapter();
                         hideenableListview();
 
                     } else {
-                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
-                        mapListview.setAdapter(adapter);
+                        setAdapter();
+//                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+//                                "CourierKpi", this);
+//                        mapListview.setAdapter(adapter);
                     }
 
                     //ValidateDatas();
@@ -434,13 +428,13 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                             getWindow().getDecorView().getRootView());
 
                     if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
-                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                        Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, RouteMap.class);
                         intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
                         intent.putParcelableArrayListExtra("places", Optmizeplaces);
                         intent.putExtra("AreaData", AreaData);
                         startActivityForResult(intent, 1);
                     } else {
-                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                        Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, RouteMap_byDistrict.class);
                         intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
                         intent.putParcelableArrayListExtra("places", Optmizeplaces);
                         intent.putExtra("AreaData", AreaData);
@@ -588,13 +582,13 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
                         try {
                             if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
-                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                                Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, RouteMap.class);
                                 intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
                                 intent.putParcelableArrayListExtra("places", Optmizeplaces);
                                 intent.putExtra("AreaData", AreaData);
                                 startActivityForResult(intent, 1);
                             } else {
-                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                                Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, RouteMap_byDistrict.class);
                                 intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
                                 intent.putParcelableArrayListExtra("places", Optmizeplaces);
                                 intent.putExtra("AreaData", AreaData);
@@ -683,7 +677,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 sDialog.dismissWithAnimation();
 
                 try {
-                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                    Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, RouteMap_byDistrict.class);
                     intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
                     intent.putParcelableArrayListExtra("places", Optmizeplaces);
                     intent.putExtra("AreaData", AreaData);
@@ -703,8 +697,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        //    inflater.inflate(R.menu.myroutemenu, menu);
-        inflater.inflate(R.menu.myroutemenupaperless, menu);
+        inflater.inflate(R.menu.myroutemenu, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView = (SearchView) menu.findItem(R.id.action_search)
@@ -763,16 +756,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 return true;
             case R.id.deleteall:
                 deleteConfirmRoute();
-
-                return true;
-            case R.id.dssummery:
-
-                startActivity(new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, PaperLessDSSummary.class));
-
-                return true;
-            case R.id.routehistory:
-
-                startActivity(new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteHistory.class));
 
                 return true;
             case R.id.mnuShowDeliverySheetOrder:
@@ -860,7 +843,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //                    Toast.makeText(getApplicationContext(), "No Location ", Toast.LENGTH_LONG).show();
 
                 if (!GlobalVar.isMyroutesync(getApplicationContext())) {
-                    GlobalVar.ShowDialog(MyRouteActivity_Complaince_GroupbyPhn.this,
+                    GlobalVar.ShowDialog(MyRouteActivity_PaperlessDS.this,
                             "Info", "Please wait, try after sometime ", true);
                     return false;
                 }
@@ -870,16 +853,16 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 try {
                     int areaCount = getAreaWaybills().size();
                     if (areaCount == 0) {
-                        GlobalVar.GV().alertMsgAll("Info", "No Planned Location", MyRouteActivity_Complaince_GroupbyPhn.this, Enum.ERROR_TYPE,
+                        GlobalVar.GV().alertMsgAll("Info", "No Planned Location", MyRouteActivity_PaperlessDS.this, Enum.ERROR_TYPE,
                                 "MyRouteActivity_Complaince_GroupbyPhn");
                         return true;
                     }
                     if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
-                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, OptimiseMap.class);
+                        Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, OptimiseMap.class);
                         intent.putParcelableArrayListExtra("myroute", myRouteShipmentList);
                         startActivityForResult(intent, 2);
                     } else {
-                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, OptimiseMapbyDistrict.class);
+                        Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, OptimiseMapbyDistrict.class);
                         intent.putParcelableArrayListExtra("myroute", myRouteShipmentList);
                         startActivityForResult(intent, 2);
                     }
@@ -890,7 +873,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 return true;
             case R.id.movingmap:
                 try {
-                    Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, MapMovingOnCurLatLng.class);
+                    Intent intent = new Intent(MyRouteActivity_PaperlessDS.this, MapMovingOnCurLatLng.class);
                     startActivity(intent);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
@@ -987,10 +970,10 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                                 , getWindow().getDecorView().getRootView());
 
 
-                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                                "CourierKpi", this);
-                        mapListview.setAdapter(adapter);
-
+//                        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+//                                "CourierKpi", this);
+//                        mapListview.setAdapter(adapter);
+                        setAdapter();
                         adapter.notifyDataSetChanged();
                         hideenableListview();
                         GetPlannedLocation();
@@ -1023,6 +1006,12 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
     }
 
+    private void setAdapter() {
+        adapter = new RouteListAdapterPaperlessDS(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+                "CourierKpi", this);
+        mapListview.setAdapter(adapter);
+    }
+
     private ProgressDialog progressDialog;
     private ProgressDialog progressDialog_NotifyClient;
     //private ProgressDialog progressDialog_critical;
@@ -1038,7 +1027,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         @Override
         protected void onPreExecute() {
             if (progressflag == 1)
-                progressDialog = ProgressDialog.show(MyRouteActivity_Complaince_GroupbyPhn.this, "Please wait.", "Downloading Shipments Details.", true);
+                progressDialog = ProgressDialog.show(MyRouteActivity_PaperlessDS.this, "Please wait.", "Downloading Shipments Details.", true);
             DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
         }
 
@@ -1052,9 +1041,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             InputStream ist = null;
 
             try {
-                //below one currently in active
-//                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute_GroupbyDistrict";//""BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
-                String function = "BringDeliverySheetbyOFDPiece_DSSummary";
+                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute_GroupbyDistrict";//""BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
 //                function = "BringDeliverySheetbyOFDPiece_PlanAll"; //BringDeliverySheetbyOFDPiece_PlanAll
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
@@ -1062,7 +1049,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 if (GlobalVar.GV().isFortesting) {
                     // function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
                     function = "BringDeliverySheetbyOFDPiece_PlanAll";
-                    //function = "BringDeliverySheetbyOFDPiece_DSSummary";
                 }
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence
@@ -1143,7 +1129,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 }
             }
 
-            if (MyRouteActivity_Complaince_GroupbyPhn.this.isDestroyed()) { // or call isFinishing() if min sdk version < 17
+            if (MyRouteActivity_PaperlessDS.this.isDestroyed()) { // or call isFinishing() if min sdk version < 17
                 return;
             }
             if (progressDialog != null && progressDialog.isShowing()) {
@@ -1175,11 +1161,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             e.printStackTrace();
         }
 
-        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
-                "CourierKpi", this);
-
-        mapListview.setAdapter(adapter);
-
+//        adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+//                "CourierKpi", this);
+//
+//        mapListview.setAdapter(adapter);
+        setAdapter();
         //ValidateDatas();
         btnStartTrip.setVisibility(View.GONE);
         btnCloseTrip.setVisibility(View.GONE);
@@ -1354,8 +1340,9 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 GlobalVar.GV().myRouteShipmentList.addAll(temp);
                 temp.clear();
 
-                adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
-                mapListview.setAdapter(adapter);
+//                adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+//                mapListview.setAdapter(adapter);
+                setAdapter();
 
             }
         } catch (JSONException e) {
@@ -1381,7 +1368,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     }
 
     private void deleteConfirmRoute() {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_Complaince_GroupbyPhn.this);
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_PaperlessDS.this);
         builder1.setTitle("Info");
         builder1.setMessage("Do you want to delete all? ");
         builder1.setCancelable(true);
@@ -1453,7 +1440,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
         @Override
         protected void onPreExecute() {
-            progressDialog = ProgressDialog.show(MyRouteActivity_Complaince_GroupbyPhn.this,
+            progressDialog = ProgressDialog.show(MyRouteActivity_PaperlessDS.this,
                     "Info",
                     "Your Request is being process,kindly please wait");
         }
@@ -1485,8 +1472,9 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             Optmizeplaces = (ArrayList<Location>) savedInstanceState.getSerializable("Optmizeplaces");
             AreaData = savedInstanceState.getString("AreaData");
 
-            adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
-            mapListview.setAdapter(adapter);
+//            adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList, "CourierKpi", this);
+//            mapListview.setAdapter(adapter);
+            setAdapter();
 
             GlobalVar.GV().haslocation = (ArrayList<Integer>) savedInstanceState.getSerializable("haslocation");
 
@@ -1660,8 +1648,6 @@ public class MyRouteActivity_Complaince_GroupbyPhn
             bundle.putInt("isOtp", GlobalVar.GV().myRouteShipmentList.get(position).isOtp);
             bundle.putInt("position", position);
             bundle.putBoolean("isupdate", GlobalVar.GV().myRouteShipmentList.get(position).isupdate);
-            bundle.putInt("dsID", GlobalVar.GV().myRouteShipmentList.get(position).DeliverySheetID);
-
             intent.putExtras(bundle);
             startActivityForResult(intent, 1);
 
@@ -1875,7 +1861,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //                        , getWindow().getDecorView().getRootView());
                 GlobalVar.GV().LoadMyRouteShipments("OrderNo", true, getApplicationContext(),
                         getWindow().getDecorView().getRootView());
-                adapter = new RouteListAdapterGroupbyPNo(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
+                adapter = new RouteListAdapterPaperlessDS(getApplicationContext(), GlobalVar.GV().myRouteShipmentList,
                         "CourierKpi", this);
 
                 DuplicateCustomer();
@@ -1954,7 +1940,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         protected void onPreExecute() {
 
             if (progressDialog_NotifyClient == null)
-                progressDialog_NotifyClient = ProgressDialog.show(MyRouteActivity_Complaince_GroupbyPhn.this,
+                progressDialog_NotifyClient = ProgressDialog.show(MyRouteActivity_PaperlessDS.this,
                         "Please wait.", "Notify the Consignee for Delivery", true);
 
             DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
@@ -2157,7 +2143,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         protected void onPreExecute() {
 
             if (progressDialog_NotifyClient == null)
-                progressDialog_NotifyClient = ProgressDialog.show(MyRouteActivity_Complaince_GroupbyPhn.this,
+                progressDialog_NotifyClient = ProgressDialog.show(MyRouteActivity_PaperlessDS.this,
                         "Please wait.", "Cross check with data .", true);
 
             DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
@@ -2236,7 +2222,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                         dbConnections.close();
                         finish();
                     } else
-                        GlobalVar.ShowDialog(MyRouteActivity_Complaince_GroupbyPhn.this, "Error", jsonObject.getString("ErrorMessage"), true);
+                        GlobalVar.ShowDialog(MyRouteActivity_PaperlessDS.this, "Error", jsonObject.getString("ErrorMessage"), true);
 
 
                 } catch (JSONException e) {
@@ -2267,7 +2253,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     }
 
     private ArrayList<Location> getAreaWaybills() {
-        GlobalVar.GV().alertMsgAll("please wait ", "", MyRouteActivity_Complaince_GroupbyPhn.this, Enum.PROGRESS_TYPE,
+        GlobalVar.GV().alertMsgAll("please wait ", "", MyRouteActivity_PaperlessDS.this, Enum.PROGRESS_TYPE,
                 "MyRouteActivity_Complaince_GroupbyPhn");
 
 //        pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
@@ -2348,7 +2334,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     }
 
     private void deleteConfirmRoute_SkipRoute() {
-        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_Complaince_GroupbyPhn.this);
+        AlertDialog.Builder builder1 = new AlertDialog.Builder(MyRouteActivity_PaperlessDS.this);
         builder1.setTitle("Warning");
         builder1.setMessage("You killed app , while loading fully , please delete and reolaod again ");
         builder1.setCancelable(false);

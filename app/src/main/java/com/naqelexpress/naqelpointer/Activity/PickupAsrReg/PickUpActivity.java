@@ -11,7 +11,9 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -259,15 +261,16 @@ public class PickUpActivity extends AppCompatActivity {
 
         if (IsValid()) {
 
-            if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
-                SaveData_SP("", true);
-            else
+            if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+                ArrayList<String> empty = new ArrayList<>();
+                SaveData_SP("", true, empty);
+            } else
                 GlobalVar.RedirectSettings(PickUpActivity.this);
 
         }
     }
 
-    private void SaveData_SP(String aftervalidduplicatewaybill, boolean isFinish) {
+    private void SaveData_SP(String aftervalidduplicatewaybill, boolean isFinish, ArrayList<String> notpickedWaybills) {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
 
         boolean IsSaved = true;
@@ -285,6 +288,8 @@ public class PickUpActivity extends AppCompatActivity {
             OriginID = bookingList.getFromStationID();
             DestinationID = bookingList.getToStationID();
 
+            if (notpickedWaybills.contains(String.valueOf(Waybillno)))
+                continue;
             //PiecesCount = firstFragment.PickUpBarCodeList.size();
             ArrayList<String> PickUpBarCodeList = new ArrayList<>();
             for (int i = 0; i < firstFragment.PickUpBarCodeList.size(); i++) {
@@ -292,11 +297,19 @@ public class PickUpActivity extends AppCompatActivity {
                     PickUpBarCodeList.add(firstFragment.PickUpBarCodeList.get(i));
                 }
             }
-            if (PickUpBarCodeList.size() == 0) {
+
+
+            if (PickUpBarCodeList.size() == 0 && !notpickedWaybills.contains(String.valueOf(Waybillno))) { //!notpickedWaybills.contains(String.valueOf(Waybillno))
                 blist.add(bookingList);
                 wlist.add(String.valueOf(Waybillno));
                 continue;
             }
+
+//            else if (!notpickedWaybills.contains(String.valueOf(Waybillno))) {
+//                blist.add(bookingList);
+//                wlist.add(String.valueOf(Waybillno));
+//                continue;
+//            }
 
 //        Weight = bookinglist.get(position).getW
             RefNo = bookinglist.get(position).getRefNo();
@@ -349,6 +362,7 @@ public class PickUpActivity extends AppCompatActivity {
 
             isFinish();
         } else {
+            // wlist.removeAll();
             Intent intent = new Intent(PickUpActivity.this, SpWaybillException.class);
             intent.putExtra("PRMA", pickupSheetReasonModelArrayList);
             intent.putExtra("waybilllist", wlist);
@@ -519,6 +533,7 @@ public class PickUpActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private boolean IsValid() {
         // boolean isValid = true;
 
@@ -532,11 +547,39 @@ public class PickUpActivity extends AppCompatActivity {
 
             if (class_ == 0) {
                 if (firstFragment.txtCollectedPiece.getText().toString().length() == 0
-                        || Integer.parseInt(firstFragment.txtCollectedPiece.getText().toString()) <= 0)
+                        || Integer.parseInt(firstFragment.txtCollectedPiece.getText().toString()) <= 0) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to enter Collected Piece ", GlobalVar.AlertType.Error);
                     return false;
+                }
 
-                if (waybilllist.size() > firstFragment.PickUpBarCodeList.size()) {
-                    pcikupwaybillcountMismatch();
+                String wnos = waybilllist.toString();
+                wnos
+                        = wnos.replace("[", "")
+                        .replace("]", "")
+                        .replace(" ", "");
+
+                DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+                ArrayList<String> WaybillList = dbConnections.getNotPickedupList(wnos, getApplicationContext());
+//                ArrayList<String> wlist = new ArrayList<>();
+//                if (WaybillList.size() == 0) {
+//                    // ArrayList<String> rwlist = new ArrayList<>();
+//                    for (String wno : waybilllist) {
+//                        if (!firstFragment.PickUpBarCodeList.contains(wno + "00001"))
+//                            wlist.add(wno);
+//                    }
+//                    //wlist.addAll(waybilllist);
+//
+//                } else {
+//                    for (String wno : waybilllist) {
+//                        if (!firstFragment.PickUpBarCodeList.contains(wno + "00001"))
+//                            wlist.add(wno);
+//                    }
+//                    wlist.removeAll(WaybillList);
+//                    //wlist.removeAll(WaybillList);
+//                }
+                if (waybilllist.size() > (WaybillList.size() + firstFragment.PickUpBarCodeList.size()))
+                {
+                    pcikupwaybillcountMismatch(WaybillList);
                     return false;
                 }
 
@@ -916,10 +959,10 @@ public class PickUpActivity extends AppCompatActivity {
     }
 
 
-    private void pcikupwaybillcountMismatch() {
+    private void pcikupwaybillcountMismatch(final ArrayList<String> notpickedWNo) {
         AlertDialog.Builder builder1 = new AlertDialog.Builder(PickUpActivity.this);
         builder1.setTitle("Info");
-        builder1.setMessage("You collected less shipments than it was bookied.Are you sure to continue with saving  carrent data?");
+        builder1.setMessage("You collected less shipments than it was booked.Are you sure to continue with saving  carrent data?");
         builder1.setCancelable(false);
 
         builder1.setPositiveButton(
@@ -928,7 +971,7 @@ public class PickUpActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
 
                         if (GlobalVar.ValidateAutomacticDate(getApplicationContext()))
-                            SaveData_SP("", false);
+                            SaveData_SP("", false, notpickedWNo);
                     }
                 });
 

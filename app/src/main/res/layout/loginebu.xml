@@ -56,22 +56,49 @@
         app:layout_constraintTop_toBottomOf="@+id/txtEmployID"
         tools:ignore="HardcodedText,RtlHardcoded" />
 
-    <EditText
-        android:id="@+id/truckid"
-        style="@style/NaqelPointer.EditText"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:id="@+id/truckll"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="8dp"
-        android:ems="10"
-        android:hint="Enter truck ID"
-        android:inputType="textAutoComplete"
-        android:text=""
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="@+id/txtEmployID"
+        android:orientation="horizontal"
+        android:weightSum="1"
         app:layout_constraintTop_toBottomOf="@+id/txtPassword"
-        tools:ignore="HardcodedText,RtlHardcoded" />
+
+        tools:ignore="RtlHardcoded">
+
+        <EditText
+            android:id="@+id/truckid"
+            style="@style/NaqelPointer.EditText"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+
+            android:layout_weight="0.7"
+            android:ems="10"
+            android:hint="Enter truck ID"
+            android:inputType="textAutoComplete"
+            android:text=""
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="@+id/txtEmployID"
+
+            tools:ignore="HardcodedText,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/btntruckID"
+            style="@style/NaqelPointer.BlueButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:background="@drawable/roundshape"
+            android:onClick="BringTruckData"
+            android:text="Truck"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            tools:ignore="HardcodedText,RtlHardcoded" />
+    </LinearLayout>
+
 
     <EditText
         android:id="@+id/odometer"
@@ -87,7 +114,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="@+id/txtEmployID"
-        app:layout_constraintTop_toBottomOf="@+id/truckid"
+        app:layout_constraintTop_toBottomOf="@+id/truckll"
         tools:ignore="HardcodedText,RtlHardcoded" />
 
     <!--

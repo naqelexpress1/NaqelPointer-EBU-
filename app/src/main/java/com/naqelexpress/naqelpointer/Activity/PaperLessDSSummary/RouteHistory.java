@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.PaperLessDSSummary;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,10 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.SelectData;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.CourierNotesModels;
 import com.naqelexpress.naqelpointer.R;
@@ -34,6 +37,7 @@ public class RouteHistory extends AppCompatActivity implements RouteHistoryAdapt
     List<HashMap<String, String>> hashMapList;
     TextView statusheader;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +48,16 @@ public class RouteHistory extends AppCompatActivity implements RouteHistoryAdapt
 
         hashMapList = new ArrayList<>();
         statusheader = (TextView) findViewById(R.id.statusheader);
+        Button ds = (Button) findViewById(R.id.ds);
+        Button as = (Button) findViewById(R.id.as);
+        Button nas = (Button) findViewById(R.id.nas);
+
+        HashMap<String, String> hashMap = SelectData.getPaperlessDSHeaderInfo(getApplicationContext());
+        if (hashMap.size() > 0) {
+            ds.setText("Delivered Shipments - " + hashMap.get("DeliveredCount"));
+            as.setText("Attempted Shipments - " + hashMap.get("AttemptedCount"));
+            nas.setText("Not attempted Shipments - " + hashMap.get("NotAttemptCount"));
+        }
     }
 
     public void DeliveredShipments(View view) {
@@ -109,7 +123,12 @@ public class RouteHistory extends AppCompatActivity implements RouteHistoryAdapt
     @Override
     public void onItemSelected(HashMap<String, String> hashMap, int position) {
         if (statusheader.getText().toString().equals("Attempted Shipments"))
-            updateNotes(hashMap);
+            if (GlobalVar.GV().isSeqComplete(getApplicationContext()))
+                RedirectWaybillPlanActivity(hashMap.get("WaybillNo"));
+            else
+                GlobalVar.ShowDialog(RouteHistory.this, "Info", "Please finish your Sequenced delivery", true);
+
+//            updateNotes(hashMap);
 
     }
 
@@ -165,21 +184,47 @@ public class RouteHistory extends AppCompatActivity implements RouteHistoryAdapt
         atemptedshp();
     }
 
-//    private void RedirectWaybillPlanActivity() {
-//
-//        Intent intent = new Intent(getApplicationContext(), WaybillPlanActivity.class);
-//        Bundle bundle = new Bundle();
-//        bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
-//        bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
-//        bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
-//        bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
-//        bundle.putInt("SeqNo", GlobalVar.GV().myRouteShipmentList.get(position).DsOrderNo);
-//        bundle.putInt("isOtp", GlobalVar.GV().myRouteShipmentList.get(position).isOtp);
-//        bundle.putInt("position", position);
-//        bundle.putBoolean("isupdate", GlobalVar.GV().myRouteShipmentList.get(position).isupdate);
-//        bundle.putInt("dsID", GlobalVar.GV().myRouteShipmentList.get(position).DeliverySheetID);
-//
-//        intent.putExtras(bundle);
-//
-//    }
+    private void RedirectWaybillPlanActivity(String WaybillNo) {
+        GlobalVar.GV().myRouteShipmentList.clear();
+        GlobalVar.GV().myRouteShipmentList.add(SelectData.GetMyRouteShipmentsbyWaybillNo(WaybillNo, getApplicationContext()));
+        if (GlobalVar.GV().myRouteShipmentList.size() > 0) {
+            int position = 0;
+            Intent intent = new Intent(getApplicationContext(), com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putString("ID", String.valueOf(GlobalVar.GV().myRouteShipmentList.get(position).ID));
+            bundle.putString("WaybillNo", GlobalVar.GV().myRouteShipmentList.get(position).ItemNo);
+            bundle.putDouble("COD", GlobalVar.GV().myRouteShipmentList.get(position).CODAmount);
+            bundle.putString("BT", GlobalVar.GV().myRouteShipmentList.get(position).BillingType);
+            bundle.putInt("SeqNo", GlobalVar.GV().myRouteShipmentList.get(position).DsOrderNo);
+            bundle.putInt("isOtp", GlobalVar.GV().myRouteShipmentList.get(position).isOtp);
+            bundle.putInt("position", position);
+            bundle.putBoolean("isupdate", GlobalVar.GV().myRouteShipmentList.get(position).isupdate);
+            bundle.putInt("dsID", GlobalVar.GV().myRouteShipmentList.get(position).DeliverySheetID);
+            bundle.putBoolean("isEnable", GlobalVar.GV().isSeqComplete(getApplicationContext()));
+
+            intent.putExtras(bundle);
+            startActivityForResult(intent, 1);
+
+        } else
+            GlobalVar.ShowDialog(RouteHistory.this, "Info", "There is no record ,please try after sometime/restart the app.", true);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1 && resultCode == RESULT_OK) { //Refresh Data
+            Bundle extras = data.getExtras();
+
+            if (extras != null) {
+                if (extras.containsKey("result")) {
+                    String result = extras.getString("result");
+                    if (result.equals("refreshdata"))
+                        atemptedshp();
+
+
+                }
+            }
+        }
+    }
 }

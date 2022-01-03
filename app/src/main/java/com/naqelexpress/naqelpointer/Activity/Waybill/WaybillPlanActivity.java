@@ -71,8 +71,9 @@ public class WaybillPlanActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private GoogleMap mMap;
     Marker now;
-    TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtMobileNo, txtBillingType, txtCODAmount,
-            txtPODType, txtPhoneNo, txtCDAmount, txtTotalAmount;
+    TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtBillingType, txtCODAmount,
+            txtPODType, txtCDAmount, txtTotalAmount, txtMobileNo, txtPhoneNo;
+    ;
     TextView lbPODType;
     ConsingeeMobileSpinnerDialog spinnerDialog;
     //Button btnDelivered, btnNotDeliverd, btnCall;
@@ -84,7 +85,10 @@ public class WaybillPlanActivity extends AppCompatActivity
     public double Latitude = 0;
     public double Longitude = 0;
     int position;
+    boolean isEnable = true;
     EditText txtNotes;
+    AppCompatImageButton btnCallMobile, btnCallMobile1, btnWhatsApp, btnWhatsApp1, sms, sms1;
+    Button togoogle;//, txtMobileNo, txtPhoneNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,14 +126,14 @@ public class WaybillPlanActivity extends AppCompatActivity
             if (GlobalVar.GV().GetDivision(getApplicationContext()))
                 txtNotes.setVisibility(View.VISIBLE);
 
-            AppCompatImageButton btnCallMobile, btnCallMobile1, btnWhatsApp, btnWhatsApp1, sms, sms1;
+
             btnCallMobile = (AppCompatImageButton) findViewById(R.id.btnCall);
             btnWhatsApp = (AppCompatImageButton) findViewById(R.id.btnWhatsapp);
             btnCallMobile1 = (AppCompatImageButton) findViewById(R.id.btnCall1);
             btnWhatsApp1 = (AppCompatImageButton) findViewById(R.id.btnWhatsapp1);
             sms = (AppCompatImageButton) findViewById(R.id.sms);
             sms1 = (AppCompatImageButton) findViewById(R.id.sms1);
-            Button togoogle = (Button) findViewById(R.id.toGoogle);
+            togoogle = (Button) findViewById(R.id.toGoogle);
 
 
             btnCallMobile.setOnClickListener(new View.OnClickListener() {
@@ -278,6 +282,15 @@ public class WaybillPlanActivity extends AppCompatActivity
 
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println(e);
+        }
+
+        try {
+            if (bundle.containsKey("isEnable"))
+                isEnable = bundle.getBoolean("isEnable");
+            if (!isEnable)
+                disableportion();
+        } catch (Exception e) {
+            isEnable = true;
         }
 
 //        if (!GlobalVar.GV().checkPermission(WaybillPlanActivity.this, GlobalVar.PermissionType.AccessFindLocation)) {
@@ -1104,6 +1117,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                             new Intent(WaybillPlanActivity.this,
                                     com.naqelexpress.naqelpointer.service.CourierNotesService.class));
                 }
+                sendbackData();
             }
             dbConnections.close();
 
@@ -1112,6 +1126,29 @@ public class WaybillPlanActivity extends AppCompatActivity
             GlobalVar.ShowDialog(WaybillPlanActivity.this, "Error", "Please enter Notes.", true);
 
         return false;
+
+    }
+
+    private void sendbackData() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("result", "refreshdata");
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
+    }
+
+    private void disableportion() {
+        btnCallMobile.setClickable(false);
+        btnCallMobile1.setClickable(false);
+        btnWhatsApp.setClickable(false);
+        btnWhatsApp1.setClickable(false);
+        sms.setClickable(false);
+        sms1.setClickable(false);
+        togoogle.setClickable(false);
+        txtMobileNo.setLinksClickable(false);
+        // txtMobileNo.setClickable(false);
+        txtPhoneNo.setLinksClickable(false);
+        // txtPhoneNo.setClickable(false);
+
 
     }
 

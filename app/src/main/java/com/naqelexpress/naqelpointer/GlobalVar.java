@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU-ASR FinalTest 28-12-2021"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU-PLDS-ASR-SP FinalTest 03-01-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -156,7 +156,7 @@ public class GlobalVar {
 
     public boolean isneedOtp = true;
 
-    public boolean isFortesting = true;
+    public boolean isFortesting = false;
     public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;
@@ -4709,8 +4709,8 @@ public class GlobalVar {
         Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
                 "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
                 "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
-                " , Count(ItemNo) WBCount , Count(b.WayBillNo) BarCodeCount , SUM(mr.CODAmount) tCoD " +
-                ",SUM(CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
+                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.WayBillNo) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
+                ",SUM(Distinct CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
                 " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
                 " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
 
@@ -4859,5 +4859,6 @@ public class GlobalVar {
         return hashMap;
 
     }
+
 
 }

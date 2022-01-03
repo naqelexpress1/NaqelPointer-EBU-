@@ -31,6 +31,7 @@ public class PaperLessDSSummary extends AppCompatActivity {
         final ImageView barcode_img = (ImageView) findViewById(R.id.barcode);
 
         TextView dsID = (TextView) findViewById(R.id.dsID);
+        TextView dsIDheader = (TextView) findViewById(R.id.dsIDheader);
         TextView courierID = (TextView) findViewById(R.id.courierID);
         TextView iqamaid = (TextView) findViewById(R.id.iqamaid);
         TextView phoneno = (TextView) findViewById(R.id.phoneno);
@@ -65,7 +66,7 @@ public class PaperLessDSSummary extends AppCompatActivity {
                 }
             }, 1000);
 
-
+            dsIDheader.setText(hashMap.get("DeliverySheetID"));
             dsID.setText(hashMap.get("DeliverySheetID"));
             courierID.setText(hashMap.get("EmployName"));
             iqamaid.setText(hashMap.get("IqamaNo"));

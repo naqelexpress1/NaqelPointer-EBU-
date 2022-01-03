@@ -1062,7 +1062,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 if (GlobalVar.GV().isFortesting) {
                     // function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
                     function = "BringDeliverySheetbyOFDPiece_PlanAll";
-                    //function = "BringDeliverySheetbyOFDPiece_DSSummary";
+//                    function = "BringDeliverySheetbyOFDPiece_DSSummary";
+
                 }
 
 //                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "BringMyRouteShipments"); //Geofence

@@ -349,8 +349,8 @@ public class MainPageActivity
             String upto = "Upto : " + resultOnlineValidationfile.getString(resultOnlineValidationfile.getColumnIndex("ValidDate")) + " 15:00"; //16:30
             if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
                 if (!GlobalVar.GV().IsAllowtoScan(upto.replace("Upto : ", ""))) { //validupto.getText().toString()
-
-                    dbConnections.deleteOnlineValidationfile(getApplicationContext());
+                    if (!GlobalVar.GV().isFortesting)
+                        dbConnections.deleteOnlineValidationfile(getApplicationContext());
                 }
             }
         }

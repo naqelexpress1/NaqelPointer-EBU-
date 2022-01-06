@@ -2,16 +2,22 @@ package com.naqelexpress.naqelpointer.DB;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.location.Location;
 
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
+import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class SelectData {
+    private static final String DBName = "NaqelPointerDB.db";
 
     public static MyRouteShipments GetMyRouteShipmentsbyWaybillNo(String WaybillNo, Context context) {
 
@@ -130,11 +136,65 @@ public class SelectData {
             hm.put("NotAttemptCount", String.valueOf(result.getInt(result.getColumnIndex("NotAttemptCount"))));
 
 
-
         }
         result.close();
         dbConnections.close();
         return hm;
 
+    }
+
+    public static List<Integer> AllowedFacilityStations(Context context, int DestFacilityID) {
+        List<Integer> allowedDestStations = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = null;
+        if (DestFacilityID != 0)
+            result = dbConnections.Fill("Select * from FacilityAllowedStation where AllowedStationID =  " + DestFacilityID, context);
+        else
+            result = dbConnections.Fill("Select * from FacilityAllowedStation  ", context);
+
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+                allowedDestStations.add(result.getInt(result.getColumnIndex("AllowedStationID")));
+            } while (result.moveToNext());
+        }
+        result.close();
+        dbConnections.close();
+        return allowedDestStations;
+
+    }
+
+    public List<Station> getStationsData(Context context) {
+
+        List<Station> stationList = new ArrayList<>();
+        SQLiteDatabase db = null;
+        try {
+            String selectQuery = "SELECT * FROM Station";
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    Station station = new Station();
+                    station.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
+                    station.setCode(cursor.getString(cursor.getColumnIndex("Code")));
+                    station.setName(cursor.getString(cursor.getColumnIndex("Name")));
+                    stationList.add(station);
+                } while (cursor.moveToNext());
+            }
+            if (cursor != null)
+                cursor.close();
+
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
+        if (db != null)
+            db.close();
+        return stationList;
     }
 }

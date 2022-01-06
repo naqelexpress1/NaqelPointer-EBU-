@@ -87,7 +87,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 169; // PaperlessDS
+    private static final int Version = 171; // PaperlessDS
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -505,8 +505,11 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS CourierNotes (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "WaybillNo  TEXT NOT NULL , TimeIn DATETIME NOT NULL ,IsSync  BOOL NOT NULL , UserID INTEGER NOT NULL " +
-                ", DeliverySheetID INTEGER NOT NULL )");
+                ", DeliverySheetID INTEGER NOT NULL , Notes TEXT )");
 
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS FacilityAllowedStation (ID INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
+                "FacilityID  INTEGER NOT NULL ,  AllowedStationID INTEGER NOT NULL )");
 
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -958,6 +961,9 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS CourierNotes (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "WaybillNo  TEXT NOT NULL , TimeIn DATETIME NOT NULL ,IsSync  BOOL NOT NULL , UserID INTEGER NOT NULL " +
                     ", DeliverySheetID INTEGER NOT NULL , Notes TEXT )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS FacilityAllowedStation (ID INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
+                    "FacilityID  INTEGER NOT NULL ,  AllowedStationID INTEGER NOT NULL )");
 
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
@@ -6735,9 +6741,12 @@ public class DBConnections
 
 
     public void insertBinMasterBulk(JSONArray binMasterList, Context context) {
+
+
+        String sql = "insert into BINMaster (ID,BINNumber) values (?, ?);";
+        SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         try {
-            String sql = "insert into BINMaster (ID,BINNumber) values (?, ?);";
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            db.execSQL("delete from BINMaster ");
             db.beginTransaction();
             SQLiteStatement stmt = db.compileStatement(sql);
 
@@ -6760,7 +6769,12 @@ public class DBConnections
         } catch (Exception ex) {
             Log.d("test", "ex " + ex.toString());
         }
+
+        if (db != null)
+            db.close();
+
     }
+
 
     /********* Riyam - Online Validation *********/
 
@@ -7157,7 +7171,8 @@ public class DBConnections
     //TH - Courier
     public boolean isValidationFileEmpty(Context context) {
         try {
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
 
             Cursor cur = db.rawQuery("SELECT * FROM OnlineValidationOffset", null);
             if (cur != null) {
@@ -10715,10 +10730,42 @@ public class DBConnections
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
-            db.execSQL("update CourierNotes set Issync = 1 where ID in(" + ID.replace("\"","") + " ) ");
+            db.execSQL("update CourierNotes set Issync = 1 where ID in(" + ID.replace("\"", "") + " ) ");
         } catch (Exception e) {
         }
         if (db != null)
             db.close();
     }
+
+    public void insertFacilityAllowedStationBulk(JSONArray facilityallowedstation, Activity activity) {
+        try {
+            String sql = "insert into FacilityAllowedStation (FacilityID,AllowedStationID) values (?, ?);";
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(activity.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            db.beginTransaction();
+            SQLiteStatement stmt = db.compileStatement(sql);
+
+            for (int i = 0; i < facilityallowedstation.length(); i++) {
+                try {
+
+                    JSONObject jsonObject = facilityallowedstation.getJSONObject(i);
+                    stmt.bindString(1, jsonObject.getString("FacilityID"));
+                    stmt.bindString(2, jsonObject.getString("AllowedStationID"));
+                    stmt.executeInsert();
+                    stmt.clearBindings();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+            db.close();
+        } catch (Exception ex) {
+            Log.d("test", "ex " + ex.toString());
+        }
+    }
+
+
 }

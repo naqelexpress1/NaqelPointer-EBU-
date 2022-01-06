@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/White"
+    android:orientation="vertical">
+
+    <!--android:paddingBottom="80dp"-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Header -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/NaqelBlue"> <!-- F7D330-->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+
+                    <!--                    <FrameLayout-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="wrap_content"-->
+                    <!--                        android:layout_marginTop="15dp">-->
+
+                    <!--                        <ImageView-->
+                    <!--                            android:layout_width="50dp"-->
+                    <!--                            android:layout_height="50dp"-->
+                    <!--                            android:layout_gravity="center"-->
+                    <!--                            android:src="@drawable/baseline_error_outline_white_18dp" />-->
+
+                    <!--                    </FrameLayout>-->
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:gravity="center"
+                        android:letterSpacing="0.055"
+                        android:text="Warning"
+                        android:textColor="@color/White"
+                        android:textSize="18.3sp" />
+
+                    <TextView
+                        android:id="@+id/tv_barcode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:gravity="center"
+                        android:letterSpacing="0.045"
+                        android:paddingBottom="8dp"
+                        android:textColor="@color/White"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="11dp"
+                android:background="@color/bg_color" />
+
+
+            <!--Shipment Not Manifested -->
+            <LinearLayout
+                android:id="@+id/ll_not_manifested"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_not_manifested_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_not_manifested_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--Shipment With No Bayam NO -->
+            <LinearLayout
+                android:id="@+id/ll_no_bayan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_no_bayan_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_no_bayan_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--CITC Shipment Complaint -->
+            <LinearLayout
+                android:id="@+id/ll_citc_complaint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_citc_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_citc_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!-- CAF -->
+            <LinearLayout
+                android:id="@+id/ll_caf_complaint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_caf_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_caf_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!--NCL Wrong Dest -->
+            <LinearLayout
+                android:id="@+id/ll_ncl_wrong_dest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_ncl_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_ncl_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <RadioGroup
+                        android:id="@+id/rg_change_dest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <RadioButton
+                            android:id="@+id/rb_change_dest"
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="Change" />
+
+                        <Space
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_change_discard"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="Discard"
+                            android:visibility="gone" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                    android:id="@+id/spinner_ncl_destinations"
+                    style="@style/spinner_style"
+                    android:drawSelectorOnTop="true"
+                    android:visibility="gone" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--Wrong Dest -->
+            <LinearLayout
+                android:id="@+id/ll_wrong_dest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_wrong_dest_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="Wrong Destination"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_wrong_dest_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Wrong destination."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--NoAttepmts -->
+            <LinearLayout
+                android:id="@+id/ll_no_attempts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_no_attempts_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="Number Of Attempts"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_no_of_attempts_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="1"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!--Shipment not belong to emp DS Validation -->
+            <LinearLayout
+                android:id="@+id/ll_ds_validation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+
+                    <TextView
+                        android:id="@+id/tv_ds_validation_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="DS Validation"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_ds_validation_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Shipment not beling to employee."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--MultiPiece -->
+            <LinearLayout
+                android:id="@+id/ll_is_multi_piece"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_multiPiece_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="Multi Piece"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_multiPiece_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Please check pieces."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <RadioGroup
+                        android:id="@+id/rg_multi_piece"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <RadioButton
+                            android:id="@+id/rb_yes"
+                            android:layout_width="150dp"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="Yes" />
+
+                        <Space
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp" />
+
+                        <RadioButton
+                            android:id="@+id/rb_no"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:text="No" />
+                    </RadioGroup>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!--StopShipment -->
+            <LinearLayout
+                android:id="@+id/ll_is_stop_shipment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_stop_shipment_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_stop_shipment_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!--RTO -->
+            <LinearLayout
+                android:id="@+id/ll_is_rto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_rto_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="RTO Request"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_rto_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="RTO Request."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--DeliveryReq -->
+            <LinearLayout
+                android:id="@+id/ll_is_delivery_req"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_delivery_req_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="Delivery Request"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_delivery_req_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Delivery Request."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+
+            <!--Relabel -->
+            <LinearLayout
+                android:id="@+id/ll_is_relabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+
+                    <TextView
+                        android:id="@+id/tv_relabel_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:text="Re-Label"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_relabel_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:text="Re-Label."
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <!--Shipment With No Bayam NO -->
+            <LinearLayout
+                android:id="@+id/ll_hv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16.7dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_hv_header"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/sf_pro_text_medium"
+                        android:textColor="@color/txt_color"
+                        android:textSize="16.7sp" />
+
+                    <TextView
+                        android:id="@+id/tv_hv_body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="11.7dp"
+                        android:fontFamily="@font/sf_pro_text_regular"
+                        android:textColor="@color/hint_txt_color"
+                        android:textSize="14sp" />
+
+
+                </LinearLayout>
+
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="11dp"
+                    android:background="@color/bg_color" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_wrongdest_miscode_misort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="1">
+
+
+                <Button
+                    android:id="@+id/btn_miscode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:layout_weight="0.5"
+                    android:background="@color/NaqelBlue"
+                    android:fontFamily="@font/sf_pro_text_medium"
+                    android:text="@string/str_miscode"
+                    android:textAllCaps="false"
+                    android:textColor="@color/White"
+                    android:textSize="16.7sp" />
+
+                <Button
+                    android:id="@+id/btn_missort"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:layout_weight="0.5"
+                    android:width="0dp"
+                    android:background="@color/NaqelBlue"
+                    android:fontFamily="@font/sf_pro_text_medium"
+                    android:text="@string/str_missort"
+                    android:textAllCaps="false"
+                    android:textColor="@color/White"
+                    android:textSize="16.7sp" />
+
+
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btn_confirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:background="@color/colorAccent_2"
+                android:fontFamily="@font/sf_pro_text_medium"
+                android:text="@string/ok"
+                android:textAllCaps="false"
+                android:textColor="@color/White"
+                android:textSize="16.7sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:indeterminate="true"
+        android:visibility="gone" />
+</RelativeLayout>

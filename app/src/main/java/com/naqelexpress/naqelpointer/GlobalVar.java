@@ -120,8 +120,8 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
 
@@ -156,7 +156,7 @@ public class GlobalVar {
 
     public boolean isneedOtp = true;
 
-    public boolean isFortesting = false;
+    public boolean isFortesting = true;
     public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;
@@ -4709,7 +4709,7 @@ public class GlobalVar {
         Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
                 "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
                 "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
-                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.WayBillNo) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
+                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.Barcode) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
                 ",SUM(Distinct CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
                 " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
                 " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
@@ -4826,9 +4826,12 @@ public class GlobalVar {
 
         DBConnections dbConnections = new DBConnections(context, null);
         Cursor result = dbConnections.Fill("select mr.ItemNo WaybillNo , '' Name, " +
-                "CASE WHEN Ispaid = 1 THEN 'PAID' WHEN Ispaid = 2 THEN 'A' ELSE 'NOT PAID' end Status  from Myrouteshipments mr " +
+                "CASE WHEN Ispaid = 1 THEN 'PAID' WHEN Ispaid = 2 THEN 'A' ELSE 'NOT PAID' end Status ,CASE WHEN cn.Notes is null THEN 'Not Avail' ELSE  cn.Notes  END Notes" +
+                "  from Myrouteshipments mr " +
                 " left join OnDelivery od on od.WaybillNo = mr.ItemNo and od.DeliverySheetID = mr.DeliverySheetID " +
                 " left join notdelivered nd  on  mr.ItemNo  = nd.WaybillNo and  nd.DeliverySheetID  = mr.DeliverySheetID" +
+                " Left Join CourierNotes cn on cn.DeliverySheetID = mr.DeliverySheetID  and cn.WaybillNo = mr.ItemNo " +
+                " and cn.ID in (Select MAx(ID) from CourierNotes tcn where cn.DeliverySheetID = tcn.DeliverySheetID  and cn.WaybillNo = tcn.WaybillNo )" +
 
                 " where od.ID is null and nd.ID is null ", context);
 
@@ -4839,7 +4842,7 @@ public class GlobalVar {
                 HashMap<String, String> hm = new HashMap<>();
                 hm.put("WaybillNo", String.valueOf(result.getInt(result.getColumnIndex("WaybillNo"))));
                 hm.put("WStatus", String.valueOf(result.getString(result.getColumnIndex("Name"))));
-                hm.put("Remarks", String.valueOf(result.getString(result.getColumnIndex("Name"))));
+                hm.put("Remarks", String.valueOf(result.getString(result.getColumnIndex("Notes"))));
                 hm.put("isPaid", String.valueOf(result.getString(result.getColumnIndex("Status"))));
                 hm.put("isDone", "1");
                 hm.put("SNo", String.valueOf(i));

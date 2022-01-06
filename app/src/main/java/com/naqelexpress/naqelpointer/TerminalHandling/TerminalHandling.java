@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -35,6 +36,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.utils.StaticClass;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -85,11 +87,18 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
         setContentView(R.layout.checkpoints);
 
 
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
         group = bundle.getString("group"); // In case of Arrival --> Group 8  In case of shipment processing --> Group 3
 
         String division = GlobalVar.GV().getDivisionID(getApplicationContext(), GlobalVar.GV().EmployID);
+
+        clearFields();
 
         try {
             if (division.equals("Courier") && group.equals("Group 8")) { //Courier includes TH && Only in Arrival Module
@@ -1069,6 +1078,12 @@ public class TerminalHandling extends AppCompatActivity implements IAPICallListe
     private void getOnlineValidation() {
         APICall apiCall = new APICall(getApplicationContext(), TerminalHandling.this, this);
         apiCall.getOnlineValidationDataOffset(GlobalVar.NclArrivalTH, 0, 1);
+    }
+
+    private void clearFields() {
+        StaticClass.stationArrayList.clear();
+        StaticClass.allowedDestStationIDs.clear();
+
     }
 }
 

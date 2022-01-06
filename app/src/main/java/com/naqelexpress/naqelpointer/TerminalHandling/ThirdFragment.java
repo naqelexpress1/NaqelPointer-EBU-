@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -101,7 +102,8 @@ public class ThirdFragment extends Fragment {
                                 }
                             }
                         } else {
-                            if (txtBarCode != null && txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
+                            if (txtBarCode != null && txtBarCode.getText().length() == 13
+                                    || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
                                 if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
                                     GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
                                     GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
@@ -763,9 +765,10 @@ public class ThirdFragment extends Fragment {
         return isValid;
     }
 
-    private boolean isValidPieceBarcode(String barcode) {
+  /*  private boolean isValidPieceBarcode(String barcode) {
         boolean isValid = true;
         try {
+
 
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
                     , barcode, getContext());
@@ -805,6 +808,58 @@ public class ThirdFragment extends Fragment {
                 onLineValidation.setBarcode(barcode);
                 onLineValidationList.add(onLineValidation);
             }
+
+        } catch (Exception e) {
+            Log.d("test", TAG + e.toString());
+        }
+        return isValid;
+    }*/
+
+    private boolean isValidPieceBarcode(String barcode) {
+        boolean isValid = true;
+        try {
+
+
+            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
+                    , barcode, getContext());
+
+            OnlineValidation onlineValidation = new OnlineValidation();
+            onlineValidation.showFlagsPopup(onLineValidationLocal, getContext(), getActivity());
+//            OnLineValidation onLineValidation = new OnLineValidation();
+
+
+//            if (onLineValidationLocal != null) {
+//
+//
+//                if (onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+//                    onLineValidation.setIsWrongDest(1);
+//                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
+//                    isValid = false;
+//                }
+//
+//                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+//                    onLineValidation.setIsMultiPiece(1);
+//                    isValid = false;
+//                }
+//
+//                if (onLineValidationLocal.getIsStopped() == 1) {
+//                    onLineValidation.setIsStopped(1);
+//                    isValid = false;
+//                }
+//
+//                if (onLineValidationLocal.getIsRelabel() == 1) {
+//                    onLineValidation.setIsRelabel(1);
+//                    isValid = false;
+//                }
+//
+//
+//            }
+//
+//
+//            if (!isValid) {
+//                onLineValidation.setBarcode(barcode);
+//                onLineValidationList.add(onLineValidation);
+//            }
 
         } catch (Exception e) {
             Log.d("test", TAG + e.toString());

@@ -355,5 +355,7 @@
          </string>
     <string name="asr_whatsapplocation2"> for   </string>
     <string name="asr_whatsapplocation3"> using Link: </string>
+    <string name="str_miscode"> Miscode</string>
+    <string name="str_missort"> Missort</string>
 
 </resources>

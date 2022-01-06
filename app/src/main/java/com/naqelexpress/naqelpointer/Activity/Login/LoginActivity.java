@@ -47,6 +47,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.NoNeedVolumeReason;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserME;
 import com.naqelexpress.naqelpointer.DB.DBObjects.UserMeLogin;
+import com.naqelexpress.naqelpointer.DB.InsertintoDB;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.GetDeliveryStatusRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.GetUserMEDataRequest;
@@ -1539,10 +1540,7 @@ public class LoginActivity
                             new NoNeedVolumeReason(noNeedVolume.toString(), view, context);
 
                         String devision = jsonObject.getString("Division");
-                        dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView()
-                                , jo.getInt("ChangesMainMenu"));
-                        dbConnections.UpdateMenu(devision, getWindow().getDecorView().getRootView()
-                                , jo.getInt("ChangesMainMenu"));
+
 
                         JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveyStatusReason");
                         if (deliverysubstatus.length() > 0)
@@ -1566,9 +1564,22 @@ public class LoginActivity
                                 JSONArray binMasterList = jsonObject.getJSONArray("BinMastersList");
                                 if (binMasterList.length() > 0)
                                     dbConnections.insertBinMasterBulk(binMasterList, getApplicationContext());
+
+                                JSONArray facilityAllowedStations = jsonObject.getJSONArray("FacilityAllowedStations");
+                                if (facilityAllowedStations.length() > 0) {
+                                    InsertintoDB insertintoDB = new InsertintoDB();
+                                    insertintoDB.insertFacilityAllowedStationBulk(facilityAllowedStations, LoginActivity.this);
+
+
+                                }
+
                             } catch (Exception ex) {
                             }
                         }
+                        dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView()
+                                , jo.getInt("ChangesMainMenu"));
+                        dbConnections.UpdateMenu(devision, getWindow().getDecorView().getRootView()
+                                , jo.getInt("ChangesMainMenu"));
                         updateUserDetails();
                         LoginIntoOpenMainPage();
 

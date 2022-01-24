@@ -72,7 +72,7 @@ public class WaybillPlanActivity extends AppCompatActivity
     private GoogleMap mMap;
     Marker now;
     TextView txtWaybillNo, txtShipperName, txtConsigneeName, txtBillingType, txtCODAmount,
-            txtPODType, txtCDAmount, txtTotalAmount, txtMobileNo, txtPhoneNo;
+            txtPODType, txtCDAmount, txtTotalAmount, txtMobileNo, txtPhoneNo, txtWeight, txtpiececount, txtaddress;
     ;
     TextView lbPODType;
     ConsingeeMobileSpinnerDialog spinnerDialog;
@@ -121,6 +121,9 @@ public class WaybillPlanActivity extends AppCompatActivity
             //txtShipmentAmount = findViewById(R.id.txtShipmentAmount);
             txtCDAmount = findViewById(R.id.tv_cd_body);
             txtTotalAmount = findViewById(R.id.tv_total_amount_body);
+            txtWeight = findViewById(R.id.txtweight);
+            txtpiececount = findViewById(R.id.txtpiececount);
+            txtaddress = findViewById(R.id.txtaddress);
             txtNotes = (EditText) findViewById(R.id.txtnotes);
 
             if (GlobalVar.GV().GetDivision(getApplicationContext()))
@@ -244,6 +247,16 @@ public class WaybillPlanActivity extends AppCompatActivity
                 txtPhoneNo.setTag(myRouteShipments.ConsigneePhoneNumber);
                 ConsigneeLatitude = myRouteShipments.Latitude;
                 ConsigneeLongitude = myRouteShipments.Longitude;
+                txtWeight.setText(String.valueOf(myRouteShipments.Weight));
+                txtpiececount.setText(String.valueOf(myRouteShipments.PiecesCount));
+                txtaddress.setText(String.valueOf(myRouteShipments.ConsigneeFirstAddress
+                        + "\n" + myRouteShipments.ConsigneeSecondAddress.replace("null", "")));
+                txtaddress.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        GlobalVar.ShowDialog(WaybillPlanActivity.this, "", txtaddress.getText().toString(), true);
+                    }
+                });
                 //Added by Riyam
                 txtCDAmount.setText(String.valueOf(cdAmount));
                 txtTotalAmount.setText(String.valueOf(totalAmount));
@@ -368,6 +381,7 @@ public class WaybillPlanActivity extends AppCompatActivity
                 return true;
             case R.id.UpdatedConsigneeNo:
                 PrepareGetConsigneeUpdatedNo(GlobalVar.GV().EmployID, Integer.parseInt(myRouteShipments.ItemNo));
+                return true;
             case R.id.save:
                 insertCourierNotes();
 

@@ -27,6 +27,161 @@ public class OnLineValidation extends DefaultResult {
     private boolean IsDestChanged;
     private boolean isHV;
     private int IsCAFRequest = 0;
+    private int ReasonID = 0;
+    private int ReasonDetailID = 0;
+    private int ReasonDDetailID = 0;
+    private boolean isManifestedalert = false;
+    private boolean isStoppedalert = false;
+    private boolean isCITCalert = false;
+    private boolean isMultiPiecealert = false;
+    private boolean isNoofAttemptsalert = false;
+    private boolean isWrongDestalert = false;
+    private boolean NoValidation = false;
+    private boolean isCAFlert = false;
+    private boolean isDLalert = false;
+
+    public boolean isConflictalert() {
+        return isConflictalert;
+    }
+
+    public void setConflictalert(boolean conflictalert) {
+        isConflictalert = conflictalert;
+    }
+
+    private boolean isConflictalert = false;
+
+    public boolean isDLalert() {
+        return isDLalert;
+    }
+
+    public void setDLalert(boolean DLalert) {
+        isDLalert = DLalert;
+    }
+
+    public boolean isCAFlert() {
+        return isCAFlert;
+    }
+
+    public void setCAFlert(boolean CAFlert) {
+        isCAFlert = CAFlert;
+    }
+
+    public boolean isNoValidation() {
+        return NoValidation;
+    }
+
+    public void setNoValidation(boolean noValidation) {
+        NoValidation = noValidation;
+    }
+
+    public boolean isRTOalert() {
+        return isRTOalert;
+    }
+
+    public void setRTOalert(boolean RTOalert) {
+        isRTOalert = RTOalert;
+    }
+
+    private boolean MultipiecePopup = false;
+    private boolean isRTOalert = false;
+    private String ClassName = "";
+
+    public String getClassName() {
+        return ClassName;
+    }
+
+    public void setClassName(String className) {
+        ClassName = className;
+    }
+
+    public boolean isMultipiecePopup() {
+        return MultipiecePopup;
+    }
+
+    public void setMultipiecePopup(boolean multipiecePopup) {
+        MultipiecePopup = multipiecePopup;
+    }
+//private boolean ischangedDestalert = false;
+
+    public boolean getisWrongDestalert() {
+        return isWrongDestalert;
+    }
+
+    public void setWrongDestalert(boolean wrongDestalert) {
+        isWrongDestalert = wrongDestalert;
+    }
+
+    public boolean getisNoofAttemptsalert() {
+        return isNoofAttemptsalert;
+    }
+
+    public void setNoofAttemptsalert(boolean noofAttemptsalert) {
+        isNoofAttemptsalert = noofAttemptsalert;
+    }
+
+    public boolean getisStoppedalert() {
+        return isStoppedalert;
+    }
+
+    public void setStoppedalert(boolean stoppedalert) {
+        isStoppedalert = stoppedalert;
+    }
+
+    public boolean getisManifestedalert() {
+        return isManifestedalert;
+    }
+
+    public void setManifestedalert(boolean manifestedalert) {
+        isManifestedalert = manifestedalert;
+    }
+
+    public boolean getisCITCalert() {
+        return isCITCalert;
+    }
+
+    public void setCITCalert(boolean CITCalert) {
+        isCITCalert = CITCalert;
+    }
+
+    public boolean getisMultiPiecealert() {
+        return isMultiPiecealert;
+    }
+
+    public void setMultiPiecealert(boolean multiPiecealert) {
+        isMultiPiecealert = multiPiecealert;
+    }
+
+//    public boolean getIschangedDestalert() {
+//        return ischangedDestalert;
+//    }
+//
+//    public void setIschangedDestalert(boolean ischangedDestalert) {
+//        this.ischangedDestalert = ischangedDestalert;
+//    }
+
+    public int getReasonID() {
+        return ReasonID;
+    }
+
+    public void setReasonID(int reasonID) {
+        ReasonID = reasonID;
+    }
+
+    public int getReasonDetailID() {
+        return ReasonDetailID;
+    }
+
+    public void setReasonDetailID(int reasonDetailID) {
+        ReasonDetailID = reasonDetailID;
+    }
+
+    public int getReasonDDetailID() {
+        return ReasonDDetailID;
+    }
+
+    public void setReasonDDetailID(int reasonDDetailID) {
+        ReasonDDetailID = reasonDDetailID;
+    }
 
     public boolean setisHV() {
         return isHV;

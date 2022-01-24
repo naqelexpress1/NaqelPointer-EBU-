@@ -113,11 +113,13 @@ public class ThirdFragment extends Fragment {
                                 if (IsValid()) {
                                     String barcode = txtBarCode.getText().toString();
                                     if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
-                                        if (isValidPieceBarcode(barcode)) {
+                                        //if (isValidPieceBarcode(barcode)) {
+                                        if (OnlineValidation.isValidPieceBarcode(barcode, getActivity(), getContext(), "ArrivedAt", false, false))
                                             AddNewPiece();
-                                        } else {
-                                            showDialog(getOnLineValidationPiece(barcode));
-                                        }
+//                                        }
+//                                    else {
+//                                            showDialog(getOnLineValidationPiece(barcode));
+//                                        }
                                     } else {
                                         AddNewPiece();
                                     }
@@ -815,57 +817,68 @@ public class ThirdFragment extends Fragment {
         return isValid;
     }*/
 
-    private boolean isValidPieceBarcode(String barcode) {
-        boolean isValid = true;
-        try {
-
-
-            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode, getContext());
-
-            OnlineValidation onlineValidation = new OnlineValidation();
-            onlineValidation.showFlagsPopup(onLineValidationLocal, getContext(), getActivity());
-//            OnLineValidation onLineValidation = new OnLineValidation();
-
-
-//            if (onLineValidationLocal != null) {
+//    private boolean isValidPieceBarcode(String barcode) {
+//        boolean isValid = true;
+//        try {
+//
+//            SetOnlineValidationAlert setOnlineValidationAlert = new SetOnlineValidationAlert();
+//            OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
+//                    , barcode, getContext());
+//
+//            onLineValidationLocal.setReasonID(Objects.requireNonNull(getActivity()).getResources().getInteger(R.integer.ArrivedAt));
+//            onLineValidationLocal = setOnlineValidationAlert.setOnlineValidationalert(onLineValidationLocal, getActivity());
+//
+////            onLineValidationLocal.setNoofAttemptsalert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isNoofAttemptsalert));
+////            onLineValidationLocal.setWrongDestalert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isWrongDestalert));
+////            onLineValidationLocal.setCITCalert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isCITCalert));
+////            onLineValidationLocal.setStoppedalert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isStoppedalert));
+////            onLineValidationLocal.setManifestedalert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isManifestedalert));
+////            onLineValidationLocal.setMultiPiecealert(getActivity().getResources().getBoolean(R.bool.ArrivedAt_isMultiPiecealert));
 //
 //
-//                if (onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
-//                    onLineValidation.setIsWrongDest(1);
-//                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
-//                    isValid = false;
-//                }
-//
-//                if (onLineValidationLocal.getIsMultiPiece() == 1) {
-//                    onLineValidation.setIsMultiPiece(1);
-//                    isValid = false;
-//                }
-//
-//                if (onLineValidationLocal.getIsStopped() == 1) {
-//                    onLineValidation.setIsStopped(1);
-//                    isValid = false;
-//                }
-//
-//                if (onLineValidationLocal.getIsRelabel() == 1) {
-//                    onLineValidation.setIsRelabel(1);
-//                    isValid = false;
-//                }
+//            OnlineValidation onlineValidation = new OnlineValidation();
+//            onlineValidation.showFlagsPopup(onLineValidationLocal, getContext(), getActivity());
+////            OnLineValidation onLineValidation = new OnLineValidation();
 //
 //
-//            }
+////            if (onLineValidationLocal != null) {
+////
+////
+////                if (onLineValidationLocal.getWaybillDestID() != GlobalVar.GV().StationID) {
+////                    onLineValidation.setIsWrongDest(1);
+////                    onLineValidation.setWaybillDestID(onLineValidationLocal.getWaybillDestID());
+////                    isValid = false;
+////                }
+////
+////                if (onLineValidationLocal.getIsMultiPiece() == 1) {
+////                    onLineValidation.setIsMultiPiece(1);
+////                    isValid = false;
+////                }
+////
+////                if (onLineValidationLocal.getIsStopped() == 1) {
+////                    onLineValidation.setIsStopped(1);
+////                    isValid = false;
+////                }
+////
+////                if (onLineValidationLocal.getIsRelabel() == 1) {
+////                    onLineValidation.setIsRelabel(1);
+////                    isValid = false;
+////                }
+////
+////
+////            }
+////
+////
+////            if (!isValid) {
+////                onLineValidation.setBarcode(barcode);
+////                onLineValidationList.add(onLineValidation);
+////            }
 //
-//
-//            if (!isValid) {
-//                onLineValidation.setBarcode(barcode);
-//                onLineValidationList.add(onLineValidation);
-//            }
-
-        } catch (Exception e) {
-            Log.d("test", TAG + e.toString());
-        }
-        return isValid;
-    }
+//        } catch (Exception e) {
+//            Log.d("test", TAG + e.toString());
+//        }
+//        return isValid;
+//    }
 
 
     public void showDialog(final OnLineValidation onLineValidation) {
@@ -1123,4 +1136,6 @@ public class ThirdFragment extends Fragment {
         }
         return onLineValidation;
     }
+
+
 }

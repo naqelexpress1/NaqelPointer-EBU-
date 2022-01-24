@@ -155,7 +155,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         if (barcodeValidation.isValid) {
                             // if(!ScanNclNoFragment.checkMix.isChecked()){}
                             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                                    , barcode, getContext());
+                                    , barcode, getContext(), false);
                             if (onLineValidationLocal != null) { //use new validation file
                                 boolean hasFlag = checkWaybillFlags(barcode);
                                 if (hasFlag)
@@ -496,7 +496,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             //Read from local online validation table
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode),
-                    barcode, getContext());
+                    barcode, getContext() , false);
 
             OnLineValidation onLineValidation = new OnLineValidation(); // To set flags
 

@@ -87,7 +87,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 171; // PaperlessDS
+    private static final int Version = 173; // Create View
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -510,6 +510,25 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS FacilityAllowedStation (ID INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
                 "FacilityID  INTEGER NOT NULL ,  AllowedStationID INTEGER NOT NULL )");
+
+        db.execSQL("Create View IF NOT EXISTS v_validation As" +
+                " select WaybillNo ,  WaybillDestID ,  IsMultiPiece , IsStopped , 0 IsRTORequest ,  NoOfAttempts," +
+                " IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF from OnLineValidationOffset onv " +
+                " union Select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 0 IsRTORequest , 0 NoOfAttempts," +
+                " 0 IsRelabel ,  CASE WHEN ReqType = 1 THEN 1 ELSE 0 END  IsDeliveryRequest  ,CASE WHEN ReqType = 3 THEN 1 ELSE 0 END IsCITC " +
+                " ,CASE WHEN ReqType = 4 THEN 1 ELSE 0 END IsCAF " +
+                " from DeliverReq " +
+                " UNION select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 1 IsRTORequest  , 0 NoOfAttempts," +
+                " 0 IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF from RtoReq rr ");
+
+        db.execSQL("Create View IF NOT EXISTS v_validationINVbyNCL " +
+                "As Select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 0 IsRTORequest , 0 NoOfAttempts, " +
+                " 0 IsRelabel ,  CASE WHEN ReqType = 1 THEN 1 ELSE 0 END  IsDeliveryRequest  ,CASE WHEN ReqType = 3 THEN 1 ELSE 0 END IsCITC " +
+                ",CASE WHEN ReqType = 4 THEN 1 ELSE 0 END IsCAF , NclNo " +
+                "from DeliverReq " +
+                " UNION " +
+                "select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 1 IsRTORequest  , 0 NoOfAttempts," +
+                "0 IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF , NclNo from RtoReq rr ");
 
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -1294,6 +1313,25 @@ public class DBConnections
 
 //            if (!isColumnExist("MyRouteShipments", "CDAmount"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN CDAmount DOUBLE");
+
+            db.execSQL("Create View IF NOT EXISTS v_validation As" +
+                    " select WaybillNo ,  WaybillDestID ,  IsMultiPiece , IsStopped , 0 IsRTORequest ,  NoOfAttempts," +
+                    " IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF from OnLineValidationOffset onv " +
+                    " union Select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 0 IsRTORequest , 0 NoOfAttempts," +
+                    " 0 IsRelabel ,  CASE WHEN ReqType = 1 THEN 1 ELSE 0 END  IsDeliveryRequest  ,CASE WHEN ReqType = 3 THEN 1 ELSE 0 END IsCITC " +
+                    " ,CASE WHEN ReqType = 4 THEN 1 ELSE 0 END IsCAF " +
+                    " from DeliverReq " +
+                    " UNION select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 1 IsRTORequest  , 0 NoOfAttempts," +
+                    " 0 IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF from RtoReq rr ");
+
+            db.execSQL("Create View IF NOT EXISTS v_validationINVbyNCL " +
+                    "As Select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 0 IsRTORequest , 0 NoOfAttempts, " +
+                    " 0 IsRelabel ,  CASE WHEN ReqType = 1 THEN 1 ELSE 0 END  IsDeliveryRequest  ,CASE WHEN ReqType = 3 THEN 1 ELSE 0 END IsCITC " +
+                    ",CASE WHEN ReqType = 4 THEN 1 ELSE 0 END IsCAF , NclNo " +
+                    "from DeliverReq " +
+                    " UNION " +
+                    "select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 1 IsRTORequest  , 0 NoOfAttempts," +
+                    "0 IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF , NclNo from RtoReq rr ");
 
         }
 
@@ -6950,31 +6988,151 @@ public class DBConnections
         return onLineValidation;
     }
 
-    //TH - Courier
-    public OnLineValidation getPieceInformationByWaybillNo(String waybillNo, String barcode, Context context) {
+    /*public OnLineValidation getPieceInformationByWaybillNo(String waybillNo, String barcode, Context context, boolean isCount) {
         OnLineValidation onLineValidation = null;
+        Cursor cursor = null;
+        SQLiteDatabase db = null;
         try {
-            String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo;
-            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
-            Cursor cursor = db.rawQuery(selectQuery, null);
+            //String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo;
+            String selectQuery = "select  WaybillNo ,  SUM(WaybillDestID) WaybillDestID ,  SUM(IsMultiPiece) IsMultiPiece , SUM(IsStopped) IsStopped ," +
+                    " SUM(IsDeliveryRequest) IsDeliveryRequest , SUM(IsRTORequest)  IsRTORequest ,  SUM(NoOfAttempts) NoOfAttempts," +
+                    "SUM(IsRelabel) IsRelabel , SUM(IsCITC) IsCITC, SUM(IsCAF) IsCAF  from v_validation where WaybillNo = " + waybillNo;
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery(selectQuery, null);
 
             if (cursor != null && cursor.moveToFirst()) {
-                onLineValidation = new OnLineValidation();
-                onLineValidation.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
-                onLineValidation.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
-                onLineValidation.setBarcode(barcode);
-                onLineValidation.setWaybillDestID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("WaybillDestID"))));
-                onLineValidation.setIsMultiPiece(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsMultiPiece"))));
-                onLineValidation.setIsStopped(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
-                onLineValidation.setIsDeliveryRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsDeliveryRequest"))));
-                onLineValidation.setIsRTORequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRTORequest"))));
-                onLineValidation.setNoOfAttempts(Integer.parseInt(cursor.getString(cursor.getColumnIndex("NoOfAttempts"))));
-                onLineValidation.setIsRelabel(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRelabel"))));
+                if (cursor.getInt(cursor.getColumnIndex("WaybillNo")) > 0) {
+                    onLineValidation = new OnLineValidation();
+                    //onLineValidation.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
+                    onLineValidation.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    onLineValidation.setBarcode(barcode);
+                    onLineValidation.setWaybillDestID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("WaybillDestID"))));
+                    onLineValidation.setIsMultiPiece(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsMultiPiece"))));
+                    onLineValidation.setIsStopped(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
+                    onLineValidation.setIsDeliveryRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsDeliveryRequest"))));
+                    onLineValidation.setIsRTORequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRTORequest"))));
+                    onLineValidation.setNoOfAttempts(Integer.parseInt(cursor.getString(cursor.getColumnIndex("NoOfAttempts"))));
+                    onLineValidation.setIsRelabel(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRelabel"))));
+                    onLineValidation.setIsCITCComplaint(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCITC"))));
+                    onLineValidation.setIsCAFRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCAF"))));
+                    onLineValidation.setNoValidation(false);
+                } else
+                    onLineValidation = setOnlinevalidationEmptyValue(waybillNo, barcode);
             }
-            cursor.close();
+
         } catch (SQLiteException e) {
             e.printStackTrace();
         }
+        if (cursor != null)
+            cursor.close();
+        if (db != null)
+            db.close();
+
+        return onLineValidation;
+    }*/
+    //TH - Courier
+    public OnLineValidation getPieceInformationByWaybillNo(String waybillNo, String barcode, Context context, boolean isCount) {
+        OnLineValidation onLineValidation = null;
+        Cursor cursor = null;
+        SQLiteDatabase db = null;
+        try {
+            //String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo;
+            String selectQuery = "select  WaybillNo ,  SUM(WaybillDestID) WaybillDestID ,  SUM(IsMultiPiece) IsMultiPiece , SUM(IsStopped) IsStopped ," +
+                    " SUM(IsDeliveryRequest) IsDeliveryRequest , SUM(IsRTORequest)  IsRTORequest ,  SUM(NoOfAttempts) NoOfAttempts," +
+                    "SUM(IsRelabel) IsRelabel , SUM(IsCITC) IsCITC, SUM(IsCAF) IsCAF  from v_validation where WaybillNo = " + waybillNo;
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                if (cursor.getInt(cursor.getColumnIndex("WaybillNo")) > 0) {
+                    onLineValidation = new OnLineValidation();
+                    //onLineValidation.setID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ID"))));
+                    onLineValidation.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillNo")));
+                    onLineValidation.setBarcode(barcode);
+                    onLineValidation.setWaybillDestID(Integer.parseInt(cursor.getString(cursor.getColumnIndex("WaybillDestID"))));
+                    onLineValidation.setIsMultiPiece(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsMultiPiece"))));
+                    onLineValidation.setIsStopped(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsStopped"))));
+                    onLineValidation.setIsDeliveryRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsDeliveryRequest"))));
+                    onLineValidation.setIsRTORequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRTORequest"))));
+                    onLineValidation.setNoOfAttempts(Integer.parseInt(cursor.getString(cursor.getColumnIndex("NoOfAttempts"))));
+                    onLineValidation.setIsRelabel(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRelabel"))));
+                    onLineValidation.setIsCITCComplaint(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCITC"))));
+                    onLineValidation.setIsCAFRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCAF"))));
+                    onLineValidation.setNoValidation(false);
+                } else
+                    onLineValidation = setOnlinevalidationEmptyValue(waybillNo, barcode);
+            }
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        if (cursor != null)
+            cursor.close();
+        if (db != null)
+            db.close();
+
+        return onLineValidation;
+    }
+
+
+    public OnLineValidation getPieceCountByNCL(String NclNo, String barcode, Context context, boolean isCount) {
+        OnLineValidation onLineValidation = null;
+        Cursor cursor = null;
+        SQLiteDatabase db = null;
+        try {
+            String selectQuery = "select  Count(WaybillNo) WaybillCount ,  SUM(IsDeliveryRequest) DRCount ,   SUM(IsRTORequest) RtoCount ," +
+                    " SUM(IsCITC) CITCCount , SUM(IsCAF)  CAFCount ," +
+                    "(select SUM(IsStopped)  from OnLineValidationOffset v where v.WaybillNo = vncl.WaybillNo) StoppedCount" +
+                    " from v_validationINVbyNCL vncl where  NclNo = " + NclNo;
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                if (cursor.getInt(cursor.getColumnIndex("WaybillCount")) > 0) {
+                    onLineValidation = new OnLineValidation();
+                    onLineValidation.setWaybillNo(cursor.getInt(cursor.getColumnIndex("WaybillCount")));
+                    onLineValidation.setBarcode(barcode);
+                    onLineValidation.setWaybillDestID(0);
+                    onLineValidation.setIsMultiPiece(0);
+                    onLineValidation.setIsStopped(cursor.getInt(cursor.getColumnIndex("StoppedCount")));
+                    onLineValidation.setIsDeliveryRequest(cursor.getInt(cursor.getColumnIndex("DRCount")));
+                    onLineValidation.setIsRTORequest(cursor.getInt(cursor.getColumnIndex("RtoCount")));
+                    onLineValidation.setNoOfAttempts(0);
+                    onLineValidation.setIsRelabel(0);
+                    onLineValidation.setIsCITCComplaint(cursor.getInt(cursor.getColumnIndex("CITCCount")));
+                    onLineValidation.setIsCAFRequest(cursor.getInt(cursor.getColumnIndex("CAFCount")));
+                    onLineValidation.setNoValidation(false);
+                } else
+                    onLineValidation = setOnlinevalidationEmptyValue(NclNo, barcode);
+            }
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+        if (cursor != null)
+            cursor.close();
+        if (db != null)
+            db.close();
+
+        return onLineValidation;
+    }
+
+    private OnLineValidation setOnlinevalidationEmptyValue(String waybillNo, String barcode) {
+        OnLineValidation onLineValidation = new OnLineValidation();
+
+        onLineValidation.setWaybillNo(Integer.parseInt(waybillNo));
+        onLineValidation.setBarcode(barcode);
+        onLineValidation.setWaybillDestID(0);
+        onLineValidation.setIsMultiPiece(0);
+        onLineValidation.setIsStopped(0);
+        onLineValidation.setIsDeliveryRequest(0);
+        onLineValidation.setIsRTORequest(0);
+        onLineValidation.setNoOfAttempts(0);
+        onLineValidation.setIsRelabel(0);
+        onLineValidation.setIsCITCComplaint(0);
+        onLineValidation.setIsCAFRequest(0);
+        onLineValidation.setNoValidation(true);
+
         return onLineValidation;
     }
 

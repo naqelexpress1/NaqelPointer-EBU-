@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU-PLDS-ASR-SP FinalTest 03-01-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU/GTW 280  24-01-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -118,17 +118,17 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = false; //For EBU true only
+    public boolean LoginVariation = false; //For EBU true only 58 current version
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
 
     public static int ScanWaybillLength = 9;
     public static int ScanBarcodeLength = 14;
     public static boolean ManualType = false;
-    public static String WaybillNoStartSeries = "8"; //812345679
+    public static String WaybillNoStartSeries = "8";//871 //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;
@@ -156,7 +156,7 @@ public class GlobalVar {
 
     public boolean isneedOtp = true;
 
-    public boolean isFortesting = true;
+    public boolean isFortesting = false;
     public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;
@@ -1415,6 +1415,8 @@ public class GlobalVar {
                     myRouteShipments.IsPaid = result.getInt(result.getColumnIndex("Ispaid"));
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
                     myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
+                    myRouteShipments.Weight = result.getString(result.getColumnIndex("Weight"));
+                    myRouteShipments.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
                     myRouteShipments.Position = position - 1;
                     myRouteShipments.isOtp = result.getInt(result.getColumnIndex("IsOtp"));
 
@@ -1600,6 +1602,8 @@ public class GlobalVar {
                     myRouteShipments.IsMap = result.getInt(result.getColumnIndex("IsMap"));
                     myRouteShipments.CustomDuty = result.getDouble(result.getColumnIndex("CustomDuty"));
                     myRouteShipments.isOtp = result.getInt(result.getColumnIndex("IsOtp"));
+                    myRouteShipments.Weight = result.getString(result.getColumnIndex("Weight"));
+                    myRouteShipments.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
                     myRouteShipments.Position = position - 1;
 
                     myRouteShipmentList.add(myRouteShipments);
@@ -4062,7 +4066,15 @@ public class GlobalVar {
     //Riyam
     public static String getWaybillFromBarcode(String barcode) {
         try {
-            return barcode.substring(0, 8);
+            if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1)))
+                //txtBarCode.setText(barcode.substring(0, 8));
+                return barcode.substring(0, 8);
+            else if (barcode.replace(" ", "").length() == 13)
+                return barcode.substring(0, 8);
+            else if (barcode.replace(" ", "").length() == 14)
+                return barcode.substring(0, 9);
+
+
         } catch (Exception e) {
             //  Log.d(TAG, e.toString());
         }
@@ -4706,13 +4718,24 @@ public class GlobalVar {
         HashMap<String, String> hashMap = new HashMap<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
+//        Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
+//                "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
+//                "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
+//                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.Barcode) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
+//                ",SUM(Distinct CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
+//                " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
+//                " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
+
         Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
                 "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
                 "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
-                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.Barcode) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
+                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.Barcode) BarCodeCount , ( SELECT SUM(tmr.CODAmount) from MyRouteShipments tmr " +
+                " where tmr.DeliverysheetID = mr.DeliverysheetID ) - ( SELECT SUM(tmr.CustomDuty) from MyRouteShipments tmr " +
+                " where tmr.DeliverysheetID = mr.DeliverysheetID ) tCoD " +
                 ",SUM(Distinct CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
                 " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
-                " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
+                " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo and od.DeliverysheetID = mr.DeliverysheetID" +
+                " LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo and mr.DeliverysheetID = nd.DeliverysheetID", context);
 
 
         if (result.getCount() > 0) {

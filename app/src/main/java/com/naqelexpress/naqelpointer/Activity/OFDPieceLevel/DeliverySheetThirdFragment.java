@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.OFDPieceLevel;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,10 +32,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
+import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
+import com.naqelexpress.naqelpointer.utils.StaticClass;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +56,7 @@ import java.util.ArrayList;
 import static android.app.Activity.RESULT_OK;
 
 public class DeliverySheetThirdFragment
-        extends Fragment {
+        extends DialogFragment implements AlertCallbackOnlineValidation {
     View rootView;
     TextView lbTotal;
     private EditText txtBarCode, txtBarCodePiece;
@@ -65,6 +71,9 @@ public class DeliverySheetThirdFragment
     private View view;
     private boolean add = false;
     public ArrayList<String> pieceDenied = new ArrayList<>();
+    public static int isMulitPiecePop = 0;
+    Activity activity;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +114,8 @@ public class DeliverySheetThirdFragment
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && (txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
+                        if (txtBarCode != null && (txtBarCode.getText().length() == 13
+                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
                             if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
                                 GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
                                 GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
@@ -139,10 +149,23 @@ public class DeliverySheetThirdFragment
                                 txtBarCode.setText("");
                                 return true;
                             }
-                            if (!pieceDenied.contains(txtBarCode.getText().toString()))
-                                new GetWaybillInfo().execute(txtBarCode.getText().toString());
-                            else {
-                                GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                            OnlineValidation onlineValidation = new OnlineValidation();
+                            if (!pieceDenied.contains(txtBarCode.getText().toString())) {
+                                if (!StaticClass.isDsValidation)
+                                    new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                                else if (OnlineValidation.isValidPieceBarcode(txtBarCode.getText().toString(), getActivity(), getContext(),
+                                        "DeliverySheet", false, false)) {
+                                    if (isMulitPiecePop == 0)
+                                        new GetWaybillInfo().execute(txtBarCode.getText().toString());
+//                                    else {
+//                                        if (onlineValidation.ShowMultiPieceAlertMessage("Please confirm all pcs are available", getActivity(), "Multi Piece"))
+//                                            new GetWaybillInfo().execute(txtBarCode.getText().toString());
+//
+//                                    }
+                                } else txtBarCode.setText("");
+
+                            } else {
+                                GlobalVar.MakeSound(getContext(), R.raw.wrongbarcodescan);
                                 ShowAlertMessage("ON HOLD WAYBILL CONTACT YOU SUPERVISOR");
                             }
                         }
@@ -366,6 +389,77 @@ public class DeliverySheetThirdFragment
 
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isAdded()) {
+            System.out.println("");
+        } else
+            System.out.println("");
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = activity;
+        System.out.println("");
+
+    }
+
+//    public void EnableMultipiecePopup() {
+//        OnlineValidation onlineValidation = new OnlineValidation();
+//        boolean isAdd = onlineValidation.ShowMultiPieceAlertMessage("Message", getActivity(), "title");
+//        isAddPiece(isAdd);
+//    }
+
+   /* public void isAddPiece(boolean ok) {
+        try {
+            if (ok)
+                new GetWaybillInfo().execute(txtBarCode.getText().toString());
+            else
+                txtBarCode.setText("");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }*/
+
+    @Override
+    public void onAttachFragment(Fragment childFragment) {
+        super.onAttachFragment(childFragment);
+        System.out.println("");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        System.out.println("");
+    }
+
+    public void isAddPiece(int ok, Activity activity, com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation onlineValidation) {//, Activity activity, Context context
+        try {
+
+
+            if (ok == 1) {
+                AddNewWaybill(String.valueOf(onlineValidation.getWaybillNo()));
+                AddNewPiece(String.valueOf(String.valueOf(onlineValidation.getWaybillNo())));
+                System.out.println("");
+            } else
+                ((DeliverySheetActivity) activity).thirdFragment.txtBarCode.setText("");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+    @Override
+    public void returnOk(int ok, Activity activity, OnLineValidation onLineValidation) {
+        if (ok == 1)
+            new GetWaybillInfo().execute(txtBarCode.getText().toString());
+        else
+            txtBarCode.setText("");
+    }
+
     private class GetWaybillInfo extends AsyncTask<String, Void, String> {
         private ProgressDialog progressDialog;
         String result = "";
@@ -567,4 +661,6 @@ public class DeliverySheetThirdFragment
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+
 }

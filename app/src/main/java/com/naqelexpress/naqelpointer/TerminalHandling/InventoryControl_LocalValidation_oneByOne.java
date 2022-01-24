@@ -32,6 +32,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -146,7 +147,9 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     if (!division.equals("Courier"))
                         AddNewPiece();
                     else {
-                        THAddNewPiece();
+                        if (OnlineValidation.isValidPieceBarcode(txtBarCode.getText().toString(), InventoryControl_LocalValidation_oneByOne.this,
+                                getApplicationContext(), "INV", false, false))
+                            THAddNewPiece();
                     }
 
                     return true;
@@ -515,14 +518,14 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     private void THAddNewPiece() {
 
 
-        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            if (!GlobalVar.IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+                GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
                 return;
             }
         } else {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             GlobalVar.RedirectSettings(InventoryControl_LocalValidation_oneByOne.this);
             return;
         }
@@ -574,11 +577,11 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
 
-        OnLineValidation onLineValidation = getOnLineValidation(barcode);
-        onLineValidation.setIsCITCComplaint(0);
-        onLineValidation.setIsRTORequest(0);
-        onLineValidation.setIsDeliveryRequest(0);
-        onLineValidation.setIsCAFRequest(0);
+//        OnLineValidation onLineValidation = getOnLineValidation(barcode);
+//        onLineValidation.setIsCITCComplaint(0);
+//        onLineValidation.setIsRTORequest(0);
+//        onLineValidation.setIsDeliveryRequest(0);
+//        onLineValidation.setIsCAFRequest(0);
         boolean rtoreq = false;
         boolean ismatch = false;
 
@@ -590,29 +593,29 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             WaybillAttempt = "No Data";
 
         if (iscafshipments.contains(txtBarCode.getText().toString()))
-            onLineValidation.setIsCAFRequest(1);
+//            onLineValidation.setIsCAFRequest(1);
 
-        if (isrtoReq.contains(txtBarCode.getText().toString())) {
-            onLineValidation.setIsRTORequest(1);
-            if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                ismatch = true;
-                rtoreq = true;
-                isHeldout.add(txtBarCode.getText().toString());
-                HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
-                temp.put("Status", "44");
-                temp.put("Ref", "Request For RTO");
-                delrtoreq.add(temp);
-                inventorycontrol.add(txtBarCode.getText().toString());
-                initViews();
-            } else {
-                return;
+            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+//            onLineValidation.setIsRTORequest(1);
+                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                    ismatch = true;
+                    rtoreq = true;
+                    isHeldout.add(txtBarCode.getText().toString());
+                    HashMap<String, String> temp = new HashMap<>();
+                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("Status", "44");
+                    temp.put("Ref", "Request For RTO");
+                    delrtoreq.add(temp);
+                    inventorycontrol.add(txtBarCode.getText().toString());
+                    initViews();
+                } else {
+                    return;
+                }
             }
-        }
 
 
         if (iscitcshipments.contains(txtBarCode.getText().toString()) && !ismatch) {
-            onLineValidation.setIsCITCComplaint(1);
+//            onLineValidation.setIsCITCComplaint(1);
 
             if (!isHeldout.contains(txtBarCode.getText().toString())) {
                 ismatch = true;
@@ -635,7 +638,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
         if (!ismatch) {
             if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
-                onLineValidation.setIsDeliveryRequest(1);
+//                onLineValidation.setIsDeliveryRequest(1);
                 if (isrtoReq.contains(txtBarCode.getText().toString())) {
                     ismatch = true;
                     rtoreq = true;
@@ -701,7 +704,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
             if (!WaybillAttempt.equals("No Data")) {
                 try {
-                    onLineValidation.setNoOfAttempts(Integer.parseInt(WaybillAttempt));
+//                    onLineValidation.setNoOfAttempts(Integer.parseInt(WaybillAttempt));
                 } catch (Exception ex) {
                     Log.d("test", "Add new piece - no of attempt" + ex.toString());
                 }
@@ -741,8 +744,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             SaveData(2);
         }
 
-
-        showDialog(onLineValidation);
+        txtBarCode.setText("");
+//        showDialog(onLineValidation);
 
     }
 
@@ -1839,7 +1842,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         onLineValidation.setBarcode(barcode);
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode, getApplicationContext());
+                    , barcode, getApplicationContext(), false);
 
             if (onLineValidationLocal != null) {
 
@@ -1982,7 +1985,6 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                 }
 
 
-
                 if (onlineValidation.getIsCAFRequest() == 1) {
                     LinearLayout llcaf = dialogView.findViewById(R.id.ll_caf_complaint);
                     llcaf.setVisibility(View.VISIBLE);
@@ -2001,7 +2003,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     }*/
 
                 OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(onlineValidation.getBarcode())
-                        , onlineValidation.getBarcode(), getApplicationContext());
+                        , onlineValidation.getBarcode(), getApplicationContext(), false);
                 String noOfAttempts = "";
                 if (onLineValidationLocal != null || !WaybillAttempt.equals("No Data")) {
                     noOfAttempts = String.valueOf(onlineValidation.getNoOfAttempts());

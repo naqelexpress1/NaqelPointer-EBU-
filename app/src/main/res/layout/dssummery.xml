@@ -466,7 +466,7 @@
                     android:ellipsize="marquee"
                     android:gravity="center"
                     android:singleLine="true"
-                    android:text="Delivery Summery"
+                    android:text="Delivery Summary"
                     android:textColor="#000000"
                     android:textSize="15sp"
                     android:textStyle="bold" />

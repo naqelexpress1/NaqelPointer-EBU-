@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -82,7 +83,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
         try {
             // Get shipment info for Courier || TH
-            if (division.equals("Courier")) {
+            if (division.equals("Courier") && !GlobalVar.GV().isFortesting) {
                 if (!isValidValidationFile()) {
                     getOnlineValidationFile();
                 }
@@ -225,7 +226,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
             String result = txtBarcode.getText().toString();
             if (!GlobalVar.GV().isValidBarcode(result)) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 txtBarcode.setText("");
                 return false;
             }
@@ -233,35 +234,42 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
             // To show onlineValidation warning if any
             boolean isConflict = !scannedBarCode.contains(result);
-            if (division.equals("Courier")) {
-                onlineValidation(result, isConflict);
-            }
+
+            if (OnlineValidation.isValidPieceBarcode(txtBarcode.getText().toString(), ValidationDS.this,
+                    getApplicationContext(), "VDS", isConflict , false)) {
 
 
-            if (!GlobalVar.GV().isValidBarcode(result)) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
-                        "Wrong Barcode", GlobalVar.AlertType.Warning);
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+//            if (division.equals("Courier")) {
+//                onlineValidation(result, isConflict);
+//            }
+
+
+                if (!GlobalVar.GV().isValidBarcode(result)) {
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
+                            "Wrong Barcode", GlobalVar.AlertType.Warning);
+                    GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                    txtBarcode.setText("");
+                    return false;
+                }
+
+
+                if (scannedBarCode.contains(result)) {
+                    GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
+                    if (!ScanbyDevice.contains(result))
+                        ScanbyDevice.add(result);
+
+                } else {
+                    GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                    if (!ConflictBarcode.contains(result))
+                        ConflictBarcode.add(result);
+
+                    if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                        conflict(result);
+                }
+
                 txtBarcode.setText("");
-                return false;
+                doaction();
             }
-
-
-            if (scannedBarCode.contains(result)) {
-                GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                if (!ScanbyDevice.contains(result))
-                    ScanbyDevice.add(result);
-
-            } else {
-                GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                if (!ConflictBarcode.contains(result))
-                    ConflictBarcode.add(result);
-
-                if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
-                    conflict(result);
-            }
-            txtBarcode.setText("");
-            doaction();
         }
         return true;
     }
@@ -817,7 +825,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         boolean isShowWarning = false;
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode, getApplicationContext());
+                    , barcode, getApplicationContext() , false);
 
             OnLineValidation onLineValidation = new OnLineValidation();
 

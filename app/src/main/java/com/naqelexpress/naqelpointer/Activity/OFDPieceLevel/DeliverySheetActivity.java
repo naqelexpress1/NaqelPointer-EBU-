@@ -48,7 +48,7 @@ public class DeliverySheetActivity
         extends AppCompatActivity {
     DeliverySheetFirstFragment firstFragment;
     DeliverySheetSecondFragment secondFragment;
-    DeliverySheetThirdFragment thirdFragment;
+    public DeliverySheetThirdFragment thirdFragment;
     DateTime TimeIn;
     TabLayout tabLayout;
 

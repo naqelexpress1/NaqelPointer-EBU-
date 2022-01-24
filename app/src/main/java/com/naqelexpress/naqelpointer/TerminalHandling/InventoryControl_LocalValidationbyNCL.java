@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -691,7 +692,13 @@ public class InventoryControl_LocalValidationbyNCL extends AppCompatActivity imp
             SaveData(2);
         }
 
-        showDialog(onLineValidation, Barcode);
+//        showDialog(onLineValidation, Barcode);
+
+        OnlineValidation.isValidPieceBarcode(Barcode, InventoryControl_LocalValidationbyNCL.this
+                , getApplicationContext(),
+                "INV_byNCL", false, true);
+
+        txtBarCode.setText("");
     }
 
     private void initSwipe() {

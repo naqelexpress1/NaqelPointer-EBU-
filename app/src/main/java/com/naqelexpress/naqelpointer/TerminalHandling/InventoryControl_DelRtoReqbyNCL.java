@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
+import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
@@ -428,7 +429,7 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
             }
         }*/
 
-        OnLineValidation onLineValidation = GetPieceInfoByScanning(txtBarCode.getText().toString());
+//        OnLineValidation onLineValidation = GetPieceInfoByScanning(txtBarCode.getText().toString());
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
@@ -611,7 +612,11 @@ public class InventoryControl_DelRtoReqbyNCL extends AppCompatActivity implement
 //        }
 
 //        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.barcodescanned);
-        showDialog(onLineValidation, txtBarCode.getText().toString());
+//        showDialog(onLineValidation, txtBarCode.getText().toString());
+
+        OnlineValidation.isValidPieceBarcode(txtBarCode.getText().toString(), InventoryControl_DelRtoReqbyNCL.this
+                , getApplicationContext(), "INV_byPiece", false, false);
+
         txtBarCode.setText("");
         txtBarCode.requestFocus();
 

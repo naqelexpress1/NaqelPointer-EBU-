@@ -1,4 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <bool name="isSoftPOS">false</bool>
+    <!--ArrivedAt com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment -->
+    <bool name="ArrivedAt_isWrongDestalert">true</bool>
+    <bool name="ArrivedAt_isNoofAttemptsalert">false</bool>
+    <bool name="ArrivedAt_isStoppedalert">true</bool>
+    <bool name="ArrivedAt_isManifestedalert">false</bool>
+    <bool name="ArrivedAt_isCITCalert">false</bool>
+    <bool name="ArrivedAt_isMultiPiecealert">true</bool>
+    <bool name="ArrivedAt_ischangedDestalert">false</bool>
+    <bool name="ArrivedAt_isMultiPiecePopup">false</bool>
+    <bool name="ArrivedAt_isCAFCalert">false</bool>
+    <bool name="ArrivedAt_isRtoCalert">false</bool>
+    <bool name="ArrivedAt_isDLalert">false</bool>
+    <!--DeliverySheet com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment -->
+    <bool name="DeliverySheet_isWrongDestalert">true</bool>
+    <bool name="DeliverySheet_isNoofAttemptsalert">false</bool>
+    <bool name="DeliverySheet_isStoppedalert">true</bool>
+    <bool name="DeliverySheet_isManifestedalert">false</bool>
+    <bool name="DeliverySheet_isCITCalert">true</bool>
+    <bool name="DeliverySheet_isMultiPiecealert">true</bool>
+    <bool name="DeliverySheet_ischangedDestalert">false</bool>
+    <bool name="DeliverySheet_isMultiPiecePopup">true</bool>
+    <bool name="DeliverySheet_isCAFCalert">true</bool>
+    <bool name="DeliverySheet_isRtoCalert">true</bool>
+    <bool name="DeliverySheet_isDLalert">false</bool>
+    <bool name="DeliverySheet_isConflictalert">false</bool>
+
+    <!--InventoryControl_LocalValidation_oneByOne com.naqelexpress.naqelpointer.InventoryControl_LocalValidation_oneByOne-->
+
+    <bool name="INV_isWrongDestalert">true</bool>
+    <bool name="INV_isNoofAttemptsalert">true</bool>
+    <bool name="INV_isStoppedalert">true</bool>
+    <bool name="INV_isManifestedalert">false</bool>
+    <bool name="INV_isCITCalert">true</bool>
+    <bool name="INV_isMultiPiecealert">false</bool>
+    <bool name="INV_ischangedDestalert">false</bool>
+    <bool name="INV_isMultiPiecePopup">false</bool>
+    <bool name="INV_isCAFCalert">true</bool>
+    <bool name="INV_isRtoCalert">true</bool>
+    <bool name="INV_isDLalert">true</bool>
+    <bool name="INV_isConflictalert">false</bool>
+    <!--com.naqelexpress.naqelpointer.Activity.ValidationDS-->
+
+    <bool name="VDS_isWrongDestalert">false</bool>
+    <bool name="VDS_isNoofAttemptsalert">false</bool>
+    <bool name="VDS_isStoppedalert">true</bool>
+    <bool name="VDS_isManifestedalert">false</bool>
+    <bool name="VDS_isCITCalert">true</bool>
+    <bool name="VDS_isMultiPiecealert">true</bool>
+    <bool name="VDS_ischangedDestalert">false</bool>
+    <bool name="VDS_isMultiPiecePopup">true</bool>
+    <bool name="VDS_isCAFCalert">true</bool>
+    <bool name="VDS_isRtoCalert">false</bool>
+    <bool name="VDS_isDLalert">false</bool>
+    <bool name="VDS_isConflictalert">true</bool>
+
+    <!--com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationbyNCL-->
+
+    <bool name="INV_byNCL_isWrongDestalert">false</bool>
+    <bool name="INV_byNCL_isNoofAttemptsalert">false</bool>
+    <bool name="INV_byNCL_isStoppedalert">true</bool>
+    <bool name="INV_byNCL_isManifestedalert">false</bool>
+    <bool name="INV_byNCL_isCITCalert">true</bool>
+    <bool name="INV_byNCL_isMultiPiecealert">false</bool>
+    <bool name="INV_byNCL_ischangedDestalert">false</bool>
+    <bool name="INV_byNCL_isMultiPiecePopup">false</bool>
+    <bool name="INV_byNCL_isCAFCalert">true</bool>
+    <bool name="INV_byNCL_isRtoCalert">true</bool>
+    <bool name="INV_byNCL_isDLalert">true</bool>
+    <bool name="INV_byNCL_isConflictalert">false</bool>
+
+    <!-- com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_DelRtoReqbyNCL -->
+
+    <bool name="INV_byPiece_isWrongDestalert">false</bool>
+    <bool name="INV_byPiece_isNoofAttemptsalert">false</bool>
+    <bool name="INV_byPiece_isStoppedalert">true</bool>
+    <bool name="INV_byPiece_isManifestedalert">false</bool>
+    <bool name="INV_byPiece_isCITCalert">true</bool>
+    <bool name="INV_byPiece_isMultiPiecealert">false</bool>
+    <bool name="INV_byPiece_ischangedDestalert">false</bool>
+    <bool name="INV_byPiece_isMultiPiecePopup">false</bool>
+    <bool name="INV_byPiece_isCAFCalert">true</bool>
+    <bool name="INV_byPiece_isRtoCalert">true</bool>
+    <bool name="INV_byPiece_isDLalert">true</bool>
+    <bool name="INV_byPiece_isConflictalert">false</bool>
+
+
 </resources>

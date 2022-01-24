@@ -251,7 +251,7 @@ public class NewBarCodeScannerForVS_Old extends AppCompatActivity
         boolean isShowWarning = false;
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode , getApplicationContext());
+                    , barcode , getApplicationContext() , false);
             OnLineValidation onLineValidation = new OnLineValidation();
 
             if (onLineValidationLocal != null) {

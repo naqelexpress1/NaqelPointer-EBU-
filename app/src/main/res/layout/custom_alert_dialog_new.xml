@@ -803,6 +803,45 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/ll_multipiececonfirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="1">
+
+
+                <Button
+                    android:id="@+id/btn_ok"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:layout_weight="0.5"
+                    android:background="@color/NaqelBlue"
+                    android:fontFamily="@font/sf_pro_text_medium"
+                    android:text="Yes"
+                    android:textAllCaps="false"
+                    android:textColor="@color/White"
+                    android:textSize="16.7sp" />
+
+                <Button
+                    android:id="@+id/btn_no"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="1dp"
+                    android:layout_weight="0.5"
+                    android:width="0dp"
+                    android:background="@color/NaqelBlue"
+                    android:fontFamily="@font/sf_pro_text_medium"
+                    android:text="No"
+                    android:textAllCaps="false"
+                    android:textColor="@color/White"
+                    android:textSize="16.7sp" />
+
+
+            </LinearLayout>
+
 
             <Button
                 android:id="@+id/btn_confirm"

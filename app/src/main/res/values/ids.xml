@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="ArrivedAt">7</integer>
+    <integer name="ArrivedAtMisscode">56</integer>
+    <integer name="ArrivedAtMissort">57</integer>
+
+    <!-- Load to Deliverysheet only TH app com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetThirdFragment -->
+    <integer name="DeliverySheet">5</integer>
+    <integer name="DeliverySheetMisscode">11</integer>
+    <integer name="DeliverySheetMissort">12</integer>
+
+    <!-- InventoryControl_LocalValidation_oneByOne only TH app package com.naqelexpress.naqelpointer.TerminalHandling -->
+    <integer name="INV">44</integer>
+    <integer name="INVMisscode">11</integer>
+    <integer name="INVMissort">12</integer>
+
+    <!-- package com.naqelexpress.naqelpointer.Activity.ValidationDS-->
+    <integer name="VDS">999</integer>
+    <integer name="VDSMisscode">11</integer>
+    <integer name="VDSMissort">12</integer>
+
+    <!-- Load to Deliverysheet only TH app com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetThirdFragment -->
+    <integer name="INV_byNCL">44</integer>
+    <integer name="INV_byNCLMisscode">11</integer>
+    <integer name="INV_byNCLMissort">12</integer>
+
+    <!-- com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_DelRtoReqbyNCL -->
+    <integer name="INV_byPiece">44</integer>
+    <integer name="INV_byPieceMisscode">11</integer>
+    <integer name="INV_byPieceMissort">12</integer>
+
+
+</resources>

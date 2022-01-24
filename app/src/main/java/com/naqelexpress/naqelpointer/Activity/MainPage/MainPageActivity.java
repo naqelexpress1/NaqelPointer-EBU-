@@ -1350,8 +1350,12 @@ public class MainPageActivity
                         break;
                     case 23:
                         if (VersionMatct()) {
-                            Intent terminalhandling = new Intent(getApplicationContext(), TerminalHandlingGroup.class);
-                            startActivity(terminalhandling);
+                            if (GlobalVar.GV().IsTerminalApp) {
+                                Intent terminalhandling = new Intent(getApplicationContext(), TerminalHandlingGroup.class);
+                                startActivity(terminalhandling);
+                            } else
+                                GlobalVar.ShowDialog(MainPageActivity.this, "Info.", "This Module only TH users"
+                                        , true);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                     , true);

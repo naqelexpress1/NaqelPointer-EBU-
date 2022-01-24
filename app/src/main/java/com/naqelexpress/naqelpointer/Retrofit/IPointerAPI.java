@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Retrofit;
 
+import com.naqelexpress.naqelpointer.JSON.Request.UpdateWaybillRequest;
 import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
 import com.naqelexpress.naqelpointer.Models.FuelSupplierTypeModels;
@@ -77,5 +78,9 @@ public interface IPointerAPI {
     //Fetch Fuel Type
     @GET("FetchFuelSupplierType")
     Observable<FuelSupplierTypeModels> FetchFuelSupplierType();
+
+    //Fuel
+    @POST("UpdateNonManifestedWaybillDestination")
+    Observable<CommonResult> UpdateNonManifestedWaybillDestination(@Body UpdateWaybillRequest updateWaybillRequest);
 
 }

@@ -149,7 +149,7 @@ public class TerminalHandling extends Service {
                     checkPoint.TerminalHandlingScanStatusReasonID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
                     checkPoint.Reference = result.getString(result.getColumnIndex("Ref"));
                     //mohammed
-                    checkPoint.TripID = Integer.parseInt( result.getString(result.getColumnIndex("TripID")));
+                    checkPoint.TripID = Integer.parseInt(result.getString(result.getColumnIndex("TripID")));
 
                     Cursor resultDetail = db.Fill("select * from CheckPointWaybillDetails where CheckPointID = " + checkPoint.ID, getApplicationContext());
                     if (resultDetail.getCount() > 0) {

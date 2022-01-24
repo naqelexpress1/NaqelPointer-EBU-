@@ -9,7 +9,6 @@
     android:orientation="vertical">
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -141,6 +140,35 @@
         android:gravity="center"
         android:orientation="horizontal"
         android:weightSum="1">
+
+        <LinearLayout
+            android:id="@+id/lladdtosort"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_weight=".3"
+            android:clickable="true"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/addtoscope"
+                android:layout_width="wrap_content"
+                android:layout_height="60dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/transit"
+                android:text=""
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/txtCheckPointType"
+                tools:ignore="HardcodedText,RtlHardcoded" />
+
+            <TextView
+                android:id="@+id/lbladdtoscope"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+
+                android:gravity="center"
+                android:text="Add to Scope" />
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/llgroup4"

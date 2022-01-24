@@ -59,6 +59,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.UserSettings;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurement;
 import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurementDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Models.AddtoScopeModels;
 import com.naqelexpress.naqelpointer.Models.CourierNotesModels;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
 import com.naqelexpress.naqelpointer.Models.IsFollowSequncerModel;
@@ -87,7 +88,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 173; // Create View
+    private static final int Version = 174; // Create View
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -506,6 +507,11 @@ public class DBConnections
         db.execSQL("CREATE TABLE IF NOT EXISTS CourierNotes (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "WaybillNo  TEXT NOT NULL , TimeIn DATETIME NOT NULL ,IsSync  BOOL NOT NULL , UserID INTEGER NOT NULL " +
                 ", DeliverySheetID INTEGER NOT NULL , Notes TEXT )");
+
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS AddtoScope (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                "PIDNCL  TEXT NOT NULL , TimeIn DATETIME NOT NULL ,IsSync  BOOL NOT NULL , UserID INTEGER NOT NULL , " +
+                "Latitude TEXT NOT NULL , Longitude TEXT NOT NULL )");
 
 
         db.execSQL("CREATE TABLE IF NOT EXISTS FacilityAllowedStation (ID INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
@@ -931,6 +937,10 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"SkipRouteSequencer\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                     "\"isSkip\" Integer NOT NULL )");
+
+            db.execSQL("CREATE TABLE IF NOT EXISTS AddtoScope (ID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE ," +
+                    "PIDNCL  TEXT NOT NULL , TimeIn DATETIME NOT NULL ,IsSync  BOOL NOT NULL , UserID INTEGER NOT NULL , " +
+                    "Latitude TEXT NOT NULL , Longitude TEXT NOT NULL )");
 
             /*  END -  Riyam */
 
@@ -10925,5 +10935,32 @@ public class DBConnections
         }
     }
 
+
+    public boolean insertAddtoScope(Context context, AddtoScopeModels addtoScopeModels) {
+
+
+        Long result = null;
+        try {
+
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null,
+                    SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("PIDNCL", addtoScopeModels.getPIDNCL());
+            contentValues.put("TimeIn", DateTime.now().toString());
+            contentValues.put("IsSync", false);
+            contentValues.put("UserID", addtoScopeModels.getUserID());
+            contentValues.put("Latitude", addtoScopeModels.getLatitude());
+            contentValues.put("Longitude", addtoScopeModels.getLongitude());
+
+            result = db.insert("AddtoScope", null, contentValues);
+            db.close();
+
+        } catch (SQLiteException e) {
+
+        }
+
+        return result != -1;
+    }
 
 }

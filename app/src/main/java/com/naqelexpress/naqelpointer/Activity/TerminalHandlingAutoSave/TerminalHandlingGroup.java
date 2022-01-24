@@ -67,6 +67,8 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         group5.setOnClickListener(this);
         ImageView ncl = (ImageView) findViewById(R.id.ncl);
         ncl.setOnClickListener(this);
+        ImageView addtoscope = (ImageView) findViewById(R.id.addtoscope);
+        addtoscope.setOnClickListener(this);
 
 
         // mohammed
@@ -236,6 +238,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
                 break;
 
+            case R.id.addtoscope:
+                Intent addtoscope = new Intent(this, NclShipmentActivity.class);
+                startActivity(addtoscope);
+                break;
 
             //related to Mohammed
             case R.id.truckarrival:

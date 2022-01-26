@@ -1051,7 +1051,7 @@ public class MainPageActivity
                                             startActivity(mapList);
                                         }
                                     } else
-                                        GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
+                                        GlobalVar.ShowDialog(MainPageActivity.this, "Info.", "Kindly Update our Latest Version.(Logout and Login again)"
                                                 , true);
 
                                 }

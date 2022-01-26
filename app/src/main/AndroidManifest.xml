@@ -1138,6 +1138,13 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name=".Activity.AddtoScope.AddtoScope"
+            android:label="AddtoScope"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"
@@ -1147,6 +1154,7 @@
             android:name="com.naqelexpress.naqelpointer.service.LocationService"
             android:exported="true"
             android:process=":location"></service>
+
         <service
             android:name="com.naqelexpress.naqelpointer.service.AtOrigin"
             android:process=":naqelAtOrigin" />
@@ -1295,7 +1303,7 @@
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp"
-            android:process=":myroutecomp"></service>
+            android:process=":myroutecomp" />
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.DeviceActivity"
@@ -1304,6 +1312,10 @@
         <service
             android:name="com.naqelexpress.naqelpointer.service.CourierNotesService"
             android:process=":CourierNotesService" />
+
+        <service
+            android:name="com.naqelexpress.naqelpointer.service.AddtoScopeService"
+            android:process=":AddtoScopeService" />
 
 
         <receiver

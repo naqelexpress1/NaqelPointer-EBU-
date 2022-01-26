@@ -29,10 +29,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.DBObjects.UpdateData;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.JSON.Request.OnCLoadingForDeliverySheetPiece;
-import com.naqelexpress.naqelpointer.JSON.Request.OnCLoadingForDeliverySheetRequest;
-import com.naqelexpress.naqelpointer.JSON.Request.OnCLoadingForDeliverySheetWaybill;
+import com.naqelexpress.naqelpointer.Models.AddtoScopeModels;
 import com.naqelexpress.naqelpointer.R;
 
 import org.joda.time.DateTime;
@@ -40,7 +39,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AddtoScopeService extends Service {
@@ -65,8 +66,8 @@ public class AddtoScopeService extends Service {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void startMyOwnForeground() {
-        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.Deliverysheet";
-        String channelName = "My Background Service";
+        String NOTIFICATION_CHANNEL_ID = "com.naqelexpress.naqelpointer.service.AddtoScope";
+        String channelName = "Naqel Service";
         NotificationChannel chan = new NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
@@ -99,15 +100,15 @@ public class AddtoScopeService extends Service {
                         updatefile();
 
                     }
-                    handler.postDelayed(this, 20000);
+                    handler.postDelayed(this, 50000);
                 } catch (Exception e) {
                     flag_thread = false;
-                    handler.postDelayed(this, 20000);
+                    handler.postDelayed(this, 50000);
                     Log.e("Dashboard thread", e.toString());
                 }
 
             }
-        }, 20000);
+        }, 50000);
 
         return START_STICKY;
     }
@@ -128,63 +129,35 @@ public class AddtoScopeService extends Service {
         super.onDestroy();
     }
 
-
     protected void updatefile() {
+        DBConnections db = new DBConnections(getApplicationContext(), null);
 
         try {
-            DBConnections db = new DBConnections(getApplicationContext(), null);
 
-            Cursor result = db.Fill("select * from OnCloadingForD where IsSync = 0 Limit 1 ", getApplicationContext());
+
+            Cursor result = db.Fill("select * from AddtoScope where IsSync = 0 Limit 50  ", getApplicationContext());
 
             if (result.getCount() > 0) {
+                List<AddtoScopeModels> addtoScopeModelsList = new ArrayList<>();
 
-                if (result.moveToFirst()) {
+                result.moveToFirst();
 
-                    OnCLoadingForDeliverySheetRequest onCLoadingForDeliverySheetRequest = new OnCLoadingForDeliverySheetRequest();
-                    onCLoadingForDeliverySheetRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-                    onCLoadingForDeliverySheetRequest.CourierID = Integer.parseInt(result.getString(result.getColumnIndex("CourierID")));
-                    onCLoadingForDeliverySheetRequest.UserID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
-                    onCLoadingForDeliverySheetRequest.CTime = DateTime.parse(result.getString(result.getColumnIndex("CTime")));
-                    onCLoadingForDeliverySheetRequest.PieceCount = Integer.parseInt(result.getString(result.getColumnIndex("PieceCount")));
-                    onCLoadingForDeliverySheetRequest.TruckID = result.getString(result.getColumnIndex("TruckID"));
-                    onCLoadingForDeliverySheetRequest.WaybillCount = Integer.parseInt(result.getString(result.getColumnIndex("WaybillCount")));
-                    onCLoadingForDeliverySheetRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
-
-                    Cursor resultDetail = db.Fill("select * from OnCLoadingForDDetail where OnCLoadingForDID = " +
-                            onCLoadingForDeliverySheetRequest.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
-                        int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            onCLoadingForDeliverySheetRequest.OnCLoadingForDeliverySheetPieceList.add(index,
-                                    new OnCLoadingForDeliverySheetPiece(resultDetail.getString(resultDetail.getColumnIndex("BarCode")),
-                                            resultDetail.getString(resultDetail.getColumnIndex("WaybillNo"))));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-                    }
-
-                    resultDetail = db.Fill("select * from OnCLoadingForDWaybill where OnCLoadingID = "
-                            + onCLoadingForDeliverySheetRequest.ID, getApplicationContext());
-
-                    if (resultDetail.getCount() > 0) {
-                        resultDetail.moveToFirst();
-                        int index = 0;
-                        resultDetail.moveToFirst();
-                        do {
-                            onCLoadingForDeliverySheetRequest.OnCLoadingForDeliverySheetWaybillList.add(index, new OnCLoadingForDeliverySheetWaybill(resultDetail.getString(resultDetail.getColumnIndex("WaybillNo"))));
-                            index++;
-                        }
-                        while (resultDetail.moveToNext());
-                    }
+                do {
+                    AddtoScopeModels addtoScopeModels = new AddtoScopeModels();
+                    addtoScopeModels.setUserID(result.getInt(result.getColumnIndex("UserID")));
+                    addtoScopeModels.setTimeIn(DateTime.parse(result.getString(result.getColumnIndex("TimeIn"))));
+                    addtoScopeModels.setPIDNCL(result.getString(result.getColumnIndex("PIDNCL")));
+                    addtoScopeModels.setLongitude(result.getString(result.getColumnIndex("Longitude")));
+                    addtoScopeModels.setLatitude(result.getString(result.getColumnIndex("Latitude")));
+                    addtoScopeModels.setID(result.getInt(result.getColumnIndex("ID")));
+                    addtoScopeModelsList.add(addtoScopeModels);
+                } while (result.moveToNext());
 
 
-                    String jsonData = JsonSerializerDeserializer.serialize(onCLoadingForDeliverySheetRequest, true);
-                    jsonData = jsonData.replace("Date(-", "Date(");
-                    SaveOnLoading(db, jsonData, onCLoadingForDeliverySheetRequest.ID);
-                }
+                String jsonData = JsonSerializerDeserializer.serialize(addtoScopeModelsList, true);
+
+                //jsonData = jsonData.replace("Date(-", "Date(");
+                SaveAddtoScopeData(jsonData);
 
 
             } else {
@@ -196,15 +169,18 @@ public class AddtoScopeService extends Service {
         } catch (Exception e) {
             flag_thread = false;
         }
+
+        if (db != null)
+            db.close();
     }
 
 
-    public void SaveOnLoading(final DBConnections db, final String input, final int id) {
+    public void SaveAddtoScopeData(final String input) {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
-        String URL = GlobalVar.GV().NaqelPointerAPILink + "SendOnCLoadingForDeliverySheet";
+        String URL = GlobalVar.GV().NaqelPointerAPILink + "insertAddtoScopeData";
 
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
@@ -213,22 +189,22 @@ public class AddtoScopeService extends Service {
             public void onResponse(JSONObject response) {
 
                 try {
-                    boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
+//                    boolean IsSync = Boolean.parseBoolean(response.getString("IsSync"));
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
-                    if (IsSync && !HasError) {
-                        db.deleteOnLoadingID(id, getApplicationContext());
-                        db.deleteOnLoadingWayBill(id, getApplicationContext());
-                        db.deleteOnLoadingBarcode(id, getApplicationContext());
+                    if (!HasError) {
+                        UpdateData updateData = new UpdateData();
+
+                        updateData.UpdateAddtoScope(response.getString("ErrorMessage"), getApplicationContext());
+
                         flag_thread = false;
 
 
                     } else
                         flag_thread = false;
-                    db.close();
+
+
                 } catch (JSONException e) {
                     flag_thread = false;
-                    if (db != null)
-                        db.close();
                     e.printStackTrace();
                 }
 
@@ -239,7 +215,7 @@ public class AddtoScopeService extends Service {
 
                 //ArrayList<String> value = GlobalVar.VolleyError(error);
                 flag_thread = false;
-                db.close();
+
             }
         }) {
             @Override
@@ -264,16 +240,6 @@ public class AddtoScopeService extends Service {
                 return params;
             }
 
-//            @Override
-//            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-//                String responseString = "";
-//                if (response != null) {
-//
-//                    responseString = String.valueOf(response.statusCode);
-//
-//                }
-//                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-//            }
         };
 
 

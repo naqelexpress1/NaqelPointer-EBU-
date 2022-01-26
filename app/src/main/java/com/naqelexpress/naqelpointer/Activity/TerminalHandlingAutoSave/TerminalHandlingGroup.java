@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.naqelexpress.naqelpointer.Activity.AddtoScope.AddtoScope;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -203,6 +205,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 //if (!GlobalVar.getDivision(getApplicationContext()).equals("IRS"))
 // Toast.makeText(getApplicationContext(), "Dont have access , kindly contact concern Person", Toast.LENGTH_SHORT).show();
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -239,7 +242,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
                 break;
 
             case R.id.addtoscope:
-                Intent addtoscope = new Intent(this, NclShipmentActivity.class);
+                Intent addtoscope = new Intent(this, AddtoScope.class);
                 startActivity(addtoscope);
                 break;
 

@@ -108,7 +108,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU/GTW 281  24-01-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "TH AddtoScope test  26-01-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -120,8 +120,9 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only 58 current version
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
+    public boolean isFortesting = false;
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
 
@@ -156,7 +157,7 @@ public class GlobalVar {
 
     public boolean isneedOtp = true;
 
-    public boolean isFortesting = false;
+
     public int isRouteLineSeqLimit = 24;
 
     public int CourierDailyRouteID = 0;

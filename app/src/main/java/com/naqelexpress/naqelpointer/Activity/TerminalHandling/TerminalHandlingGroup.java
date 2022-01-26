@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.TerminalHandling;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.naqelexpress.naqelpointer.Activity.AddtoScope.AddtoScope;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -59,6 +61,9 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         group5.setOnClickListener(this);
         ImageView ncl = (ImageView) findViewById(R.id.ncl);
         ncl.setOnClickListener(this);
+        ImageView addtoscope = (ImageView) findViewById(R.id.addtoscope);
+        addtoscope.setOnClickListener(this);
+
 
         //ImageView loadtotrip = (ImageView) findViewById(R.id.loadtrotrip);
         //loadtotrip.setOnClickListener(this);
@@ -164,6 +169,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
     ProgressDialog progressDialog;
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -199,6 +205,11 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
 
                 break;
 
+            case R.id.addtoscope:
+                Intent addtoscope = new Intent(this, AddtoScope.class);
+                startActivity(addtoscope);
+                break;
+
 
         }
     }
@@ -221,7 +232,7 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         bundle.putString("group", "Group " + group);
 
         if (group.equals("1")) {
-            Intent intent = new Intent(this,  InventoryGroup.class);
+            Intent intent = new Intent(this, InventoryGroup.class);
             intent.putExtras(bundle);
             startActivity(intent);
         } else if (group.equals("3")) {

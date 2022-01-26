@@ -148,20 +148,21 @@ public class AddtoScope extends AppCompatActivity implements View.OnClickListene
             return;
         }
 
-        if (lbTotal.getText().toString().replace(" ", "").length() == 0) {
+      /*  if (lbTotal.getText().toString().replace(" ", "").length() == 0) {
             GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "You have to scan Bin Location",
                     GlobalVar.AlertType.Error);
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             return;
-        }
+        }*/
 
 
         if (!arrayList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13) {
+            if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == 10 ||
+                    txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
+
                 SaveData(txtBarCode.getText().toString());
                 arrayList.add(0, txtBarCode.getText().toString());
-//                lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
                 txtBarCode.setText("");
                 initViews();
 

@@ -4,11 +4,12 @@ import org.joda.time.DateTime;
 
 public class AddtoScopeModels {
     private String PIDNCL;
-    private DateTime TimeIn;
-    private int UserID;
+    private DateTime ScanTime;
+    private int EmployID;
     private String Latitude;
     private String Longitude;
     private int ID;
+    private boolean IsSync;
 
     public int getID() {
         return ID;
@@ -27,19 +28,19 @@ public class AddtoScopeModels {
     }
 
     public DateTime getTimeIn() {
-        return TimeIn;
+        return ScanTime;
     }
 
     public void setTimeIn(DateTime timeIn) {
-        TimeIn = timeIn;
+        ScanTime = timeIn;
     }
 
     public int getUserID() {
-        return UserID;
+        return EmployID;
     }
 
     public void setUserID(int userID) {
-        UserID = userID;
+        EmployID = userID;
     }
 
     public String getLatitude() {

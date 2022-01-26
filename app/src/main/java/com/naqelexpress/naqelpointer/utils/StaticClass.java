@@ -12,7 +12,7 @@ public class StaticClass {
     public static List<Integer> allowedDestStationIDs = new ArrayList<>();
 
     //Validation Currently isonly TH ,  so if you release CBU or other Please change to false
-    public static boolean isDsValidation = false;
+    public static boolean isDsValidation = true;
 
 
 }

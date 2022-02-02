@@ -7,6 +7,30 @@
     android:layout_height="match_parent"
     tools:context=".Activity.NotDelivered.NotDeliveredSecondFragment">
 
+    <Button
+        android:id="@+id/getsorting"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:gravity="end"
+        android:onClick="btn_getTLData"
+        android:text="Get Sort Data"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="HardcodedText,OnClick" />
+
+    <TextView
+        android:id="@+id/dowloaddateandcount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:onClick="btn_getTLData"
+        android:text=""
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/getsorting"
+
+        tools:ignore="HardcodedText,OnClick" />
 
     <EditText
         android:id="@+id/txtbinlocation"
@@ -24,7 +48,8 @@
         android:visibility="gone"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/dowloaddateandcount"
+
         tools:ignore="HardcodedText" />
 
 

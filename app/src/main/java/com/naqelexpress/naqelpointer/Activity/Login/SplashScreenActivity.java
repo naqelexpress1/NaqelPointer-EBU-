@@ -63,6 +63,15 @@ public class SplashScreenActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
 
+//
+//        DBConnections dbConnection = new DBConnections(getApplicationContext(), null);
+//        dbConnection.clearAllCourierDailyRoute(getApplicationContext());
+//        dbConnection.DeleteAllSuggestLocation(getApplicationContext());
+//
+//
+//        dbConnection.DeleteAllPlannedLocation(getApplicationContext());
+//        dbConnection.close();
+
 //        Calendar mCalendar = new GregorianCalendar();
 //        TimeZone mTimeZone = mCalendar.getTimeZone();
 //        int mGMTOffset = mTimeZone.getRawOffset();

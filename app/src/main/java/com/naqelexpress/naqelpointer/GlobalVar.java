@@ -44,6 +44,7 @@ import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
 import com.naqelexpress.naqelpointer.Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn;
 import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
 import com.naqelexpress.naqelpointer.Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine;
+import com.naqelexpress.naqelpointer.Activity.SortingShipmentbyPiece.SortingShipment;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.Languages;
 import com.naqelexpress.naqelpointer.Classes.OnUpdateListener;
@@ -108,7 +109,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "TH AddtoScope test  26-01-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "CBU POS test 02-02-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -120,8 +121,8 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only 58 current version
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
     public boolean isFortesting = false;
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
@@ -4162,6 +4163,8 @@ public class GlobalVar {
             alertCallback = new com.naqelexpress.naqelpointer.NCLBulk.NclShipmentActivity();
         else if (classname.equals("CBM"))
             alertCallback = new CBM();
+        else if (classname.equals("SortingShipment"))
+            alertCallback = new SortingShipment();
     }
 
     public void CommonProgessAlertMessageActivity(String title, String msg,

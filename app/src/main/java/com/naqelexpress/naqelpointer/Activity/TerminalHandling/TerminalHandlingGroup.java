@@ -17,6 +17,7 @@ import android.widget.ImageView;
 
 import com.naqelexpress.naqelpointer.Activity.AddtoScope.AddtoScope;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.Activity.SortingShipmentbyPiece.SortingShipment;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -63,6 +64,9 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         ncl.setOnClickListener(this);
         ImageView addtoscope = (ImageView) findViewById(R.id.addtoscope);
         addtoscope.setOnClickListener(this);
+
+        ImageView sortshipmet = (ImageView) findViewById(R.id.sortshipmet);
+        sortshipmet.setOnClickListener(this);
 
 
         //ImageView loadtotrip = (ImageView) findViewById(R.id.loadtrotrip);
@@ -208,6 +212,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             case R.id.addtoscope:
                 Intent addtoscope = new Intent(this, AddtoScope.class);
                 startActivity(addtoscope);
+                break;
+            case R.id.sortshipmet:
+                Intent sortshipmet = new Intent(this, SortingShipment.class);
+                startActivity(sortshipmet);
                 break;
 
 

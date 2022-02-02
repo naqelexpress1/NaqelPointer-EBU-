@@ -13,6 +13,7 @@ import com.naqelexpress.naqelpointer.Models.Request.FuelRequest;
 import com.naqelexpress.naqelpointer.Models.Request.NotificationRequest;
 import com.naqelexpress.naqelpointer.Models.Request.PickupSheetSPASRRegResult;
 import com.naqelexpress.naqelpointer.Models.SkipRouteLineSeqWaybillnoReasonModels;
+import com.naqelexpress.naqelpointer.Models.TLAllocationAreaModels;
 import com.naqelexpress.naqelpointer.Models.WaybillNoBarcodeModels;
 import com.naqelexpress.naqelpointer.Retrofit.Request.OnlineValidationRequest;
 import com.naqelexpress.naqelpointer.Retrofit.Response.RetrofitCallResponse;
@@ -82,5 +83,8 @@ public interface IPointerAPI {
     //Fuel
     @POST("UpdateNonManifestedWaybillDestination")
     Observable<CommonResult> UpdateNonManifestedWaybillDestination(@Body UpdateWaybillRequest updateWaybillRequest);
+
+    @POST("GetTLAllocationArea")
+    Observable<List<TLAllocationAreaModels>> GetTLAllocationArea(@Body CommonRequest commonRequest);
 
 }

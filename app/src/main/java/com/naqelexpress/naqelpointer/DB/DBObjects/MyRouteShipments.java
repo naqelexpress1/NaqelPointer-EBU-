@@ -106,6 +106,7 @@ public class MyRouteShipments implements Parcelable {
     public String TruckName = "";
     public String POSName = "";
     public String IqamaNo = "";
+    public int YSeqNo = 0;
 
     public MyRouteShipments() {
 
@@ -283,7 +284,7 @@ public class MyRouteShipments implements Parcelable {
                 instance.TruckName = jsonObject.getString("TruckName");
                 instance.POSName = jsonObject.getString("POSName");
                 instance.IqamaNo = jsonObject.getString("IqamaNo");
-
+                instance.YSeqNo = jsonObject.getInt("SeqNo");
 
                 if (i == 0)
                     instance.AreaWaypoints = MyRouteActivity_Complaince_GroupbyPhn.AreaData;

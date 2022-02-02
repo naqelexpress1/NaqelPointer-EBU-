@@ -88,7 +88,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 174; // Create View
+    private static final int Version = 177; // Create View
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -188,7 +188,7 @@ public class DBConnections
                 "\"Refused\" BOOL , \"PartialDelivered\" BOOL  , \"UpdateDeliverScan\" BOOL , OTPNo Integer ,   IqamaLength Integer," +
                 " DsOrderNo Integer , Ispaid Integer , IsMap Integer , IsPlan Interger ,  IsRestarted Interger, IsScan Integer Default 0 , IsNotDelivered Default 0 , CustomDuty Integer" +
                 ", IsOtp Integer , AreaWaypoints TEXT , PosResult Text ,KMOut TEXT,RouteName TEXT,PlateNumber TEXT ,TruckName TEXT,POSName TEXT," +
-                "IqamaNo TEXT )"); //, CDAmount DOUBLE NOT NULL
+                "IqamaNo TEXT , YSeqNo Integer )"); //, CDAmount DOUBLE NOT NULL
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"CheckPoint\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL  UNIQUE , " +
                 "\"EmployID\" INTEGER NOT NULL , \"Date\" DATETIME NOT NULL , \"CheckPointTypeID\" INTEGER NOT NULL , " +
@@ -535,6 +535,11 @@ public class DBConnections
                 " UNION " +
                 "select WaybillNo , 0 WaybillDestID , 0 IsMultiPiece , 0 IsStopped , 1 IsRTORequest  , 0 NoOfAttempts," +
                 "0 IsRelabel , 0 IsDeliveryRequest , 0 IsCITC , 0 IsCAF , NclNo from RtoReq rr ");
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS TLAreaAllocation(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                "AreaName TEXT NOT NULL  , DominateArea TEXT NOT NULL  , TeamName TEXT NOT NULL   , WaybillNo TEXT NOT NULL ," +
+                "BarCode TEXT NOT NULL , DummyCourierID TEXT , " +
+                "DestStaionID TEXT NOT NULL , sysDate DATETIME NOT NULL )");
 
         /*  Added By : Riyam */
         db.execSQL("CREATE TABLE IF NOT EXISTS \"BINMaster\"" +
@@ -994,6 +999,11 @@ public class DBConnections
             db.execSQL("CREATE TABLE IF NOT EXISTS FacilityAllowedStation (ID INTEGER PRIMARY KEY NOT NULL  UNIQUE ," +
                     "FacilityID  INTEGER NOT NULL ,  AllowedStationID INTEGER NOT NULL )");
 
+            db.execSQL("CREATE TABLE IF NOT EXISTS TLAreaAllocation(ID INTEGER PRIMARY KEY AUTOINCREMENT  NOT NULL , " +
+                    "AreaName TEXT NOT NULL  , DominateArea TEXT NOT NULL  , TeamName TEXT NOT NULL   , WaybillNo TEXT NOT NULL ," +
+                    "BarCode TEXT NOT NULL , DummyCourierID TEXT , " +
+                    "DestStaionID TEXT NOT NULL , sysDate DATETIME NOT NULL )");
+
             if (!isColumnExist("CallLog", "EmpID"))
                 db.execSQL("ALTER TABLE CallLog ADD COLUMN EmpID INTEGER DEFAULT 0");
             if (!isColumnExist("PickUp", "LoadTypeID"))
@@ -1320,6 +1330,12 @@ public class DBConnections
 
             if (!isColumnExist("CourierNotes", "Notes"))
                 db.execSQL("ALTER TABLE CourierNotes ADD COLUMN Notes TEXT");
+
+            if (!isColumnExist("CourierNotes", "Notes"))
+                db.execSQL("ALTER TABLE CourierNotes ADD COLUMN Notes TEXT");
+
+            if (!isColumnExist("MyRouteShipments", "YSeqNo"))
+                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN YSeqNo  INTEGER ");
 
 //            if (!isColumnExist("MyRouteShipments", "CDAmount"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN CDAmount DOUBLE");
@@ -3276,6 +3292,7 @@ public class DBConnections
             contentValues.put("TruckName", instance.TruckName);
             contentValues.put("POSName", instance.POSName);
             contentValues.put("IqamaNo", instance.IqamaNo);
+            contentValues.put("YSeqNo", instance.YSeqNo);
 
             if (isColumnExist("MyRouteShipments", "OptimzeSerialNo", context))
                 contentValues.put("OptimzeSerialNo", 0);

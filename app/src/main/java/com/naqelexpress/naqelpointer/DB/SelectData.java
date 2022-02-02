@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.location.Location;
+import android.os.Bundle;
 
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
@@ -196,5 +197,169 @@ public class SelectData {
         if (db != null)
             db.close();
         return stationList;
+    }
+
+    //has Yandex route
+    public boolean isPredefienedSeq(Context context) {
+
+        boolean isseq = false;
+
+        SQLiteDatabase db = null;
+        try {
+            String selectQuery = "SELECT count(*) totalcount from MyRouteShipments Where YSeqNo <> 0 and  EmpID = " + GlobalVar.GV().EmployID;
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                isseq = cursor.getInt(cursor.getColumnIndex("totalcount")) > 1;
+
+            }
+            if (cursor != null)
+                cursor.close();
+
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
+        if (db != null)
+            db.close();
+
+        return isseq;
+    }
+
+    //has Yandex route
+    public ArrayList<Location> isPredefienedSeqSortbySeq(Context context, boolean insertintoplannedLocation) {
+        ArrayList<Location> placesList = new ArrayList<>();
+
+        SQLiteDatabase db = null;
+        DBConnections dbConnections = new DBConnections(context, null);
+        try {
+            String selectQuery = "SELECT Latitude , Longitude , ItemNo  from MyRouteShipments Where YSeqNo > 0 and  EmpID = " + GlobalVar.GV().EmployID
+                    + " order by YSeqNo ";
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            int precount = 0;
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                do {
+                    precount = precount + 1;
+                    if (!insertintoplannedLocation) {
+                        dbConnections.InsertMyRouteComplaince(context, 1);
+                        dbConnections.InsertPlannedLocationWayPoints(context, "", precount, Integer.parseInt(cursor.getString(cursor.getColumnIndex("ItemNo")))
+                                , "0", "0",
+                                "", "", 0);
+                    }
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString("WNo", cursor.getString(cursor.getColumnIndex("ItemNo")));
+                    Location places = new Location("");
+                    places.setLatitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex("Latitude"))));
+                    places.setLongitude(Double.parseDouble(cursor.getString(cursor.getColumnIndex("Longitude"))));
+                    places.setExtras(bundle);
+                    placesList.add(places);
+
+                } while (cursor.moveToNext());
+
+
+            }
+            if (cursor != null)
+                cursor.close();
+
+
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
+        if (db != null)
+            db.close();
+
+        return placesList;
+    }
+
+
+    public boolean isPlannedLocation(Context context) {
+
+        boolean isseq = false;
+
+        SQLiteDatabase db = null;
+        try {
+            String selectQuery = "SELECT count(*) totalcount from plannedLocation ";
+            db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            Cursor cursor = db.rawQuery(selectQuery, null);
+
+            if (cursor != null && cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                isseq = cursor.getInt(cursor.getColumnIndex("totalcount")) > 1;
+
+            }
+            if (cursor != null)
+                cursor.close();
+        } catch (SQLiteException e) {
+            e.printStackTrace();
+        }
+
+        if (db != null)
+            db.close();
+
+        return isseq;
+    }
+
+    public boolean IsHasLocationbyPlan2(Context context) {
+        boolean ishasLocation = false;
+
+        final DBConnections dbConnections = new DBConnections(context, null);
+        String Query = "select count(ID) totalcount from MyRouteShipments " +
+                "where  IsPlan = 2   and CourierDailyRouteID = " + GlobalVar.GV().CourierDailyRouteID;
+
+
+        Cursor ds = dbConnections.Fill(Query, context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            ishasLocation = ds.getInt(ds.getColumnIndex("totalcount")) > 0;
+
+        }
+        return ishasLocation;
+    }
+
+    public String isTLAllocationAreabyPiece(Context context, String barcode) {
+        String DominateArea = "";
+
+        final DBConnections dbConnections = new DBConnections(context, null);
+        String Query = "select DominateArea , TeamName   from TLAreaAllocation where  BarCode ='" + barcode + "'";
+
+        Cursor ds = dbConnections.Fill(Query, context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            DominateArea = ds.getString(ds.getColumnIndex("DominateArea")) + " - " +
+                    ds.getString(ds.getColumnIndex("TeamName"));
+        }
+        dbConnections.close();
+        ds.close();
+        return DominateArea;
+    }
+
+    public String TLAllocationAreaDataCount(Context context) {
+        String downloadtime = "";
+
+        final DBConnections dbConnections = new DBConnections(context, null);
+        String Query = "select count(ID) totalCount , sysDate   from TLAreaAllocation ";
+
+        Cursor ds = dbConnections.Fill(Query, context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            downloadtime = "Count " + ds.getString(ds.getColumnIndex("totalCount")) + " - " +
+                    "Downloaded DateTime " + ds.getString(ds.getColumnIndex("sysDate"));
+        }
+        dbConnections.close();
+        ds.close();
+        return downloadtime;
     }
 }

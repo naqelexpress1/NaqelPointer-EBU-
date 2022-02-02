@@ -42,10 +42,12 @@ import com.naqelexpress.naqelpointer.Activity.routeMap.MapMovingOnCurLatLng;
 import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMap;
 import com.naqelexpress.naqelpointer.Activity.routeMap.OptimiseMapbyDistrict;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap;
+import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMapPreSeq;
 import com.naqelexpress.naqelpointer.Activity.routeMap.RouteMap_byDistrict;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
+import com.naqelexpress.naqelpointer.DB.SelectData;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
 import com.naqelexpress.naqelpointer.Models.Enum.Enum;
@@ -98,6 +100,15 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         Thread.setDefaultUncaughtExceptionHandler(new ErrorReporter());
 
         setContentView(R.layout.myroutenew);
+
+//        DBConnections dbConnection = new DBConnections(getApplicationContext(), null);
+//        dbConnection.clearAllCourierDailyRoute(getApplicationContext());
+//        //  dbConnections.DeleteAllSuggestLocation(getApplicationContext());
+//        new DeleteContact().execute("");
+//
+//        // dbConnections.DeleteAllPlannedLocation(getApplicationContext());
+//        dbConnection.close();
+
 
 //        String asd = "asd";
 //        Integer.parseInt(asd);
@@ -370,7 +381,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 //            Cursor result = dbConnections.Fill("select * from plannedLocation where Date = '" + GlobalVar.getDate() + "'" +
 //                    " and EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
 
-            Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
+            Cursor result = dbConnections.Fill("select * from plannedLocation where EmpID = " +
+                    GlobalVar.GV().EmployID, getApplicationContext());
 
             int Legscount = plannedCount();
 //            GetSeqWaybillNo();
@@ -384,6 +396,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
 
             //if (result.getCount() != places.size()) {
             if (result.getCount() != Legscount) {
+
                 alertPlannedLocation();
 
 
@@ -460,10 +473,24 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     private boolean IsHasLocation() {
 
         boolean ishasLocation = false;
+        boolean isyandextrue = getResources().getBoolean(R.bool.isYandextest);
+
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-        Cursor ds = dbConnections.Fill("select count(ID) totalcount from MyRouteShipments " +
-                "where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and IsPlan = 1  and CourierDailyRouteID = " +
-                GlobalVar.GV().CourierDailyRouteID, getApplicationContext());
+        String Query1 = "select count(ID) totalcount from MyRouteShipments " +
+                "where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and (IsPlan = 1  ";
+        String Query2 = " Or IsPlan = 2 ";
+        String Query3 = ") ";
+        String Query4 = "and CourierDailyRouteID = " + GlobalVar.GV().CourierDailyRouteID;
+        String Query = "";
+        if (isyandextrue)
+            Query = Query1 + Query2 + Query3 + Query4;
+        else
+            Query = Query1 + Query3 + Query4;
+
+//        Cursor ds = dbConnections.Fill("select count(ID) totalcount from MyRouteShipments " +
+//                "where Latitude <>'0' and Longitude <> '0' and Latitude <>'' and Longitude <> '' and IsPlan = 1  and CourierDailyRouteID = " +
+//                GlobalVar.GV().CourierDailyRouteID, getApplicationContext());
+        Cursor ds = dbConnections.Fill(Query, getApplicationContext());
         if (ds.getCount() > 0) {
             ds.moveToFirst();
             int count = ds.getInt(ds.getColumnIndex("totalcount"));
@@ -564,88 +591,20 @@ public class MyRouteActivity_Complaince_GroupbyPhn
     private void MyRouteCompliance() {
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        SelectData selectData = new SelectData();
         if (GlobalVar.GV().CourierDailyRouteID == 0)
             return;
 
         if (IsHasLocation()) {
             //Comment this line Google Given Less Location compare with Actual One
-            IsplannedLocationLoaded();
+            boolean isPreSeq = selectData.isPredefienedSeq(getApplicationContext());
+            if (!isPreSeq)
+                IsplannedLocationLoaded();
 
             if (!dbConnections.isMyRouteComplaince(getApplicationContext())) {
-                SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
-
-                eDialog.setCancelable(false);
-                eDialog.setTitleText("Are you sure?");
-                eDialog.setContentText("Are you follow to Deliver by Google Map");
-                eDialog.setConfirmText("Yes");
-//                eDialog.setCancelText("Yes");
-
-                eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                    @Override
-                    public void onClick(SweetAlertDialog sDialog) {
-                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
-                        sDialog.dismissWithAnimation();
-
-                        try {
-                            if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
-                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
-                                intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                                intent.putParcelableArrayListExtra("places", Optmizeplaces);
-                                intent.putExtra("AreaData", AreaData);
-                                startActivityForResult(intent, 1);
-                            } else {
-                                Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
-                                intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-                                intent.putParcelableArrayListExtra("places", Optmizeplaces);
-                                intent.putExtra("AreaData", AreaData);
-                                startActivityForResult(intent, 1);
-                            }
-                        } catch (Exception e) {
-                            System.out.println(e.getMessage());
-                        }
-
-
-                    }
-                });
-                eDialog.show();
-//                eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                    @Override
-//                    public void onClick(SweetAlertDialog sDialog) {
-////                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
-//                        sDialog.dismissWithAnimation();
-////
-////                        try {
-////                            Intent intent = new Intent(MyRouteActivity_Complaince.this, RouteMap.class);
-////                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-////                            startActivity(intent);
-////                        } catch (Exception e) {
-////                            System.out.println(e.getMessage());
-////                        }
-//
-//
-//                    }
-//                });
-
-//                eDialog.setCancelClickListener(new SweetAlertDialog.OnSweetClickListener() {
-//                    @Override
-//                    public void onClick(SweetAlertDialog sDialog) {
-////                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
-//                        sDialog.dismissWithAnimation();
-//                        //sDialog.dismissWithAnimation();
-//                        dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
-//                        sDialog.dismissWithAnimation();
-//
-//                        try {
-//                            Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
-//                            intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
-//                            startActivityForResult(intent, 1);
-//                        } catch (Exception e) {
-//                            System.out.println(e.getMessage());
-//                        }
-//
-//                    }
-//                });
-                eDialog.show();
+                if (!isPreSeq) {
+                    FollowseqAlert(dbConnections);
+                } else RouteMapbypreSeq(dbConnections);
             }
         } else {
             dbConnections.InsertMyRouteComplaince(getApplicationContext(), 2);
@@ -658,6 +617,55 @@ public class MyRouteActivity_Complaince_GroupbyPhn
         dbConnections.close();
     }
 
+    private void FollowseqAlert(final DBConnections dbConnections) {
+        SweetAlertDialog eDialog = new SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE);
+
+        eDialog.setCancelable(false);
+        eDialog.setTitleText("Are you sure?");
+        eDialog.setContentText("Are you follow to Deliver by Google Map");
+        eDialog.setConfirmText("Yes");
+//                eDialog.setCancelText("Yes");
+
+        eDialog.setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+            @Override
+            public void onClick(SweetAlertDialog sDialog) {
+                dbConnections.InsertMyRouteComplaince(getApplicationContext(), 1);
+                sDialog.dismissWithAnimation();
+
+                try {
+                    if (getAreaWaybills().size() <= GlobalVar.GV().isRouteLineSeqLimit) {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                        intent.putExtra("AreaData", AreaData);
+                        startActivityForResult(intent, 1);
+                    } else {
+                        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMap_byDistrict.class);
+                        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+                        intent.putParcelableArrayListExtra("places", Optmizeplaces);
+                        intent.putExtra("AreaData", AreaData);
+                        startActivityForResult(intent, 1);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e.getMessage());
+                }
+
+
+            }
+        });
+        eDialog.show();
+    }
+
+    private void RouteMapbypreSeq(final DBConnections dbConnections) {
+
+        Intent intent = new Intent(MyRouteActivity_Complaince_GroupbyPhn.this, RouteMapPreSeq.class);
+        intent.putParcelableArrayListExtra("myroute", GlobalVar.GV().myRouteShipmentList);
+        intent.putParcelableArrayListExtra("places", Optmizeplaces);
+        intent.putExtra("AreaData", AreaData);
+        startActivityForResult(intent, 1);
+
+
+    }
 
     private void MyRouteCompliance1() {
 
@@ -1061,8 +1069,8 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                     function = "BringMyRouteShipments"; //EBU Divison
                 if (GlobalVar.GV().isFortesting) {
                     // function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
-                    function = "BringDeliverySheetbyOFDPiece_PlanAll";
-//                    function = "BringDeliverySheetbyOFDPiece_DSSummary";
+//                    function = "BringDeliverySheetbyOFDPiece_PlanAll";
+                    function = "BringDeliverySheetbyOFDPiecewithPreSeq";
 
                 }
 
@@ -1132,10 +1140,11 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                     CrossCheckandUpdateFields(finalJson);
             } else {
                 if (isInternetAvailable.contains("No address associated with hostname")) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet", GlobalVar.AlertType.Error);
+                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Kindly check your internet",
+                            GlobalVar.AlertType.Error);
                 } else {
-                    GlobalVar.GV().triedTimes = GlobalVar.GV().triedTimes + 1;
-                    if (GlobalVar.GV().triedTimes == GlobalVar.GV().triedTimesCondition) {
+                    GlobalVar.triedTimes = GlobalVar.triedTimes + 1;
+                    if (GlobalVar.triedTimes == GlobalVar.triedTimesCondition) {
                         GlobalVar.GV().SwitchoverDomain(getApplicationContext(), DomainURL);
 
                     }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="isSoftPOS">false</bool>
+    <bool name="isSoftPOS">true</bool>
+    <bool name="isYandextest">true</bool>
+
     <!--ArrivedAt com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment -->
     <bool name="ArrivedAt_isWrongDestalert">true</bool>
     <bool name="ArrivedAt_isNoofAttemptsalert">false</bool>

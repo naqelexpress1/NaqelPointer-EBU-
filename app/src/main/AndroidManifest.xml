@@ -1145,6 +1145,20 @@
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name=".Activity.routeMap.RouteMapPreSeq"
+            android:label=""
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name=".Activity.SortingShipmentbyPiece.SortingShipment"
+            android:label="SortingShipment"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+
 
         <service
             android:name="com.naqelexpress.naqelpointer.service.signature"

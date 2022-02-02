@@ -17,6 +17,7 @@ import android.widget.ImageView;
 
 import com.naqelexpress.naqelpointer.Activity.AddtoScope.AddtoScope;
 import com.naqelexpress.naqelpointer.Activity.NCL.NclShipmentActivity;
+import com.naqelexpress.naqelpointer.Activity.SortingShipmentbyPiece.SortingShipment;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -71,7 +72,8 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
         ncl.setOnClickListener(this);
         ImageView addtoscope = (ImageView) findViewById(R.id.addtoscope);
         addtoscope.setOnClickListener(this);
-
+        ImageView sortshipmet = (ImageView) findViewById(R.id.sortshipmet);
+        sortshipmet.setOnClickListener(this);
 
         // mohammed
         ImageView truckarrival = (ImageView) findViewById(R.id.truckarrival);
@@ -249,6 +251,10 @@ public class TerminalHandlingGroup extends AppCompatActivity implements View.OnC
             //related to Mohammed
             case R.id.truckarrival:
                 fetchgroup("8");
+                break;
+            case R.id.sortshipmet:
+                Intent sortshipmet = new Intent(this, SortingShipment.class);
+                startActivity(sortshipmet);
                 break;
 
         }

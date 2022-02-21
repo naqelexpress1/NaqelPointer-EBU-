@@ -85,7 +85,8 @@ public class PickUpSecondFragment
 
             txtBarCode.setClickable(true);
             txtBarCode.setFocusable(true);
-            txtBarCode.setInputType(InputType.TYPE_NULL);
+            if (!GlobalVar.GV().getDeviceName().contains("TC25") && !GlobalVar.GV().getDeviceName().contains("TC26"))
+                txtBarCode.setInputType(InputType.TYPE_NULL);
             // txtBarCode.setFocusableInTouchMode(true);
 
 //
@@ -101,10 +102,12 @@ public class PickUpSecondFragment
                 @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE || actionId == KeyEvent.KEYCODE_ENTER) {
-                        if (txtBarCode != null && txtBarCode.getText().length() == 13 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
+                        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+                        if (txtBarCode != null && barcode.length() == 13
+                                || barcode.length() == GlobalVar.ScanBarcodeLength) {
                             if (!fetchdata) {
-                                if (txtBarCode.getText().toString().startsWith("6"))
-                                    new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                                if (barcode.startsWith("6"))
+                                    new GetWaybillInfo().execute(barcode);
                                 else
                                     AddNewPiece();
                             } else
@@ -127,8 +130,10 @@ public class PickUpSecondFragment
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                         if (!fetchdata) {
-                            if (txtBarCode.getText().toString().startsWith("6"))
-                                new GetWaybillInfo().execute(txtBarCode.getText().toString());
+                            String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+                            if (barcode.startsWith("6"))
+                                new GetWaybillInfo().execute(barcode);
                             else
                                 AddNewPiece();
                         } else
@@ -178,7 +183,7 @@ public class PickUpSecondFragment
                     }
                 }
             });
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
             initViews();
             // initDialog();
         }
@@ -338,11 +343,15 @@ public class PickUpSecondFragment
     boolean prvCharAt = false;
 
     private void AddNewPiece() {
-        if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
+
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+
+        if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength) {
 
 
             txtBarCode.setFocusable(true);
-            if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+            if (!GlobalVar.GV().isValidBarcode(barcode)) {
                 GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                 txtBarCode.setText("");
@@ -358,7 +367,7 @@ public class PickUpSecondFragment
             for (int i = 0; i < PickUpBarCodeList.size(); i++) {
 
 
-                if (txtBarCode.getText().toString().charAt(0) == '6') {
+                if (barcode.charAt(0) == '6') {
                     if (PickUpBarCodeList.get(i).charAt(0) != '6') {
                         ShowAlertMessage("your piece is mismatch with previos one. " + PickUpBarCodeList.get(i) + " " + preBarcode);
 //                    allowtosave = false;
@@ -374,13 +383,13 @@ public class PickUpSecondFragment
             }
 
             if (fetchdata)
-                if (!PieceLists.contains(txtBarCode.getText().toString())) {
+                if (!PieceLists.contains(barcode)) {
                     ShowAlertMessage("your piece is not belongs with this Waybill(" + Waybill + ")");
                     return;
                 }
-            if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
-                if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
-                    PickUpBarCodeList.add(0, txtBarCode.getText().toString());
+            if (!PickUpBarCodeList.contains(barcode)) {
+                if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength) {
+                    PickUpBarCodeList.add(0, barcode);
                     lbTotal.setText(getString(R.string.lbCount) + PickUpBarCodeList.size());
                     GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                     txtBarCode.setText("");

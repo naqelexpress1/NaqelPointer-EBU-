@@ -64,7 +64,7 @@ public class SortingShipment extends AppCompatActivity implements AlertCallback 
         txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
         txtBarCode.setKeyListener(null);
         txtBarCode.setHint("PieceID");
-        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
         txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
 
         txtBarCode.setOnKeyListener(new View.OnKeyListener() {
@@ -173,6 +173,7 @@ public class SortingShipment extends AppCompatActivity implements AlertCallback 
 
     private void AddNewPiece() {
 
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
 
         if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
             GlobalVar.RedirectSettings(SortingShipment.this);
@@ -181,10 +182,10 @@ public class SortingShipment extends AppCompatActivity implements AlertCallback 
 
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-            GlobalVar.ShowDialog(SortingShipment.this, "Error", "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")", true
+            GlobalVar.ShowDialog(SortingShipment.this, "Error", "Incorrect Piece Barcode(" + barcode + ")", true
             );
 
             txtBarCode.setText("");
@@ -200,11 +201,11 @@ public class SortingShipment extends AppCompatActivity implements AlertCallback 
         }*/
 
 
-        if (!arrayList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13 ||
-                    txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
-                isTLAllocatePieces(txtBarCode.getText().toString());
-                arrayList.add(0, txtBarCode.getText().toString());
+        if (!arrayList.contains(barcode)) {
+            if (barcode.length() == 13 ||
+                    barcode.length() == GlobalVar.ScanBarcodeLength) {
+                isTLAllocatePieces(barcode);
+                arrayList.add(0, barcode);
                 lbTotal.setText(String.valueOf(arrayList.size()));
                 txtBarCode.setText("");
                 initViews();

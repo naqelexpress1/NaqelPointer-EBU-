@@ -11,11 +11,12 @@ import android.widget.EditText;
 
 import com.naqelexpress.naqelpointer.R;
 
+import java.util.ArrayList;
+
 public class DeliverySheetFirstFragment
         extends Fragment {
     View rootView;
     public EditText txtCourierID, txtTruckID;
-
 
 
     @Override
@@ -26,11 +27,14 @@ public class DeliverySheetFirstFragment
             rootView = inflater.inflate(R.layout.deliverysheetfirstfragment, container, false);
             txtCourierID = (EditText) rootView.findViewById(R.id.txtCourierID);
             txtTruckID = (EditText) rootView.findViewById(R.id.txtTruckID);
+
+
         }
 
 
         return rootView;
     }
+
 
     @Override
     public void onDestroyView() {

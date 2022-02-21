@@ -31,6 +31,7 @@ import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -146,16 +147,19 @@ public class DeliverySheetSecondFragment
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybillNo.getText().toString();
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            //txtBarCode.setText(barcode.substring(0, 8));
-            //AddNewWaybill();//(txtWaybillNo.getText().toString().substring(0, 8));
-            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, 8));
+        utilities utilities = new utilities();
+        AddNewWaybill8and9(utilities.findwaybillno(barcode));
 
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
+//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+//            //txtBarCode.setText(barcode.substring(0, 8));
+//            //AddNewWaybill();//(txtWaybillNo.getText().toString().substring(0, 8));
+//            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //ValidateWayBill(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//            AddNewWaybill8and9(txtWaybillNo.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
 
         //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 

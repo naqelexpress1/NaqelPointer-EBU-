@@ -28,13 +28,17 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
+import com.naqelexpress.naqelpointer.DB.SelectData;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
@@ -59,21 +63,24 @@ public class DeliverySheetThirdFragment
         extends DialogFragment implements AlertCallbackOnlineValidation {
     View rootView;
     TextView lbTotal;
-    private EditText txtBarCode, txtBarCodePiece;
-    public ArrayList<String> PieceBarCodeList = new ArrayList<>();
-    public ArrayList<String> PieceBarCodeWaybill = new ArrayList<>();
-    private DataAdapter adapter;
-    private RecyclerView recyclerView;
-    private Paint p = new Paint();
+    public EditText txtBarCode, txtBarCodePiece;
+    public static ArrayList<String> PieceBarCodeList = new ArrayList<>();
+    public static ArrayList<String> PieceBarCodeWaybill = new ArrayList<>();
+    public static DataAdapter adapter;
+    public static RecyclerView recyclerView;
+    public Paint p = new Paint();
 
-    private AlertDialog.Builder alertDialog;
+    public AlertDialog.Builder alertDialog;
     private int edit_position;
     private View view;
     private boolean add = false;
-    public ArrayList<String> pieceDenied = new ArrayList<>();
+    public static ArrayList<String> pieceDenied = new ArrayList<>();
     public static int isMulitPiecePop = 0;
     Activity activity;
+    public static ArrayList<String> WaybillList = new ArrayList<>();
 
+    ArrayList<String> tlareaList = new ArrayList<>();
+    String tlAreaName = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,9 +99,19 @@ public class DeliverySheetThirdFragment
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
 
             DBConnections dbConnections = new DBConnections(getContext(), null);
+
+            Spinner spinner = (Spinner) rootView.findViewById(R.id.tlareaallocation);
+
+
+            if (getResources().getBoolean(R.bool.isYandextest)) {
+                spinner.setVisibility(View.VISIBLE);
+                setSpinnerList();
+                setSpinnerAdapter(spinner);
+            }
+
             if (GlobalVar.ValidateAutomacticDate(getContext())) {
                 dbConnections.DeleteFacilityLoggedIn(getContext());
                 dbConnections.DeleteExsistingLogin(getContext());
@@ -118,7 +135,7 @@ public class DeliverySheetThirdFragment
                                 || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)) {
                             if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
                                 GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
-                                GlobalVar.GV().MakeSound(getActivity(), R.raw.wrongbarcodescan);
+                                GlobalVar.MakeSound(getActivity(), R.raw.wrongbarcodescan);
                                 txtBarCode.setText("");
                                 return;
                             }
@@ -211,8 +228,11 @@ public class DeliverySheetThirdFragment
                     }
                 }
             }
-            initViews();
+
             //initDialog();
+
+
+            initViews();
         }
 
         ReadFromLocal();
@@ -220,10 +240,10 @@ public class DeliverySheetThirdFragment
     }
 
 
-    private void initViews() {
+    public void initViews() {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
         recyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new DataAdapter(PieceBarCodeWaybill);
         recyclerView.setAdapter(adapter);
@@ -351,14 +371,14 @@ public class DeliverySheetThirdFragment
                 PieceBarCodeWaybill.add(0, txtBarCode.getText().toString() + "-" + WaybillNo);
                 PieceBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                GlobalVar.MakeSound(this.getContext(), R.raw.barcodescanned);
                 txtBarCode.setText("");
                 txtBarCode.requestFocus();
                 initViews();
             }
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
-            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
     }
@@ -579,7 +599,6 @@ public class DeliverySheetThirdFragment
         }
     }
 
-    public ArrayList<String> WaybillList = new ArrayList<>();
 
     private void AddNewWaybill(String WaybillNo) {
 
@@ -662,5 +681,46 @@ public class DeliverySheetThirdFragment
         alertDialog.show();
     }
 
+    private void setSpinnerList() {
+        tlareaList.clear();
+        SelectData selectData = new SelectData();
+        tlareaList.addAll(selectData.FetchTLAllocationArea(getContext()));
+    }
 
+    private void setSpinnerAdapter(Spinner spinner) {
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
+                android.R.layout.simple_spinner_item, tlareaList);
+
+        spinner.setBackgroundResource(android.R.drawable.spinner_dropdown_background);
+        spinner.setAdapter(adapter);
+        spinner.setSelection(0, false);
+        // You can create an anonymous listener to handle the event when is selected an spinner item
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view,
+                                       int position, long id) {
+                // Here you get the current item (a User object) that is selected by its position
+                // String value = adapter.getItem(position);
+                tlAreaName = adapter.getItem(position);
+
+                // DeliverySheetFirstFragment deliverySheetFirstFragment = new DeliverySheetFirstFragment();
+                SelectData selectData = new SelectData();
+
+                WaybillList.clear();
+                PieceBarCodeList.clear();
+                PieceBarCodeWaybill.clear();
+
+                if (tlAreaName.length() > 0 && !tlAreaName.equals("Select Area"))
+                    selectData.FetchTLAllocationPiecesbyArea(getContext(), tlAreaName);
+                lbTotal.setText("Count : " + String.valueOf(DeliverySheetThirdFragment.PieceBarCodeList.size()));
+                initViews();
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapter) {
+            }
+        });
+    }
 }

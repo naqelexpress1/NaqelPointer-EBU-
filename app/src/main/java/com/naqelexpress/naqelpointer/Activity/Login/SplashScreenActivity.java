@@ -65,11 +65,12 @@ public class SplashScreenActivity
 
 //
 //        DBConnections dbConnection = new DBConnections(getApplicationContext(), null);
-//        dbConnection.clearAllCourierDailyRoute(getApplicationContext());
-//        dbConnection.DeleteAllSuggestLocation(getApplicationContext());
+//        dbConnection.deleteDeliverRtoReqData(getApplicationContext());
+        //        dbConnection.clearAllCourierDailyRoute(getApplicationContext());
+////        dbConnection.DeleteAllSuggestLocation(getApplicationContext());
 //
 //
-//        dbConnection.DeleteAllPlannedLocation(getApplicationContext());
+//        //dbConnection.DeleteAllPlannedLocation(getApplicationContext());
 //        dbConnection.close();
 
 //        Calendar mCalendar = new GregorianCalendar();

@@ -34,7 +34,9 @@ import com.naqelexpress.naqelpointer.service.UpdateLocation;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import Error.ErrorReporter;
+
 public class NotDeliveredActivity
         extends AppCompatActivity {
 

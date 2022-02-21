@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity;
 import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetThirdFragment;
+import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.CheckPointBarCodeDetails;
 import com.naqelexpress.naqelpointer.DB.DBObjects.PieceDetail;
@@ -232,6 +233,19 @@ public class OnlineValidation implements View.OnClickListener {
 
                 TextView tvMultiPieceBody = dialogView.findViewById(R.id.tv_no_of_attempts_body);
                 tvMultiPieceBody.setText(String.valueOf(onLineValidation.getNoOfAttempts()));
+            }
+
+            if (onLineValidation.isFD() == 1 && onLineValidation.isFDalert()) {
+                isshowPopup = true;
+                isAddPiece = false;
+                LinearLayout ll_fd = dialogView.findViewById(R.id.ll_fd);
+                ll_fd.setVisibility(View.VISIBLE);
+
+                TextView tv_fd_header = dialogView.findViewById(R.id.tv_fd_header);
+                tv_fd_header.setText("Please hold!");
+
+                TextView tv_fd_body = dialogView.findViewById(R.id.tv_fd_body);
+                tv_fd_body.setText("Requested OFD date is wrong");
             }
 
 
@@ -516,7 +530,8 @@ public class OnlineValidation implements View.OnClickListener {
     private void setCallback(OnLineValidation onLineValidation) {
         if (onLineValidation.getClassName().equals("DeliverySheet"))
             alertCallback = ((DeliverySheetActivity) activity).thirdFragment;
-        ;
+        else if (onLineValidation.getClassName().equals("VDS"))
+            alertCallback = new ValidationDS();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -926,6 +941,7 @@ public class OnlineValidation implements View.OnClickListener {
             else if (KeyName.equals("VDS")) {
                 onLineValidationLocal.setReasonID(Objects.requireNonNull(activity).getResources().getInteger(R.integer.VDS));
                 onLineValidationLocal.setIsConflict(isConflict ? 1 : 0);
+                ValidationDS.isMulitPiecePop = onLineValidationLocal.getIsMultiPiece();
             } else if (KeyName.equals("INV_byNCL"))
                 onLineValidationLocal.setReasonID(Objects.requireNonNull(activity).getResources().getInteger(R.integer.INV_byNCL));
             else if (KeyName.equals("INV_byPiece"))
@@ -936,10 +952,10 @@ public class OnlineValidation implements View.OnClickListener {
 
             OnlineValidation onlineValidation = new OnlineValidation();
             if (!isCount)
-                isAddPiece = onlineValidation.showFlagsPopup(onLineValidationLocal, context, activity);
+                isAddPiece = onlineValidation.showFlagsPopup(onLineValidationLocal, context, activity); // By Piece
 
             else if (isCount)
-                isAddPiece = onlineValidation.showFlagsPopupCount(onLineValidationLocal, context, activity);
+                isAddPiece = onlineValidation.showFlagsPopupCount(onLineValidationLocal, context, activity); // NCL
 
         } catch (Exception e) {
 

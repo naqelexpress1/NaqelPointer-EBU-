@@ -124,6 +124,7 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             btnSoftPOS.setOnClickListener(this);
             if (getResources().getBoolean(R.bool.isSoftPOS)) {
                 btnSoftPOS.setEnabled(true);
+                btnSoftPOS.setVisibility(View.VISIBLE);
                 txtPOS.setInputType(InputType.TYPE_NULL);
             } else {
                 txtPOS.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);

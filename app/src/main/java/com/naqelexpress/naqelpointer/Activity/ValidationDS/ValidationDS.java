@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.ValidationDS;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
+import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
 import com.naqelexpress.naqelpointer.service.Discrepancy;
 
 import org.joda.time.DateTime;
@@ -51,25 +54,26 @@ import java.util.List;
  * Created by Hasna on 11/11/18.
  */
 
-public class ValidationDS extends AppCompatActivity implements IAPICallListener {
+public class ValidationDS extends AppCompatActivity implements IAPICallListener, AlertCallbackOnlineValidation {
 
-    ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
+    static ArrayList<HashMap<String, String>> conflict = new ArrayList<>();
     public static ArrayList<String> scannedBarCode = new ArrayList<>();
-    ArrayList<HashMap<String, String>> waybilldetails = new ArrayList<>();
-    ArrayList<HashMap<String, String>> ScannedBarCode = new ArrayList<>();
+    static ArrayList<HashMap<String, String>> waybilldetails = new ArrayList<>();
+    static ArrayList<HashMap<String, String>> ScannedBarCode = new ArrayList<>();
     public static ArrayList<String> ScanbyDevice = new ArrayList<>();
     public static ArrayList<String> ConflictBarcode = new ArrayList<>();
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
     private DBConnections dbConnections;
-    private String division;
+    private static String division;
 
     private GridView waybilgrid;
-    BarCode adapter;
+    static BarCode adapter;
     EditText txtBarcode;
     TextView count;
     EditText employid;
 
     private static final String TAG = "ValidationDS";
+    public static int isMulitPiecePop = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +109,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         waybilgrid.setAdapter(adapter);
 
         txtBarcode = (EditText) findViewById(R.id.txtBarcode);
+        txtBarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
 //        txtBarcode.setKeyListener(null);
         employid = (EditText) findViewById(R.id.employ);
         count = (TextView) findViewById(R.id.count);
@@ -220,11 +225,14 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
     }
 
     private boolean validateBarcode() {
-        if (txtBarcode != null && txtBarcode.getText().length() == GlobalVar.ScanBarcodeLength
-                || txtBarcode.getText().length() == 13) {
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarcode.getText().toString());
 
-            String result = txtBarcode.getText().toString();
-            if (!GlobalVar.GV().isValidBarcode(result)) {
+        if (txtBarcode != null && barcode.length() == GlobalVar.ScanBarcodeLength
+                || barcode.length() == 13) {
+
+//            String result = barcode;
+
+            if (!GlobalVar.GV().isValidBarcode(barcode)) {
                 GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
                 GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 txtBarcode.setText("");
@@ -233,49 +241,51 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
 
 
             // To show onlineValidation warning if any
-            boolean isConflict = !scannedBarCode.contains(result);
+            boolean isConflict = !scannedBarCode.contains(barcode);
 
-            if (OnlineValidation.isValidPieceBarcode(txtBarcode.getText().toString(), ValidationDS.this,
-                    getApplicationContext(), "VDS", isConflict , false)) {
+            if (OnlineValidation.isValidPieceBarcode(barcode, ValidationDS.this,
+                    getApplicationContext(), "VDS", isConflict, false) && isMulitPiecePop == 0) {
 
+                return isAddintoList(barcode, ValidationDS.this);
 
-//            if (division.equals("Courier")) {
-//                onlineValidation(result, isConflict);
-//            }
-
-
-                if (!GlobalVar.GV().isValidBarcode(result)) {
-                    GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(),
-                            "Wrong Barcode", GlobalVar.AlertType.Warning);
-                    GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                    txtBarcode.setText("");
-                    return false;
-                }
-
-
-                if (scannedBarCode.contains(result)) {
-                    GlobalVar.MakeSound(getApplicationContext(), R.raw.barcodescanned);
-                    if (!ScanbyDevice.contains(result))
-                        ScanbyDevice.add(result);
-
-                } else {
-                    GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                    if (!ConflictBarcode.contains(result))
-                        ConflictBarcode.add(result);
-
-                    if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
-                        conflict(result);
-                }
-
-                txtBarcode.setText("");
-                doaction();
             }
         }
         return true;
     }
 
-    public void conflict(String Barcode) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(ValidationDS.this);
+    private boolean isAddintoList(String barcode, Activity activity) {
+
+        if (!GlobalVar.GV().isValidBarcode(barcode)) {
+            GlobalVar.GV().ShowSnackbar(activity.getWindow().getDecorView().getRootView(),
+                    "Wrong Barcode", GlobalVar.AlertType.Warning);
+            GlobalVar.MakeSound(activity.getApplicationContext(), R.raw.wrongbarcodescan);
+            txtBarcode.setText("");
+            return false;
+        }
+
+
+        if (scannedBarCode.contains(barcode)) {
+            GlobalVar.MakeSound(activity.getApplicationContext(), R.raw.barcodescanned);
+            if (!ScanbyDevice.contains(barcode))
+                ScanbyDevice.add(barcode);
+
+        } else {
+            GlobalVar.MakeSound(activity.getApplicationContext(), R.raw.wrongbarcodescan);
+            if (!ConflictBarcode.contains(barcode))
+                ConflictBarcode.add(barcode);
+
+            if (!division.equals("Courier")) //For courier popup will be shown in onlineValidation
+                conflict(barcode, activity);
+        }
+        ((ValidationDS) activity).txtBarcode.setText("");
+//        txtBarcode.setText("");
+        doaction();
+
+        return true;
+    }
+
+    public void conflict(String Barcode, Activity activity) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("Warning " + Barcode)
                 .setMessage("This Piece is not belongs to this Employee")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -400,6 +410,15 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
                 });
 
         alertDialog.show();
+    }
+
+    @Override
+    public void returnOk(int ok, Activity activity, OnLineValidation onLineValidation) {
+        if (ok == 1)
+            isAddintoList(onLineValidation.getBarcode(), activity);
+        else
+            ((ValidationDS) activity).txtBarcode.setText("");
+
     }
 
     private class BringMyRouteShipmentsList extends AsyncTask<String, Void, String> {
@@ -825,7 +844,7 @@ public class ValidationDS extends AppCompatActivity implements IAPICallListener 
         boolean isShowWarning = false;
         try {
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode)
-                    , barcode, getApplicationContext() , false);
+                    , barcode, getApplicationContext(), false);
 
             OnLineValidation onLineValidation = new OnLineValidation();
 

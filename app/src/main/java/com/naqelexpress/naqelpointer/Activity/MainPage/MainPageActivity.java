@@ -1350,7 +1350,7 @@ public class MainPageActivity
                         break;
                     case 23:
                         if (VersionMatct()) {
-                            if (GlobalVar.GV().IsTerminalApp || devision.equals("IRS")) {
+                            if (GlobalVar.GV().IsTerminalApp || devision.equals("IRS") || GlobalVar.GV().isFortesting) {
                                 Intent terminalhandling = new Intent(getApplicationContext(), TerminalHandlingGroup.class);
                                 startActivity(terminalhandling);
                             } else

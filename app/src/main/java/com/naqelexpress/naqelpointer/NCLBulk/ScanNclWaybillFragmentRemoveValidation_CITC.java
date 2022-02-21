@@ -99,7 +99,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             rootView = inflater.inflate(R.layout.scannclwaybill, container, false);
 
             txtBarcode = (EditText) rootView.findViewById(R.id.txtBarcode);
-            txtBarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
             if (!isNCLDestChosen) {
                 txtBarcode.setEnabled(false);
                 txtBarcode.setHint("Generate NCL No first");
@@ -147,7 +147,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         return true;
                     } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                        String barcode = txtBarcode.getText().toString();
+                        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarcode.getText().toString());
                         PieceDetail pieceDetail = new PieceDetail(barcode, "0", 0);
 
                         BarcodeValidation barcodeValidation = validateBarcode(barcode);
@@ -167,7 +167,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                             }
 
                         } else {
-                            GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
+                            GlobalVar.MakeSound(getContext(), R.raw.wrongbarcodescan);
                             GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Error);
                         }
 
@@ -243,8 +243,8 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
-                        String barcode = extras.getString("barcode");
-                        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
+                        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(extras.getString("barcode"));
+                        GlobalVar.MakeSound(getContext(), R.raw.barcodescanned);
                         txtBarcode.setText(barcode);
                     }
                 }
@@ -496,7 +496,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
             //Read from local online validation table
             OnLineValidation onLineValidationLocal = dbConnections.getPieceInformationByWaybillNo(GlobalVar.getWaybillFromBarcode(barcode),
-                    barcode, getContext() , false);
+                    barcode, getContext(), false);
 
             OnLineValidation onLineValidation = new OnLineValidation(); // To set flags
 
@@ -567,20 +567,22 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
         boolean hasFlags = false;
         OnLineValidation onLineValidation = new OnLineValidation();
 
-        GetNCLDatafromDB(txtBarcode.getText().toString());
+        // String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+        GetNCLDatafromDB(barcode);
 
         boolean rtoreq = false;
         boolean ismatch = false;
 
-        if (iscitcshipments.contains(txtBarcode.getText().toString())) {
+        if (iscitcshipments.contains(barcode)) {
             ismatch = true;
             hasFlags = true;
             onLineValidation.setIsCITCComplaint(1);
         }
 
         if (!ismatch) {
-            if (isdeliveryReq.contains(txtBarcode.getText().toString())) {
-                if (isrtoReq.contains(txtBarcode.getText().toString())) {
+            if (isdeliveryReq.contains(barcode)) {
+                if (isrtoReq.contains(barcode)) {
                     ismatch = true;
                     rtoreq = true;
                     onLineValidation.setIsDeliveryRequest(1);
@@ -593,7 +595,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
             }
         }
         if (!rtoreq) {
-            if (isrtoReq.contains(txtBarcode.getText().toString())) {
+            if (isrtoReq.contains(barcode)) {
                 onLineValidation.setIsRTORequest(1);
                 hasFlags = true;
             }

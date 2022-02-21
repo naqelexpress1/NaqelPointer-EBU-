@@ -81,7 +81,7 @@ public class ThirdFragment extends Fragment {
 
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
 
             txtBarCode.setOnKeyListener(new View.OnKeyListener() {
                 public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -94,6 +94,7 @@ public class ThirdFragment extends Fragment {
                     } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
                         if (FirstFragment.CheckPointTypeID == 6 || FirstFragment.CheckPointTypeID == 8 ||
                                 FirstFragment.CheckPointTypeID == 2) {
+
                             if (txtBarCode != null && txtBarCode.getText().toString().length() == 10) {
                                 if (IsValid()) {
                                     AddNewPiece();
@@ -102,19 +103,24 @@ public class ThirdFragment extends Fragment {
                                 }
                             }
                         } else {
-                            if (txtBarCode != null && txtBarCode.getText().length() == 13
-                                    || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
-                                if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
+                            String barcode = "";
+                            if (txtBarCode != null)
+                                barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+                            if (txtBarCode != null && barcode.length() == 13
+                                    || barcode.length() == GlobalVar.ScanBarcodeLength) {
+                                if (!GlobalVar.GV().isValidBarcode(barcode)) {
                                     GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
                                     GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
                                     txtBarCode.setText("");
                                     return false;
                                 }
                                 if (IsValid()) {
-                                    String barcode = txtBarCode.getText().toString();
+                                    // barcode = txtBarCode.getText().toString();
                                     if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
                                         //if (isValidPieceBarcode(barcode)) {
-                                        if (OnlineValidation.isValidPieceBarcode(barcode, getActivity(), getContext(), "ArrivedAt", false, false))
+                                        if (OnlineValidation.isValidPieceBarcode(barcode, getActivity(), getContext(), "ArrivedAt",
+                                                false, false))
                                             AddNewPiece();
 //                                        }
 //                                    else {
@@ -360,7 +366,9 @@ public class ThirdFragment extends Fragment {
             return;
         }
 
-        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+        String Barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+        if (Barcode.toUpperCase().matches(".*[ABCDEFGH].*")) {
             txtBarCode.requestFocus();
             txtBarCode.setText("");
             initViews();
@@ -368,11 +376,11 @@ public class ThirdFragment extends Fragment {
         }
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(Barcode);
         } catch (Exception e) {
             GlobalVar.GV().MakeSound(getContext(), R.raw.wrongbarcodescan);
             ErrorAlert("Error",
-                    "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
+                    "Incorrect Piece Barcode(" + Barcode + ")"
             );
             requestfocus();
             return;
@@ -383,52 +391,52 @@ public class ThirdFragment extends Fragment {
 //            return;
 //        }
 
-        String Barcode = txtBarCode.getText().toString();
+//        String Barcode = txtBarCode.getText().toString();
         OnLineValidation onLineValidation = isValidation(Barcode);
 
         if (TerminalHandling.group.equals("Group 1")) {
             boolean rtoreq = false;
 
-            if (TerminalHandling.isdeliveryReq.contains(txtBarCode.getText().toString())) {
-                if (TerminalHandling.isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (TerminalHandling.isdeliveryReq.contains(Barcode)) {
+                if (TerminalHandling.isrtoReq.contains(Barcode)) {
                     rtoreq = true;
-                    if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
-                        TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
+                    if (!TerminalHandling.isHeldout.contains(Barcode)) {
+                        TerminalHandling.isHeldout.add(Barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", Barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery & RTO");
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
                     }
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0);
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + Barcode + ") is Request For Delivery & RTO ", 0);
                 } else {
-                    if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
-                        TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
+                    if (!TerminalHandling.isHeldout.contains(Barcode)) {
+                        TerminalHandling.isHeldout.add(Barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", Barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery");
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.delivery);
                     }
-                    ErrorAlert("Request For Delivery", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0);
+                    ErrorAlert("Request For Delivery", "This Waybill Number(" + Barcode + ") is Request For Delivery ", 0);
                 }
                 return;
             }
 
             if (!rtoreq) {
-                if (TerminalHandling.isrtoReq.contains(txtBarCode.getText().toString())) {
-                    if (!TerminalHandling.isHeldout.contains(txtBarCode.getText().toString())) {
-                        TerminalHandling.isHeldout.add(txtBarCode.getText().toString());
+                if (TerminalHandling.isrtoReq.contains(Barcode)) {
+                    if (!TerminalHandling.isHeldout.contains(Barcode)) {
+                        TerminalHandling.isHeldout.add(Barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", Barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For RTO");
                         TerminalHandling.delrtoreq.add(temp);
                         GlobalVar.GV().MakeSound(getContext(), R.raw.rto);
                     }
-                    ErrorAlert("Request For RTO", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0);
+                    ErrorAlert("Request For RTO", "This Waybill Number(" + Barcode + ") is Request For RTO ", 0);
                     return;
                 }
             }
@@ -439,16 +447,16 @@ public class ThirdFragment extends Fragment {
                 FirstFragment.CheckPointTypeID == 2) {
             picecodeLength = 10;
         } else {
-            if (txtBarCode.getText().length() == 13)
+            if (Barcode.length() == 13)
                 picecodeLength = 13;
-            else if (txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength)
+            else if (Barcode.length() == GlobalVar.ScanBarcodeLength)
                 picecodeLength = GlobalVar.ScanBarcodeLength;
         }
 
-        if (!BarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == picecodeLength) {
-                Barcodes.add(txtBarCode.getText().toString());
-                BarCodeList.add(0, txtBarCode.getText().toString());
+        if (!BarCodeList.contains(Barcode)) {
+            if (Barcode.length() == picecodeLength) {
+                Barcodes.add(Barcode);
+                BarCodeList.add(0, Barcode);
                 lbTotal.setText(getString(R.string.lbCount) + BarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                 requestfocus();

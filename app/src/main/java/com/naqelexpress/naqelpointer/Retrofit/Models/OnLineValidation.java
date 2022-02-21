@@ -30,6 +30,7 @@ public class OnLineValidation extends DefaultResult {
     private int ReasonID = 0;
     private int ReasonDetailID = 0;
     private int ReasonDDetailID = 0;
+    private int isFD = 0;
     private boolean isManifestedalert = false;
     private boolean isStoppedalert = false;
     private boolean isCITCalert = false;
@@ -39,6 +40,24 @@ public class OnLineValidation extends DefaultResult {
     private boolean NoValidation = false;
     private boolean isCAFlert = false;
     private boolean isDLalert = false;
+    private boolean isFDalert = false;
+
+
+    public int isFD() {
+        return isFD;
+    }
+
+    public void setFD(int FDalert) {
+        isFD = FDalert;
+    }
+
+    public boolean isFDalert() {
+        return isFDalert;
+    }
+
+    public void setFDalert(boolean FDalert) {
+        isFDalert = FDalert;
+    }
 
     public boolean isConflictalert() {
         return isConflictalert;

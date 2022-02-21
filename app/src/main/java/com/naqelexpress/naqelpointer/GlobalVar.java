@@ -109,7 +109,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "CBU POS test 02-02-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "TH SPL-Barcode 21-02-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -121,14 +121,15 @@ public class GlobalVar {
     public static int triedTimesCondition = 2;
     public boolean LoginVariation = false; //For EBU true only 58 current version
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = false; //For TH onlyre
-    public int AppIDForTH = 0; //for TH only 1
+    public boolean IsTerminalApp = true; //For TH onlyre
+    public int AppIDForTH = 1; //for TH only 1
     public boolean isFortesting = false;
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
 
     public static int ScanWaybillLength = 9;
-    public static int ScanBarcodeLength = 14;
+    public static int ScanBarcodeLength = 14; // if EBU Max length 14 , CBU 17 becuase of SPL
+    public static int BarcodeLength = 17; // if EBU Max length 14 , CBU 17 becuase of SPL
     public static boolean ManualType = false;
     public static String WaybillNoStartSeries = "8";//871 //812345679
 
@@ -3557,6 +3558,8 @@ public class GlobalVar {
 
     public boolean isValidBarcode(String Barcode) {
         boolean isvalid = true;
+
+
 //        try {
 //            double barcode = Double.parseDouble(Barcode);
 //            if (Barcode.length() == 13) {
@@ -3579,14 +3582,15 @@ public class GlobalVar {
         boolean isvalid = true;
         try {
             double barcode = Double.parseDouble(Barcode);
-            if (Barcode.length() == GlobalVar.ScanBarcodeLength || Barcode.length() == 13) {
+            int BLength = 14;
+            if (Barcode.length() == BLength || Barcode.length() == 13) {
                 int splitlength = 0, waybilllength = 0;
 
                 if (Barcode.length() == 13) {
                     splitlength = 11;
                     waybilllength = 8;
                 } else {
-                    splitlength = GlobalVar.ScanBarcodeLength - 2;
+                    splitlength = BLength - 2;
                     waybilllength = GlobalVar.ScanWaybillLength;
                 }
 
@@ -3620,6 +3624,18 @@ public class GlobalVar {
 
         return isvalid;
 
+    }
+
+    public String ReplaceBarcodeCharcater(String Barcode) {
+
+        try {
+            if (Barcode.contains("NQL"))
+                return Barcode.replace("NQL", "");
+        } catch (Exception e) {
+
+        }
+
+        return Barcode;
     }
 
     public MyRouteShipments FetchMyRouteShipments(Context context, int notifywaybillno, String colorCode, String Lat, String Lng, boolean isupdate) {

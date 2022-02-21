@@ -20,7 +20,7 @@ android {
         targetSdkVersion 30
         versionName '1.5.6.0'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionCode 281
+        versionCode 409
     }
     buildTypes {
 
@@ -138,6 +138,7 @@ dependencies {
     //implementation 'com.google.android.material:material:1.0.0'
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
     implementation 'io.reactivex.rxjava2:rxjava:2.1.6'
+   // implementation 'com.google.ortools:ortools-java:9.2.9972'
 
 }
 

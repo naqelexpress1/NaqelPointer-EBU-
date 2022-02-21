@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.utils;
 
+import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
 import com.naqelexpress.naqelpointer.Models.SkipRouteLineSeqWaybillnoReasonModels;
 
@@ -57,6 +58,19 @@ public class utilities {
         }
         return toList;
 
+    }
+
+    public String findwaybillno(String WaybillNo) {
+        String wno = "";
+
+        if (WaybillNo.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(WaybillNo.substring(0, 1)))
+            wno = WaybillNo.substring(0, 8);
+        else if (WaybillNo.length() > 8)
+            wno = WaybillNo.substring(0, GlobalVar.ScanWaybillLength);
+        else
+            wno = WaybillNo;//.substring(0, GlobalVar.ScanWaybillLength);
+
+        return wno;
     }
 
 }

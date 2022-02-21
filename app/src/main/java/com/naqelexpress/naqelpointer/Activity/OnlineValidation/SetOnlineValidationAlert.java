@@ -42,6 +42,8 @@ public class SetOnlineValidationAlert {
             onLineValidation.setRTOalert(activity.getResources().getBoolean(R.bool.DeliverySheet_isRtoCalert));
             onLineValidation.setDLalert(activity.getResources().getBoolean(R.bool.DeliverySheet_isDLalert));
             onLineValidation.setConflictalert(activity.getResources().getBoolean(R.bool.DeliverySheet_isConflictalert));
+            onLineValidation.setFDalert(activity.getResources().getBoolean(R.bool.DeliverySheet_isFDalert));
+
         } else if (onLineValidation.getReasonID() == 44 && keyName.equals("INV")) {
             onLineValidation.setClassName("INV");
             onLineValidation.setMultipiecePopup(activity.getResources().getBoolean(R.bool.INV_isMultiPiecePopup));
@@ -113,6 +115,7 @@ public class SetOnlineValidationAlert {
         onLineValidation.setCAFlert(false);
         onLineValidation.setRTOalert(false);
         onLineValidation.setDLalert(false);
+        onLineValidation.setFDalert(false);
         return onLineValidation;
     }
 

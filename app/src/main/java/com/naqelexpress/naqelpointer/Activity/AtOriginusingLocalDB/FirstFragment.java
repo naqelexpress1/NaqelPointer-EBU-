@@ -20,6 +20,7 @@ import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,14 +108,17 @@ public class FirstFragment extends Fragment {
     private void setTxtWaybillNo() {
 
         String barcode = txtBarCode.getText().toString();
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            //txtBarCode.setText(barcode.substring(0, 8));
-            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
+        utilities utilities = new utilities();
+        ValidateWayBill(utilities.findwaybillno(barcode));
+//
+//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+//            //txtBarCode.setText(barcode.substring(0, 8));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
 
         //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 

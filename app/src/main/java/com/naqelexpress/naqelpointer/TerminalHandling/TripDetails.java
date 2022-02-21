@@ -54,7 +54,7 @@ import java.util.HashMap;
 
 // Created by Ismail on 21/03/2018.
 
-public class TripDetails extends AppCompatActivity implements View.OnClickListener {
+public class    TripDetails extends AppCompatActivity implements View.OnClickListener {
 
     ArrayList<HashMap<String, String>> tripdata = new ArrayList<>();
     HashMap<String, String> trips = new HashMap<>();

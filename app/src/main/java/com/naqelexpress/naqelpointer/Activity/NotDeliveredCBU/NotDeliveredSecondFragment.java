@@ -59,7 +59,7 @@ public class NotDeliveredSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -71,7 +71,11 @@ public class NotDeliveredSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && (txtBarCode.getText().length() == 13 || txtBarCode.getText().length() ==
+                    String barcode = "";
+                    if (txtBarCode != null)
+                        barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+                    if (txtBarCode != null && (barcode.length() == 13 || barcode.length() ==
                             GlobalVar.ScanBarcodeLength))
                         AddNewPiece();
                 }
@@ -131,11 +135,13 @@ public class NotDeliveredSecondFragment
             return;
         }
 
-        if (NotDeliveredFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (!NotDeliveredBarCodeList.contains(txtBarCode.getText().toString())) {
-                if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
-                    if (!IsDelivered(txtBarCode.getText().toString())) {
-                        NotDeliveredBarCodeList.add(0, txtBarCode.getText().toString());
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+        if (NotDeliveredFirstFragment.ShipmentBarCodeList.contains(barcode)) {
+            if (!NotDeliveredBarCodeList.contains(barcode)) {
+                if (barcode.length() == 13 || barcode.length() == GlobalVar.ScanBarcodeLength) {
+                    if (!IsDelivered(barcode)) {
+                        NotDeliveredBarCodeList.add(0, barcode);
                         lbTotal.setText(getString(R.string.lbCount) + NotDeliveredBarCodeList.size());
 //                    GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                         txtBarCode.setText("");
@@ -143,7 +149,7 @@ public class NotDeliveredSecondFragment
                     } else {
                         GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                         AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                        builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is already delivered " +
+                        builder.setMessage("This piece(" + barcode + ") is already delivered " +
                                 "cannot scan again")
 
                                 .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
@@ -167,7 +173,7 @@ public class NotDeliveredSecondFragment
 
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-            builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this Waybill/OFD Scan,kindly please contact supervisor?")
+            builder.setMessage("This piece(" + barcode + ") is not in this Waybill/OFD Scan,kindly please contact supervisor?")
 
                     .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
                         @Override

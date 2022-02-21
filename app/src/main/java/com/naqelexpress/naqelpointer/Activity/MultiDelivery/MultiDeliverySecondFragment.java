@@ -30,6 +30,7 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -107,16 +108,19 @@ public class MultiDeliverySecondFragment
 
         String barcode = txtWaybilll.getText().toString();
         // txtWaybilll.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            AddNewWaybill8and9(barcode.substring(0, 8));
+        utilities utilities = new utilities();
+        AddNewWaybill8and9(utilities.findwaybillno(barcode));
 
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
+//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+//            AddNewWaybill8and9(barcode.substring(0, 8));
+//
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
 
 
         //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));

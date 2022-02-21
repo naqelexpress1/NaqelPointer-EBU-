@@ -64,7 +64,7 @@ public class DeliveryThirdFragment extends Fragment {
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -76,8 +76,12 @@ public class DeliveryThirdFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && (txtBarCode.getText().length() == 13 ||
-                            txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength))
+                    String barcode = "";
+                    if (txtBarCode != null)
+                        barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+                    if (txtBarCode != null && (barcode.length() == 13 ||
+                            barcode.length() == GlobalVar.ScanBarcodeLength))
                         AddNewPiece();
                 }
             });
@@ -125,6 +129,7 @@ public class DeliveryThirdFragment extends Fragment {
 
         return rootView;
     }
+
 
     private void initViews() {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
@@ -241,16 +246,18 @@ public class DeliveryThirdFragment extends Fragment {
 
         if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
             GlobalVar.GV().ShowSnackbar(rootView, "Wrong Barcode", GlobalVar.AlertType.Warning);
-            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             return;
         }
 
-        if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (DeliveryFirstFragment.ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
+        final String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
 
-                if (!IsDelivered(txtBarCode.getText().toString())) {
-                    DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+        if (!DeliveryBarCodeList.contains(barcode)) {
+            if (DeliveryFirstFragment.ShipmentBarCodeList.contains(barcode)) {
+
+                if (!IsDelivered(barcode)) {
+                    DeliveryBarCodeList.add(0, barcode);
                     lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
 
 //                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
@@ -258,9 +265,9 @@ public class DeliveryThirdFragment extends Fragment {
                     txtBarCode.setText("");
                     initViews();
                 } else {
-                    GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+                    GlobalVar.MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is already delivered " +
+                    builder.setMessage("This piece(" + barcode + ") is already delivered " +
                             "cannot scan again")
 
                             .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
@@ -280,7 +287,7 @@ public class DeliveryThirdFragment extends Fragment {
 
                     GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                     AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-                    builder.setMessage("This piece(" + txtBarCode.getText().toString() + ") is not in this OFD/Delivered," +
+                    builder.setMessage("This piece(" + barcode + ") is not in this OFD/Delivered," +
                             "kindly please contact supervisor?")
 //                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 //                            @Override
@@ -296,7 +303,7 @@ public class DeliveryThirdFragment extends Fragment {
                                 public void onClick(DialogInterface dialogInterface, int which) {
                                     if (GlobalVar.GV().isFortesting) {
                                         if (!IsDelivered(txtBarCode.getText().toString())) {
-                                            DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
+                                            DeliveryBarCodeList.add(0, barcode);
                                             lbTotal.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
                                             txtBarCode.setText("");
                                             initViews();
@@ -314,7 +321,7 @@ public class DeliveryThirdFragment extends Fragment {
             }
         } else {
             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
-            GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(this.getContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
     }

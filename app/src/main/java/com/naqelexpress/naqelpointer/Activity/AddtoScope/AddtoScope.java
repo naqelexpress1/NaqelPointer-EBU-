@@ -60,7 +60,7 @@ public class AddtoScope extends AppCompatActivity implements View.OnClickListene
         txtBarCode = (EditText) findViewById(R.id.txtWaybilll);
         txtBarCode.setKeyListener(null);
         txtBarCode.setHint("NCL / PID");
-        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
         txtBarCode.setInputType(InputType.TYPE_CLASS_TEXT);
 
         txtBarCode.setOnKeyListener(new View.OnKeyListener() {
@@ -131,6 +131,8 @@ public class AddtoScope extends AppCompatActivity implements View.OnClickListene
 //            ErrorAlert("Info", "Kindly save the Data and Scan Again");
 //            return;
 //        }
+
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
         if (!GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
             GlobalVar.RedirectSettings(AddtoScope.this);
             return;
@@ -138,7 +140,7 @@ public class AddtoScope extends AppCompatActivity implements View.OnClickListene
 
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
             GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             GlobalVar.ShowDialog(AddtoScope.this, "Error", "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")", true
@@ -157,12 +159,12 @@ public class AddtoScope extends AppCompatActivity implements View.OnClickListene
         }*/
 
 
-        if (!arrayList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == 10 ||
-                    txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
+        if (!arrayList.contains(barcode)) {
+            if (barcode.length() == 13 || barcode.length() == 10 ||
+                    barcode.length() == GlobalVar.ScanBarcodeLength) {
 
-                SaveData(txtBarCode.getText().toString());
-                arrayList.add(0, txtBarCode.getText().toString());
+                SaveData(barcode);
+                arrayList.add(0, barcode);
                 txtBarCode.setText("");
                 initViews();
 

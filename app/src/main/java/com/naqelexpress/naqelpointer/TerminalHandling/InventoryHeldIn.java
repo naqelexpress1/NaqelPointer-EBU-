@@ -211,12 +211,15 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
     private void AddNewPiece() {
         //isConnected();
 //        isNetworkAvailable();
+
         if (!GlobalVar.GV().isValidBarcode(txtBarCode.getText().toString())) {
             GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), "Wrong Barcode", GlobalVar.AlertType.Warning);
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             return;
         }
+
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
 
         if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
             if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
@@ -231,14 +234,14 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         }
 
 
-        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+        if (barcode.toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(barcode.toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), barcode + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
-            lbTotal.setText(txtBarCode.getText().toString());
+            lbTotal.setText(barcode);
             txtBarCode.requestFocus();
             txtBarCode.setText("");
             inventorycontrol.clear();
@@ -247,18 +250,18 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
         }
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             ErrorAlert("Error",
-                    "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
+                    "Incorrect Piece Barcode(" + barcode + ")"
             );
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             return;
         }
 
-        if (txtBarCode.getText().toString().length() <= 12) {
+        if (barcode.length() <= 12) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
@@ -276,81 +279,84 @@ public class InventoryHeldIn extends AppCompatActivity implements View.OnClickLi
 
 
         boolean rtoreq = false;
-        if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
-            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+        if (isdeliveryReq.contains(barcode)) {
+            if (isrtoReq.contains(barcode)) {
                 rtoreq = true;
 
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                    isHeldout.add(txtBarCode.getText().toString());
+                if (!isHeldout.contains(barcode)) {
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For Delivery & RTO");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                     initViews();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                 }
-                ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO ", 0, txtBarCode.getText().toString());
+                ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + barcode + ") is Request For Delivery & RTO ",
+                        0, barcode);
 
             } else {
 
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                    isHeldout.add(txtBarCode.getText().toString());
+                if (!isHeldout.contains(barcode)) {
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For Delivery");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
                     initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                 }
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery ", 0, txtBarCode.getText().toString());
+                ErrorAlert("Delivery Request", "This Waybill Number(" + barcode + ") is Request For Delivery ", 0,
+                        barcode);
             }
 
             return;
         }
 
         if (!rtoreq) {
-            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (isrtoReq.contains(barcode)) {
 
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                    isHeldout.add(txtBarCode.getText().toString());
+                if (!isHeldout.contains(barcode)) {
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For RTO");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
                     initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
                 }
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO ", 0, txtBarCode.getText().toString());
+                ErrorAlert("RTO Request", "This Waybill Number(" + barcode + ") is Request For RTO ", 0,
+                        barcode);
                 return;
             }
         }
 
-        if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
+        if (!inventorycontrol.contains(barcode)) {
             // if (txtBarCode.getText().toString().length() == 13) {
 
             // SaveData(txtBarCode.getText().toString());
 
             HashMap<String, String> temp = new HashMap<>();
-            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("WayBillNo", barcode);
             temp.put("Status", "0");
             temp.put("Ref", lbTotal.getText().toString());
             delrtoreq.add(temp);
 
-            inventorycontrol.add(0, txtBarCode.getText().toString());
+            inventorycontrol.add(0, barcode);
             // lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
             txtBarCode.setText("");
             txtBarCode.requestFocus();

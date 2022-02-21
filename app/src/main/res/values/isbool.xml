@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <bool name="isSoftPOS">true</bool>
-    <bool name="isYandextest">true</bool>
+    <bool name="isSoftPOS">false</bool>
+    <bool name="isYandextest">false</bool>
 
     <!--ArrivedAt com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment -->
     <bool name="ArrivedAt_isWrongDestalert">true</bool>
@@ -15,6 +15,7 @@
     <bool name="ArrivedAt_isCAFCalert">false</bool>
     <bool name="ArrivedAt_isRtoCalert">false</bool>
     <bool name="ArrivedAt_isDLalert">false</bool>
+    <bool name="ArrivedAt_isFDalert">false</bool>
     <!--DeliverySheet com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment -->
     <bool name="DeliverySheet_isWrongDestalert">true</bool>
     <bool name="DeliverySheet_isNoofAttemptsalert">false</bool>
@@ -28,7 +29,7 @@
     <bool name="DeliverySheet_isRtoCalert">true</bool>
     <bool name="DeliverySheet_isDLalert">false</bool>
     <bool name="DeliverySheet_isConflictalert">false</bool>
-
+    <bool name="DeliverySheet_isFDalert">true</bool>
     <!--InventoryControl_LocalValidation_oneByOne com.naqelexpress.naqelpointer.InventoryControl_LocalValidation_oneByOne-->
 
     <bool name="INV_isWrongDestalert">true</bool>
@@ -43,6 +44,7 @@
     <bool name="INV_isRtoCalert">true</bool>
     <bool name="INV_isDLalert">true</bool>
     <bool name="INV_isConflictalert">false</bool>
+    <bool name="INV_isFDalert">false</bool>
     <!--com.naqelexpress.naqelpointer.Activity.ValidationDS-->
 
     <bool name="VDS_isWrongDestalert">false</bool>
@@ -57,6 +59,7 @@
     <bool name="VDS_isRtoCalert">false</bool>
     <bool name="VDS_isDLalert">false</bool>
     <bool name="VDS_isConflictalert">true</bool>
+    <bool name="VDS_isFDalert">false</bool>
 
     <!--com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidationbyNCL-->
 
@@ -72,6 +75,7 @@
     <bool name="INV_byNCL_isRtoCalert">true</bool>
     <bool name="INV_byNCL_isDLalert">true</bool>
     <bool name="INV_byNCL_isConflictalert">false</bool>
+    <bool name="INV_byNCL_isFDalert">false</bool>
 
     <!-- com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_DelRtoReqbyNCL -->
 
@@ -87,6 +91,7 @@
     <bool name="INV_byPiece_isRtoCalert">true</bool>
     <bool name="INV_byPiece_isDLalert">true</bool>
     <bool name="INV_byPiece_isConflictalert">false</bool>
+    <bool name="NV_byPiece_isFDalert">false</bool>
 
 
 </resources>

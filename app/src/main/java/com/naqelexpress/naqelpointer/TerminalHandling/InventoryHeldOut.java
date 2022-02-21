@@ -82,7 +82,7 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
         txtbinlocation = (EditText) findViewById(R.id.txtbinlocation);
         txtbinlocation.setVisibility(View.GONE);
 
-        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+        txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
 
 //        txtBarCode.addTextChangedListener(new TextWatcher() {
 //            @Override
@@ -200,31 +200,31 @@ public class InventoryHeldOut extends AppCompatActivity implements View.OnClickL
             txtBarCode.setText("");
             return;
         }
-
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             ErrorAlert(
-                    "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
+                    "Incorrect Piece Barcode(" + barcode + ")"
             );
             txtBarCode.setText("");
             return;
         }
 
-        if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
+        if (!inventorycontrol.contains(barcode)) {
             // if (txtBarCode.getText().toString().length() == 13) {
 
             //SaveData(txtBarCode.getText().toString());
 
             HashMap<String, String> temp = new HashMap<>();
-            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("WayBillNo", barcode);
             temp.put("Status", "0");
             temp.put("Ref", "");
             delrtoreq.add(temp);
 
-            inventorycontrol.add(0, txtBarCode.getText().toString());
+            inventorycontrol.add(0, barcode);
             lbTotal.setText(getString(R.string.lbCount) + inventorycontrol.size());
             txtBarCode.setText("");
             initViews();

@@ -244,6 +244,7 @@ public class PickUpActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void SaveData_SP() {
         GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION)
@@ -577,8 +578,7 @@ public class PickUpActivity extends AppCompatActivity {
 //                    wlist.removeAll(WaybillList);
 //                    //wlist.removeAll(WaybillList);
 //                }
-                if (waybilllist.size() > (WaybillList.size() + firstFragment.PickUpBarCodeList.size()))
-                {
+                if (waybilllist.size() > (WaybillList.size() + firstFragment.PickUpBarCodeList.size())) {
                     pcikupwaybillcountMismatch(WaybillList);
                     return false;
                 }

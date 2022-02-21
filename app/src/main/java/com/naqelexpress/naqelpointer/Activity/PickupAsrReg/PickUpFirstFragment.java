@@ -150,7 +150,7 @@ public class PickUpFirstFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtBarcode);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(18)});
+            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.BarcodeLength)});
             txtBarCode.setInputType(InputType.TYPE_NULL);
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override

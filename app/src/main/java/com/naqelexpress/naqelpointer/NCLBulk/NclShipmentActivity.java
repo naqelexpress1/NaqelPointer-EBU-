@@ -200,7 +200,8 @@ public class NclShipmentActivity extends AppCompatActivity implements INclShipme
             case R.id.print:
 //                if (IsValid())
 //                    askPermission();
-                FetchHighValueShipments();
+                if (GlobalVar.GetLastLoginEmployCountryID(getApplicationContext()) == 3)
+                    FetchHighValueShipments();
                 return true;
 
             default:

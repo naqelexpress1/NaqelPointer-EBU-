@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.location.Location;
 import android.os.Bundle;
 
+import com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetThirdFragment;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -333,13 +334,18 @@ public class SelectData {
         String DominateArea = "";
 
         final DBConnections dbConnections = new DBConnections(context, null);
-        String Query = "select DominateArea , TeamName   from TLAreaAllocation where  BarCode ='" + barcode + "'";
+        String Query = "select DominateArea , TeamName , DummyCourierID    from TLAreaAllocation where  BarCode ='" + barcode + "'";
 
         Cursor ds = dbConnections.Fill(Query, context);
         if (ds.getCount() > 0) {
             ds.moveToFirst();
-            DominateArea = ds.getString(ds.getColumnIndex("DominateArea")) + " - " +
-                    ds.getString(ds.getColumnIndex("TeamName"));
+            if (ds.getString(ds.getColumnIndex("DummyCourierID")).contains("Crowdsource"))
+                DominateArea = "Crowdsource - " + ds.getString(ds.getColumnIndex("DominateArea"));
+            else if (ds.getString(ds.getColumnIndex("DummyCourierID")).contains("Can't be delivered"))
+                DominateArea = ds.getString(ds.getColumnIndex("DominateArea"));
+            else
+                DominateArea = ds.getString(ds.getColumnIndex("TeamName")) + " - " + ds.getString(ds.getColumnIndex("DominateArea"));
+
         }
         dbConnections.close();
         ds.close();
@@ -361,5 +367,45 @@ public class SelectData {
         dbConnections.close();
         ds.close();
         return downloadtime;
+    }
+
+    public ArrayList<String> FetchTLAllocationArea(Context context) {
+        ArrayList<String> DominateArea = new ArrayList<>();
+
+        final DBConnections dbConnections = new DBConnections(context, null);
+        String Query = "select DominateArea  from TLAreaAllocation Group by DominateArea ";
+
+        Cursor ds = dbConnections.Fill(Query, context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            do {
+                DominateArea.add(ds.getString(ds.getColumnIndex("DominateArea")));
+            } while (ds.moveToNext());
+        }
+        dbConnections.close();
+        ds.close();
+        DominateArea.add(0, "Select Area");
+        return DominateArea;
+    }
+
+    public void FetchTLAllocationPiecesbyArea(Context context, String areaName) {
+
+        final DBConnections dbConnections = new DBConnections(context, null);
+        String Query = "select DISTINCT WaybillNo , BarCode from TLAreaAllocation where DominateArea = '" + areaName + "'";
+
+        Cursor ds = dbConnections.Fill(Query, context);
+        if (ds.getCount() > 0) {
+            ds.moveToFirst();
+            do {
+                DeliverySheetThirdFragment.WaybillList.add(ds.getString(ds.getColumnIndex("WaybillNo")));
+                DeliverySheetThirdFragment.PieceBarCodeList.add(ds.getString(ds.getColumnIndex("BarCode")));
+                DeliverySheetThirdFragment.PieceBarCodeWaybill.add(ds.getString(ds.getColumnIndex("BarCode")) + "-" + ds.getString(ds.getColumnIndex("WaybillNo")));
+
+            } while (ds.moveToNext());
+        }
+
+        dbConnections.close();
+        ds.close();
+
     }
 }

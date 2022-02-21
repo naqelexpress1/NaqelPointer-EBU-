@@ -147,7 +147,8 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
                     if (!division.equals("Courier"))
                         AddNewPiece();
                     else {
-                        if (OnlineValidation.isValidPieceBarcode(txtBarCode.getText().toString(), InventoryControl_LocalValidation_oneByOne.this,
+                        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+                        if (OnlineValidation.isValidPieceBarcode(barcode, InventoryControl_LocalValidation_oneByOne.this,
                                 getApplicationContext(), "INV", false, false))
                             THAddNewPiece();
                     }
@@ -270,29 +271,30 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 //            return;
 //        }
 
-        if (GlobalVar.GV().ValidateAutomacticDate(getApplicationContext())) {
-            if (!GlobalVar.GV().IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
-                GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+        if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
+            if (!GlobalVar.IsAllowtoScan(validupto.getText().toString().replace("Upto : ", ""))) { //validupto.getText().toString()
+                GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
                 ErrorAlert("Info", "Data is Expired kindly Load today Data , (Press Bring Data)");
                 return;
             }
         } else {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             GlobalVar.RedirectSettings(InventoryControl_LocalValidation_oneByOne.this);
             return;
         }
 
 
-        String barcode = txtBarCode.getText().toString().toUpperCase();
-        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
+        if (barcode.toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(barcode.toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), barcode + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
 
-            lbTotal.setText(txtBarCode.getText().toString());
+            lbTotal.setText(barcode);
             txtBarCode.requestFocus();
             txtBarCode.setText("");
             inventorycontrol.clear();
@@ -301,19 +303,19 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             ErrorAlert("Error",
-                    "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
+                    "Incorrect Piece Barcode(" + barcode + ")"
             );
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             return;
         }
 
-        if (txtBarCode.getText().toString().length() <= 12) {
-            GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+        if (barcode.length() <= 12) {
+            GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             return;
@@ -333,109 +335,109 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         boolean ismatch = false;
 
         //Get barcode info (Delivery req - rto req - citc - NoOfAttempts) and add it to lists
-        GetNCLDatafromDB(txtBarCode.getText().toString());
+        GetNCLDatafromDB(barcode);
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
             WaybillAttempt = "No Data";
 
 
-        if (isrtoReq.contains(txtBarCode.getText().toString())) {
+        if (isrtoReq.contains(barcode)) {
 
-            if (!isHeldout.contains(txtBarCode.getText().toString())) {
+            if (!isHeldout.contains(barcode)) {
                 ismatch = true;
                 rtoreq = true;
-                isHeldout.add(txtBarCode.getText().toString());
+                isHeldout.add(barcode);
                 HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
+                temp.put("WayBillNo", barcode);
                 temp.put("Status", "44");
                 temp.put("Ref", "Request For RTO");
                 delrtoreq.add(temp);
-                inventorycontrol.add(txtBarCode.getText().toString());
+                inventorycontrol.add(barcode);
                 initViews();
 
 
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO "
-                        , 0, txtBarCode.getText().toString());
+                ErrorAlert("RTO Request", "This Waybill Number(" + barcode + ") is Request For RTO "
+                        , 0, barcode);
             } else {
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO "
-                        , 0, txtBarCode.getText().toString());
+                ErrorAlert("RTO Request", "This Waybill Number(" + barcode + ") is Request For RTO "
+                        , 0, barcode);
                 return;
             }
         }
 
 
-        if (iscitcshipments.contains(txtBarCode.getText().toString()) && !ismatch) {
+        if (iscitcshipments.contains(barcode) && !ismatch) {
 
-            if (!isHeldout.contains(txtBarCode.getText().toString())) {
+            if (!isHeldout.contains(barcode)) {
                 ismatch = true;
-                isHeldout.add(txtBarCode.getText().toString());
+                isHeldout.add(barcode);
                 HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
+                temp.put("WayBillNo", barcode);
                 temp.put("Status", "44");
                 temp.put("Ref", "CITC Complaint Shipment");
                 delrtoreq.add(temp);
-                inventorycontrol.add(txtBarCode.getText().toString());
+                inventorycontrol.add(barcode);
                 initViews();
 
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                ErrorAlert("CITC Complaint", "This Waybill Number(" + txtBarCode.getText().toString() + ") has CITC Complaint \n" +
-                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                ErrorAlert("CITC Complaint", "This Waybill Number(" + barcode + ") has CITC Complaint \n" +
+                        "Attempted Count : " + WaybillAttempt, 0, barcode);
             } else {
 
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                 return;
             }
         }
 
         if (!ismatch) {
-            if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
-                if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (isdeliveryReq.contains(barcode)) {
+                if (isrtoReq.contains(barcode)) {
                     ismatch = true;
                     rtoreq = true;
 
-                    if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                        isHeldout.add(txtBarCode.getText().toString());
+                    if (!isHeldout.contains(barcode)) {
+                        isHeldout.add(barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery & RTO");
                         delrtoreq.add(temp);
-                        inventorycontrol.add(txtBarCode.getText().toString());
+                        inventorycontrol.add(barcode);
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
                         initViews();
 
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
                     }
-                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery & RTO \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                    ErrorAlert("Delivery/RTO Request", "This Waybill Number(" + barcode + ") is Request For Delivery & RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, barcode);
 
 
                     // return;
                 } else {
 
-                    if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                    if (!isHeldout.contains(barcode)) {
                         ismatch = true;
-                        isHeldout.add(txtBarCode.getText().toString());
+                        isHeldout.add(barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery");
                         delrtoreq.add(temp);
-                        inventorycontrol.add(txtBarCode.getText().toString());
+                        inventorycontrol.add(barcode);
                         initViews();
 //                    txtBarCode.setText("");
 //                    txtBarCode.requestFocus();
-                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                        ErrorAlert("Delivery Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For Delivery \n" +
-                                "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.delivery);
+                        ErrorAlert("Delivery Request", "This Waybill Number(" + barcode + ") is Request For Delivery \n" +
+                                "Attempted Count : " + WaybillAttempt, 0, barcode);
                     } else {
-                        GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                        ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                        GlobalVar.MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
+                        ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                         return;
                     }
                 }
@@ -445,48 +447,48 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         if (!rtoreq) {
-            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (isrtoReq.contains(barcode)) {
 
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                if (!isHeldout.contains(barcode)) {
                     ismatch = true;
-                    isHeldout.add(txtBarCode.getText().toString());
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For RTO");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
                     initViews();
 
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.rto);
-                    ErrorAlert("RTO Request", "This Waybill Number(" + txtBarCode.getText().toString() + ") is Request For RTO \n" +
-                            "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                    ErrorAlert("RTO Request", "This Waybill Number(" + barcode + ") is Request For RTO \n" +
+                            "Attempted Count : " + WaybillAttempt, 0, barcode);
                 } else {
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                    ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                    ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                     return;
                 }
             }
         }
 
-        if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
+        if (!inventorycontrol.contains(barcode)) {
 //            if (txtBarCode.getText().toString().length() == 13) {
 
             if (!WaybillAttempt.equals("No Data")) {
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.delivery);
-                ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + txtBarCode.getText().toString() + ")  \n" +
-                        "Attempted Count : " + WaybillAttempt, 0, txtBarCode.getText().toString());
+                ErrorAlert("Attempt Waybill Count", "This Waybill Number(" + barcode + ")  \n" +
+                        "Attempted Count : " + WaybillAttempt, 0, barcode);
             }
 
             // SaveData(txtBarCode.getText().toString());
 
             HashMap<String, String> temp = new HashMap<>();
-            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("WayBillNo", barcode);
             temp.put("Status", "0");
             temp.put("Ref", lbTotal.getText().toString());
             delrtoreq.add(temp);
 
-            inventorycontrol.add(0, txtBarCode.getText().toString());
+            inventorycontrol.add(0, barcode);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             initViews();
@@ -531,16 +533,16 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
 
-        String barcode = txtBarCode.getText().toString().toUpperCase();
-        if (txtBarCode.getText().toString().toUpperCase().matches(".*[ABCDEFGH].*")) {
+        String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+        if (barcode.toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
-            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(txtBarCode.getText().toString().toUpperCase(), getApplicationContext())) {
-                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), txtBarCode.getText().toString() + " is invalid bin", GlobalVar.AlertType.Error);
+            if (binMasterCount > 0 && !GlobalVar.isBinMasterValueExists(barcode.toUpperCase(), getApplicationContext())) {
+                GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), barcode + " is invalid bin", GlobalVar.AlertType.Error);
                 return;
             }
 
-            lbTotal.setText(txtBarCode.getText().toString());
+            lbTotal.setText(barcode);
             txtBarCode.requestFocus();
             txtBarCode.setText("");
             inventorycontrol.clear();
@@ -549,18 +551,18 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         try {
-            double convert = Double.parseDouble(txtBarCode.getText().toString());
+            double convert = Double.parseDouble(barcode);
         } catch (Exception e) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             ErrorAlert("Error",
-                    "Incorrect Piece Barcode(" + txtBarCode.getText().toString() + ")"
+                    "Incorrect Piece Barcode(" + barcode + ")"
             );
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             return;
         }
 
-        if (txtBarCode.getText().toString().length() <= 12) {
+        if (barcode.length() <= 12) {
             GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
@@ -586,27 +588,27 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         boolean ismatch = false;
 
         //Get barcode info (Delivery req - rto req - citc - NoOfAttempts) and add it to lists
-        GetNCLDatafromDB(txtBarCode.getText().toString());
+        GetNCLDatafromDB(barcode);
 
 
         if (WaybillAttempt.equals("19127") || WaybillAttempt.equals("0"))
             WaybillAttempt = "No Data";
 
-        if (iscafshipments.contains(txtBarCode.getText().toString()))
+        if (iscafshipments.contains(barcode))
 //            onLineValidation.setIsCAFRequest(1);
 
-            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (isrtoReq.contains(barcode)) {
 //            onLineValidation.setIsRTORequest(1);
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                if (!isHeldout.contains(barcode)) {
                     ismatch = true;
                     rtoreq = true;
-                    isHeldout.add(txtBarCode.getText().toString());
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For RTO");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
                     initViews();
                 } else {
                     return;
@@ -614,62 +616,62 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
 
 
-        if (iscitcshipments.contains(txtBarCode.getText().toString()) && !ismatch) {
+        if (iscitcshipments.contains(barcode) && !ismatch) {
 //            onLineValidation.setIsCITCComplaint(1);
 
-            if (!isHeldout.contains(txtBarCode.getText().toString())) {
+            if (!isHeldout.contains(barcode)) {
                 ismatch = true;
-                isHeldout.add(txtBarCode.getText().toString());
+                isHeldout.add(barcode);
                 HashMap<String, String> temp = new HashMap<>();
-                temp.put("WayBillNo", txtBarCode.getText().toString());
+                temp.put("WayBillNo", barcode);
                 temp.put("Status", "44");
                 temp.put("Ref", "CITC Complaint Shipment");
                 delrtoreq.add(temp);
-                inventorycontrol.add(txtBarCode.getText().toString());
+                inventorycontrol.add(barcode);
                 initViews();
 
             } else {
 
                 GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                 return;
             }
         }
 
         if (!ismatch) {
-            if (isdeliveryReq.contains(txtBarCode.getText().toString())) {
+            if (isdeliveryReq.contains(barcode)) {
 //                onLineValidation.setIsDeliveryRequest(1);
-                if (isrtoReq.contains(txtBarCode.getText().toString())) {
+                if (isrtoReq.contains(barcode)) {
                     ismatch = true;
                     rtoreq = true;
 
-                    if (!isHeldout.contains(txtBarCode.getText().toString())) {
-                        isHeldout.add(txtBarCode.getText().toString());
+                    if (!isHeldout.contains(barcode)) {
+                        isHeldout.add(barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery & RTO");
                         delrtoreq.add(temp);
-                        inventorycontrol.add(txtBarCode.getText().toString());
+                        inventorycontrol.add(barcode);
 
                         initViews();
                     }
 
                 } else {
 
-                    if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                    if (!isHeldout.contains(barcode)) {
                         ismatch = true;
-                        isHeldout.add(txtBarCode.getText().toString());
+                        isHeldout.add(barcode);
                         HashMap<String, String> temp = new HashMap<>();
-                        temp.put("WayBillNo", txtBarCode.getText().toString());
+                        temp.put("WayBillNo", barcode);
                         temp.put("Status", "44");
                         temp.put("Ref", "Request For Delivery");
                         delrtoreq.add(temp);
-                        inventorycontrol.add(txtBarCode.getText().toString());
+                        inventorycontrol.add(barcode);
                         initViews();
                     } else {
                         GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                        ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                        ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                         return;
                     }
                 }
@@ -679,27 +681,27 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
         }
 
         if (!rtoreq) {
-            if (isrtoReq.contains(txtBarCode.getText().toString())) {
+            if (isrtoReq.contains(barcode)) {
 
-                if (!isHeldout.contains(txtBarCode.getText().toString())) {
+                if (!isHeldout.contains(barcode)) {
                     ismatch = true;
-                    isHeldout.add(txtBarCode.getText().toString());
+                    isHeldout.add(barcode);
                     HashMap<String, String> temp = new HashMap<>();
-                    temp.put("WayBillNo", txtBarCode.getText().toString());
+                    temp.put("WayBillNo", barcode);
                     temp.put("Status", "44");
                     temp.put("Ref", "Request For RTO");
                     delrtoreq.add(temp);
-                    inventorycontrol.add(txtBarCode.getText().toString());
+                    inventorycontrol.add(barcode);
                     initViews();
                 } else {
                     GlobalVar.GV().MakeSound(getApplicationContext(), R.raw.wrongbarcodescan);
-                    ErrorAlert("Info", getString(R.string.AlreadyExists), 0, txtBarCode.getText().toString());
+                    ErrorAlert("Info", getString(R.string.AlreadyExists), 0, barcode);
                     return;
                 }
             }
         }
 
-        if (!inventorycontrol.contains(txtBarCode.getText().toString())) {
+        if (!inventorycontrol.contains(barcode)) {
             //if (txtBarCode.getText().toString().length() == 13) {
 
             if (!WaybillAttempt.equals("No Data")) {
@@ -712,12 +714,12 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
 
             HashMap<String, String> temp = new HashMap<>();
-            temp.put("WayBillNo", txtBarCode.getText().toString());
+            temp.put("WayBillNo", barcode);
             temp.put("Status", "0");
             temp.put("Ref", lbTotal.getText().toString());
             delrtoreq.add(temp);
 
-            inventorycontrol.add(0, txtBarCode.getText().toString());
+            inventorycontrol.add(0, barcode);
             txtBarCode.setText("");
             txtBarCode.requestFocus();
             initViews();

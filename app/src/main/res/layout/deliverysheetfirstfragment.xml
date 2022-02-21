@@ -46,5 +46,24 @@
             app:layout_constraintTop_toBottomOf="@+id/txtCourierID"
             tools:ignore="HardcodedText" />
 
+        <Spinner
+            android:id="@+id/tlareaallocation"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="8dp"
+            android:maxLines="1"
+            android:spinnerMode="dropdown"
+            android:text="Description"
+            android:textColor="#B4ADA9"
+            android:textSize="15sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/txtTruckID"
+            tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded" />
+
     </android.support.constraint.ConstraintLayout>
+
+
 </RelativeLayout>

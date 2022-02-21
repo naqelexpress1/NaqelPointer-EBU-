@@ -459,7 +459,11 @@ public class WaybillPlanActivity extends AppCompatActivity
 
                 if (result.getCount() > 0) {
                     result.moveToFirst();
-                    if (result.getInt(result.getColumnIndex("PiecesCount")) > 1) {
+                    int count = 0;
+                    if (!GlobalVar.GV().isFortesting)
+                        count = 1;
+
+                    if (result.getInt(result.getColumnIndex("PiecesCount")) > count) {
                         Intent notDelivered = new Intent(getApplicationContext(),
                                 com.naqelexpress.naqelpointer.Activity.NotDeliveredCBU.NotDeliveredActivity.class);
                         notDelivered.putExtras(bundle);

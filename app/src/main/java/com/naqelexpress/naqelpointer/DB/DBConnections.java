@@ -88,7 +88,7 @@ import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
-    private static final int Version = 177; // Create View
+    private static final int Version = 178; // Create View
     private static final String DBName = "NaqelPointerDB.db";
     //    public Context context;
     public View rootView;
@@ -383,7 +383,7 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXt NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL ," +
-                "ReqType Integer Not Null , NCLNO Text )");
+                "ReqType Integer Not Null , NCLNO Text , ConsigneeDLReqDate TEXT  )");
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                 "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL , NCLNO Text  )");
@@ -808,7 +808,7 @@ public class DBConnections
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"DeliverReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL ," +
-                    " ReqType Integer Not Null , NCLNO Text )");
+                    " ReqType Integer Not Null , NCLNO Text ,  ConsigneeDLReqDate TEXT  )");
 
             db.execSQL("CREATE TABLE IF NOT EXISTS \"RtoReq\" (\"ID\" INTEGER PRIMARY KEY  AUTOINCREMENT NOT NULL  UNIQUE ," +
                     "\"WaybillNo\"  TEXT NOT NULL ,BarCode  TEXT NOT NULL , InsertedDate TEXT NOT NULL , ValidDate TEXT NOT NULL , NCLNO Text )");
@@ -1336,6 +1336,9 @@ public class DBConnections
 
             if (!isColumnExist("MyRouteShipments", "YSeqNo"))
                 db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN YSeqNo  INTEGER ");
+
+            if (!isColumnExist("DeliverReq", "ConsigneeDLReqDate"))
+                db.execSQL("ALTER TABLE DeliverReq ADD COLUMN ConsigneeDLReqDate TEXT ");
 
 //            if (!isColumnExist("MyRouteShipments", "CDAmount"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN CDAmount DOUBLE");
@@ -6529,7 +6532,8 @@ public class DBConnections
 
     //Bulk Insert
     public void insertDelBulk(JSONArray deliveryReq, Context context) {
-        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO ) values (?, ?, ?, ? , ? , ?);";
+        String sql = "insert into DeliverReq (WaybillNo, BarCode, InsertedDate, ValidDate , ReqType , NCLNO  , ConsigneeDLReqDate)" +
+                " values (?, ?, ?, ? , ? , ? , ?);";
         SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
         //db.getWritableDatabase();
         db.beginTransaction();
@@ -6546,11 +6550,12 @@ public class DBConnections
                 stmt.bindString(3, GlobalVar.GV().getCurrentDateTime());
                 stmt.bindString(4, GlobalVar.GV().getDateAdd1Day(insdate[0]));
                 stmt.bindString(5, String.valueOf(jsonObject1.getInt("RequestType")));
+
                 String NCLNo = "0";
                 if (jsonObject1.getString("NCLNO") != null || jsonObject1.getString("NCLNO").length() == 0)
                     NCLNo = jsonObject1.getString("NCLNO");
                 stmt.bindString(6, NCLNo);
-
+                stmt.bindString(7, String.valueOf(jsonObject1.getString("CneeRequestedDeliveryDate")));
                 long entryID = stmt.executeInsert();
                 stmt.clearBindings();
             } catch (JSONException e) {
@@ -7064,10 +7069,20 @@ public class DBConnections
         SQLiteDatabase db = null;
         try {
             //String selectQuery = "SELECT * FROM OnLineValidationOffset WHERE WaybillNo = " + waybillNo;
-            String selectQuery = "select  WaybillNo ,  SUM(WaybillDestID) WaybillDestID ,  SUM(IsMultiPiece) IsMultiPiece , SUM(IsStopped) IsStopped ," +
-                    " SUM(IsDeliveryRequest) IsDeliveryRequest , SUM(IsRTORequest)  IsRTORequest ,  SUM(NoOfAttempts) NoOfAttempts," +
-                    "SUM(IsRelabel) IsRelabel , SUM(IsCITC) IsCITC, SUM(IsCAF) IsCAF  from v_validation where WaybillNo = " + waybillNo;
+//            String selectQuery = "select  WaybillNo ,  SUM(WaybillDestID) WaybillDestID ,  SUM(IsMultiPiece) IsMultiPiece , SUM(IsStopped) IsStopped ," +
+//                    " SUM(IsDeliveryRequest) IsDeliveryRequest , SUM(IsRTORequest)  IsRTORequest ,  SUM(NoOfAttempts) NoOfAttempts," +
+//                    "SUM(IsRelabel) IsRelabel , SUM(IsCITC) IsCITC, SUM(IsCAF) IsCAF  from v_validation where WaybillNo = " + waybillNo;
+            String selectQuery = "select   v.WaybillNo ,  SUM(v.WaybillDestID) WaybillDestID ,  SUM(v.IsMultiPiece) IsMultiPiece ," +
+                    " SUM(v.IsStopped) IsStopped ," +
+                    "SUM(v.IsDeliveryRequest) IsDeliveryRequest , SUM(v.IsRTORequest)  IsRTORequest ,  SUM(v.NoOfAttempts) NoOfAttempts," +
+                    "SUM(v.IsRelabel) IsRelabel , SUM(v.IsCITC) IsCITC, SUM(v.IsCAF) IsCAF , " +
+                    "CASE WHEN strftime('%Y-%m-%d', dr.ConsigneeDLReqDate)  <= Date() THEN 0 WHEN dr.ConsigneeDLReqDate is NULL THEN 0  " +
+                    " ELSE 1 END ISFD " +
+                    "from v_validation v " +
+                    "Left Join DeliverReq dr on  v.WaybillNo = dr.WaybillNo and ReqType = 5 where v.WaybillNo = " + waybillNo;
+
             db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+
             cursor = db.rawQuery(selectQuery, null);
 
             if (cursor != null && cursor.moveToFirst()) {
@@ -7085,6 +7100,7 @@ public class DBConnections
                     onLineValidation.setIsRelabel(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsRelabel"))));
                     onLineValidation.setIsCITCComplaint(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCITC"))));
                     onLineValidation.setIsCAFRequest(Integer.parseInt(cursor.getString(cursor.getColumnIndex("IsCAF"))));
+                    onLineValidation.setFD(Integer.parseInt(cursor.getString(cursor.getColumnIndex("ISFD"))));
                     onLineValidation.setNoValidation(false);
                 } else
                     onLineValidation = setOnlinevalidationEmptyValue(waybillNo, barcode);

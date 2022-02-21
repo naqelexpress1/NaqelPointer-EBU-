@@ -1063,6 +1063,9 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 //below one currently in active
 //                String function = "BringDeliverySheetbyOFDPiece_ExcludeRoute_GroupbyDistrict";//""BringDeliverySheetbyOFDPiece_ExcludeRoute"; //CBU division BringDeliverySheetbyOFDPiece
                 String function = "BringDeliverySheetbyOFDPiece_DSSummary";
+
+                if (getResources().getBoolean(R.bool.isYandextest))
+                    function = "BringDeliverySheetbyOFDPiecewithPreSeq";
 //                function = "BringDeliverySheetbyOFDPiece_PlanAll"; //BringDeliverySheetbyOFDPiece_PlanAll
 //                String function = "BringMyRouteShipments";
                 if (!GetDivision())
@@ -1070,7 +1073,7 @@ public class MyRouteActivity_Complaince_GroupbyPhn
                 if (GlobalVar.GV().isFortesting) {
                     // function = "BringDeliverySheetbyOFDPiece_ExcludeRoute"; //EBU Divison //BringDeliverySheetFortest for test one
 //                    function = "BringDeliverySheetbyOFDPiece_PlanAll";
-                    function = "BringDeliverySheetbyOFDPiecewithPreSeq";
+                    function = "BringDeliverySheetbyOFDPiece_DSSummary";
 
                 }
 

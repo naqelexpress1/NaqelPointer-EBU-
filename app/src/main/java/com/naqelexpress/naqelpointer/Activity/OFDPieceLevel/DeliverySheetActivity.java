@@ -65,12 +65,18 @@ public class DeliverySheetActivity
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(2);
 
+        DeliverySheetThirdFragment.WaybillList.clear();
+        DeliverySheetThirdFragment.pieceDenied.clear();
+        DeliverySheetThirdFragment.PieceBarCodeList.clear();
+        DeliverySheetThirdFragment.PieceBarCodeWaybill.clear();
+
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
         GlobalVar.GV().ResetTriedCount();
 
         TimeIn = DateTime.now();
+
 
     }
 

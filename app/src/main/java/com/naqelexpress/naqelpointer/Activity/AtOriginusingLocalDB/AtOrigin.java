@@ -44,9 +44,9 @@ import static com.naqelexpress.naqelpointer.R.id.container;
 
 public class AtOrigin extends AppCompatActivity {
 
-    CourierDetails courierdetails;
-    FirstFragment secondFragment;
-    SecondFragment thirdFragment;
+    CourierDetails courierdetails;//1
+    FirstFragment secondFragment;//2
+    SecondFragment thirdFragment;//3
     DateTime TimeIn;
     private Bundle bundle;
 

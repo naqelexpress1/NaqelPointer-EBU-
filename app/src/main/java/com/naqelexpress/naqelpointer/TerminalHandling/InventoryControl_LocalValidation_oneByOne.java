@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -42,6 +43,7 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
 import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
+import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
@@ -63,7 +65,8 @@ import Error.ErrorReporter;
 
 // Created by Ismail on 21/03/2018.
 
-public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener, IAPICallListener {
+public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity implements View.OnClickListener, IAPICallListener,
+        AlertCallbackOnlineValidation {
 
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
@@ -89,6 +92,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     private int binMasterCount;
     private List<OnLineValidation> onLineValidationList = new ArrayList<>();
     private DBConnections dbConnections;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,6 +233,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
             }
         }
         binMasterCount = GlobalVar.getBinMasterCount(getApplicationContext());
+        handler = new Handler();
     }
 
     private void initViews() {
@@ -534,6 +539,7 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
 
 
         String barcode = GlobalVar.GV().ReplaceBarcodeCharcater(txtBarCode.getText().toString());
+
         if (barcode.toUpperCase().matches(".*[ABCDEFGH].*")) {
 
             //Validate Bin location
@@ -1128,6 +1134,24 @@ public class InventoryControl_LocalValidation_oneByOne extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
         }
+    }
+
+    @Override
+    public void returnOk(int ok, Activity activity, OnLineValidation onLineValidation) {
+        if(ok == 1)
+            System.out.println("");
+//        if (ok == 1) {
+//            handler.post(new Runnable() {
+//                public void run() {
+//                    if (!division.equals("Courier"))
+//                        AddNewPiece();
+//                    else
+//
+//                        THAddNewPiece();
+//                }
+//            });
+//        } else
+//            ((InventoryControl_LocalValidation_oneByOne) activity).txtBarCode.setText("");
     }
 
 

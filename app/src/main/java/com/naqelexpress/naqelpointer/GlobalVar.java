@@ -109,7 +109,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "TH SPL-Barcode 21-02-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "TH Bug Fix - 1 23-02-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;
@@ -119,10 +119,10 @@ public class GlobalVar {
     public static int triedTimes_ForAtOrigin = 0;
     public static int triedTimes_ForPickup = 0;
     public static int triedTimesCondition = 2;
-    public boolean LoginVariation = false; //For EBU true only 58 current version
+    public boolean LoginVariation = true; //For EBU true only 58 current version
     //For TH APP Enable true and AppIDForTH is 1
-    public boolean IsTerminalApp = true; //For TH onlyre
-    public int AppIDForTH = 1; //for TH only 1
+    public boolean IsTerminalApp = false; //For TH onlyre
+    public int AppIDForTH = 0; //for TH only 1
     public boolean isFortesting = false;
     public String ExcludeCamera = "TC25TC26"; //For EBU true only
     //
@@ -131,7 +131,7 @@ public class GlobalVar {
     public static int ScanBarcodeLength = 14; // if EBU Max length 14 , CBU 17 becuase of SPL
     public static int BarcodeLength = 17; // if EBU Max length 14 , CBU 17 becuase of SPL
     public static boolean ManualType = false;
-    public static String WaybillNoStartSeries = "8";//871 //812345679
+    public static String WaybillNoStartSeries = "871";//871 //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;

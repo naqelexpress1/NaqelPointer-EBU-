@@ -1,6 +1,7 @@
 
 package com.naqelexpress.naqelpointer.TerminalHandling;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -40,6 +42,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
+import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,7 +50,7 @@ import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 
-public class ThirdFragment extends Fragment {
+public class ThirdFragment extends Fragment implements AlertCallbackOnlineValidation {
 
     View rootView;
     TextView lbTotal;
@@ -60,7 +63,8 @@ public class ThirdFragment extends Fragment {
     private Intent intent;
     private Context mContext;
     private String division;
-
+    public static int isMulitPiecePop = 0;
+    private Handler handler;
     ArrayList<HashMap<String, String>> delrtoreq = new ArrayList<>();
 
     private DBConnections dbConnections = new DBConnections(getContext(), null);
@@ -119,9 +123,11 @@ public class ThirdFragment extends Fragment {
                                     // barcode = txtBarCode.getText().toString();
                                     if (division.equals("Courier") && TerminalHandling.group.equals("Group 8")) { //Arrival - Online Validation
                                         //if (isValidPieceBarcode(barcode)) {
+
                                         if (OnlineValidation.isValidPieceBarcode(barcode, getActivity(), getContext(), "ArrivedAt",
                                                 false, false))
-                                            AddNewPiece();
+                                            if (isMulitPiecePop == 0)
+                                                AddNewPiece();
 //                                        }
 //                                    else {
 //                                            showDialog(getOnLineValidationPiece(barcode));
@@ -209,7 +215,7 @@ public class ThirdFragment extends Fragment {
             initViews();
             //initDialog();
         }
-
+        handler = new Handler();
 
         return rootView;
     }
@@ -1146,4 +1152,17 @@ public class ThirdFragment extends Fragment {
     }
 
 
+    @Override
+    public void returnOk(int ok, Activity activity, OnLineValidation onLineValidation) {
+        if (ok == 1) {
+            handler.post(new Runnable() {
+                public void run() {
+
+                    AddNewPiece();
+
+                }
+            });
+        } else
+            txtBarCode.setText("");
+    }
 }

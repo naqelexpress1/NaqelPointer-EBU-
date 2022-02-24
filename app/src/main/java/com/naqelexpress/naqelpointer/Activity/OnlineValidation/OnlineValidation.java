@@ -83,6 +83,13 @@ public class OnlineValidation implements View.OnClickListener {
             tvBarcode.setText("Piece #" + onLineValidation.getBarcode());
             Button btnConfirm = dialogView.findViewById(R.id.btn_confirm);
             btnConfirm.setVisibility(View.VISIBLE);
+
+//            Button btnok = dialogView.findViewById(R.id.btn_ok);
+//            btnok.setVisibility(View.GONE);
+//
+//            Button btnno = dialogView.findViewById(R.id.btn_no);
+//            btnno.setVisibility(View.GONE);
+
             btnConfirm.setText("OK & Quit");
 
 
@@ -223,7 +230,7 @@ public class OnlineValidation implements View.OnClickListener {
                 tvMultiPieceBody.setText("Please check pieces.");
             }
 
-            if (onLineValidation.getNoOfAttempts() > 1 && onLineValidation.getisNoofAttemptsalert()) {
+            if (onLineValidation.getNoOfAttempts() > 0 && onLineValidation.getisNoofAttemptsalert()) {
                 isshowPopup = true;
                 LinearLayout ll_no_attempts = dialogView.findViewById(R.id.ll_no_attempts);
                 ll_no_attempts.setVisibility(View.VISIBLE);
@@ -282,8 +289,8 @@ public class OnlineValidation implements View.OnClickListener {
             }
 
 
-            if (onLineValidation.isMultipiecePopup())
-                setCallback(onLineValidation);
+//            if (onLineValidation.isMultipiecePopup())
+            setCallback(onLineValidation);
 
             if (!ismispop && isAddPiece && isshowPopup && onLineValidation.getIsMultiPiece() > 0)
                 isEnableMultipiecepopup(dialogView);
@@ -532,6 +539,10 @@ public class OnlineValidation implements View.OnClickListener {
             alertCallback = ((DeliverySheetActivity) activity).thirdFragment;
         else if (onLineValidation.getClassName().equals("VDS"))
             alertCallback = new ValidationDS();
+        else if (onLineValidation.getClassName().equals("ArrivedAt"))
+            alertCallback = ((com.naqelexpress.naqelpointer.TerminalHandling.TerminalHandling) activity).thirdFragment;
+        else if (onLineValidation.getClassName().equals("INV"))
+            alertCallback = new com.naqelexpress.naqelpointer.TerminalHandling.InventoryControl_LocalValidation_oneByOne();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -931,9 +942,10 @@ public class OnlineValidation implements View.OnClickListener {
                 onLineValidationLocal = dbConnections.getPieceCountByNCL(barcode
                         , barcode, context, isCount);
 
-            if (KeyName.equals("ArrivedAt"))
+            if (KeyName.equals("ArrivedAt")) {
                 onLineValidationLocal.setReasonID(Objects.requireNonNull(activity).getResources().getInteger(R.integer.ArrivedAt));
-            else if (KeyName.equals("DeliverySheet")) {
+                com.naqelexpress.naqelpointer.TerminalHandling.ThirdFragment.isMulitPiecePop = onLineValidationLocal.getIsMultiPiece();
+            } else if (KeyName.equals("DeliverySheet")) {
                 onLineValidationLocal.setReasonID(Objects.requireNonNull(activity).getResources().getInteger(R.integer.DeliverySheet));
                 DeliverySheetThirdFragment.isMulitPiecePop = onLineValidationLocal.getIsMultiPiece();
             } else if (KeyName.equals("INV"))

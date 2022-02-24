@@ -192,6 +192,7 @@ public class MainPageActivity
         //  GlobalVar.GV().MainContext = this;
         GlobalVar.GV().SignedIn = true;
 
+
 //        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
 //        dbConnections1.DeleteAllSuggestPlannedLocation(getApplicationContext());
 
@@ -484,7 +485,8 @@ public class MainPageActivity
         // updateApp();
 
         if (android.os.Build.VERSION.SDK_INT >= 29)
-            if (GlobalVar.GV().isPermissionEnabled(Manifest.permission.ACCESS_BACKGROUND_LOCATION, MainPageActivity.this) == PackageManager.PERMISSION_DENIED) {
+            if (GlobalVar.GV().isPermissionEnabled(Manifest.permission.ACCESS_BACKGROUND_LOCATION, MainPageActivity.this)
+                    == PackageManager.PERMISSION_DENIED) {
 //                GlobalVar.GV().PermissionAlert(MainPageActivity.this);
                 ActivityCompat.requestPermissions(
                         MainPageActivity.this,
@@ -521,12 +523,12 @@ public class MainPageActivity
             cellIcon = new int[5];
         } else if (devision.equals("Express")) {
             if (menu == 0) {
-                cellTitle = new String[20];
-                cellIcon = new int[20];//18
+                cellTitle = new String[21];
+                cellIcon = new int[21];//18
 
             } else {
-                cellTitle = new String[25];
-                cellIcon = new int[25];
+                cellTitle = new String[26];
+                cellIcon = new int[26];
             }
         }
 
@@ -604,6 +606,7 @@ public class MainPageActivity
                 cellTitle[22] = "KPI";//CBU 7
                 cellTitle[23] = "InCab CheckList";//CBU 7
                 cellTitle[24] = "Fuel Model";//CBU 7
+                cellTitle[25] = "Scan Waybills";//CBU 7
 
             } else {
 
@@ -627,6 +630,7 @@ public class MainPageActivity
                 cellTitle[17] = "KPI";//CBU 7
                 cellTitle[18] = "InCab CheckList";//CBU 7
                 cellTitle[19] = "Fuel Model";//CBU 7
+                cellTitle[20] = "Scan Waybills";//CBU 7
 
             }
 
@@ -657,6 +661,7 @@ public class MainPageActivity
                 itemposition.put(22, 26);
                 itemposition.put(23, 27);
                 itemposition.put(24, 31);
+                itemposition.put(25, 33);
 
             } else {
                 itemposition.put(0, 11);
@@ -679,7 +684,7 @@ public class MainPageActivity
                 itemposition.put(17, 26);
                 itemposition.put(18, 27);
                 itemposition.put(19, 31);
-
+                itemposition.put(20, 33);
                 // itemposition.put(18, 11);
             }
 
@@ -752,7 +757,7 @@ public class MainPageActivity
                 cellIcon[22] = R.drawable.customclearence; //CBU
                 cellIcon[23] = R.drawable.car; //CBU
                 cellIcon[24] = R.drawable.fuel; //CBU
-
+                cellIcon[25] = R.drawable.fuel; //CBU
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -775,7 +780,7 @@ public class MainPageActivity
                 cellIcon[17] = R.drawable.customclearence; //CBU
                 cellIcon[18] = R.drawable.car; //CBU
                 cellIcon[19] = R.drawable.fuel; //CBU
-
+                cellIcon[20] = R.drawable.fuel; //CBU
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
@@ -1460,6 +1465,19 @@ public class MainPageActivity
 
                         break;
                     case 32:
+                        if (VersionMatct()) {
+                            Intent cbm = new Intent(getApplicationContext(),
+                                    CBM.class);
+//
+                            startActivity(cbm);
+                        } else {
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    , true);
+                        }
+
+                        break;
+                    case 33:
                         if (VersionMatct()) {
                             Intent cbm = new Intent(getApplicationContext(),
                                     CBM.class);

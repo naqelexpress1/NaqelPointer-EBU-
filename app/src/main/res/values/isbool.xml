@@ -11,7 +11,7 @@
     <bool name="ArrivedAt_isCITCalert">false</bool>
     <bool name="ArrivedAt_isMultiPiecealert">true</bool>
     <bool name="ArrivedAt_ischangedDestalert">false</bool>
-    <bool name="ArrivedAt_isMultiPiecePopup">false</bool>
+    <bool name="ArrivedAt_isMultiPiecePopup">true</bool>
     <bool name="ArrivedAt_isCAFCalert">false</bool>
     <bool name="ArrivedAt_isRtoCalert">false</bool>
     <bool name="ArrivedAt_isDLalert">false</bool>

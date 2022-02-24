@@ -60,7 +60,7 @@ import Error.ErrorReporter;
 public class TerminalHandling extends AppCompatActivity implements IAPICallListener {
 
     FirstFragment firstFragment;
-    ThirdFragment thirdFragment;
+    public ThirdFragment thirdFragment;
 
     com.naqelexpress.naqelpointer.Activity.TerminalHandling.FirstFragment firstFragment2;
 

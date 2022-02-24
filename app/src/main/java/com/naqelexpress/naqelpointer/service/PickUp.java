@@ -221,8 +221,8 @@ public class PickUp extends Service {
 
             } else {
                 flag_thread = false;
-                this.stopSelf();
-                android.os.Process.killProcess(android.os.Process.myPid());
+                this.stopSelf(); // stop service
+                android.os.Process.killProcess(android.os.Process.myPid()); // kill service
             }
         } catch (Exception e) {
             flag_thread = false;

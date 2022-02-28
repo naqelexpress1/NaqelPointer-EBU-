@@ -2,10 +2,14 @@ package com.naqelexpress.naqelpointer.Activity.ScanWaybill;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +19,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -29,19 +35,34 @@ import com.naqelexpress.naqelpointer.callback.AlertCallback;
 import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.utils.CommonApi;
 
+import org.joda.time.DateTime;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ScanWaybill extends AppCompatActivity implements View.OnClickListener {
     EditText txtWNo, txtWidth, txtHeight, txtLength;
-    static SweetAlertDialog alertDialog;
-    ImageView image1, image2, image3, image4;
+    ImageView image1, image2;
     int flag_insert = 1;
     String filename;
     HashMap<Integer, String> tempimages;
     String imagenames[] = {"Waybill1.png", "Waybill2.png"};
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +73,8 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         txtLength = (EditText) findViewById(R.id.txtlength);
         image1 = (ImageView) findViewById(R.id.image1);
         image1.setOnClickListener(this);
-        image2 = (ImageView) findViewById(R.id.image2);
-        image2.setOnClickListener(this);
+        //image2 = (ImageView) findViewById(R.id.image2);
+        //image2.setOnClickListener(this);
         tempimages = new HashMap<Integer, String>();
     }
 
@@ -134,7 +155,7 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         String id = String.valueOf(GlobalVar.GV().EmployID);
 
         if (id.length() > 0) {
-            filename = id + "_" + timpstamp.toString() + "_" + imagenames[position];
+            filename = "ScanWaybill_"+id + "_" + timpstamp.toString() + "_" + imagenames[position];
         }
         return filename;
     }
@@ -151,8 +172,409 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         else if(tempimages.size()==0)
         {
             GlobalVar.ShowDialog(ScanWaybill.this, "Info", "Please Capture the WaybillNo", true);
+        }else
+        {
+            new Image1().execute(createfilename(0));
         }
     }
 
+    ProgressDialog pDialog;
+
+    private class InsertIncident extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+
+
+        @Override
+        protected void onPreExecute() {
+
+            // if (progressDialog == null)
+
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... params) {
+
+            String jsonData = params[0];
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "InsertIncident");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+//
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+                    JSONObject jsonObject = new JSONObject(result);
+                    if (!jsonObject.getBoolean("HasError")) {
+
+                        GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+//                        GlobalVar.ShowDialog(Incident.this, "Info", "Your Request Sucessfully Inserted", true);
+                        SucessfullyInsert();
+                    } else {
+                        GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
+                        GlobalVar.ShowDialog(ScanWaybill.this, "Error", jsonObject.getString("ErrorMessage"), true);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(result);
+            } else {
+
+                GlobalVar.ShowDialog(ScanWaybill.this, "Error", "Your Request Not Insert, please try again later", true);
+            }
+            if (pDialog != null && pDialog.isShowing()) {
+                pDialog.dismiss();
+                pDialog = null;
+            }
+
+            File sourceFile = new File(GlobalVar.naqelvehicleimagepath + "/" + filename);
+
+            if (sourceFile.exists() ) {
+                deletefile(filename);
+            }
+
+        }
+    }
+
+    private void SucessfullyInsert() {
+        AlertDialog alertDialog = new AlertDialog.Builder(ScanWaybill.this).create();
+        alertDialog.setCancelable(false);
+        alertDialog.setTitle("Info.");
+        alertDialog.setMessage("your request sucessfully inserted ?");
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        tempimages.clear();
+
+                        image1.setBackgroundResource(R.drawable.capture);
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+//        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "no",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        finish();
+//                    }
+//                });
+        alertDialog.show();
+    }
+
+
+
+    private void insertDatatoServer(String imagename) {
+        JSONObject jsonObject = new JSONObject();
+        JSONObject incident = new JSONObject();
+        JSONArray jsonArray = new JSONArray();
+
+        try {
+            jsonObject.put("Reason", "ScanWaybill");
+
+            jsonObject.put("SReason","");
+            jsonObject.put("RequestAction", "");
+            jsonObject.put("Latitude", "");
+            jsonObject.put("Longitude", "");
+            jsonObject.put("CreatedDate", DateTime.now());
+            jsonObject.put("Requestby", GlobalVar.GV().EmployID);
+            jsonObject.put("DeliverysheetID", 0);
+            jsonObject.put("VehicleNo", "");
+            jsonObject.put("image1", imagename);
+            jsonObject.put("image2", 0);
+            jsonObject.put("image3", 0);
+            jsonObject.put("image4", 0);
+            jsonArray.put(jsonObject);
+            incident.put("Incident", jsonArray);
+            incident.put("Region", GlobalVar.GV().EmployStation);
+            incident.put("PendingWayBills", 0);
+            incident.put("EmpName", GlobalVar.GV().EmployName);
+            incident.put("Address", "");
+            incident.put("Distance", "");
+            incident.put("Remarks", "ScanWaybills");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        new InsertIncident().execute(incident.toString());
+    }
+
+    private class Image1 extends AsyncTask<String, Integer, String> {
+        StringBuffer buffer;
+        int position = 0;
+
+        @Override
+        protected void onPreExecute() {
+
+            pDialog = ProgressDialog.show(ScanWaybill.this,
+                    "Please wait.", "your Waybill Request is being process.", true);
+            super.onPreExecute();
+
+        }
+
+        protected String doInBackground(String... params) {
+
+
+
+            JSONObject jsonObject = null;
+            try {
+                jsonObject = new JSONObject();
+                jsonObject.put("ImageName", filename);
+                jsonObject.put("FileName", convertimage(filename));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String jsonData = jsonObject.toString();
+            HttpURLConnection httpURLConnection = null;
+            OutputStream dos = null;
+            InputStream ist = null;
+
+            try {
+
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                httpURLConnection.setRequestMethod("POST");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                httpURLConnection.setDoInput(true);
+                httpURLConnection.setDoOutput(true);
+                httpURLConnection.connect();
+
+                dos = httpURLConnection.getOutputStream();
+                httpURLConnection.getOutputStream();
+                dos.write(jsonData.getBytes());
+
+                ist = httpURLConnection.getInputStream();
+                String line;
+                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
+                buffer = new StringBuffer();
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line);
+                }
+                return String.valueOf(buffer);
+            } catch (Exception ignored) {
+            } finally {
+                try {
+                    if (ist != null)
+                        ist.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    if (dos != null)
+                        dos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (httpURLConnection != null)
+                    httpURLConnection.disconnect();
+            }
+            return null;
+//
+
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute("");
+            if (result != null) {
+
+                try {
+                    boolean delete = false;
+
+                    if (result.contains("Created Successfully")) {
+                        insertDatatoServer(filename);
+
+
+                    }
+
+
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                System.out.println(result);
+            } else {
+
+                GlobalVar.ShowDialog(ScanWaybill.this,"Error" , "Please try after sometime" , true);
+                if(pDialog !=null)
+                {
+                    pDialog.dismiss();
+                    pDialog = null;
+                }
+            }
+
+        }
+    }
+
+    public void compressimage(File imageDir, int size) {
+        Bitmap bm = null;
+        try {
+            Uri outputFileUri = Uri.fromFile(imageDir);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            // options.inJustDecodeBounds = true;
+
+                options.inSampleSize = 2;
+
+
+            // bm = Media.getBitmap(mContext.getContentResolver(), imageLoc);
+            bm = BitmapFactory.decodeStream(this.getContentResolver()
+                    .openInputStream(outputFileUri), null, options);
+            FileOutputStream out = new FileOutputStream(imageDir);
+            bm.compress(Bitmap.CompressFormat.JPEG, 60, out);
+
+            bm.recycle();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private String convertimage( String imname) {
+        String image = "";
+        String imagename = GlobalVar.naqelvehicleimagepath + "/" + imname;
+
+        File imgfile = new File(imagename);
+
+
+        Uri outputFileUri = null;
+        if (Build.VERSION.SDK_INT > 23)
+            outputFileUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider",
+                    imgfile);
+        else
+            outputFileUri = Uri.fromFile(imgfile);
+
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), outputFileUri);
+            Bitmap lastBitmap = null;
+            lastBitmap = bitmap;
+            //encoding image to string
+            image = getStringImage(lastBitmap);
+            Log.d("image", image);
+            //passing the image to volley
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
+
+    }
+
+    private void deletefile(String imagename) {
+        try {
+            File deletefile = new File(GlobalVar.naqelvehicleimagepath + "/"
+                    + imagename);
+            deletefile.delete();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        switch (requestCode) {
+            case 0:
+
+                if (requestCode == 0
+                        && resultCode == Activity.RESULT_OK) {
+
+                    File image = new File(GlobalVar.naqelvehicleimagepath + "/"
+                            + filename);
+
+                    int file_size = Integer
+                            .parseInt(String.valueOf(image.length() / 1024));
+                    if (file_size > 0) {
+                        boolean ci = true;
+                        while (ci) {
+                            long kb = image.length() / 1024;
+                            if (kb > 300)
+                                compressimage(image, 0);
+                            else
+                                ci = false;
+                        }
+                        image1.setImageBitmap(BitmapFactory.decodeFile(image
+                                .getAbsolutePath()));
+
+
+
+                    } else
+                        GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.prp),
+                                GlobalVar.AlertType.Error);
+
+                }
+                break;
+
+        }
+
+    }
 
 }

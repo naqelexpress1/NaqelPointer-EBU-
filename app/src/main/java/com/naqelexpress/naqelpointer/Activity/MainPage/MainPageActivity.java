@@ -82,6 +82,7 @@ import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Activity.PendingMoney.PendingMoneyActivity;
 import com.naqelexpress.naqelpointer.Activity.PickUp.PickUpActivity;
 import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
+import com.naqelexpress.naqelpointer.Activity.ScanWaybill.ScanWaybill;
 import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
@@ -1480,7 +1481,7 @@ public class MainPageActivity
                     case 33:
                         if (VersionMatct()) {
                             Intent cbm = new Intent(getApplicationContext(),
-                                    CBM.class);
+                                    ScanWaybill.class);
 //
                             startActivity(cbm);
                         } else {

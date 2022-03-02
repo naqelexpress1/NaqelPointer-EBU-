@@ -202,7 +202,7 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "InsertIncident");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "InsertScanWaybill");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -291,7 +291,7 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         AlertDialog alertDialog = new AlertDialog.Builder(ScanWaybill.this).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Info.");
-        alertDialog.setMessage("your request sucessfully inserted ?");
+        alertDialog.setMessage("your request sucessfully inserted");
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "yes",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -321,29 +321,9 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         JSONArray jsonArray = new JSONArray();
 
         try {
-            jsonObject.put("Reason", "ScanWaybill");
-
-            jsonObject.put("SReason","");
-            jsonObject.put("RequestAction", "");
-            jsonObject.put("Latitude", "");
-            jsonObject.put("Longitude", "");
-            jsonObject.put("CreatedDate", DateTime.now());
-            jsonObject.put("Requestby", GlobalVar.GV().EmployID);
-            jsonObject.put("DeliverysheetID", 0);
-            jsonObject.put("VehicleNo", "");
-            jsonObject.put("image1", imagename);
-            jsonObject.put("image2", 0);
-            jsonObject.put("image3", 0);
-            jsonObject.put("image4", 0);
-            jsonArray.put(jsonObject);
-            incident.put("Incident", jsonArray);
-            incident.put("Region", GlobalVar.GV().EmployStation);
-            incident.put("PendingWayBills", 0);
-            incident.put("EmpName", GlobalVar.GV().EmployName);
-            incident.put("Address", "");
-            incident.put("Distance", "");
-            incident.put("Remarks", "ScanWaybills");
-
+            incident.put("Requestby", GlobalVar.GV().EmployID);
+            incident.put("image1", imagename);
+            incident.put("WaybillNo", txtWNo.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -384,7 +364,7 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
 
             try {
 
-                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "upload");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink_UploadImage + "uploadImage");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");

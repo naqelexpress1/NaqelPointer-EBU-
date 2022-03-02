@@ -758,7 +758,7 @@ public class MainPageActivity
                 cellIcon[22] = R.drawable.customclearence; //CBU
                 cellIcon[23] = R.drawable.car; //CBU
                 cellIcon[24] = R.drawable.fuel; //CBU
-                cellIcon[25] = R.drawable.fuel; //CBU
+                cellIcon[25] = R.drawable.scanwaybill; //CBU
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -781,7 +781,7 @@ public class MainPageActivity
                 cellIcon[17] = R.drawable.customclearence; //CBU
                 cellIcon[18] = R.drawable.car; //CBU
                 cellIcon[19] = R.drawable.fuel; //CBU
-                cellIcon[20] = R.drawable.fuel; //CBU
+                cellIcon[20] = R.drawable.scanwaybill; //CBU
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }

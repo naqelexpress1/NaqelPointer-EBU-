@@ -3,6 +3,9 @@
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/66933aa2658e02b84e18d1c7f8ca4542/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/66933aa2658e02b84e18d1c7f8ca4542/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7b57071b04bda50fc8da80b723535944/materialish-progress-1.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7b57071b04bda50fc8da80b723535944/materialish-progress-1.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7b57071b04bda50fc8da80b723535944/materialish-progress-1.0/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

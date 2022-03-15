@@ -109,7 +109,7 @@ public class GlobalVar {
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
-    public String AppVersion = "TH Bug Fix - 1 23-02-2022"; //"RouteLineSeq 15-01-2021";
+    public String AppVersion = "EBU - 15-03-2022"; //"RouteLineSeq 15-01-2021";
     public static int triedTimes = 0;
     public static int triedTimes_ForDelService = 0;
     public static int triedTimes_ForNotDeliverService = 0;

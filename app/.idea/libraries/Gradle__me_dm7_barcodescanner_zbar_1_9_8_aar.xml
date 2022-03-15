@@ -4,6 +4,10 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1abe9ea32705cd1bdc3d42148b553355/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1abe9ea32705cd1bdc3d42148b553355/res" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/1abe9ea32705cd1bdc3d42148b553355/jars/libs/zbar.jar!/" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ec9e4063dde613b529ad92691ab2213/zbar-1.9.8/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ec9e4063dde613b529ad92691ab2213/zbar-1.9.8/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ec9e4063dde613b529ad92691ab2213/zbar-1.9.8/jars/libs/zbar.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5ec9e4063dde613b529ad92691ab2213/zbar-1.9.8/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

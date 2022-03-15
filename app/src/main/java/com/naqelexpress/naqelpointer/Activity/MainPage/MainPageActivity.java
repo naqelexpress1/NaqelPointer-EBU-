@@ -82,6 +82,7 @@ import com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredActivity;
 import com.naqelexpress.naqelpointer.Activity.PendingMoney.PendingMoneyActivity;
 import com.naqelexpress.naqelpointer.Activity.PickUp.PickUpActivity;
 import com.naqelexpress.naqelpointer.Activity.Rating.CourierRating;
+import com.naqelexpress.naqelpointer.Activity.ScanWaybill.ScanWaybill;
 import com.naqelexpress.naqelpointer.Activity.Settings.SettingActivity;
 import com.naqelexpress.naqelpointer.Activity.TerminalHandlingAutoSave.TerminalHandlingGroup;
 import com.naqelexpress.naqelpointer.Activity.ValidationDS.ValidationDS;
@@ -757,7 +758,7 @@ public class MainPageActivity
                 cellIcon[22] = R.drawable.customclearence; //CBU
                 cellIcon[23] = R.drawable.car; //CBU
                 cellIcon[24] = R.drawable.fuel; //CBU
-                cellIcon[25] = R.drawable.fuel; //CBU
+                cellIcon[25] = R.drawable.scanwaybill; //CBU
 //            cellIcon[20] = R.drawable.delivery; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
@@ -780,7 +781,7 @@ public class MainPageActivity
                 cellIcon[17] = R.drawable.customclearence; //CBU
                 cellIcon[18] = R.drawable.car; //CBU
                 cellIcon[19] = R.drawable.fuel; //CBU
-                cellIcon[20] = R.drawable.fuel; //CBU
+                cellIcon[20] = R.drawable.scanwaybill; //CBU
                 // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
@@ -1480,7 +1481,7 @@ public class MainPageActivity
                     case 33:
                         if (VersionMatct()) {
                             Intent cbm = new Intent(getApplicationContext(),
-                                    CBM.class);
+                                    ScanWaybill.class);
 //
                             startActivity(cbm);
                         } else {

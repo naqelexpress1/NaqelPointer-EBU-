@@ -9,9 +9,13 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/ScanWaybill.xml" value="0.1331521739130435" />
+        <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/activity_inventory_list.xml" value="0.18614130434782608" />
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/arivedatdestpallet.xml" value="0.15579710144927536" />
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/cbmexp.xml" value="0.1331521739130435" />
+        <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/content_booking_list.xml" value="0.18614130434782608" />
+        <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/content_booking_list_spasr.xml" value="0.18614130434782608" />
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/incident.xml" value="0.15081521739130435" />
+        <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/pickup.xml" value="0.18614130434782608" />
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/layout/scanwaybill.xml" value="0.15579710144927536" />
         <entry key="..\:/PointerIsmailvacation/PointerMobileApp/app/src/main/res/menu/checkpointmenu.xml" value="0.20416666666666666" />
       </map>

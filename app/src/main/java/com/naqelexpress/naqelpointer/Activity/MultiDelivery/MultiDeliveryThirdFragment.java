@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.MultiDelivery;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,8 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputFilter;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +32,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class MultiDeliveryThirdFragment
         extends Fragment {
@@ -58,8 +58,8 @@ public class MultiDeliveryThirdFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
-            /*txtBarCode.addTextChangedListener(new TextWatcher() {
+//            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+            txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -70,41 +70,43 @@ public class MultiDeliveryThirdFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
                         AddNewPiece();
-                }
-            });*/
-
-            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        //finish();
-                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
-                            AddNewPiece();
-                        return true;
-                    }
-                    return false;
                 }
             });
 
-            intent = new Intent(getActivity(), NewBarCodeScanner.class);
+//            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        //finish();
+//                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+//                            AddNewPiece();
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
+
+
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
+//            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
                         GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                    } else
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                    } else {
+                        Intent intent = new Intent(getActivity(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(intent, 3);
+                    }
                 }
             });
 
@@ -128,7 +130,7 @@ public class MultiDeliveryThirdFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 3 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
@@ -229,7 +231,7 @@ public class MultiDeliveryThirdFragment
 
     private void AddNewPiece() {
         if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13 || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength) {
+            if (txtBarCode.getText().toString().length() >= 8) {// || txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength
                 PieceBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

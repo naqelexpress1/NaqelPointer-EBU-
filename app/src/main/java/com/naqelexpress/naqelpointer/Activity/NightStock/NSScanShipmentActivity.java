@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.Activity.NightStock;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ public class NSScanShipmentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nsscan_shipment);
         TimeIn = DateTime.now();
         bundle = getIntent().getExtras();
+
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -211,6 +213,24 @@ public class NSScanShipmentActivity extends AppCompatActivity {
                     return getResources().getString(R.string.ns_Peices);
             }
             return null;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+                if (result == 0) {
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 

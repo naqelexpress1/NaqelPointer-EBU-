@@ -99,16 +99,16 @@ public class CourierDetails extends Fragment // implements ResultInterface
     private void clearfields() {
         waybilldetails.clear();
         waybillBardetails.clear();
-        FirstFragment.Selectedwaybilldetails.clear();
-        FirstFragment.validatewaybilldetails.clear();
-        SecondFragment.SelectedwaybillBardetails.clear();
-        SecondFragment.ValidateBarCodeList.clear();
+        SecondFragment.Selectedwaybilldetails.clear();
+        SecondFragment.validatewaybilldetails.clear();
+        ThirdFragment.SelectedwaybillBardetails.clear();
+        ThirdFragment.ValidateBarCodeList.clear();
         selectedwaybillcount.setText("0");
-        if (FirstFragment.adapter != null)
-            FirstFragment.adapter.notifyDataSetChanged();
-        if (SecondFragment.adapter != null) {
+        if (SecondFragment.adapter != null)
             SecondFragment.adapter.notifyDataSetChanged();
-            SecondFragment.lbTotal.setText("0");
+        if (ThirdFragment.adapter != null) {
+            ThirdFragment.adapter.notifyDataSetChanged();
+            ThirdFragment.lbTotal.setText("0");
         }
     }
 
@@ -135,8 +135,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
                 if (result.getString(result.getColumnIndex("bgcolor")).equals("1")) {
                     selectedwayabill = selectedwayabill + 1;
-                    FirstFragment.Selectedwaybilldetails.add(tempwaybill);
-                    FirstFragment.validatewaybilldetails.add(result.getString(result.getColumnIndex("WaybillNo")));
+                    SecondFragment.Selectedwaybilldetails.add(tempwaybill);
+                    SecondFragment.validatewaybilldetails.add(result.getString(result.getColumnIndex("WaybillNo")));
                 }
                 waybilldetails.add(tempwaybill);
 
@@ -145,8 +145,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
             waybillcount.setText(String.valueOf(result.getCount()));
             selectedwaybillcount.setText(String.valueOf(selectedwayabill));
-            if (FirstFragment.adapter != null)
-                FirstFragment.adapter.notifyDataSetChanged();
+            if (SecondFragment.adapter != null)
+                SecondFragment.adapter.notifyDataSetChanged();
         }
         result.close();
 
@@ -165,17 +165,17 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
                 if (result.getString(result.getColumnIndex("bgcolor")).equals("1")) {
                     pc++;
-                    SecondFragment.ValidateBarCodeList.add(result.getString(result.getColumnIndex("BarCode")));
-                    SecondFragment.SelectedwaybillBardetails.add(tempbarcode);
+                    ThirdFragment.ValidateBarCodeList.add(result.getString(result.getColumnIndex("BarCode")));
+                    ThirdFragment.SelectedwaybillBardetails.add(tempbarcode);
                 }
                 waybillBardetails.add(tempbarcode);
             }
             while (result.moveToNext());
 
             piececount.setText(String.valueOf(result.getCount()));
-            if (SecondFragment.adapter != null) {
-                SecondFragment.adapter.notifyDataSetChanged();
-                SecondFragment.lbTotal.setText(String.valueOf(pc));
+            if (ThirdFragment.adapter != null) {
+                ThirdFragment.adapter.notifyDataSetChanged();
+                ThirdFragment.lbTotal.setText(String.valueOf(pc));
             }
         }
         result.close();
@@ -268,8 +268,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
                 waybilldetails.clear();
                 waybillBardetails.clear();
 
-                FirstFragment.Selectedwaybilldetails.clear();
-                SecondFragment.SelectedwaybillBardetails.clear();
+                SecondFragment.Selectedwaybilldetails.clear();
+                ThirdFragment.SelectedwaybillBardetails.clear();
 
                 try {
                     JSONObject job = new JSONObject(finalJson);

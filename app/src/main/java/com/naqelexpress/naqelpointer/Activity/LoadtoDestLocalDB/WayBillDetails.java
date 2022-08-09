@@ -1,24 +1,31 @@
 package com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -30,6 +37,7 @@ public class WayBillDetails extends Fragment // implements ResultInterface
     static CourierAdapterNew adapter;
     private GridView waybilgrid;
     static TextView tripname, tripcode;
+    private Intent intent;
 
     //static ArrayList<HashMap<String, String>> waybilldetails = new ArrayList<>();
     public static ArrayList<String> validatewaybilldetails = new ArrayList<>();
@@ -51,7 +59,7 @@ public class WayBillDetails extends Fragment // implements ResultInterface
                 waybillcount = (TextView) rootView.findViewById(R.id.waybillcount);
                 txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
-                txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//                txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 
                 txtBarCode.addTextChangedListener(new TextWatcher() {
                     @Override
@@ -62,61 +70,82 @@ public class WayBillDetails extends Fragment // implements ResultInterface
                     public void onTextChanged(CharSequence s, int start, int before, int count) {
                     }
 
+
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                            setTxtWaybillNo();
-
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 8){
+                            String code = txtBarCode.getText().toString();
+                            setTxtWaybillNo(code);
+                        }
                     }
                 });
-                // waybilldetails.clear();
-
             }
+
+            Button cmrabtn = (Button) rootView.findViewById(R.id.btnOpenCamera);
+            //cmrabtn.setVisibility(View.GONE);
+
+
+
+            cmrabtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                        GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                    } else
+                    {
+                        Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(newIntent, 1);
+                    }
+                }
+            });
             ReadFromLocal();
             return rootView;
         }
     }
 
-    private void setTxtWaybillNo() {
 
-        String barcode = txtBarCode.getText().toString();
-        utilities utilities = new utilities();
-        ValidateWayBill(utilities.findwaybillno(barcode));
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("SECFRAG", "AtOriginUsingLocalDB/SecondFragment: ");
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            if (data != null) {
+                Bundle extras = data.getExtras();
+                if (extras != null) {
+                    if (extras.containsKey("barcode")) {
+                        String barcode = extras.getString("barcode");
+                        txtBarCode.setText(barcode);
 
-//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-//            //txtBarCode.setText(barcode.substring(0, 8));
-//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//            ValidateWayBill(utilities.findwaybillno(barcode));
-//
-//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-////            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-//            ValidateWayBill(utilities.findwaybillno(barcode));
-//        }
+                    }
+                }
+            }
+        }
+    }
 
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
+    private void setTxtWaybillNo(String barcode) {
+//        String barcode = txtBarCode.getText().toString();
+//        utilities utilities = new utilities();
+//        ValidateWayBill(utilities.findwaybillno(barcode));
+        ValidateWayBill(barcode);
 
     }
 
     private void ValidateWayBill(String waybillno) {
         if (!validatewaybilldetails.contains(waybillno)) {
-
             DBConnections dbConnections = new DBConnections(getContext(), null);
             dbConnections.InsertLoadtoDestWaybill(waybillno, LoadtoDestination.triplanID, getContext());
             dbConnections.close();
 
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-            txtBarCode.setText("");
+//            txtBarCode.setText("");
             adapter.notifyDataSetChanged();
             validatewaybilldetails.add(waybillno);
             waybillcount.setText(getString(R.string.lbCount) + validatewaybilldetails.size());
 
         } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
-            txtBarCode.setText("");
+//            txtBarCode.setText("");
         }
     }
 

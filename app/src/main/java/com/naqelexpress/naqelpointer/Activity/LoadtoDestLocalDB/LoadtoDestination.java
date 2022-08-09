@@ -1,5 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB;
 
+import static com.naqelexpress.naqelpointer.R.id.container;
+
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -42,12 +45,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.naqelexpress.naqelpointer.R.id.container;
-
 public class LoadtoDestination extends AppCompatActivity {
 
     WayBillDetails courierdetails;
-    BuildPallet secondFragment;
+    //    BuildPallet secondFragment;
     SingleLoad thirdFragment;
     DateTime TimeIn;
 
@@ -96,8 +97,8 @@ public class LoadtoDestination extends AppCompatActivity {
         });
 
         courierdetails.validatewaybilldetails.clear();
-        secondFragment.Createpallertlist.clear();
-        secondFragment.validateBarcodeetails.clear();
+//        secondFragment.Createpallertlist.clear();
+//        secondFragment.validateBarcodeetails.clear();
         thirdFragment.ValidateBarCodeList.clear();
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -119,6 +120,22 @@ public class LoadtoDestination extends AppCompatActivity {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.loadtodest, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
     }
 
     @Override
@@ -310,9 +327,9 @@ public class LoadtoDestination extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
 
-        if (secondFragment instanceof IOnFocusListenable) {
-            ((IOnFocusListenable) secondFragment).onWindowFocusChanged(hasFocus);
-        }
+//        if (secondFragment instanceof IOnFocusListenable) {
+//            ((IOnFocusListenable) secondFragment).onWindowFocusChanged(hasFocus);
+//        }
     }
 
 

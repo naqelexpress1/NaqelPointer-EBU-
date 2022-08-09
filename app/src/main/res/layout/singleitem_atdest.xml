@@ -60,18 +60,17 @@
             android:id="@+id/waybillno"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8"
-            android:ems="10"
+            android:layout_weight="0.85"
             android:hint="Waybill No"
             android:inputType="number" />
 
         <Button
             android:id="@+id/btnOpenCamera"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_weight="0.15"
             android:background="@drawable/camera"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 

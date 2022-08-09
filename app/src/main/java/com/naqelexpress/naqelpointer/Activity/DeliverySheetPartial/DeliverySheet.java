@@ -49,7 +49,6 @@ public class DeliverySheet
         setContentView(R.layout.notdelivered);
         bundle = getIntent().getExtras();
 
-
         Intent intent = this.getIntent();
         Bundle bundle = intent.getExtras();
 

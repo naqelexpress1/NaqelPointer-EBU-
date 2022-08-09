@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.DeliverysheetEBU;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,7 +19,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,13 +32,10 @@ import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DeliverySheetSecondFragment
         extends Fragment {
@@ -64,7 +62,7 @@ public class DeliverySheetSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 
             txtWaybillNo.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -91,16 +89,16 @@ public class DeliverySheetSecondFragment
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
             //intent = new Intent(getActivity().getApplicationContext(), NewBarCodeScanner.class);
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
                         GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                    } else {
-                        Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                    }  else
+                    {
+                        Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(newIntent, 1);
                     }
                 }
             });
@@ -147,8 +145,9 @@ public class DeliverySheetSecondFragment
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybillNo.getText().toString();
-        utilities utilities = new utilities();
-        AddNewWaybill8and9(utilities.findwaybillno(barcode));
+//        utilities utilities = new utilities();
+//        AddNewWaybill8and9(utilities.findwaybillno(barcode));
+        AddNewWaybill8and9(barcode);
 
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
 //            //txtBarCode.setText(barcode.substring(0, 8));
@@ -179,14 +178,13 @@ public class DeliverySheetSecondFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() > 8)
-                            barcode = barcode.substring(0, 8);
+                        if (barcode.length() >= 8)
                         txtWaybillNo.setText(barcode);
 //                        AddNewWaybill();
                     }

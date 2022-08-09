@@ -1,22 +1,29 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -25,9 +32,7 @@ import com.naqelexpress.naqelpointer.utils.utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static android.app.Activity.RESULT_OK;
-
-public class FirstFragment extends Fragment {
+public class SecondFragment extends Fragment {
     View rootView;
     private EditText txtBarCode;
     TextView lbTotal;
@@ -48,6 +53,7 @@ public class FirstFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         {
             if (rootView == null) {
+
                 rootView = inflater.inflate(R.layout.atoriginfirstnew, container, false);
                 lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
@@ -68,32 +74,28 @@ public class FirstFragment extends Fragment {
                         if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
                             //if (setTxtWaybillNo())
                             setTxtWaybillNo();
-//                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-//                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                            //  ValidateWayBill(txtBarCode.getText().toString());
                         }
                     }
                 });
 
+                Button cmrabtn = (Button) rootView.findViewById(R.id.btnOpenCamera);
+                //cmrabtn.setVisibility(View.GONE);
 
-//                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                        // If the event is a key-down event on the "enter" button
-//                        if (event.getAction() != KeyEvent.ACTION_DOWN)
-//                            return true;
-//                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
-//                            //finish();
-//                            onBackpressed();
-//                            return true;
-//                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-//
-//                            setTxtWaybillNo();
-//                            return true;
-//                        }
-//                        return false;
-//                    }
-//                });
-                //Selectedwaybilldetails.clear();
+                cmrabtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                            GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                        } else
+                        {
+                            Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                            getActivity().startActivityForResult(newIntent, 2);
+                        }
+
+                    }
+                });
+
 
                 swipeMenuListView = (SwipeMenuListView) rootView.findViewById(R.id.pieceslist);
                 adapter = new DataAdapter(Selectedwaybilldetails, getContext());
@@ -105,25 +107,19 @@ public class FirstFragment extends Fragment {
         }
     }
 
+
+
+
+
     private void setTxtWaybillNo() {
 
         String barcode = txtBarCode.getText().toString();
         utilities utilities = new utilities();
         ValidateWayBill(utilities.findwaybillno(barcode));
-//
-//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-//            //txtBarCode.setText(barcode.substring(0, 8));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//
-//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-//        }
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
 
     }
+
 
     private void ValidateWayBill(String waybillno) {
         if (!validatewaybilldetails.contains(waybillno)) {
@@ -149,7 +145,7 @@ public class FirstFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
@@ -209,4 +205,8 @@ public class FirstFragment extends Fragment {
         alertDialog.show();
 
     }
+
+
+
 }
+

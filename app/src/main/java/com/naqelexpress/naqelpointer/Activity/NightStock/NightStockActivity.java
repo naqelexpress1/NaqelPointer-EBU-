@@ -4,6 +4,7 @@ package com.naqelexpress.naqelpointer.Activity.NightStock;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.naqelexpress.naqelpointer.R;
 
@@ -18,6 +19,7 @@ public class NightStockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_night_stock);
+
 
 //        LoadMenu();
 //        gridView = (GridView) findViewById(R.id.gridnightStock);

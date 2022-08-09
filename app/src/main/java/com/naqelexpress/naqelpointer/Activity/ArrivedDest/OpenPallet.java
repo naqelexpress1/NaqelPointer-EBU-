@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.ArrivedDest;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,8 +25,6 @@ import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static android.app.Activity.RESULT_OK;
 
 public class OpenPallet extends Fragment {
     View rootView;
@@ -65,7 +65,7 @@ public class OpenPallet extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && txtBarCode.getText().length() == 7)
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
                             ValidateWayBill(txtBarCode.getText().toString());
                     }
                 });
@@ -79,8 +79,10 @@ public class OpenPallet extends Fragment {
                         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                             GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                        } else
-                            startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        } else{
+                            Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                            getActivity().startActivityForResult(intent, 2);
+                        }
                     }
                 });
 
@@ -115,7 +117,7 @@ public class OpenPallet extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {

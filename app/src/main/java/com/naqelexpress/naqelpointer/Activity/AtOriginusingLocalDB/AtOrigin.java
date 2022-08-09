@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 
+import static com.naqelexpress.naqelpointer.R.id.container;
+
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -40,13 +42,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static com.naqelexpress.naqelpointer.R.id.container;
-
 public class AtOrigin extends AppCompatActivity {
 
     CourierDetails courierdetails;//1
-    FirstFragment secondFragment;//2
-    SecondFragment thirdFragment;//3
+    SecondFragment secondFragment;//2
+    ThirdFragment thirdFragment;//3
     DateTime TimeIn;
     private Bundle bundle;
 
@@ -92,9 +92,9 @@ public class AtOrigin extends AppCompatActivity {
 
         CourierDetails.waybilldetails.clear();
         CourierDetails.waybillBardetails.clear();
-        FirstFragment.Selectedwaybilldetails.clear();
-        SecondFragment.SelectedwaybillBardetails.clear();
-        SecondFragment.ValidateBarCodeList.clear();
+        SecondFragment.Selectedwaybilldetails.clear();
+        ThirdFragment.SelectedwaybillBardetails.clear();
+        ThirdFragment.ValidateBarCodeList.clear();
 
     }
 
@@ -131,7 +131,7 @@ public class AtOrigin extends AppCompatActivity {
             case R.id.PartialSave:
                 if (GlobalVar.ValidateAutomacticDate(getApplicationContext())) {
 
-                    if (FirstFragment.Selectedwaybilldetails.size() > 0 && SecondFragment.SelectedwaybillBardetails.size() > 0) {
+                    if (SecondFragment.Selectedwaybilldetails.size() > 0 && ThirdFragment.SelectedwaybillBardetails.size() > 0) {
                         showPopup(AtOrigin.this, p, 0);
                     } else
                         ShowAlertMessage();
@@ -184,8 +184,8 @@ public class AtOrigin extends AppCompatActivity {
                 if (tripplanbarcode != null && tripplanbarcode.getText().length() == 14) {
                     if (tripplanbarcode.getText().toString().equals("At@riginDelete")) {
                         Intent intent = new Intent(AtOrigin.this, AtOriginDelete.class);
-                        intent.putExtra("Waybills", FirstFragment.Selectedwaybilldetails);
-                        intent.putExtra("BarCode", SecondFragment.SelectedwaybillBardetails);
+                        intent.putExtra("Waybills", SecondFragment.Selectedwaybilldetails);
+                        intent.putExtra("BarCode", ThirdFragment.SelectedwaybillBardetails);
                         startActivityForResult(intent, 1);
                     }
                     popup.dismiss();
@@ -205,31 +205,51 @@ public class AtOrigin extends AppCompatActivity {
         popup.showAtLocation(layout, Gravity.CENTER, p.x + OFFSET_X, p.y + OFFSET_Y);
     }
 
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == RESULT_OK) {
-            if (data != null) {
-                Bundle extras = data.getExtras();
-                if (extras != null) {
-                    if (extras.containsKey("Save")) {
-                        finish();
-                    }
-                }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+//                if (result == 0) {
+//                    addwaybillagain();
+//                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
 
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == 1 && resultCode == RESULT_OK) {
+//            if (data != null) {
+//                Bundle extras = data.getExtras();
+//                if (extras != null) {
+//                    if (extras.containsKey("Save")) {
+//                        finish();
+//                    }
+//                }
+//            }
+//        }
+//    }
+
     private void SaveData() {
 
-        for (int i = 0; i < FirstFragment.Selectedwaybilldetails.size(); i++) {
-            int piececount = Integer.parseInt(FirstFragment.Selectedwaybilldetails.get(i).get("PieceCount"));
+        for (int i = 0; i < SecondFragment.Selectedwaybilldetails.size(); i++) {
+            int piececount = Integer.parseInt(SecondFragment.Selectedwaybilldetails.get(i).get("PieceCount"));
             int barcodeCout = 0;
             String Waybill = "", BarCode = "";
-            Waybill = FirstFragment.Selectedwaybilldetails.get(i).get("WaybillNo");
-            for (int j = 0; j < SecondFragment.SelectedwaybillBardetails.size(); j++) {
-                BarCode = SecondFragment.SelectedwaybillBardetails.get(j).get("BarCode");
-                if (FirstFragment.Selectedwaybilldetails.get(i).get("WaybillNo").
-                        equals(SecondFragment.SelectedwaybillBardetails.get(j).get("WaybillNo"))) {
+            Waybill = SecondFragment.Selectedwaybilldetails.get(i).get("WaybillNo");
+            for (int j = 0; j < ThirdFragment.SelectedwaybillBardetails.size(); j++) {
+                BarCode = ThirdFragment.SelectedwaybillBardetails.get(j).get("BarCode");
+                if (SecondFragment.Selectedwaybilldetails.get(i).get("WaybillNo").
+                        equals(ThirdFragment.SelectedwaybillBardetails.get(j).get("WaybillNo"))) {
                     barcodeCout = barcodeCout + 1;
 
                 }
@@ -259,15 +279,15 @@ public class AtOrigin extends AppCompatActivity {
                     boolean add = false;
                     if (Waybill.equals(CourierDetails.waybillBardetails.get(k).get("WaybillNo"))) {
 
-                        for (int j = 0; j < SecondFragment.SelectedwaybillBardetails.size(); j++) {
+                        for (int j = 0; j < ThirdFragment.SelectedwaybillBardetails.size(); j++) {
 
                             if (CourierDetails.waybillBardetails.get(k).get("BarCode").
-                                    equals(SecondFragment.SelectedwaybillBardetails.get(j).get("BarCode"))) {
+                                    equals(ThirdFragment.SelectedwaybillBardetails.get(j).get("BarCode"))) {
 
                                 break;
                             }
 
-                            if (j == SecondFragment.SelectedwaybillBardetails.size() - 1) {
+                            if (j == ThirdFragment.SelectedwaybillBardetails.size() - 1) {
                                 if (count == 0)
                                     BarCode = CourierDetails.waybillBardetails.get(k).get("BarCode");
                                 else
@@ -281,9 +301,9 @@ public class AtOrigin extends AppCompatActivity {
                 ErrorAlert(Waybill, BarCode, count);
                 break;
             } else {
-                if (FirstFragment.Selectedwaybilldetails.size() - 1 == i)
+                if (SecondFragment.Selectedwaybilldetails.size() - 1 == i)
 
-                    SavetoLocal(FirstFragment.Selectedwaybilldetails.get(i).get("EmployID"));
+                    SavetoLocal(SecondFragment.Selectedwaybilldetails.get(i).get("EmployID"));
             }
         }
     }
@@ -314,12 +334,12 @@ public class AtOrigin extends AppCompatActivity {
             header.put("UserID", GlobalVar.GV().UserID);
             header.put("IDs", GlobalVar.GV().UserID);
             header.put("IsSync", false);
-            header.put("WaybillCount", FirstFragment.Selectedwaybilldetails.size());
+            header.put("WaybillCount", SecondFragment.Selectedwaybilldetails.size());
             header.put("StationID", GlobalVar.GV().StationID);
-            header.put("PieceCount", SecondFragment.SelectedwaybillBardetails.size());
+            header.put("PieceCount", ThirdFragment.SelectedwaybillBardetails.size());
             header.put("CTime", DateTime.now().toString());
             int insertpartial = 0;
-            for (int i = 0; i < FirstFragment.Selectedwaybilldetails.size(); i++) {
+            for (int i = 0; i < SecondFragment.Selectedwaybilldetails.size(); i++) {
 
                 if (insertpartial == 5) {
                     header.put("AtOriginWaybillDetails", jsonArray);
@@ -329,14 +349,14 @@ public class AtOrigin extends AppCompatActivity {
                 }
                 insertpartial++;
                 JSONObject waybill = new JSONObject();
-                waybill.put("WaybillNo", FirstFragment.Selectedwaybilldetails.get(i).get("WaybillNo"));
+                waybill.put("WaybillNo", SecondFragment.Selectedwaybilldetails.get(i).get("WaybillNo"));
                 waybill.put("IsSync", false);
                 jsonArray.put(waybill);
 
             }
             insertpartial = 0;
 
-            for (int i = 0; i < SecondFragment.SelectedwaybillBardetails.size(); i++) {
+            for (int i = 0; i < ThirdFragment.SelectedwaybillBardetails.size(); i++) {
 
                 if (insertpartial == 5) {
                     JSONArray dummy = new JSONArray();
@@ -349,7 +369,7 @@ public class AtOrigin extends AppCompatActivity {
                 insertpartial++;
 
                 JSONObject waybill = new JSONObject();
-                waybill.put("BarCode", SecondFragment.SelectedwaybillBardetails.get(i).get("BarCode"));
+                waybill.put("BarCode", ThirdFragment.SelectedwaybillBardetails.get(i).get("BarCode"));
                 waybill.put("IsSync", false);
                 jsonArray1.put(waybill);
 
@@ -420,18 +440,18 @@ public class AtOrigin extends AppCompatActivity {
                     }
                 case 1:
                     if (secondFragment == null) {
-                        secondFragment = new FirstFragment();
+                        secondFragment = new SecondFragment();
                         return secondFragment;
                     } else {
                         return secondFragment;
                     }
                 case 2:
                     if (thirdFragment == null) {
-                        thirdFragment = new SecondFragment();
-                        // thirdFragment.ShipmentBarCodeList = firstFragment.ShipmentBarCodeList;
+                        thirdFragment = new ThirdFragment();
+                        // thirdFragment.ShipmentBarCodeList = SecondFragment.ShipmentBarCodeList;
                         return thirdFragment;
                     } else {
-                        //   thirdFragment.ShipmentBarCodeList = firstFragment.ShipmentBarCodeList;
+                        //   thirdFragment.ShipmentBarCodeList = SecondFragment.ShipmentBarCodeList;
                         return thirdFragment;
                     }
             }
@@ -479,7 +499,7 @@ public class AtOrigin extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         getSupportFragmentManager().putFragment(outState, "courierdetails", courierdetails);
-        getSupportFragmentManager().putFragment(outState, "secondFragment", secondFragment);
+        getSupportFragmentManager().putFragment(outState, "ThirdFragment", secondFragment);
         if (thirdFragment != null)
             getSupportFragmentManager().putFragment(outState, "thirdFragment", thirdFragment);
         outState.putInt("EmployID", GlobalVar.GV().EmployID);
@@ -499,8 +519,8 @@ public class AtOrigin extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
             courierdetails = (CourierDetails) getSupportFragmentManager().getFragment(savedInstanceState, "courierdetails");
-            secondFragment = (FirstFragment) getSupportFragmentManager().getFragment(savedInstanceState, "secondFragment");
-            thirdFragment = (SecondFragment) getSupportFragmentManager().getFragment(savedInstanceState, "thirdFragment");
+            secondFragment = (SecondFragment) getSupportFragmentManager().getFragment(savedInstanceState, "ThirdFragment");
+            thirdFragment = (ThirdFragment) getSupportFragmentManager().getFragment(savedInstanceState, "thirdFragment");
             GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
             GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
             GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");

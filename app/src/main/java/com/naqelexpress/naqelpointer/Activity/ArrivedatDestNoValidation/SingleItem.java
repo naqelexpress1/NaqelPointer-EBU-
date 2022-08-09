@@ -1,32 +1,38 @@
 package com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.InputFilter;
-import android.view.KeyEvent;
+import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 
-import static android.app.Activity.RESULT_OK;
-
 
 public class SingleItem extends Fragment {
 
-    EditText palletbarcode;
+    Button btnOpenCamera;
+    EditText txtBarCode;
     View rootView;
     public SingleItemAdapter adapter;
     static ArrayList<String> ValidateBarCodeList = new ArrayList<>();
@@ -45,45 +51,61 @@ public class SingleItem extends Fragment {
                 adapter = new SingleItemAdapter(ValidateBarCodeList, getContext(), getActivity());
                 waybilgrid.setAdapter(adapter);
 
-                palletbarcode = (EditText) rootView.findViewById(R.id.palletbarcode);
-                palletbarcode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+                btnOpenCamera = rootView.findViewById(R.id.btnOpenCamera);
+                txtBarCode = (EditText) rootView.findViewById(R.id.palletbarcode);
+//                txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-//                palletbarcode.addTextChangedListener(new TextWatcher() {
-//                    @Override
-//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//                    }
+                txtBarCode.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                            ValidatePallet(txtBarCode.getText().toString());
+                            setBarcode();
+                    }
+                });
+
+//                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                        // If the event is a key-down event on the "enter" button
+//                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                            return true;
+//                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                            //finish();
+//                            GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+//                            return true;
+//                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 //
-//                    @Override
-//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                    }
-//
-//                    @Override
-//                    public void afterTextChanged(Editable s) {
-//                        if (palletbarcode != null && palletbarcode.getText().length() >= 13)
-////                            ValidatePallet(palletbarcode.getText().toString());
-//                            setBarcode();
+//                            if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+////                            ValidatePallet(txtBarCode.getText().toString());
+//                                setBarcode();
+//                            return true;
+//                        }
+//                        return false;
 //                    }
 //                });
 
-                palletbarcode.setOnKeyListener(new View.OnKeyListener() {
-                    public boolean onKey(View v, int keyCode, KeyEvent event) {
-                        // If the event is a key-down event on the "enter" button
-                        if (event.getAction() != KeyEvent.ACTION_DOWN)
-                            return true;
-                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                            //finish();
-                            GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-                            return true;
-                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-                            if (palletbarcode != null && palletbarcode.getText().length() >= 13)
-//                            ValidatePallet(palletbarcode.getText().toString());
-                                setBarcode();
-                            return true;
+                btnOpenCamera.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                            GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                            GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                        } else
+                        {
+                            Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                            getActivity().startActivityForResult(newIntent, 2);
                         }
-                        return false;
+
                     }
                 });
+
             }
 
             ReadFromLocal();
@@ -91,23 +113,23 @@ public class SingleItem extends Fragment {
         }
     }
 
+
     private void setBarcode() {
-        if (palletbarcode.getText().length() >= 13) {
-            //txtBarCode.setText(barcode.substring(0, 8));
-            ValidatePallet(palletbarcode.getText().toString());
 
-        }
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+        String barcode = txtBarCode.getText().toString();
+//        utilities utilities = new utilities();
+//        ValidatePallet(utilities.findwaybillno(barcode));
+        ValidatePallet(barcode);
 
 
     }
 
 
+
     private void ValidatePallet(String barcode) {
         if (!ValidateBarCodeList.contains(barcode)) {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-            palletbarcode.setText("");
+            txtBarCode.setText("");
             adapter.notifyDataSetChanged();
             ValidateBarCodeList.add(barcode);
             SaveBarcodetoLocal(barcode);
@@ -115,7 +137,7 @@ public class SingleItem extends Fragment {
 
         } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
-            palletbarcode.setText("");
+            txtBarCode.setText("");
         }
     }
 
@@ -127,13 +149,13 @@ public class SingleItem extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        palletbarcode.setText(barcode);
+                        txtBarCode.setText(barcode);
                     }
                 }
             }
@@ -143,7 +165,7 @@ public class SingleItem extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("palletbarcode", palletbarcode.getText().toString());
+        outState.putString("txtBarCode", txtBarCode.getText().toString());
     }
 
     @Override

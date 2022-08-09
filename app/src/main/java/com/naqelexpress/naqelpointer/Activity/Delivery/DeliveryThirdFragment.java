@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.Delivery;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
@@ -20,8 +22,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputFilter;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,8 +36,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DeliveryThirdFragment extends Fragment {
     View rootView;
@@ -61,28 +61,28 @@ public class DeliveryThirdFragment extends Fragment {
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
+//            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        //finish();
-                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        //finish();
+//                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+//                            AddNewPiece8and9();
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
 
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
-                            AddNewPiece8and9();
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-          /*  txtBarCode.addTextChangedListener(new TextWatcher() {
+            txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -95,22 +95,25 @@ public class DeliveryThirdFragment extends Fragment {
                 public void afterTextChanged(Editable s) {
 //                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
 //                        AddNewPiece();
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
                         AddNewPiece8and9();
                 }
-            });*/
+            });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
-            intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+//            btnOpenCamera.setVisibility(View.GONE);
+
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                         GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                    } else
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                    } else{
+                        Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                    }
+
                 }
             });
 

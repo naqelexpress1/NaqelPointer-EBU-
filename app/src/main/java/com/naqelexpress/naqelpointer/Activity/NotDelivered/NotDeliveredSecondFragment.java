@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.NotDelivered;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,8 +18,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.text.InputFilter;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,8 +33,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class NotDeliveredSecondFragment
         extends Fragment {
@@ -56,28 +56,8 @@ public class NotDeliveredSecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanBarcodeLength)});
 
-            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        //finish();
-                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)
-                            AddNewPiece();
-                        return true;
-                    }
-                    return false;
-                }
-            });
-
-       /*     txtBarCode.addTextChangedListener(new TextWatcher() {
+            txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -90,13 +70,13 @@ public class NotDeliveredSecondFragment
                 public void afterTextChanged(Editable s) {
 //                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
 //                        AddNewPiece();
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
                         AddNewPiece();
                 }
-            });*/
+            });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
+//            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -105,7 +85,7 @@ public class NotDeliveredSecondFragment
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                     } else {
                         Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        getActivity().startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                     }
                 }
             });
@@ -262,9 +242,7 @@ public class NotDeliveredSecondFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13)
                             txtBarCode.setText(barcode);
-
                     }
                 }
 

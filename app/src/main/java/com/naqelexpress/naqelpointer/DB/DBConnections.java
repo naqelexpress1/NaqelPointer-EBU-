@@ -5970,7 +5970,7 @@ public class DBConnections
 
     }
 
-    public boolean InsertAtDestWaybill(int Waybill, String tripid, Context context) {
+    public boolean InsertAtDestWaybill(String Waybill, String tripid, Context context) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);

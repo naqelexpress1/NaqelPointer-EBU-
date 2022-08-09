@@ -1,6 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.NotDelivered;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -106,6 +107,25 @@ public class NotDeliveredActivity
             Longitude = location.getLongitude();
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+                if (result == 0) {
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
+    }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

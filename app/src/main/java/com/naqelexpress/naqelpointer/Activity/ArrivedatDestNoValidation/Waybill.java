@@ -1,33 +1,37 @@
 package com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation;
 
 
+import static android.app.Activity.RESULT_OK;
+
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
-import static android.app.Activity.RESULT_OK;
-
 public class Waybill extends Fragment {
 
+    Button btnOpenCamera;
     View rootView;
     WaybillAdapter adapter;
     private GridView waybilgrid;
@@ -57,8 +61,9 @@ public class Waybill extends Fragment {
             slScanned = (TextView) rootView.findViewById(R.id.slscanned);
 
 
-            txtBarCode = (EditText) rootView.findViewById(R.id.waybillno);
-            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+            btnOpenCamera = rootView.findViewById(R.id.btnOpenCamera);
+            txtBarCode = rootView.findViewById(R.id.waybillno);
+//            txtBarCode.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             waybilgrid = (GridView) rootView.findViewById(R.id.waybills);
             adapter = new WaybillAdapter(validatewaybillist, getContext(), getActivity());
             waybilgrid.setAdapter(adapter);
@@ -81,6 +86,20 @@ public class Waybill extends Fragment {
                 }
             });
 
+            btnOpenCamera.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
+                        GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
+                    } else
+                    {
+                        Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(newIntent, 1);
+                    }
+
+                }
+            });
+
             ReadFromLocal();
 
         }
@@ -88,23 +107,10 @@ public class Waybill extends Fragment {
         return rootView;
     }
 
+
     private void setTxtWaybillNo() {
-
         String barcode = txtBarCode.getText().toString();
-        utilities utilities = new utilities();
-        ValidateWayBill(utilities.findwaybillno(barcode));
-
-//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-//            //txtBarCode.setText(barcode.substring(0, 8));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//
-//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-//        }
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
+        ValidateWayBill(barcode);
 
     }
 
@@ -136,7 +142,7 @@ public class Waybill extends Fragment {
             adapter.notifyDataSetChanged();
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
             txtBarCode.setText("");
-            SaveWaybilltoLocal(Integer.parseInt(barcode));
+            SaveWaybilltoLocal(barcode);
             bpTotal.setText("Count : " + String.valueOf(validatewaybillist.size()));
 
         } else {
@@ -147,7 +153,7 @@ public class Waybill extends Fragment {
     }
 
 
-    private void SaveWaybilltoLocal(int waybill) {
+    private void SaveWaybilltoLocal(String waybill) {
         DBConnections dbConnections = new DBConnections(getContext(), null);
         dbConnections.InsertAtDestWaybill(waybill, ArrivedatDestination.tripPlanID, getContext());
         dbConnections.close();
@@ -155,7 +161,7 @@ public class Waybill extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {

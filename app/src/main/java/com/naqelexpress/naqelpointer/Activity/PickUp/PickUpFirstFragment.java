@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.PickUp;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -65,8 +67,6 @@ import java.util.List;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
-import static android.app.Activity.RESULT_OK;
 
 public class PickUpFirstFragment
         extends Fragment implements AlertCallback, AdapterView.OnItemSelectedListener {
@@ -447,12 +447,12 @@ public class PickUpFirstFragment
 
         String barcode = txtWaybillNo.getText().toString();
         txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            txtWaybillNo.setText(barcode.substring(0, 8));
+        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+            txtWaybillNo.setText(barcode);
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
         } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            txtWaybillNo.setText(barcode);
             //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
         }
@@ -461,8 +461,8 @@ public class PickUpFirstFragment
     private void setTxtWaybillNo(String barcode) {
 
         txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() > 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            txtWaybillNo.setText(barcode.substring(0, 8));
+        if (barcode.length() > 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+            txtWaybillNo.setText(barcode);
         } else
             txtWaybillNo.setText(barcode);
 

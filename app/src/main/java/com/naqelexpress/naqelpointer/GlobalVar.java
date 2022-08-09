@@ -1,5 +1,8 @@
 package com.naqelexpress.naqelpointer;
 
+import static android.content.Context.LOCATION_SERVICE;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -100,9 +103,6 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-import static android.content.Context.LOCATION_SERVICE;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class GlobalVar {
 

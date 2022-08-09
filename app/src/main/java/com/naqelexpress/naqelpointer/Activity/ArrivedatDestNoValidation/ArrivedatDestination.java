@@ -1,5 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation;
 
+import static com.naqelexpress.naqelpointer.R.id.container;
+
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -60,8 +63,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.naqelexpress.naqelpointer.R.id.container;
-
 public class ArrivedatDestination extends AppCompatActivity {
 
     Waybill courierdetails;
@@ -108,6 +109,24 @@ public class ArrivedatDestination extends AppCompatActivity {
         }
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+                if (result == 0) {
+                }
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
+            }
+        }
     }
 
     @Override
@@ -255,7 +274,7 @@ public class ArrivedatDestination extends AppCompatActivity {
             }
             jsonObject.put("Requestby", GlobalVar.GV().EmployID);
             jsonObject.put("CreatedDate", DateTime.now());
-                jsonObject.put("Imagnames", imagenames);
+            jsonObject.put("Imagnames", imagenames);
             jsonObject.put("Region", GlobalVar.GV().EmployStation);
             jsonObject.put("TripNumber", tripPlanID);
             // jsonArray.put(jsonObject);

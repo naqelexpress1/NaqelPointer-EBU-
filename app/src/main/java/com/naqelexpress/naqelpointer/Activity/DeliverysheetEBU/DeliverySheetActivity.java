@@ -71,7 +71,6 @@ public class DeliverySheetActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.deliverysheet);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -810,18 +809,37 @@ public class DeliverySheetActivity
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case 1: {
-                if (resultCode == Activity.RESULT_OK) {
-                    // TODO Extract the data returned from the child Activity.
-                    String returnValue = data.getStringExtra("result");
-                    if (returnValue.equals("done"))
-                        finish();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+                if (result == 0) {
                 }
-                break;
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
+
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case 1: {
+//                if (resultCode == Activity.RESULT_OK) {
+//                    // TODO Extract the data returned from the child Activity.
+//                    String returnValue = data.getStringExtra("result");
+//                    if (returnValue.equals("done"))
+//                        finish();
+//                }
+//                break;
+//            }
+//        }
+//    }
 }

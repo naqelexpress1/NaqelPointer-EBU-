@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.Delivery;
 
+import static com.naqelexpress.naqelpointer.R.id.container;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -53,8 +55,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-
-import static com.naqelexpress.naqelpointer.R.id.container;
 
 public class DeliveryActivity
         extends AppCompatActivity {
@@ -781,19 +781,37 @@ public class DeliveryActivity
         alertDialog.show();
     }
 
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case 1: {
-                if (resultCode == Activity.RESULT_OK) {
-                    // TODO Extract the data returned from the child Activity.
-                    String returnValue = data.getStringExtra("result");
-                    if (returnValue.equals("done"))
-                        finish();
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                int result = data.getIntExtra("result", -1);
+                if (result == 0) {
                 }
-                break;
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        } else {
+            for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+                fragment.onActivityResult(requestCode, resultCode, data);
             }
         }
     }
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        switch (requestCode) {
+//            case 1: {
+//                if (resultCode == Activity.RESULT_OK) {
+//                    // TODO Extract the data returned from the child Activity.
+//                    String returnValue = data.getStringExtra("result");
+//                    if (returnValue.equals("done"))
+//                        finish();
+//                }
+//                break;
+//            }
+//        }
+//    }
 }

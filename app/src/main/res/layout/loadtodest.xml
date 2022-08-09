@@ -61,8 +61,8 @@
             android:id="@+id/txtWaybilll"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.75"
-            android:ems="10"
+            android:maxLength="50"
+            android:layout_weight="0.85"
             android:hint="@string/WaybillNo"
             android:inputType="number" />
 
@@ -73,7 +73,7 @@
             android:layout_weight="0.1"
             android:background="@drawable/camera"
             android:text=""
-            android:visibility="gone" />
+            android:visibility="visible" />
 
     </LinearLayout>
 

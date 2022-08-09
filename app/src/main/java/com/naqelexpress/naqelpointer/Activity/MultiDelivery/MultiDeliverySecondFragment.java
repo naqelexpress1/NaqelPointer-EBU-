@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.MultiDelivery;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -17,7 +19,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +31,8 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class MultiDeliverySecondFragment
         extends Fragment {
@@ -61,9 +59,9 @@ public class MultiDeliverySecondFragment
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
             txtWaybilll = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybilll.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
-            txtWaybilll.addTextChangedListener(textWatcher);
-           /* txtWaybilll.addTextChangedListener(new TextWatcher() {
+//            txtWaybilll.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybilll.addTextChangedListener(textWatcher);
+            txtWaybilll.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -74,16 +72,15 @@ public class MultiDeliverySecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtWaybilll != null && txtWaybilll.getText().toString().length() == 8 ||
-                            txtWaybilll.getText().toString().length() == GlobalVar.ScanWaybillLength)
+                    if (txtWaybilll != null && txtWaybilll.getText().toString().length() >= 8)//txtWaybilll.getText().toString().length() == GlobalVar.ScanWaybillLength
                         AddNewWaybill();
                 }
-            });*/
+            });
 
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
-            intent = new Intent(getActivity(), NewBarCodeScanner.class);
+//            intent = new Intent(getActivity(), NewBarCodeScanner.class);
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(view.GONE);
+//            btnOpenCamera.setVisibility(view.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -92,8 +89,8 @@ public class MultiDeliverySecondFragment
                                 GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                     } else {
-//                        Intent intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
+                        getActivity().startActivityForResult(intent, 2);
                     }
                 }
             });
@@ -107,9 +104,11 @@ public class MultiDeliverySecondFragment
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybilll.getText().toString();
+        AddNewWaybill8and9(barcode);
         // txtWaybilll.removeTextChangedListener(textWatcher);
-        utilities utilities = new utilities();
-        AddNewWaybill8and9(utilities.findwaybillno(barcode));
+//        utilities utilities = new utilities();
+//        AddNewWaybill8and9(utilities.findwaybillno(barcode));
+
 
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
 //            AddNewWaybill8and9(barcode.substring(0, 8));
@@ -141,14 +140,14 @@ public class MultiDeliverySecondFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() > 8)
-                            barcode = barcode.substring(0, 8);
+//                        if (barcode.length() > 8)
+//                            barcode = barcode.substring(0, 8);
                         txtWaybilll.setText(barcode);
 //                        AddNewWaybill();
                     }
@@ -262,15 +261,15 @@ public class MultiDeliverySecondFragment
                 txtWaybilll.setText("");
             }
         }
-        txtWaybilll.addTextChangedListener(textWatcher);
+//        txtWaybilll.addTextChangedListener(textWatcher);
     }
 
     private void AddNewWaybill() {
         String WaybillNo = txtWaybilll.getText().toString();
-        if (WaybillNo.length() > 8)
-            WaybillNo = WaybillNo.substring(0, 8);
+//        if (WaybillNo.length() > 8)
+//            WaybillNo = WaybillNo.substring(0, 8);
 
-        if (WaybillNo.toString().length() == 8) {
+        if (WaybillNo.toString().length() >= 8) {
             if (!WaybillList.contains(WaybillNo.toString())) {
                 WaybillList.add(0, WaybillNo.toString());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
@@ -345,25 +344,25 @@ public class MultiDeliverySecondFragment
         }
     }
 
-    protected TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // your logic here
-            if (txtWaybilll != null && txtWaybilll.getText().length() >= 8)
-                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                setTxtWaybillNo();
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // your logic here
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // your logic here
-        }
-    };
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybilll != null && txtWaybilll.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 }

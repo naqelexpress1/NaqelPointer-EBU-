@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.MainPage;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -69,6 +71,7 @@ import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.History.History;
 import com.naqelexpress.naqelpointer.Activity.IncabCheckList.IncCabChecklist;
 import com.naqelexpress.naqelpointer.Activity.Incident.Incident;
+import com.naqelexpress.naqelpointer.Activity.InterCity.TripAndVehicleDetail;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.LoadtoDestination;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.SyncTripDetails;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
@@ -126,14 +129,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
-
-//import com.naqelexpress.naqelpointer.Activity.LoadtoDest.LoadtoDestination;
-//import com.naqelexpress.naqelpointer.Activity.LoadtoDest.SyncTripDetails;
-//import com.naqelexpress.naqelpointer.Activity.ArrivedatDestNew.ArrivedatDestination;
-//import com.naqelexpress.naqelpointer.Activity.AtOriginNew.AtOrigin;
-
-//import com.naqelexpress.naqelpointer.Activity.DeliverySheet.DeliverySheetActivity;
 
 public class MainPageActivity
         extends AppCompatActivity {
@@ -145,31 +140,6 @@ public class MainPageActivity
     int UNINSTALL_REQUEST_CODE = 123;
     int menu = 0;
 
-
-    //    int cellIcon[] = {
-//
-//            R.drawable.deliverysheet, //CBU
-//            R.drawable.maplist,//CBU
-//            R.drawable.delivery,//CBU
-//            R.drawable.delivery,
-//            R.drawable.notdelivered,//CBU
-//            R.drawable.pickup,//CBU
-//            R.drawable.waybillmeasurement,
-//            R.drawable.settings,//CBU
-//            // R.drawable.datasync,
-//            R.drawable.money,//CBU
-//            R.drawable.pendingcod,//CBU
-//            R.drawable.customclearence,
-//            R.drawable.checkpoint,
-//            R.drawable.checkpoint,
-//            R.drawable.pendingdata,
-//            R.drawable.ld,
-//            R.drawable.importtruck,
-//            R.drawable.contacts,
-//            R.drawable.closetrip,
-//            R.drawable.maplist
-//
-//    };
     GridView gridView;
 
     String devision = "";
@@ -190,12 +160,7 @@ public class MainPageActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //  GlobalVar.GV().MainContext = this;
         GlobalVar.GV().SignedIn = true;
-
-
-//        DBConnections dbConnections1 = new DBConnections(getApplicationContext(), null);
-//        dbConnections1.DeleteAllSuggestPlannedLocation(getApplicationContext());
 
         try {
             setContentView(R.layout.mainpage);
@@ -212,12 +177,10 @@ public class MainPageActivity
 
             ratingBar = (RatingBar) findViewById(R.id.ratingBar);
             ratingBar.setNumStars(3);
-            ratingBar.setVisibility(View.GONE);
+            //ratingBar.setVisibility(View.GONE);
             tl = (TableLayout) findViewById(R.id.tl);
             tl1 = (TableLayout) findViewById(R.id.tl1);
 
-//            int screenSize = getResources().getConfiguration().screenLayout &
-//                    Configuration.SCREENLAYOUT_SIZE_MASK;
 
             float screenSize = getResources().getDisplayMetrics().density;
             ActionBar mActionBar = getSupportActionBar();
@@ -254,7 +217,7 @@ public class MainPageActivity
 
 
         if (savedInstanceState != null)
-            setSavedinstance(savedInstanceState);
+            setSavedInstance(savedInstanceState);
 
         //setProductivitytext();
 
@@ -264,75 +227,10 @@ public class MainPageActivity
                     com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService.class));
         }
 
-        //GlobalVar.GV().rootViewMainPage = mainRootView = findViewById(android.R.id.content);
-
         SharedPreferences sharedpreferences = getSharedPreferences("naqelSettings", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedpreferences.edit();
         editor.putBoolean("mc", true);
         editor.commit();
-
-//        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_CALL_LOG) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(
-//                    MainPageActivity.this,
-//                    new String[]{Manifest.permission.READ_CALL_LOG},
-//                    2
-//            );
-//        }
-//
-//        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(
-//                    MainPageActivity.this,
-//                    new String[]{Manifest.permission.READ_PHONE_NUMBERS},
-//                    2
-//            );
-//        }
-//        try {
-//
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            CallRecordTrigger.cancelJob(getApplicationContext());
-//            if (!CallRecordTrigger.isScheduled(getApplicationContext())) {
-//                JobInfo.Builder builder = new JobInfo.Builder(4002,
-//                        new ComponentName("com.naqelexpress.naqelpointer", CallRecordTrigger.class.getName()));
-//                builder.addTriggerContentUri(new JobInfo.TriggerContentUri(
-//                        CallLog.Calls.CONTENT_URI_WITH_VOICEMAIL,
-//                        JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS));
-//                builder.addTriggerContentUri(new JobInfo.TriggerContentUri(CallLog.Calls.CONTENT_URI, 0));
-//                JobScheduler jobScheduler = getSystemService(JobScheduler.class);
-//                jobScheduler.schedule(builder.build());
-//
-//            }
-//
-//        }
-//        } catch (Exception e) {
-//            System.out.println(e);
-//        }
-        //LocationTrigger.cancelJob(getApplicationContext());
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//            if (!LocationTrigger.isScheduled(getApplicationContext())) {
-//                JobInfo.Builder builder = new JobInfo.Builder(4003,
-//                        new ComponentName("com.naqelexpress.naqelpointer", LocationTrigger.class.getName()));
-//                //builder.setMinimumLatency(10000);
-//                builder.setTriggerContentMaxDelay(5000);
-//                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-//                builder.setPersisted(true);
-//                builder.setOverrideDeadline(3 * 5000);
-//                JobScheduler jobScheduler = getSystemService(JobScheduler.class);
-//                jobScheduler.schedule(builder.build());
-//            } else {
-//                JobInfo.Builder builder = new JobInfo.Builder(4003,
-//                        new ComponentName("com.naqelexpress.naqelpointer", LocationTrigger.class.getName()));
-//                builder.setPeriodic(5000);
-//                builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-//                builder.setPersisted(true);
-//                builder.setOverrideDeadline(3 * 5000);
-//                JobScheduler jobScheduler = getSystemService(JobScheduler.class);
-//                jobScheduler.schedule(builder.build());
-//            }
-//
-//        }
-
 
         final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         Rating = dbConnections.getCourierRating(GlobalVar.GV().EmployID, getApplicationContext());
@@ -370,12 +268,7 @@ public class MainPageActivity
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int which) {
-//                                int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-//                                UserMeLogin userMeLogin = new UserMeLogin(id);
-//                                dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-//                                finish();
-//                                Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-//                                startActivity(intent);
+
                                 Logout();
                             }
                         }).setNegativeButton("Cancel", null).setCancelable(false);
@@ -395,26 +288,11 @@ public class MainPageActivity
             menu = menuresult.getInt(menuresult.getColumnIndex("Menu"));
 
         } else {
-//            dbConnections.deleteLoginIDs(getApplicationContext());
-//            menuresult.close();
-//            dbConnections.close();
-//            android.os.Process.killProcess(android.os.Process.myPid());
-//            Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
-//            startActivity(intent);
             menuresult.close();
             Logout();
         }
         menuresult.close();
 
-
-        // if (savedInstanceState == null) {
-
-//            if (getIntent().getIntExtra("getMaster", 0) == 1) {
-//
-//                GetMasterData asynthread = new GetMasterData();
-//                StartAsyncTaskInParallel(asynthread);
-//
-//            } else {
         Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
                 GlobalVar.GV().EmployID, getApplicationContext());
         if (result.getCount() > 0) {
@@ -422,12 +300,6 @@ public class MainPageActivity
             devision = result.getString(result.getColumnIndex("Division"));
             menu = result.getInt(result.getColumnIndex("Menu"));
 
-//            if (GlobalVar.GV().EmployID == 19127) {
-//                devision = "Express";
-//                menu = 1;
-//                LoadMenu();
-//            }
-//                    devision = "Express";
             if (devision.equals("0")) {
 
                 // GetMasterData asynthread = new GetMasterData();
@@ -450,16 +322,10 @@ public class MainPageActivity
                     LoadMenu();
                     version.setText("Version :-" + " NEW ");
                 }
-//                    } else {
-//                        LoadMenu();
-//
-//                    }
+
             }
         }
-        //}
 
-        //  }
-//
         Cursor EmployeeInfo = dbConnections.Fill("SELECT *  FROM  EmployInfo where EmpID = " + GlobalVar.GV().EmployID, getApplicationContext());
 
         if (EmployeeInfo.getCount() == 0 && GlobalVar.GV().EmployID != 19127 && GlobalVar.GV().EmployID != 17742) { // && GlobalVar.GV().EmployID != 17099
@@ -488,7 +354,7 @@ public class MainPageActivity
         if (android.os.Build.VERSION.SDK_INT >= 29)
             if (GlobalVar.GV().isPermissionEnabled(Manifest.permission.ACCESS_BACKGROUND_LOCATION, MainPageActivity.this)
                     == PackageManager.PERMISSION_DENIED) {
-//                GlobalVar.GV().PermissionAlert(MainPageActivity.this);
+
                 ActivityCompat.requestPermissions(
                         MainPageActivity.this,
                         new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION,
@@ -515,30 +381,22 @@ public class MainPageActivity
                 cellTitle = new String[14];
                 cellIcon = new int[14];
             }
-
-//            cellTitle = new String[11];
-//            cellIcon = new int[11];
-
         } else if (devision.equals("IRS")) {
             cellTitle = new String[5];
             cellIcon = new int[5];
         } else if (devision.equals("Express")) {
             if (menu == 0) {
                 cellTitle = new String[21];
-                cellIcon = new int[21];//18
-
+                cellIcon = new int[21];
             } else {
-                cellTitle = new String[26];
-                cellIcon = new int[26];
+                cellTitle = new String[27];
+                cellIcon = new int[27];
             }
         }
 
         if (devision.equals("Courier")) {
             cellTitle[0] = getResources().getString(R.string.DeliverySheetActivity);//CBU
             cellTitle[1] = getResources().getString(R.string.MyRouteActivity);//CBU
-
-            //cellTitle[2] = getResources().getString(R.string.DeliveryActivity);//CBU
-            //cellTitle[3] = getResources().getString(R.string.NotDeliveredActivity);//CBU 4
 
             cellTitle[2] = getResources().getString(R.string.PickUpActivity);//CBU 5
             cellTitle[3] = getResources().getString(R.string.WaybillMeasurementActivity); //6
@@ -559,8 +417,6 @@ public class MainPageActivity
 
             itemposition.put(0, 0);
             itemposition.put(1, 1); // 1 is old screen
-//            itemposition.put(2, 2);
-//            itemposition.put(3, 4);
             itemposition.put(2, 5);
             itemposition.put(3, 6);
             itemposition.put(4, 7);
@@ -585,7 +441,6 @@ public class MainPageActivity
                 cellTitle[2] = getResources().getString(R.string.AtOrigin);//12
                 cellTitle[3] = getResources().getString(R.string.ld);//14
                 cellTitle[4] = "Arrived Dest";//15
-
                 cellTitle[5] = getResources().getString(R.string.DeliverySheetActivity);//CBU
                 cellTitle[6] = getResources().getString(R.string.MyRouteActivity);//CBU
                 cellTitle[7] = getResources().getString(R.string.DeliveryActivity);//CBU
@@ -596,11 +451,10 @@ public class MainPageActivity
                 cellTitle[12] = "CBM";//24
                 cellTitle[13] = "Sync Trip";//19
                 cellTitle[14] = "Incident";//19
-                //cellTitle[14] = "Suggest DS";//18
                 cellTitle[15] = getResources().getString(R.string.CODChecking);//CBU 8
                 cellTitle[16] = getResources().getString(R.string.PendingCOD);//CBU 9
                 cellTitle[17] = "Contacts";//16
-                cellTitle[18] = "Hisory";//13
+                cellTitle[18] = "History";//13
                 cellTitle[19] = getResources().getString(R.string.SettingsActivity);//CBU 7
                 cellTitle[20] = "Change Password";//CBU 7
                 cellTitle[21] = "Chat";//CBU 7
@@ -608,6 +462,7 @@ public class MainPageActivity
                 cellTitle[23] = "InCab CheckList";//CBU 7
                 cellTitle[24] = "Fuel Model";//CBU 7
                 cellTitle[25] = "Scan Waybills";//CBU 7
+                cellTitle[26] = "Inter City";//CBU 7
 
             } else {
 
@@ -632,7 +487,6 @@ public class MainPageActivity
                 cellTitle[18] = "InCab CheckList";//CBU 7
                 cellTitle[19] = "Fuel Model";//CBU 7
                 cellTitle[20] = "Scan Waybills";//CBU 7
-
             }
 
             if (menu == 1) {
@@ -651,7 +505,6 @@ public class MainPageActivity
                 itemposition.put(12, 32);
                 itemposition.put(13, 22);
                 itemposition.put(14, 20);
-                // itemposition.put(14, 19);
                 itemposition.put(15, 8);
                 itemposition.put(16, 9);
                 itemposition.put(17, 16);
@@ -663,6 +516,7 @@ public class MainPageActivity
                 itemposition.put(23, 27);
                 itemposition.put(24, 31);
                 itemposition.put(25, 33);
+                itemposition.put(26, 34);
 
             } else {
                 itemposition.put(0, 11);
@@ -686,7 +540,6 @@ public class MainPageActivity
                 itemposition.put(18, 27);
                 itemposition.put(19, 31);
                 itemposition.put(20, 33);
-                // itemposition.put(18, 11);
             }
 
         }
@@ -695,7 +548,7 @@ public class MainPageActivity
             cellTitle[0] = getResources().getString(R.string.CustomsClearance);
             cellTitle[1] = getResources().getString(R.string.PickUpActivity);//CBU 5;
             cellTitle[2] = "Change Password";//CBU 5;
-            cellTitle[3] = "Hisory";//13
+            cellTitle[3] = "History";//13
             cellTitle[4] = "Terminal Handling";//13
 
             itemposition.put(0, 10);
@@ -708,9 +561,6 @@ public class MainPageActivity
         if (devision.equals("Courier") || devision.equals("Express")) {
             cellIcon[0] = R.drawable.deliverysheet; //CBU
             cellIcon[1] = R.drawable.maplist; //CBU
-//            cellIcon[2] = R.drawable.delivery; //CBU
-
-//            cellIcon[3] = R.drawable.notdelivered; //CBU
             cellIcon[2] = R.drawable.pickup; //CBU
             cellIcon[3] = R.drawable.waybillmeasurement; //CBU
             cellIcon[4] = R.drawable.settings; //CBU
@@ -740,15 +590,12 @@ public class MainPageActivity
                 cellIcon[7] = R.drawable.delivery; //CBU
                 cellIcon[8] = R.drawable.deliverysheet; //CBU
                 cellIcon[9] = R.drawable.notdelivered; //CBU
-
                 cellIcon[10] = R.drawable.delivery; //CBU
                 cellIcon[11] = R.drawable.waybillmeasurement; //CBU
                 cellIcon[12] = R.drawable.bluebox; //CBU
                 cellIcon[13] = R.drawable.datasync; //CBU
                 cellIcon[14] = R.drawable.delivery; //CBU
-                // cellIcon[14] = R.drawable.delivery; //CBU
                 cellIcon[15] = R.drawable.money; //CBU
-                //cellIcon[16] = R.drawable.maplist; //CBU
                 cellIcon[16] = R.drawable.pendingcod; //CBU
                 cellIcon[17] = R.drawable.contacts; //CBU
                 cellIcon[18] = R.drawable.pendingdata; //CBU
@@ -759,7 +606,7 @@ public class MainPageActivity
                 cellIcon[23] = R.drawable.car; //CBU
                 cellIcon[24] = R.drawable.fuel; //CBU
                 cellIcon[25] = R.drawable.scanwaybill; //CBU
-//            cellIcon[20] = R.drawable.delivery; //CBU
+                cellIcon[26] = R.drawable.contacts; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
                 cellIcon[1] = R.drawable.pickup; //CBU
@@ -782,7 +629,6 @@ public class MainPageActivity
                 cellIcon[18] = R.drawable.car; //CBU
                 cellIcon[19] = R.drawable.fuel; //CBU
                 cellIcon[20] = R.drawable.scanwaybill; //CBU
-                // cellIcon[18] = R.drawable.waybillmeasurement; //CBU
             }
         }
         if (devision.equals("IRS")) {
@@ -1009,7 +855,6 @@ public class MainPageActivity
                 position = itemposition.get(position);
                 switch (position) {
                     case 0:
-
                         if (GlobalVar.locationEnabled(getApplicationContext())) {
                             if (GlobalVar.AskPermission_Camera(MainPageActivity.this, 6)) {
                                 if (!GetDivision()) {
@@ -1482,7 +1327,6 @@ public class MainPageActivity
                         if (VersionMatct()) {
                             Intent cbm = new Intent(getApplicationContext(),
                                     ScanWaybill.class);
-//
                             startActivity(cbm);
                         } else {
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
@@ -1490,6 +1334,16 @@ public class MainPageActivity
                                     , true);
                         }
 
+                        break;
+                    case 34:
+                        if (VersionMatct()){
+                            Intent cbm = new Intent(getApplicationContext(), TripAndVehicleDetail.class);
+                            startActivity(cbm);
+                        }else{
+                            GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",
+                                    "Kindly Update our Latest Version.(Logout and Login again)"
+                                    ,true);
+                        }
                         break;
                 }
             }
@@ -1548,14 +1402,10 @@ public class MainPageActivity
                                            String permissions[], int[] grantResults) {
         switch (requestCode) {
             case 111:
-
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     Intent mapList = new Intent(getApplicationContext(), MyRouteActivity.class);
                     startActivity(mapList);
-
-
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -1612,11 +1462,8 @@ public class MainPageActivity
             case 2:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     Intent delivery = new Intent(getApplicationContext(), DeliveryActivity.class);
                     startActivity(delivery);
-
-
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -1638,7 +1485,6 @@ public class MainPageActivity
             case 3:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     if (GetDivision()) {
                         Intent notDelivered = new Intent(getApplicationContext(),
                                 com.naqelexpress.naqelpointer.Activity.NotDeliveredCBU.NotDeliveredActivity.class);
@@ -1647,7 +1493,6 @@ public class MainPageActivity
                         Intent notDelivered = new Intent(getApplicationContext(), NotDeliveredActivity.class);
                         startActivity(notDelivered);
                     }
-
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -1723,7 +1568,6 @@ public class MainPageActivity
             case 6:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     if (!GetDivision()) {
                         Intent deliverySheet = new Intent(getApplicationContext(), DeliverySheetActivity.class);
                         startActivity(deliverySheet);
@@ -1732,7 +1576,6 @@ public class MainPageActivity
                                 com.naqelexpress.naqelpointer.Activity.OFDPieceLevel.DeliverySheetActivity.class);
                         startActivity(deliverySheet);
                     }
-
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -1754,15 +1597,12 @@ public class MainPageActivity
                 break;
 
             case 7:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     boolean redirect = true;
-                    if (grantResults.length > 0
-                            && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                    if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                         for (int i = 0; i < permissions.length; i++) {
                             int result = ContextCompat.checkSelfPermission(this, permissions[i]);
-                            if (result == PackageManager.PERMISSION_DENIED) {
+                            if(result == PackageManager.PERMISSION_DENIED){
                                 redirect = false;
                                 if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[i])) {
                                     try {
@@ -1810,7 +1650,6 @@ public class MainPageActivity
             case 8:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     if (!GlobalVar.isMyServiceRunning(LocationService.class, getApplicationContext())) {
                         startService(new Intent(getBaseContext(),
                                 LocationService.class));
@@ -1819,7 +1658,6 @@ public class MainPageActivity
                         Intent mapList = new Intent(getApplicationContext(), DeliverySheet.class);
                         startActivity(mapList);
                     }
-
                 } else {
                     try {
                         Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
@@ -1830,14 +1668,9 @@ public class MainPageActivity
                 }
                 break;
             case 9:
-
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                     Intent mapList = new Intent(getApplicationContext(), DeliverySheet.class);
                     startActivity(mapList);
-
-
                 } else {
                     //  GlobalVar.AskPermission_Location(MainPageActivity.this);
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
@@ -1851,8 +1684,7 @@ public class MainPageActivity
                         } else {
                             ActivityCompat.requestPermissions(
                                     MainPageActivity.this,
-                                    new String[]{Manifest.permission.CAMERA},
-                                    6);
+                                    new String[]{Manifest.permission.CAMERA}, 6);
                         }
                     }
                 }
@@ -1861,11 +1693,8 @@ public class MainPageActivity
             case 10:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     Intent delivery = new Intent(getApplicationContext(), MultiDeliveryActivity.class);
                     startActivity(delivery);
-
-
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
@@ -1972,32 +1801,25 @@ public class MainPageActivity
                 } else {
                     if (ContextCompat.checkSelfPermission(this, permissions[0]) == PackageManager.PERMISSION_DENIED) {
                         if (!ActivityCompat.shouldShowRequestPermissionRationale(this, permissions[0])) {
-
                             try {
                                 Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                                 startActivity(i);
                             } catch (Exception e) {
                                 GlobalVar.ShowDialog(MainPageActivity.this, "Permission necessary", "Kindly please contact our Admin", true);
                             }
-                            // finish();
                         } else {
                             ActivityCompat.requestPermissions(
                                     MainPageActivity.this,
                                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    14
-                            );
+                                    14);
                         }
                     }
                 }
                 break;
             case 15:
-
-//                int backgroundLocationPermissionApproved = ActivityCompat.checkSelfPermission(MainPageActivity.this,
-//                        Manifest.permission.ACCESS_BACKGROUND_LOCATION);
                 boolean background = ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
                 if (!background) {
-//                    GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
                     try {
                         Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                         startActivityForResult(i, 15);
@@ -2017,7 +1839,6 @@ public class MainPageActivity
         switch (requestCode) {
             case 1: {
                 if (resultCode == Activity.RESULT_OK) {
-
                     String returnValue = data.getStringExtra("result");
                     if (returnValue.equals("done"))
                         finish();
@@ -2028,14 +1849,12 @@ public class MainPageActivity
                 boolean background = ActivityCompat.checkSelfPermission(this,
                         Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED;
                 if (!background) {
-//                    GlobalVar.GV().PermissionAlertInfo(MainPageActivity.this);
                     try {
                         Intent i = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + BuildConfig.APPLICATION_ID));
                         startActivityForResult(i, 15);
                     } catch (Exception e) {
                         GlobalVar.ShowDialog(MainPageActivity.this, "Contacts Permission necessary", "Kindly please contact our Admin", true);
                     }
-
                 }
                 break;
         }
@@ -2047,27 +1866,8 @@ public class MainPageActivity
         System.out.println("test");
     }
 
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        if (savedInstanceState != null) {
-//            GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
-//            GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
-//            GlobalVar.GV().StationID = savedInstanceState.getInt("StationID");
-//            GlobalVar.GV().EmployMobileNo = savedInstanceState.getString("EmployMobileNo");
-//            GlobalVar.GV().EmployName = savedInstanceState.getString("EmployName");
-//            GlobalVar.GV().EmployStation = savedInstanceState.getString("EmployStation");
-//            GlobalVar.GV().currentSettings = savedInstanceState.getParcelable("currentSettings");
-//            GlobalVar.GV().currentSettings.ID = savedInstanceState.getInt("currentSettingsID");
-//            devision = savedInstanceState.getString("devision");
-//            installaionfile = savedInstanceState.getString("installaionfile");
-//
-//            itemposition = (HashMap<Integer, Integer>) savedInstanceState.getSerializable("itemposition");
-//            LoadMenu();
-//        }
-//    }
 
-    private void setSavedinstance(Bundle savedInstanceState) {
+    private void setSavedInstance(Bundle savedInstanceState) {
 
         GlobalVar.GV().EmployID = savedInstanceState.getInt("EmployID");
         GlobalVar.GV().UserID = savedInstanceState.getInt("UserID");
@@ -2118,10 +1918,6 @@ public class MainPageActivity
         @SuppressWarnings("deprecation")
         protected String doInBackground(String... params) {
 
-
-            //uploadfilescount = uploadfilescount + 1;
-
-            // GlobalVar.GV().GetMasterData(MainPageActivity.this, getWindow().getDecorView().getRootView(), progressDialog);
             GetDeliveryStatusRequest getDeliveryStatusRequest = new GetDeliveryStatusRequest();
             String jsonData = JsonSerializerDeserializer.serialize(getDeliveryStatusRequest, true);
 
@@ -2168,11 +1964,8 @@ public class MainPageActivity
                 }
                 if (httpURLConnection != null)
                     httpURLConnection.disconnect();
-                // result = String.valueOf(buffer);
             }
             return null;
-//
-
 
         }
 
@@ -2190,36 +1983,14 @@ public class MainPageActivity
                     DBConnections dbConnections = new DBConnections(context, null);
                     dbConnections.InsertAppVersion(jo.getInt("VersionCode"), context);
                     int versioncode = GlobalVar.VersionCode(context);
-
-//                    if ((jsonObject.getString("Division").equals("Courier") ||
-//                            jsonObject.getString("Division").equals("Express") ||
-//                            jsonObject.getString("Division").equals("IRS")) && GlobalVar.GV().EmployID != 19127
-//                            && GlobalVar.GV().EmployID != 15365) {
                     if (GlobalVar.GV().EmployID == 19127)
                         versioncode = jo.getInt("VersionCode");
-
-
                     if (jo.getInt("VersionCode") == versioncode) {
-                        // if (jo.getInt("ChangesMainMenu") == 1) {
-
-                        fetchmasterdata(jsonObject, view, getApplicationContext(), jo.getInt("ChangesMainMenu"));
-
-                        // }
+                        fetchMasterData(jsonObject, view, getApplicationContext(), jo.getInt("ChangesMainMenu"));
                     } else {
                         deleteApk();
-//                            if (GlobalVar.GV().EmployID == 19127)
                         updateApp();
-//                            else
-//                                GlobalVar.updateApp(MainPageActivity.this);
                     }
-//                            updateApp();
-                    //   }
-
-//                else {
-//                        fetchmasterdata(jsonObject, view, getApplicationContext());
-//                    }
-
-                    // fetchmasterdata(jsonObject, view, getApplicationContext());
                     dbConnections.close();
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -2241,35 +2012,23 @@ public class MainPageActivity
     private void updateApp() {
         AlertDialog.Builder builder = new AlertDialog.Builder(MainPageActivity.this);
         builder.setTitle("Info")
-                .setMessage("Kindly Please update our lastest version")
+                .setMessage("Kindly Please update our latest version")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int which) {
-
                         ActivityCompat.requestPermissions(
                                 MainPageActivity.this,
                                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                                 14
                         );
-
-//                        new DownloadApk().execute("");
-
-//                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.naqelexpress.naqelpointer"));
-//                        startActivity(intent);
-//                        final DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
-//                        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", getApplicationContext());
-//                        UserMeLogin userMeLogin = new UserMeLogin(id);
-//                        dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
-//                        finish();
                     }
                 }).setCancelable(false);//.setNegativeButton("Cancel", null).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-
     }
 
 
-    private void fetchmasterdata(JSONObject jsonObject, View view, Context context, int updatemenu) {
+    private void fetchMasterData(JSONObject jsonObject, View view, Context context, int updatemenu) {
         try {
             JSONArray station = jsonObject.getJSONArray("Station");
             if (station.length() > 0)
@@ -2303,7 +2062,7 @@ public class MainPageActivity
             devision = jsonObject.getString("Division");
             DBConnections dbConnections = new DBConnections(context, null);
             dbConnections.UpdateUserDivision(devision, getWindow().getDecorView().getRootView(), updatemenu);
-            JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveyStatusReason");
+            JSONArray deliverysubstatus = jsonObject.getJSONArray("DeliveryStatusReason");
             if (deliverysubstatus.length() > 0)
                 new DeliveryStatus(deliverysubstatus.toString(), view, context, 0);
 
@@ -2328,7 +2087,7 @@ public class MainPageActivity
         alertDialog.setCancelable(false);
         alertDialog.setTitle("Info.");
         alertDialog.setMessage("Kindly Check your Internet Connection,please try again");
-        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,"OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         GetMasterData asynthread = new GetMasterData();
@@ -2350,37 +2109,6 @@ public class MainPageActivity
     }
 
 
-    public void checkthreadalive() {
-        int checkthread = 1;
-        for (int i = 0; i < asyncTasks.size(); i++) {
-            AsyncTask<String, Integer, String> asyncTaskItem = (AsyncTask<String, Integer, String>) asyncTasks
-                    .get(i);
-
-            if (asyncTaskItem.getStatus() == AsyncTask.Status.FINISHED)
-                checkthread++;
-
-        }
-//        if (checkthread == asyncTasks.size()) {
-//            boolean loop = false;
-//            while (!loop) {
-//                if (GlobalVar.gs && GlobalVar.dsl && GlobalVar.cptl && GlobalVar.cptdl && GlobalVar.cptddl && GlobalVar.nnvdl) {
-//                    if (progressDialog != null)
-//                        progressDialog.dismiss();
-//
-//                    break;
-//                }
-//                try {
-//                    Thread.sleep(10000);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//        }
-
-
-    }
-
     Point p;
 
     @Override
@@ -2399,8 +2127,6 @@ public class MainPageActivity
     PopupWindow popup;
 
     private void showPopup(final Activity context, Point p, final int redirect) {
-
-
         LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.popup);
         LayoutInflater layoutInflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -2431,7 +2157,6 @@ public class MainPageActivity
         });
 
         popup = new PopupWindow(layout, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
-//        popup.setContentView(layout);
         popup.setFocusable(true);
         popup.update();
         popup.setOutsideTouchable(false);
@@ -2582,11 +2307,6 @@ public class MainPageActivity
 
                         File file = new File(DIRECTORY);
                         if (file.exists()) {
-//
-//                            Intent intent1 = new Intent(Intent.ACTION_UNINSTALL_PACKAGE);
-//                            intent1.setData(Uri.parse("package:" + app_pkg_name));
-//                            intent1.putExtra(Intent.EXTRA_RETURN_RESULT, true);
-//                            startActivityForResult(intent1, UNINSTALL_REQUEST_CODE);
 
                             String DIRECTORY1 = "";
                             if (Build.VERSION.SDK_INT >= 30)
@@ -2608,11 +2328,6 @@ public class MainPageActivity
                             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
                             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                             startActivity(intent);
-
-//                            Intent promptInstall = new Intent(Intent.ACTION_VIEW)
-//                                    .setDataAndType(Uri.parse(DIRECTORY1),
-//                                            "application/vnd.android.package-archive");
-//                            startActivity(promptInstall);
                         }
                     } else {
                         try {
@@ -2644,7 +2359,6 @@ public class MainPageActivity
     }
 
     private void deleteApk() {
-
         if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
@@ -2690,7 +2404,7 @@ public class MainPageActivity
 
     Handler isdeviceonlinehandler;
 
-    private void isDeviceonline() {
+    private void isDeviceOnline() {
         try {
             isdeviceonlinehandler = new Handler();
             isdeviceonlinehandler.postDelayed(new Runnable() {
@@ -2770,17 +2484,17 @@ public class MainPageActivity
     @Override
     protected void onResume() {
         setValidationText();
-        deleteExsistinguser();
+        deleteExistingUser();
         setProductivitytext();
-        isDeviceonline();
+        isDeviceOnline();
         super.onResume();
     }
 
-    private void deleteExsistinguser() {
+
+    private void deleteExistingUser() {
         DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
         dbConnections.DeleteExsistingLogin(getApplicationContext());
         Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 ", getApplicationContext());
-
         if (result != null && result.getCount() == 0) {
             result.close();
             dbConnections.close();
@@ -2796,11 +2510,9 @@ public class MainPageActivity
         UserMeLogin userMeLogin = new UserMeLogin(id);
         dbConnections.UpdateUserMeLogout(userMeLogin, getApplicationContext());
         dbConnections.close();
-//        android.os.Process.killProcess(android.os.Process.myPid());
         Intent intent = new Intent(getApplicationContext(), SplashScreenActivity.class);
         intent.addFlags(FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-
     }
 
     private void VersionMismatch(String title, String message) {
@@ -2811,19 +2523,15 @@ public class MainPageActivity
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Logout",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
                         dialog.dismiss();
                         Logout();
-
                     }
                 });
-
         alertDialog.show();
     }
 
     private void registerFirebase() {
         try {
-
             FirebaseApp.initializeApp(getApplicationContext());
             final FirebaseAuth mAuth = FirebaseAuth.getInstance();
             if (mAuth.getUid() == null) {

@@ -1,5 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="enterTextHere">Enter Text Here</string>
+    <string name="trailerBoy">Trailer Boy *</string>
+    <string name="checkRearDoorBolts">Check rear door bolts, If available?</string>
+    <string name="checkRearDoorLocks">Check rear door locks, If available?</string>
+    <string name="checkSlidingSupport">Check sliding support post &amp; its locking mechanism</string>
+    <string name="checkNumberPlate">Check number plate &amp; its holder</string>
+    <string name="checkAirLeak">Check Air leak. If Ok</string>
+    <string name="checkAirSuspension">Check Air suspension condition, If OK</string>
+    <string name="trailerBoyRemarks">Trailer Boy - Remark</string>
+    <string name="chassisBeams">Chassis Beams *</string>
+    <string name="landingLelFunctional">Landing Leg functional?</string>
+    <string name="landingLegsShoes">Landing legs shoes</string>
+    <string name="vehicleElectricals">Vehicle Electricals *</string>
+    <string name="checkLightsCondition">Check lights condition Heads/Tail/Side(Highlight to local head)</string>
+    <string name="attactEightPics">Attach 8 pictures(1 front with TH, 1 Rear(Trailer), 3 right side, 3 left side)</string>
+    <string name="uploadFile">upload file</string>
+    <string name="fleetSafety">Fleet Safety *</string>
+    <string name="fireExtinguisherAvailability">Fire extinguisher availability</string>
+    <string name="fireExtinguisherValidity">Fire extinguisher validity(expiry date)</string>
+    <string name="submit">Submit</string>
+    <string name="safetyCurtainsAndCargoPic">Safety - Curtains &amp; Cargo Pictures</string>
+    <string name="safetyCurtains">Safety - Curtains &amp; Cargo</string>
+    <string name="singleDecker">Single Decker - 16 Side bars available(If Less, highlight before dispatch)</string>
+    <string name="doubleDecker">Double Decker - 12 Side bars available(If Less, highlight before dispatch):</string>
+    <string name="checkCurtainLocking">Check Curtain Locking - Ratchet, If Ok</string>
+    <string name="checkCurtainBelt">Check Curtains belt &amp; tears(Highlight any red color before dispatch)</string>
+    <string name="cargoBeltApplied">Cargo Belts applied(Single Decker-48, Double Decker-8)</string>
+    <string name="checkCurtainRollers">Check Curtain rollers, If Ok?</string>
+    <string name="checkCurtainCleanliness">Check Curtain Cleanliness(Highlight to respective to RM before dispatch)</string>
+    <string name="curtainBeltLock">Curtain Belt Lock</string>
+    <string name="checkAllThatApply">Check all that apply:</string>
+    <string name="tireCondition">Tire Condition:</string>
+    <string name="tireConditionPicture">Tire Condition Picture</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+    <string name="driverContactNo">Driver Contact No</string>
+    <string name="driverEmpName">Driver Employee Name</string>
+    <string name="driverEmpId">Driver Employee ID</string>
+    <string name="vehicleTractorHead">Vehicle Tractor Head &amp; Trailer</string>
+    <string name="tripId">Trip ID</string>
+    <string name="enterVehicleTractorHead">Enter Vehicle Tractor Head &amp; Trailer</string>
+    <string name="enterDriverContactNo">Enter Driver Contact No</string>
+    <string name="enterDriverEmpName">Enter Driver Employee Name</string>
+    <string name="enterDriverEmpId">Enter Driver Employee ID</string>
+    <string name="enterTripId">Enter Trip ID</string>
+
+    <string name="dispatchChecklist">Dispatch Checklist</string>
+    <string name="spareTire">Spare Tire</string>
+    <string name="greaseHubCup">Grease Hub Cup(Yes/No)</string>
+    <string name="damagesOrPunctureIfYesThanAddPicture">Damage of Puncture (If YES, than add a picture and highlight to the local head)</string>
+    <string name="back"><u>Back</u></string>
+    <string name="next"><u>Next</u></string>
+
     <string name="app_name">Naqel Pointer</string>
     <string name="app_nameTH">Terminal Handling</string>
     <string name="lbWelcome">Welcome to Naqel Pointer</string>

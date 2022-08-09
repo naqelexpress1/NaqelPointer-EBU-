@@ -24,8 +24,6 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
         findViewById();
 
 
-
-
     }
 
     public void findViewById(){

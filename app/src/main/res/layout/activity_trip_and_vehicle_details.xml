@@ -1,6 +1,374 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="18dp"
+        android:layout_marginRight="18dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:weightSum="3">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@mipmap/back_icon"></ImageView>
+
+        <TextView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:text="@string/back"
+            android:textColor="@color/Black"
+            android:textSize="16dp"></TextView>
+
+        <TextView
+            android:id="@+id/next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.5"
+            android:gravity="right"
+            android:text="@string/next"
+            android:textColor="@color/Black"
+            android:textSize="16dp"></TextView>
+
+    </LinearLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="18dp"
+                android:text="@string/dispatchChecklist"
+                android:textColor="@color/Black"
+                android:textSize="25dp"
+                android:textStyle="bold"></TextView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/Black"></View>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal"
+                android:weightSum="2">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:layout_weight="1.1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="2dp"
+                        android:text="@string/tripId"
+                        android:textColor="@color/Black"
+                        android:textSize="16dp"></TextView>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginRight="2dp"
+                        android:text="@string/vehicleTractorHead"
+                        android:textColor="@color/Black"
+                        android:textSize="16dp"></TextView>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="2dp"
+                        android:text="@string/driverEmpId"
+                        android:textColor="@color/Black"
+                        android:textSize="16dp"></TextView>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="2dp"
+                        android:text="@string/driverEmpName"
+                        android:textColor="@color/Black"
+                        android:textSize="16dp"></TextView>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginRight="2dp"
+                        android:text="@string/driverContactNo"
+                        android:textColor="@color/Black"
+                        android:textSize="16dp"></TextView>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="0.9"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/tripId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Black"
+                        android:hint="@string/enterTripId"
+                        android:textSize="15dp"></EditText>
+
+                    <EditText
+                        android:id="@+id/vehicleTractorHead"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Black"
+                        android:hint="@string/enterVehicleTractorHead"
+                        android:textSize="15dp"></EditText>
+
+                    <EditText
+                        android:id="@+id/driverEmpId"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Black"
+                        android:hint="@string/enterDriverEmpId"
+                        android:textSize="15dp"></EditText>
+
+                    <EditText
+                        android:id="@+id/driverEmpName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Black"
+                        android:hint="@string/enterDriverEmpName"
+                        android:textSize="15dp"></EditText>
+
+                    <EditText
+                        android:id="@+id/driverContactNo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Black"
+                        android:hint="@string/enterDriverContactNo"
+                        android:textSize="15dp"></EditText>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="18dp"
+                android:text="@string/tireCondition"
+                android:textColor="@color/Black"
+                android:textSize="16dp"></TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="16dp"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:text="@string/checkAllThatApply"
+                    android:textColor="@color/Black"
+                    android:textSize="16dp"></TextView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.45"
+                    android:gravity="center"
+                    android:text="@string/yes"
+                    android:textColor="@color/Black"
+                    android:textSize="14dp"></TextView>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.45"
+                    android:gravity="center"
+                    android:text="@string/no"
+                    android:textColor="@color/Black"
+                    android:textSize="14dp"></TextView>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="14dp"
+                android:background="@color/Black"></View>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="16dp"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".9"
+                    android:text="@string/damagesOrPunctureIfYesThanAddPicture"
+                    android:textColor="@color/Black"
+                    android:textStyle="bold"
+                    android:textSize="16dp"></TextView>
+
+                <CheckBox
+                    android:id="@+id/damageOrPunctureCBY"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.45"
+                    android:gravity="center"></CheckBox>
+
+                <CheckBox
+                    android:id="@+id/damageOrPunctureCBN"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.65"
+                    android:gravity="center"
+                    ></CheckBox>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="14dp"
+                android:background="@color/Black"></View>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="16dp"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".9"
+                    android:text="@string/greaseHubCup"
+                    android:textColor="@color/Black"
+                    android:textStyle="bold"
+                    android:textSize="16dp"></TextView>
+
+                <CheckBox
+                    android:id="@+id/greaseHubCupCBY"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.45"
+                    android:gravity="center"></CheckBox>
+
+                <CheckBox
+                    android:id="@+id/greaseHubCupCBN"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.65"
+                    android:gravity="center"
+                    ></CheckBox>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="14dp"
+                android:background="@color/Black"></View>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginRight="16dp"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".9"
+                    android:text="@string/spareTire"
+                    android:textColor="@color/Black"
+                    android:textStyle="bold"
+                    android:textSize="16dp"></TextView>
+
+                <CheckBox
+                    android:id="@+id/spareTireCBY"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.45"
+                    android:gravity="center"></CheckBox>
+
+                <CheckBox
+                    android:id="@+id/spareTireCBN"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.65"
+                    android:gravity="center"
+                    ></CheckBox>
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="14dp"
+                android:background="@color/Black"></View>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>

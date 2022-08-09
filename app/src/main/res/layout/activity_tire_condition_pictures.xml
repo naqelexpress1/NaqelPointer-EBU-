@@ -59,7 +59,7 @@
                 android:layout_marginRight="18dp"
                 android:textStyle="bold"
                 android:textSize="25dp"
-                android:text="Dispatch Checklist">
+                android:text="@string/dispatchChecklist">
             </TextView>
             <View
                 android:layout_width="match_parent"
@@ -68,7 +68,48 @@
                 android:background="@color/Black">
             </View>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="@string/tireConditionPicture"
+                    android:textStyle="bold"
+                    android:textColor="@color/Black"
+                    android:textSize="16dp"></TextView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center">
+
+                    <Button
+                        android:id="@+id/uploadFile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="32dp"
+                        android:gravity="center"
+                        android:paddingLeft="60dp"
+                        android:paddingRight="60dp"
+                        android:background="@color/NaqelBlue"
+                        android:textColor="@color/White"
+                        android:text="@string/uploadFile"
+                        android:textAllCaps="false"
+                        ></Button>
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
         </LinearLayout>
+
+
+
 
     </ScrollView>
 

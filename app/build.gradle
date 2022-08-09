@@ -20,8 +20,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        versionName '1.5.9.1'
-        versionCode 5001
+        versionName '1.5.9.2'
+        versionCode 5002
     }
     buildTypes {
 

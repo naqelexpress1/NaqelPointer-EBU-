@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-
     package="com.naqelexpress.naqelpointer">
 
     <queries>
@@ -14,7 +13,6 @@
             <action android:name="android.media.action.IMAGE_CAPTURE" />
         </intent>
     </queries>
-
 
     <uses-permission
         android:name="android.permission.READ_PRIVILEGED_PHONE_STATE"
@@ -45,14 +43,12 @@
         android:name="android.permission.GET_ACCOUNTS"
         android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
-
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
@@ -70,22 +66,15 @@
         android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
-
-
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
     <uses-permission android:name="android.permission.SEND_SMS" />
-    <uses-permission android:name="android.permission.READ_SMS" />
-
-
-    <!-- <uses-feature android:name="android.hardware.camera" /> -->
+    <uses-permission android:name="android.permission.READ_SMS" /> <!-- <uses-feature android:name="android.hardware.camera" /> -->
     <!-- <uses-permission android:name="android.permission.CAMERA" /> -->
-
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
 
@@ -94,11 +83,7 @@
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
-
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-
-    <!-- <permission-group android:name="android.permission-group.CALL_LOG" /> -->
-
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" /> <!-- <permission-group android:name="android.permission-group.CALL_LOG" /> -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission
         android:name="android.permission.INSTALL_PACKAGES"
@@ -111,12 +96,14 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-
         android:networkSecurityConfig="@xml/network_security_config"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:appComponentFactory,android:icon,android:allowBackup">
+        <activity
+            android:name=".Activity.PickUp.NoPickup"
+            android:exported="false" />
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -128,11 +115,9 @@
         <meta-data
             android:name="com.google.android.gms.vision.DEPENDENCIES"
             android:value="barcode" />
-
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
             android:value="true" />
-
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -142,9 +127,7 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
-        </provider>
-
-        <!-- [START firebase_iid_service] -->
+        </provider> <!-- [START firebase_iid_service] -->
         <service android:name=".DB.FirebaseIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -157,7 +140,6 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-
             </intent-filter>
         </service>
 
@@ -167,10 +149,10 @@
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="com.naqelexpress.naqelpointer" />
             </intent-filter>
         </receiver>
-
 
         <service android:name=".Activity.GoogleMap.GeofenceTransitionService" />
 
@@ -212,7 +194,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity">
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -221,15 +202,12 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".Activity.MyrouteCBU.MyRouteActivity"
             android:label="My Route"
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity">
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -238,14 +216,12 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.MyrouteCBU.MyRouteActivity_Complaince"
             android:label="My Route"
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity">
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -254,14 +230,12 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.MyrouteCBU.MyRouteActivity_Complaince_GroupbyPhn"
             android:label="My Route"
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity">
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -270,14 +244,12 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".Activity.MyRouteCBUPaperless.MyRouteActivity_PaperlessDS"
             android:label="My Route"
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity">
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -286,22 +258,19 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
         <activity android:name=".Activity.PaperLessDSSummary.PaperLessDSSummary" />
         <activity android:name=".Activity.PaperLessDSSummary.RouteHistory" />
-
         <activity android:name=".Activity.MyRouteCBUPaperless.RouteMap" />
         <activity android:name=".Activity.MyRouteCBUPaperless.RouteMap_byDistrict" />
         <activity android:name=".Activity.MyRouteCBUPaperless.OptimiseMap" />
         <activity android:name=".Activity.MyRouteCBUPaperless.OptimiseMapbyDistrict" />
         <activity android:name=".Activity.MyRouteCBUPaperless.MapMovingOnCurLatLng" />
-
         <!--
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
 
-            android:screenOrientation="portrait" /> -->
-
+            android:screenOrientation="portrait" />
+        -->
         <activity
             android:name=".Activity.Login.SplashScreenActivity"
             android:screenOrientation="portrait"
@@ -311,8 +280,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.DIAL" />
@@ -327,7 +294,6 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".Activity.Login.ForgotPasswordActivity"
@@ -361,15 +327,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.CheckPointbyPieceLevel.CheckPointsActivity"
             android:label="@string/CheckPointsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.MultiDelivery.MultiDeliveryActivity"
             android:label="@string/MultiDeliveryActivity"
@@ -382,27 +345,22 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.NotDelivered.NotDeliveredActivity"
             android:label="@string/NotDelivered"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.NotDeliveredCBU.NotDeliveredActivity"
             android:label="@string/NotDelivered"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.NotDeliveredSinglePiece.NotDeliveredActivity"
             android:label="@string/NotDelivered"
             android:theme="@style/myDialog" />
-
-
         <activity
             android:name=".Activity.PickUp.PickUpActivity"
             android:label="@string/title_activity_pick_up"
@@ -432,23 +390,18 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.DeliverysheetEBU.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.OFDPieceLevel.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.MyAccount.MyAccountActivity"
             android:label="My Account"
@@ -468,21 +421,14 @@
             android:label="Pending COD"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Classes.NewBarCodeScanner"
-
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Classes.NewBarCodeScannerForVS"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Classes.BarcodeScan"
             android:screenOrientation="portrait"
@@ -501,7 +447,6 @@
             android:label="@string/title_activity_booking_list" />
         <activity android:name=".Activity.Booking.BookingDetailActivity" />
         <activity android:name=".Activity.History.History" />
-
         <activity
             android:name=".Activity.LoadtoDestLocalDB.LoadtoDestination"
             android:label="LoadtoDest"
@@ -518,15 +463,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.LoadtoDestLocalDB.SyncTripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.LoadtoDest.LoadtoDestination"
             android:screenOrientation="portrait"
@@ -542,17 +483,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.LoadtoDest.SyncTripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            tools:ignore="LockedOrientationActivity" />
-
-
-        <!-- comment by ismail and added <activity android:name=".MainActivity"></activity> -->
-
+            tools:ignore="LockedOrientationActivity" /> <!-- comment by ismail and added <activity android:name=".MainActivity"></activity> -->
         <activity android:name=".Activity.routeMap.RouteMap" />
         <activity android:name=".Activity.routeMap.RouteMap_byDistrict" />
         <activity android:name=".Activity.routeMap.RouteMap_SingleWaybill" />
@@ -573,50 +508,42 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.AtOriginusingLocalDB.AtOrigin"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.AtOriginDelete.AtOriginDelete"
             android:label="@string/AtOrigin"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.Login.UpdatePassword"
             android:label="Update Password"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Login.UpdatePasswordModule"
             android:label="Update Password"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".ContactNo.Contact"
             android:label="Contact Details"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.ArrivedDest.ArrivedatDestination"
             android:label="Arrived at Destination"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.ArrivedatDestNew.ArrivedatDestination"
             android:label="Arrived at Destination"
@@ -629,70 +556,56 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.ValidationDS.ValidationDS"
             android:label="Arrived at Destination"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.Login.EmployeeInformation"
             android:label="Employee Information"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.routeMap.RouteMap_Distance"
             android:theme="@style/trans" />
-
         <activity
             android:name=".Activity.EBURoute.DeliverySheet"
             android:label="DeliverySheet"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SuggestDeliverysheet.MyRouteActivity"
             android:label="Suggest Deliverysheet"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Incident.Incident"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.NightStock.NSScanShipmentActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Login.FacilityLogin"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Login.VerifyMobileNo"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.PickupPieceLevel.PickUpActivity"
             android:label="@string/title_activity_pick_up"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.DeliveryOFD.DeliveryActivity"
             android:label="@string/DeliveryActivity"
@@ -704,27 +617,23 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.TerminalHandlingGroup"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.NCL.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.NCLAutoSave.NclShipmentActivity"
             android:label="Consolidation"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.BringTripDetails"
             android:label="TripDetails"
@@ -737,47 +646,39 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.InventoryHeldIn"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.InventoryHeldOut"
             android:label="Inventory Held OUT"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.InventoryGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandling.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TerminalHandling"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TerminalHandlingGroup"
             android:screenOrientation="portrait"
@@ -795,54 +696,46 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldIn"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryHeldOut"
             android:label="Inventory Held OUT"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.InventoryControlOnetab"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.InventoryControlOnetab"
             android:label="Inventory Control"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.InventoryControl_LocalValidation"
             android:label="Inventory Control"
@@ -861,21 +754,18 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.InventoryHeldIn"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.InventoryHeldOut"
             android:label="Inventory Held - IN"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".NCL.NclShipmentActivity"
             android:label="Consolidation"
@@ -887,7 +777,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.BringTripDetails"
             android:label="TripDetails"
@@ -900,24 +789,20 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity android:name=".MainActivity" />
         <activity android:name=".RoomsListActivity" />
         <activity
             android:name=".ChatRoomActivity"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".ChatRoomActivitynew"
             android:windowSoftInputMode="adjustPan" />
-
         <activity
             android:name=".Activity.CustomerRating.CustomerRatings"
             android:label="Ratings"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.CourierKPIEBU.CourierKpi"
             android:label="KPI"
@@ -930,78 +815,66 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.CloseTruck"
             android:label="Close Truck"
             android:screenOrientation="portrait"
             android:theme="@style/myDialog"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.TerminalHandlingAutoSave.UndoNcl"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.IncabCheckList.IncCabChecklist"
             android:label="InCabChecklist"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Login.FindVehicle"
             android:label="Choose Truck"
             android:screenOrientation="portrait"
             android:theme="@style/myroute.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.SPGroup"
             android:label="TripDetails"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.TripArrviedatDest"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.CloseTruck"
             android:label="Close Truck"
             android:screenOrientation="portrait"
             android:theme="@style/myDialog"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.UndoNcl"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.UndoNclbyScan"
             android:label="Undo Ncl"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".TerminalHandling.TripArrviedatDestbyNCL"
             android:label="Arrived Dest"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".NCLBulk.NclShipmentActivity"
             android:label="Consolidation"
@@ -1014,30 +887,24 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".TerminalHandling.LinehaulGroup"
             android:label="Linehaul"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
-            tools:ignore="LockedOrientationActivity" />
-
-        <!--        related to mohammed-->
+            tools:ignore="LockedOrientationActivity" /> <!-- related to mohammed -->
         <activity
             android:name=".TerminalHandling.TerminalHandlingGroup"
             android:label=""
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
-
         <activity
             android:name=".Activity.InCabNew.IncCabChecklist"
             android:label="Incab"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".MiscodeSearch.Miscode"
             android:screenOrientation="portrait"
@@ -1051,116 +918,145 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".Activity.BookingCBU.BookingList"
             android:label="@string/title_activity_booking_list" />
-
-        <activity android:name=".Activity.BookingCBU.BookingDetailActivity" />
-
-        <!-- <activity android:name=".Activity.GoogleBarcode.MainActivity" /> -->
-
-        <!--<activity
+        <activity android:name=".Activity.BookingCBU.BookingDetailActivity" /> <!-- <activity android:name=".Activity.GoogleBarcode.MainActivity" /> -->
+        <!--
+<activity
             android:name=".PaymentGateway.StcPaymentGateway"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity"
 
-            />-->
-
+            />
+        -->
         <activity
             android:name=".TerminalHandling.InventoryControl_LocalValidationbyNCL"
             android:label="ByNCL" />
         <activity
             android:name=".TerminalHandling.InventoryControl_DelRtoReqbyNCL"
             android:label="ByNCL" />
-
         <activity
             android:name=".Activity.OFDPiecebyNCL.DeliverySheetActivity"
             android:label="Delivery Sheet"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SkipWaybillNofromRouteLine.SkipWaybillNoinRouteLine"
             android:label="Skip Waybill"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.Rating.CourierRating"
             android:label="CourierRating"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.FuelModelEBU.Fuel"
             android:label="Fuel"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SPAsrRegularBooking.BookingList"
             android:label="Booking List"
             android:screenOrientation="portrait"
-
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.PickupAsrReg.PickUpActivity"
             android:label="@string/title_activity_pick_up"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SPbookingGroup.SpWaybillGroup"
             android:label="Waybill Details"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SPbookingException.SpWaybillException"
             android:label="Please apply Exception status of remaining shipments"
             android:screenOrientation="portrait"
             android:theme="@style/myDialog"
             tools:ignore="LockedOrientationActivity,NewApi" />
-
         <activity
             android:name=".Activity.CBM.CBM"
             android:label="CBM"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.AddtoScope.AddtoScope"
             android:label="AddtoScope"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.routeMap.RouteMapPreSeq"
             android:label=""
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.SortingShipmentbyPiece.SortingShipment"
             android:label="SortingShipment"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             tools:ignore="LockedOrientationActivity" />
-
         <activity
             android:name=".Activity.ScanWaybill.ScanWaybill"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.AttachPictures"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.FleetSafety"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.SafetryCurtainsAndCargoPicture"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.SafetyCurtainsAndCargo"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.TrailerBody"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.TrailerBodyRemarks"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.TripAndVehicleDetail"
+            android:label="ScanWaybill"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name=".Activity.InterCity.TireConditionPicture"
             android:label="ScanWaybill"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
@@ -1168,100 +1064,83 @@
 
 
         <service
-            android:name="com.naqelexpress.naqelpointer.service.signature"
+            android:name=".service.signature"
             android:process=":naqelsignature" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.LocationService"
+            android:name=".service.LocationService"
             android:exported="true"
-            android:process=":location"></service>
-
+            android:process=":location" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.AtOrigin"
+            android:name=".service.AtOrigin"
             android:process=":naqelAtOrigin" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.CheckPoint"
+            android:name=".service.CheckPoint"
             android:process=":naqelCheckPoint" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.MultiDelivery"
+            android:name=".service.MultiDelivery"
             android:process=":naqelMultiDelivery" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.WayBillMeasurement"
+            android:name=".service.WayBillMeasurement"
             android:process=":naqelMultiDeliveryMeasurement" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.NotDelivery"
+            android:name=".service.NotDelivery"
             android:process=":naqelNotDelivery" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.OnDelivery"
+            android:name=".service.OnDelivery"
             android:process=":naqelOnDelivery" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.PartialDelivery"
+            android:name=".service.PartialDelivery"
             android:process=":naqelPartialDelivery" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.OnLoading"
+            android:name=".service.OnLoading"
             android:process=":naqelOnLoading" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.Deliverysheet"
+            android:name=".service.Deliverysheet"
             android:process=":naqelDeliverysheet" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.DeliverysheetbyPiece"
+            android:name=".service.DeliverysheetbyPiece"
             android:process=":naqelDeliverysheetbyPiece" />
-
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.PickUp"
+            android:name=".service.PickUp"
             android:process=":naqelPickup" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.CallRecord"
+            android:name=".service.CallRecord"
             android:process=":naqelCallRecord" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.Palletize"
+            android:name=".service.Palletize"
             android:process=":naqelPalletize" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.TripPlanDetails"
+            android:name=".service.TripPlanDetails"
             android:process=":naqelTripPlanDetails" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.TripPlanDDetails"
+            android:name=".service.TripPlanDDetails"
             android:process=":naqelTripPlanDDetails" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.ArrivedatDest"
+            android:name=".service.ArrivedatDest"
             android:process=":naqelArrivedatDest" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.Discrepancy"
+            android:name=".service.Discrepancy"
             android:process=":naqelDiscrepancy" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.DeviceToken"
+            android:name=".service.DeviceToken"
             android:process=":naqelDeviceToken" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.Radios200Service"
+            android:name=".service.Radios200Service"
             android:process=":naqelRadios200" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.Radios200InsertService"
+            android:name=".service.Radios200InsertService"
             android:process=":naqelRadios200InsertService" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.NightStock"
+            android:name=".service.NightStock"
             android:process=":naqelNightStock" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.VehicleManifest"
+            android:name=".service.VehicleManifest"
             android:process=":naqelVehicleManifest" />
-
         <service
             android:name=".Activity.History.CallRecord"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:process=":naqelCallRecordTrigger" />
-
         <service
             android:name=".Activity.History.CallRecordTrigger"
             android:exported="true"
@@ -1273,16 +1152,13 @@
             android:name=".Activity.History.LocationTrigger"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".Activity.History.LocationTriggerNew"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".service.UpdateLocation"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".service.LocationupdateResetAlarm"
             android:permission="android.permission.BIND_JOB_SERVICE" />
@@ -1292,15 +1168,12 @@
         <service
             android:name=".service.Radius200"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.Activity.GoogleApiFusedLocation.LocationService"
-            android:process=":GoogleApiFusedLocationlocation"></service>
-
+            android:name=".Activity.GoogleApiFusedLocation.LocationService"
+            android:process=":GoogleApiFusedLocationlocation" />
         <service
             android:name=".service.SendNotificationtoConsignee"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service
             android:name=".service.CallService"
             android:permission="android.permission.BIND_INCALL_SERVICE">
@@ -1312,46 +1185,41 @@
                 <action android:name="android.telecom.InCallService" />
             </intent-filter>
         </service>
-
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.PhoneState"
+            android:name=".service.PhoneState"
             android:process=":naqelDeviceToken" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.CustomerRating"
+            android:name=".service.CustomerRating"
             android:process=":naqelCustomerRating" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.PlannedRoute_MyRouteComp"
+            android:name=".service.PlannedRoute_MyRouteComp"
             android:process=":myroutecomp" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.DeviceActivity"
+            android:name=".service.DeviceActivity"
             android:process=":naqelDeviceActivity" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.CourierNotesService"
+            android:name=".service.CourierNotesService"
             android:process=":CourierNotesService" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.AddtoScopeService"
+            android:name=".service.AddtoScopeService"
             android:process=":AddtoScopeService" />
 
-
         <receiver
-            android:name="com.naqelexpress.naqelpointer.Receiver.MyReceiver"
+            android:name=".Receiver.MyReceiver"
             android:directBootAware="true"
             android:enabled="true"
             android:exported="true"
             android:process=":remote">
             <intent-filter>
-                <!--<action android:name="com.naqelexpress.naqelpointer.BroadcastReceiver" /> -->
+
+                <!-- <action android:name="com.naqelexpress.naqelpointer.BroadcastReceiver" /> -->
+
 
                 <!-- for Pre N Deive -->
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
             <intent-filter>
+
                 <!-- above N -->
                 <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.ACTION_SHUTDOWN" />
@@ -1367,26 +1235,22 @@
             <intent-filter>
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
-
-
         </receiver>
-
         <receiver android:name=".Receiver.LocationupdateInterval">
             <intent-filter>
                 <action android:name="com.naqelexpress.naqelpointer.LocationAlaram" />
-
             </intent-filter>
         </receiver>
-
-        <!--<receiver
+        <!--
+<receiver
             android:name=".Receiver.NetworkChangeReceiver"
             android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
             </intent-filter>
-        </receiver>-->
-
+        </receiver>
+        -->
         <service
             android:name=".Watsapp.WhatsappAccessibilityService"
             android:label="Accessibility Service"
@@ -1398,27 +1262,23 @@
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>
-        </service>
-
-        <!--        <receiver-->
-        <!--            android:name=".Activity.PhoneState.ServiceReceiver"-->
-        <!--            android:permission="android.permission.READ_PHONE_STATE">-->
-        <!--            <intent-filter>-->
-        <!--                <action android:name="android.intent.action.PHONE_STATE" />-->
-        <!--                <action android:name="android.intent.action.NEW_OUTGOING_CALL" />-->
-        <!--            </intent-filter>-->
-        <!--        </receiver>-->
-
+        </service> <!-- <receiver -->
+        <!-- android:name=".Activity.PhoneState.ServiceReceiver" -->
+        <!-- android:permission="android.permission.READ_PHONE_STATE"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.intent.action.PHONE_STATE" /> -->
+        <!-- <action android:name="android.intent.action.NEW_OUTGOING_CALL" /> -->
+        <!-- </intent-filter> -->
+        <!-- </receiver> -->
         <service
             android:name=".service.CallStateReceiver"
             android:enabled="true"
             android:exported="true" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.TerminalHandling"
+            android:name=".service.TerminalHandling"
             android:process=":naqelTerminalHandling" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.TerminalHandlingBulk"
+            android:name=".service.TerminalHandlingBulk"
             android:process=":naqelTerminalHandlingBulk" />
         <service
             android:name=".service.NclService"
@@ -1426,23 +1286,18 @@
         <service
             android:name=".service.NclServiceBulk"
             android:process=":naqelNclServiceBulk" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.InventorybyNCLBulk"
+            android:name=".service.InventorybyNCLBulk"
             android:process=":naqelInventorybyNCLBulk" />
         <service
-            android:name="com.naqelexpress.naqelpointer.service.LocationIntoMongo"
+            android:name=".service.LocationIntoMongo"
             android:process=":naqelLocationIntoMongo" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.DeliverysheetbyNCL"
+            android:name=".service.DeliverysheetbyNCL"
             android:process=":naqelDeliverysheetbyNCL" />
-
         <service
-            android:name="com.naqelexpress.naqelpointer.service.IsFollowSequencerService"
+            android:name=".service.IsFollowSequencerService"
             android:process=":IsFollowSequencerService" />
-
     </application>
-
 
 </manifest>

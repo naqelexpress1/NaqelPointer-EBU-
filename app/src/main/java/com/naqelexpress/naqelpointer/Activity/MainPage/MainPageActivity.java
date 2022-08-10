@@ -462,7 +462,7 @@ public class MainPageActivity
                 cellTitle[23] = "InCab CheckList";//CBU 7
                 cellTitle[24] = "Fuel Model";//CBU 7
                 cellTitle[25] = "Scan Waybills";//CBU 7
-//                cellTitle[26] = "Inter City";//CBU 7
+                cellTitle[26] = "Inter City";//CBU 7
 
             } else {
 

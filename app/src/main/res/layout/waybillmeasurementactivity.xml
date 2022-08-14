@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context="com.naqelexpress.naqelpointer.Activity.WaybillMeasurments.WaybillMeasurementActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
 
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -113,7 +113,7 @@
             app:layout_constraintTop_toBottomOf="@+id/chNoVolume"
             tools:ignore="HardcodedText,LabelFor" />
 
-        <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/constraintLayout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -408,7 +408,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/txtHeight"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
-        </android.support.constraint.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

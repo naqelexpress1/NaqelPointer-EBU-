@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             tools:ignore="ScrollViewSize">
 
-            <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
@@ -126,7 +126,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/txtWeight"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/constraintLayout"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -204,7 +204,7 @@
                         tools:ignore="HardcodedText,RtlHardcoded" />
 
 
-                    <android.support.v7.widget.LinearLayoutCompat
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/lnMobileNo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -224,7 +224,7 @@
                             android:textAlignment="textStart"
                             tools:ignore="HardcodedText,RtlHardcoded" />
 
-                        <android.support.v7.widget.AppCompatImageButton
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/btnCall"
                             android:layout_width="30dp"
                             android:layout_height="50dp"
@@ -233,7 +233,7 @@
                             android:src="@drawable/call"
                             tools:ignore="HardcodedText,RtlHardcoded" />
 
-                        <android.support.v7.widget.AppCompatImageButton
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/btnWhatsapp"
                             android:layout_width="30dp"
                             android:layout_height="50dp"
@@ -242,10 +242,10 @@
                             android:src="@drawable/whatsapp"
                             tools:ignore="HardcodedText,RtlHardcoded" />
 
-                    </android.support.v7.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-                    <android.support.v7.widget.LinearLayoutCompat
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/llc"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -265,7 +265,7 @@
                             android:textAlignment="textStart"
                             tools:ignore="HardcodedText,RtlHardcoded" />
 
-                        <android.support.v7.widget.AppCompatImageButton
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/btnCall1"
                             android:layout_width="30dp"
                             android:layout_height="50dp"
@@ -274,7 +274,7 @@
                             android:src="@drawable/call"
                             tools:ignore="HardcodedText,RtlHardcoded" />
 
-                        <android.support.v7.widget.AppCompatImageButton
+                        <androidx.appcompat.widget.AppCompatImageButton
                             android:id="@+id/btnWhatsapp1"
                             android:layout_width="30dp"
                             android:layout_height="50dp"
@@ -282,9 +282,9 @@
                             android:scaleType="fitXY"
                             android:src="@drawable/whatsapp"
                             tools:ignore="HardcodedText,RtlHardcoded" />
-                    </android.support.v7.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
-                    <android.support.v7.widget.LinearLayoutCompat
+                    <androidx.appcompat.widget.LinearLayoutCompat
                         android:id="@+id/llc1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -301,11 +301,11 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="end"
                             android:text="Actual Location" />
-                    </android.support.v7.widget.LinearLayoutCompat>
+                    </androidx.appcompat.widget.LinearLayoutCompat>
 
-                </android.support.constraint.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!--<android.support.constraint.ConstraintLayout-->
+                <!--<androidx.constraintlayout.widget.ConstraintLayout-->
                 <!--android:layout_width="match_parent"-->
                 <!--android:layout_height="100dp"-->
                 <!--android:layout_marginBottom="8dp"-->
@@ -341,7 +341,7 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
 
-                        <!--<android.support.constraint.ConstraintLayout-->
+                        <!--<androidx.constraintlayout.widget.ConstraintLayout-->
                         <!--android:layout_width="match_parent"-->
                         <!--android:layout_height="match_parent">-->
 
@@ -371,7 +371,7 @@
                             tools:layout_editor_absoluteY="426dp" />
 
 
-                        <!--</android.support.constraint.ConstraintLayout>-->
+                        <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
                     </LinearLayout>
                 </ScrollView>
 
@@ -386,8 +386,8 @@
                     app:layout_constraintRight_toLeftOf="@+id/btnGetWaybillDetails"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="MissingConstraints,RtlHardcoded" />
-                <!--</android.support.constraint.ConstraintLayout>-->
-            </android.support.constraint.ConstraintLayout>
+                <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
     </ScrollView>

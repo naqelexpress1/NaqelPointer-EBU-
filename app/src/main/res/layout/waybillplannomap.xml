@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.naqelexpress.naqelpointer.Activity.Waybill.WaybillPlanActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ShipmentInfoLayout"
         android:layout_width="0dp"
         android:layout_height="495dp"
@@ -107,7 +107,7 @@
             app:layout_constraintTop_toBottomOf="@+id/lbShipperName"
             tools:ignore="HardcodedText,MissingConstraints,RtlHardcoded" />
 
-        <android.support.v7.widget.LinearLayoutCompat
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
                 android:text="Mobile No :"
                 tools:ignore="HardcodedText,RtlHardcoded" />
 
-            <android.support.v7.widget.LinearLayoutCompat
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|center"
@@ -144,7 +144,7 @@
                     android:textColor="@color/NaqelBlue"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/btnCall"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -153,7 +153,7 @@
                     android:src="@drawable/call"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/btnWhatsapp"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -162,7 +162,7 @@
                     android:src="@drawable/whatsapp"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/sms"
                     android:layout_width="0dp"
                     android:layout_height="40dp"
@@ -173,12 +173,12 @@
                     android:visibility="invisible"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-            </android.support.v7.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-        </android.support.v7.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
 
-        <android.support.v7.widget.LinearLayoutCompat
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/ll1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -197,7 +197,7 @@
                 android:text="@string/lbPhoneNo"
                 tools:ignore="RtlHardcoded" />
 
-            <android.support.v7.widget.LinearLayoutCompat
+            <androidx.appcompat.widget.LinearLayoutCompat
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
@@ -215,7 +215,7 @@
                     android:textAlignment="textStart"
                     tools:ignore="HardcodedText" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/btnCall1"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -224,7 +224,7 @@
                     android:src="@drawable/call"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/btnWhatsapp1"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -233,7 +233,7 @@
                     android:src="@drawable/whatsapp"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-                <android.support.v7.widget.AppCompatImageButton
+                <androidx.appcompat.widget.AppCompatImageButton
                     android:id="@+id/sms1"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
@@ -244,9 +244,9 @@
                     android:visibility="invisible"
                     tools:ignore="HardcodedText,RtlHardcoded" />
 
-            </android.support.v7.widget.LinearLayoutCompat>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-        </android.support.v7.widget.LinearLayoutCompat>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <!--
         <TextView
@@ -375,6 +375,6 @@
             tools:ignore="HardcodedText,RtlHardcoded" />
         
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

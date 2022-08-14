@@ -8,9 +8,10 @@ import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
@@ -132,7 +133,7 @@ public class GeofenceTransitionService extends IntentService {
 //import android.content.DialogInterface;
 //import android.content.Intent;
 //import android.graphics.Color;
-//import android.support.v4.app.NotificationCompat;
+//import androidx.core.app.NotificationCompat;
 //import android.app.AlertDialog;
 //import android.text.TextUtils;
 //import android.util.Log;

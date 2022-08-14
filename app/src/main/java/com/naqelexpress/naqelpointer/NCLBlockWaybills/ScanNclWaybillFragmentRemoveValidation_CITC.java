@@ -331,7 +331,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 //
 //        }
         } else {
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this.getContext());
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this.getContext());
             builder.setTitle("No Bayan No");
             builder.setMessage("This piece(" + txtBarcode.getText().toString() + ") no Bayan No.kindly contact GateWay team ")
 
@@ -343,7 +343,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         }
                     })
                     .setCancelable(true);
-            android.support.v7.app.AlertDialog alertDialog = builder.create();
+            androidx.appcompat.app.AlertDialog alertDialog = builder.create();
             alertDialog.show();
             ;
             GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
@@ -422,11 +422,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
 
     private void ErrorAlert(final String title, String message, final String PieceCode, final String Waybillno, final double Weight) {
-        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
+        androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(getActivity()).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "ADD",
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "ADD",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -438,7 +438,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     }
                 });
 
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "No",
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, "No",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -664,7 +664,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
 
     private void onBackpressed() {
 
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
         builder.setTitle("Exit NCL ")
                 .setMessage("Are you sure you want to exit without saving?")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -673,7 +673,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         getActivity().finish();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
-        android.support.v7.app.AlertDialog alertDialog = builder.create();
+        androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
     }

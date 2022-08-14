@@ -10,8 +10,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.IBinder;
 import android.provider.CallLog;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
+
+import androidx.core.app.ActivityCompat;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 

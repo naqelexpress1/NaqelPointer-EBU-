@@ -11,7 +11,7 @@
     tools:context="com.naqelexpress.naqelpointer.Activity.NotDelivered.NotDeliveredFirstFragment">
 
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -137,7 +137,7 @@
             tools:ignore="RtlHardcoded" />
 
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView

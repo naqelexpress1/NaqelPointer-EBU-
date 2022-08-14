@@ -3,10 +3,11 @@ package com.naqelexpress.naqelpointer.service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;

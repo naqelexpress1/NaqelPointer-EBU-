@@ -27,14 +27,14 @@ tools:context="com.naqelexpress.naqelpointer.Activity.NightStock.InventoryListAc
 
     </androidx.appcompat.widget.Toolbar>
 
-    <android.support.design.widget.TabLayout
+    <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
 </com.google.android.material.appbar.AppBarLayout>
 
-<android.support.v4.view.ViewPager
+<androidx.viewpager.widget.ViewPager
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

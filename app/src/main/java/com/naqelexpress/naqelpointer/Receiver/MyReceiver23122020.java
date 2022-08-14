@@ -4,6 +4,8 @@ package com.naqelexpress.naqelpointer.Receiver;
  * Created by Hasna on 9/26/18.
  */
 
+import static android.content.Context.TELEPHONY_SERVICE;
+
 import android.Manifest;
 import android.app.ActivityManager;
 import android.app.job.JobInfo;
@@ -19,17 +21,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.provider.CallLog;
-import android.support.v4.app.ActivityCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.naqelexpress.naqelpointer.Activity.History.CallRecordTrigger;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 
 import org.joda.time.DateTime;
-
-import static android.content.Context.TELEPHONY_SERVICE;
 
 public class MyReceiver23122020 extends BroadcastReceiver {
 

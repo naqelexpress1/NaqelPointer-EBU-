@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import androidx.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
+import androidx.core.app.JobIntentService;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;

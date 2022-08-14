@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.EBURoute;
 
+import static com.naqelexpress.naqelpointer.R.id.container;
+
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
@@ -7,15 +9,16 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import com.google.android.material.tabs.TabLayout;
-import android.support.v4.app.ActivityCompat;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import android.widget.Toolbar;
 
+import com.google.android.material.tabs.TabLayout;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -31,8 +34,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
-import static com.naqelexpress.naqelpointer.R.id.container;
 
 /**
  * Created by Hasna on 11/20/18.

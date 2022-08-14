@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:context="com.naqelexpress.naqelpointer.Activity.Waybill.ConsigneeAddressTranslationActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -164,6 +164,6 @@
             app:layout_constraintHorizontal_bias="0.504"
             tools:ignore="HardcodedText" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

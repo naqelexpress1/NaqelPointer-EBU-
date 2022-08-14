@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.naqelexpress.naqelpointer.Activity.Booking.BookingPlanActivity">
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/ShipmentInfoLayout"
         android:layout_width="0dp"
         android:layout_height="160dp"
@@ -156,9 +156,9 @@
             app:layout_constraintTop_toBottomOf="@+id/lbMobileNo"
             tools:ignore="HardcodedText,RtlHardcoded" />
 
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/MapLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -186,7 +186,7 @@
             map:layout_constraintTop_toTopOf="parent"
             map:layout_constraintVertical_bias="0.0"
             tools:ignore="MissingConstraints" />
-    </android.support.constraint.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/OptionsLayout"
@@ -248,4 +248,4 @@
             tools:ignore="HardcodedText,RtlHardcoded" />
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.Delivery;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.content.Context;
@@ -16,10 +18,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -41,6 +39,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 import com.naqelexpress.naqelpointer.Activity.DigitalSign.Signature;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -49,8 +52,6 @@ import com.naqelexpress.naqelpointer.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DeliverySecondFragment extends Fragment implements TextWatcher {
 

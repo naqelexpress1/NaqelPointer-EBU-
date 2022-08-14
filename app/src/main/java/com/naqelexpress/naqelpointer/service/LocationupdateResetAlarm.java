@@ -3,7 +3,7 @@ package com.naqelexpress.naqelpointer.service;
 import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
+import androidx.core.app.JobIntentService;
 
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 

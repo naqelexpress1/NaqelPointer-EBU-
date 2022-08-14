@@ -16,7 +16,10 @@
             android:name="com.naqelexpress.naqelpointer.MLBarcode.BarcodeCapture"
             android:layout_width="fill_parent"
             android:layout_height="150dp"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
             app:gvb_auto_focus="true"
             app:gvb_code_format="code_39|aztec"
             app:gvb_flash="false"
@@ -40,14 +43,14 @@
             android:orientation="horizontal"
             android:padding="4dp">
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/focus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="focus" />
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/draw_rect"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,7 +59,7 @@
                 android:text="rect" />
 
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/on_flash"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,14 +77,14 @@
             android:padding="4dp">
 
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/support_multiple"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="multiple" />
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/touch_callback"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -90,7 +93,7 @@
                 android:text="touch" />
 
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/front_cam"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -105,7 +108,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.SwitchCompat
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/draw_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -15,8 +15,9 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;

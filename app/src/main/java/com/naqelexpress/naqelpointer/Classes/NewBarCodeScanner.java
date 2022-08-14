@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.support.v7.widget.SwitchCompat;
+import androidx.appcompat.widget.SwitchCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.widget.CheckBox;

@@ -27,7 +27,7 @@ import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import android.app.AlertDialog;
 import android.telephony.TelephonyManager;

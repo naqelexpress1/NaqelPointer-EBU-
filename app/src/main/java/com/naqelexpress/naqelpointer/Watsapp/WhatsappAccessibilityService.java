@@ -1,9 +1,10 @@
 package com.naqelexpress.naqelpointer.Watsapp;
 
 import android.accessibilityservice.AccessibilityService;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
 import com.naqelexpress.naqelpointer.R;
 

@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.NCLBulk;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,9 +11,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -25,6 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.naqelexpress.naqelpointer.Classes.BarcodeValidation;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
@@ -53,8 +57,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.app.Activity.RESULT_OK;
 
 
 //Used By TH - Courier
@@ -666,11 +668,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
     private void ErrorAlert(final String title, String message, final PieceDetail pieceDetail) {
-        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
+        androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(getActivity()).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "ADD",
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "ADD",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -680,7 +682,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                     }
                 });
 
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "No",
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, "No",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -1028,7 +1030,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
     private void onBackpressed() {
-        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
         builder.setTitle("Exit NCL ")
                 .setMessage("Are you sure you want to exit without saving?")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -1037,7 +1039,7 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
                         getActivity().finish();
                     }
                 }).setNegativeButton("Cancel", null).setCancelable(false);
-        android.support.v7.app.AlertDialog alertDialog = builder.create();
+        androidx.appcompat.app.AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
     }
@@ -1059,11 +1061,11 @@ public class ScanNclWaybillFragmentRemoveValidation_CITC extends Fragment {
     }
 
     /*  private void ErrorAlertTest(final String title, String message) {
-        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
+        androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(getActivity()).create();
         alertDialog.setCancelable(false);
         alertDialog.setTitle(title);
         alertDialog.setMessage(message);
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "OK",
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();

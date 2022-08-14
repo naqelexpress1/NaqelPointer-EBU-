@@ -1,7 +1,10 @@
 package com.naqelexpress.naqelpointer.Activity.DeliveryOFD;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,11 +23,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
@@ -47,6 +45,11 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Activity.DigitalSign.Signature;
 import com.naqelexpress.naqelpointer.ApplicationController;
@@ -72,8 +75,6 @@ import java.util.Objects;
 import java.util.Properties;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DeliverySecondFragment extends Fragment implements TextWatcher, View.OnClickListener {
 
@@ -820,18 +821,18 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             e.printStackTrace();
         }
 
-        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity()).create();
+        androidx.appcompat.app.AlertDialog alertDialog = new androidx.appcompat.app.AlertDialog.Builder(getActivity()).create();
         //alertDialog.setTitle(getResources().getString(R.string.app_name));
         alertDialog.setCancelable(false);
         alertDialog.setMessage("kindly choose Payment Info");
-        /*alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "StcPay", new DialogInterface.OnClickListener() {
+        /*alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "StcPay", new DialogInterface.OnClickListener() {
 
             public void onClick(DialogInterface dialog, int id) {
                 new ValidatePayment().execute(jsonObject.toString(), "0");
                 dialog.dismiss();
             }
         });*/
-        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "Payment Gateway", new DialogInterface.OnClickListener() {
+        alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, "Payment Gateway", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 new ValidatePayment().execute(jsonObject.toString(), "1", "false");
                 dialog.dismiss();
@@ -844,9 +845,9 @@ public class DeliverySecondFragment extends Fragment implements TextWatcher, Vie
             }
         });
         alertDialog.show();
-        // android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(getActivity());
+        // androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(getActivity());
 //        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-//       // final android.support.v7.app.AlertDialog alertDialog = builder.create();
+//       // final androidx.appcompat.app.AlertDialog alertDialog = builder.create();
 //        alertDialog.show();
 //        alertDialog.setCancelable(false);
 //        alertDialog.setTitle("Kindly choose payment Information");

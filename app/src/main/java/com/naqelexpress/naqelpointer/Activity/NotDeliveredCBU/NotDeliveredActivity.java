@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.NotDeliveredCBU;
 
 import android.Manifest;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,20 +11,20 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.tabs.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import android.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import android.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.material.tabs.TabLayout;
 import com.naqelexpress.naqelpointer.BuildConfig;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
@@ -34,6 +35,7 @@ import com.naqelexpress.naqelpointer.service.UpdateLocation;
 import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import Error.ErrorReporter;
 public class NotDeliveredActivity
         extends AppCompatActivity {

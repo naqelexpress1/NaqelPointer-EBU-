@@ -1,9 +1,12 @@
 <component name="libraryTable">
   <library name="Gradle: com.baoyz.swipemenulistview:library:1.3.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/59f5aac3956f0dc5faf6e2d5e9cc4284/library-1.3.0/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/59f5aac3956f0dc5faf6e2d5e9cc4284/library-1.3.0/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/59f5aac3956f0dc5faf6e2d5e9cc4284/library-1.3.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/5064ade73d82b0d686a611430eb2c55b/jetified-library-1.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/5e82652f376fcee9a470d8dc8a0bec27/transformed/jetified-library-1.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/9b2aac1ff11ac545da304ff0e65a3b69/transformed/jetified-library-1.3.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/9b2aac1ff11ac545da304ff0e65a3b69/transformed/jetified-library-1.3.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/9b2aac1ff11ac545da304ff0e65a3b69/transformed/jetified-library-1.3.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.baoyz.swipemenulistview/library/1.3.0/7a1e635b160e85140862082d7a1ef20ed656a65/library-1.3.0-javadoc.jar!/" />

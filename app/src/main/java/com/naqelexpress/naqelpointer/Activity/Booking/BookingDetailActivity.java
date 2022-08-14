@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -58,8 +58,6 @@ public class BookingDetailActivity extends AppCompatActivity
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-
-//        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
 

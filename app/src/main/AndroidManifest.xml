@@ -21,7 +21,6 @@
     <uses-permission
         android:name="android.permission.CAPTURE_AUDIO_OUTPUT"
         tools:ignore="ProtectedPermissions" />
-
     <permission-group
         android:name="android.permission-group.PHONE"
         android:description="@string/permgrouprequest_calllog"
@@ -29,7 +28,6 @@
         android:label="@string/permgroupdesc_calllog"
         android:permissionGroupFlags="personalInfo"
         android:priority="450" />
-
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <permission

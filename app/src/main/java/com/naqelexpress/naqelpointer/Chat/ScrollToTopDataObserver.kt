@@ -1,10 +1,12 @@
 package com.naqelexpress.naqelpointer
 
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+
 
 class ScrollToTopDataObserver(val layoutManager: LinearLayoutManager,
-                              val recyclerView: RecyclerView)
+                              val recyclerView: RecyclerView
+)
     : RecyclerView.AdapterDataObserver() {
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
         super.onItemRangeInserted(positionStart, itemCount)

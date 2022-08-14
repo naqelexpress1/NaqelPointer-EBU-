@@ -133,7 +133,7 @@ public class GeofenceTransitionService extends IntentService {
 //import android.content.Intent;
 //import android.graphics.Color;
 //import android.support.v4.app.NotificationCompat;
-//import android.support.v7.app.AlertDialog;
+//import android.app.AlertDialog;
 //import android.text.TextUtils;
 //import android.util.Log;
 //

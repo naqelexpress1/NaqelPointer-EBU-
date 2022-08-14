@@ -2,7 +2,7 @@ package com.naqelexpress.naqelpointer.DB.DBObjects;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;

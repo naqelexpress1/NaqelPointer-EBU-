@@ -652,14 +652,15 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="5dp"
         android:gravity="center"
+        android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/btnCallFirst"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="Delivered"
             android:text="PickUp" />
@@ -667,8 +668,9 @@
 
         <Button
             android:id="@+id/btnCallFirst2"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:background="@drawable/round"
             android:onClick="CallConsignee"
@@ -677,10 +679,10 @@
 
         <Button
             android:id="@+id/pickupexception"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="Exception"
             android:text="Exception"
@@ -688,10 +690,10 @@
 
         <Button
             android:id="@+id/btnAccept"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="AcceptClick"
             android:text="Accept"
@@ -699,10 +701,10 @@
 
         <Button
             android:id="@+id/btnReject"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="RejectClick"
             android:text="Reject"

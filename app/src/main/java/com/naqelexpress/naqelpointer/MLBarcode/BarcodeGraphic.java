@@ -4,7 +4,7 @@ package com.naqelexpress.naqelpointer.MLBarcode;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.vision.barcode.Barcode;
 import com.naqelexpress.naqelpointer.MLBarcode.ui.camera.GraphicOverlay;

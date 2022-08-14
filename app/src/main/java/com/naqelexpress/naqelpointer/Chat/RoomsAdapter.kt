@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.pusher.chatkit.rooms.Room
 import android.view.LayoutInflater
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 
 class RoomsAdapter : RecyclerView.Adapter<RoomsAdapter.ViewHolder>() {
     private var list = ArrayList<Room>()

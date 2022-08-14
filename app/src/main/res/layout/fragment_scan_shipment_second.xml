@@ -41,7 +41,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txtBarcode"
         tools:ignore="HardcodedText" />
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/shipmentBarCodes"
         android:layout_width="0dp"
         android:layout_height="0dp"

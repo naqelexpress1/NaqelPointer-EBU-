@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
+import android.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -326,6 +326,12 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetNightStock();
+            }else if (parent.getItemAtPosition(pos).toString().equals("No Pckup")) {
+                ManualFunction = "No Pickup";
+                mydeliverylist = new ArrayList<>();
+                myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+                mapListview.setAdapter(myrouteadapter);
+                GetNoPickup();
             } else if (parent.getItemAtPosition(pos).toString().equals("CheckPoint")) {
 
                 ManualFunction = "CheckPoint";
@@ -363,6 +369,16 @@ public class History extends Activity {
         public void onNothingSelected(AdapterView parent) {
             // Do nothing.
         }
+    }
+
+    private void GetNoPickup() {
+        mydeliverylist.addAll(GlobalVar.getNoPickupHistory(getApplicationContext()));
+        if (mydeliverylist.size() > 0) {
+            myrouteadapter.notifyDataSetChanged();
+            nodata.setVisibility(View.GONE);
+        } else
+            nodata.setVisibility(View.VISIBLE);
+
     }
 
     private void GetBookingList() {

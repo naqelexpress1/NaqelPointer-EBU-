@@ -14,16 +14,16 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.content.FileProvider;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.tabs.TabLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.core.content.FileProvider;
+import androidx.viewpager.widget.ViewPager;
+import android.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import android.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -81,6 +81,8 @@ public class ArrivedatDestination extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.delivery);
+
+
         Bundle bundle = getIntent().getExtras();
         tripPlanID = bundle.getString("triplanID");
         TimeIn = DateTime.now();

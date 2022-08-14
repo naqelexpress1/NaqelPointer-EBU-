@@ -28,8 +28,8 @@ import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import android.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.InputType;
 import android.view.View;
@@ -181,6 +181,9 @@ public class GlobalVar {
 
     public static String naqelvehicleimagepath = Environment.getExternalStorageDirectory()
             + "/NaqelVehicleImages";
+
+    public static String naqelCityTripModuleImages = Environment.getExternalStorageDirectory()
+            + "/NaqelCityTripModuleImages";
 
 
     //  public DBConnections dbConnections;
@@ -2327,6 +2330,32 @@ public class GlobalVar {
         }
         dbConnections.close();
         return DeliverySheetFromLocal;
+    }
+
+    public static ArrayList<MyRouteShipments> getNoPickupHistory(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+
+        DBConnections dbConnections = new DBConnections(context, null);
+        Cursor result = dbConnections.Fill("select * from NoPickupReason where IsSync = 0", context);
+        if (result.getCount() > 0) {
+            result.moveToFirst();
+            do {
+
+                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                //onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+                //onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+                //onDeliveryRequest.TypeID = -1;
+                onDeliveryRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
+                onDeliveryRequest.Reason = result.getString(result.getColumnIndex("Reason"));
+                OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+            }
+            while (result.moveToNext());
+
+        }
+        dbConnections.close();
+        return OnDeleiveryFromLocal;
     }
 
     public static ArrayList<MyRouteShipments> getNightStock(Context context) {

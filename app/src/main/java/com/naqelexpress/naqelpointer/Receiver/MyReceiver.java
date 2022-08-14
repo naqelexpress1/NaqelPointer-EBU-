@@ -26,7 +26,7 @@ import android.os.Handler;
 import android.provider.CallLog;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;

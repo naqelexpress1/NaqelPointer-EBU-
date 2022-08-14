@@ -3,11 +3,11 @@ package com.naqelexpress.naqelpointer
 import android.app.Activity
 import android.app.Dialog
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.naqelexpress.naqelpointer.Chat.ProgressDialog
 import com.pusher.chatkit.rooms.RoomEvent
 import com.pusher.chatkit.rooms.RoomListeners

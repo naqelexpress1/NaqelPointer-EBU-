@@ -245,6 +245,7 @@
         <item>MultiDelivery</item>
         <item>Pickup</item>
         <item>Waybill Measurement</item>
+        <item>No Pickup</item>
     </string-array>
     <string-array name="reportCBU">
         <item>Delivery Sheet</item>

@@ -16,12 +16,12 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -234,7 +234,6 @@ public class TakePicture extends Fragment implements View.OnClickListener {
     EditText txtBarCode;
 
     private void showPopup() {
-
         LinearLayout viewGroup = (LinearLayout) getActivity().findViewById(R.id.popup);
         LayoutInflater layoutInflater = (LayoutInflater) getActivity()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -244,22 +243,6 @@ public class TakePicture extends Fragment implements View.OnClickListener {
 
         txtBarCode = (EditText) layout.findViewById(R.id.palletbarcode);
         txtBarCode.setHint("Scan Piece Code");
-//        ImageButton imageButton = layout.findViewById(R.id.next);
-//        imageButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Long timpstamp = System.currentTimeMillis() / 1000;
-//                String id = String.valueOf(GlobalVar.GV().EmployID);
-//
-//                if (id.length() > 0) {
-//                    filename = id + "_" + timpstamp.toString() + "_" + txtBarCode.getText().toString() + ".png";
-//                }
-//
-//                CreatefileName();
-//                popup.dismiss();
-//            }
-//        });
 
         txtBarCode.addTextChangedListener(new TextWatcher() {
             @Override

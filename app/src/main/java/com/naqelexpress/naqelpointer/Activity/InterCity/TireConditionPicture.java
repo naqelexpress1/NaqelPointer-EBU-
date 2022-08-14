@@ -1,18 +1,51 @@
 package com.naqelexpress.naqelpointer.Activity.InterCity;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.os.Environment;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.SharedHelper;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TireConditionPicture extends AppCompatActivity implements View.OnClickListener {
 
     TextView back, next;
     Button uploadFile;
+    public static final int BITMAP_SAMPLE_SIZE = 8;
+    File filename;
+    String imagesuffix = "";
+
+    List<File> sendImages = new ArrayList<File>();
+    List<File> tempImages = new ArrayList<File>();
+    View view;
+    ImagesAdapter adapter;
+    GridView gridview;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,9 +54,10 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
 
         findViewById();
 
+
     }
 
-    public void findViewById(){
+    public void findViewById() {
         back = findViewById(R.id.back);
         next = findViewById(R.id.next);
 
@@ -32,13 +66,39 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
         back.setOnClickListener(this);
         next.setOnClickListener(this);
         uploadFile.setOnClickListener(this);
+
+        gridview = (GridView) findViewById(R.id.imagesGridview);
+        SharedPreferences mySettings;
+        mySettings = getSharedPreferences("ImageDetails", MODE_PRIVATE);
+        int gridSize = 50 * Integer.parseInt(mySettings.getString("gridSize", "2"));
+        gridview.setColumnWidth(gridSize + 10);
+
+
+        adapter = new ImagesAdapter(this, tempImages);
+        gridview.setAdapter(adapter);
+
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent,
+                                    View v, int position, long id) {
+                // Send intent to SingleViewActivity
+                Toast.makeText(TireConditionPicture.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+//                Intent i = new Intent(getApplicationContext(), SingleViewActivity.class);
+//                // Pass image index
+//                i.putExtra("id", position);
+//                startActivity(i);
+            }
+        });
+
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.uploadFile:
+                this.view = view;
 
+                CreateFileName();
                 break;
 
             case R.id.back:
@@ -51,5 +111,106 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
                 break;
 
         }
+    }
+
+
+    public void setImageInImageView(String imagePath) {
+        if (imagePath.equals("")) {
+            adapter = new ImagesAdapter(this, tempImages);
+            gridview.setAdapter(adapter);
+        }
+    }
+
+    private void compressImage(String filePath) {
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();//me
+
+        Bitmap bitmap = optimizeBitmap(BITMAP_SAMPLE_SIZE, filePath);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes); //me
+
+        String imageFileName = SharedHelper.getKeyString(getApplicationContext(), "fileName");//new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File storageDir = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = new File(storageDir, imageFileName + ".jpg");
+        String path = String.valueOf(image);
+        FileOutputStream fo;
+        try {
+            fo = new FileOutputStream(path);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static Bitmap optimizeBitmap(int sampleSize, String filePath) {
+        // bitmap factory
+        BitmapFactory.Options options = new BitmapFactory.Options();
+
+        // downsizing image as it throws OutOfMemory Exception for larger
+        // images
+        options.inSampleSize = sampleSize;
+
+        return BitmapFactory.decodeFile(filePath, options);
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You Must Allow Permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // handle result of CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                setImageInImageView(filename.getAbsolutePath());
+                compressImage(filename.getAbsolutePath());
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+
+
+    protected void CreateFileName() {
+//        Long timestamp = System.currentTimeMillis() / 1000;
+//        String id = String.valueOf(GlobalVar.GV().EmployID);
+//        imagesuffix = "TireCondition";
+        int count = tempImages.size() + 1;
+//        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
+        try {
+            filename = Constant.createImageFile(TireConditionPicture.this, "TireCondition", count);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        tempImages.add(filename);
+//        callCameraIntent(filename.getAbsolutePath(), 0);
+        Uri check = Uri.fromFile(filename);
+        CropImage.activity(null).setOutputUri(check).setGuidelines(CropImageView.Guidelines.ON).start(TireConditionPicture.this);
+
+
+
     }
 }

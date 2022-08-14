@@ -10,11 +10,10 @@ import retrofit2.Response
 import org.json.JSONObject
 import android.widget.Toast
 import android.content.Intent
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import com.naqelexpress.naqelpointer.Chat.ProgressDialog
 import kotlinx.android.synthetic.main.activity_main.*
 

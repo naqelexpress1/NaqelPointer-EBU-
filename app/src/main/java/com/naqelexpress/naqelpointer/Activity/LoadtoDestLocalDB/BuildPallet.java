@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -8,10 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -26,6 +24,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
@@ -34,8 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.app.Activity.RESULT_OK;
 
 public class BuildPallet extends Fragment implements IOnFocusListenable {
     View rootView;

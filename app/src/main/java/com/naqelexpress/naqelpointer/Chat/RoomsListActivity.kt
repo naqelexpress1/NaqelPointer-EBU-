@@ -3,9 +3,9 @@ package com.naqelexpress.naqelpointer
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.naqelexpress.naqelpointer.ApplicationController.currentUser
 import com.naqelexpress.naqelpointer.Chat.ProgressDialog
 //import com.naqelexpress.naqelpointer.AppController.Companion.currentUser

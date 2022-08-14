@@ -7,8 +7,6 @@ import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +17,9 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.GlobalVar;

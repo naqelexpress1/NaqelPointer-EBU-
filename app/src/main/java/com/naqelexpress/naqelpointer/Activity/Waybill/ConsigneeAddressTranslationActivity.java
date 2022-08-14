@@ -2,7 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.Waybill;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.InputType;
 import android.view.View;
 import android.widget.Button;

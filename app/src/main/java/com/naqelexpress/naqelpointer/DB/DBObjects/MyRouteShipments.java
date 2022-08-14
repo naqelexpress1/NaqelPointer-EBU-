@@ -107,6 +107,8 @@ public class MyRouteShipments implements Parcelable {
     public String POSName = "";
     public String IqamaNo = "";
     public int YSeqNo = 0;
+    public String RefNo = "";
+    public String Reason = "";
 
     public MyRouteShipments() {
 

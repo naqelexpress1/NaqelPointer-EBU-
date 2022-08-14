@@ -9,9 +9,11 @@
 
     <ScrollView
         android:id="@+id/scrollView2"
-        android:layout_width="370dp"
+        android:layout_width="match_parent"
         android:layout_height="207dp"
         tools:ignore="MissingConstraints"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         tools:layout_editor_absoluteX="7dp">
 
         <TableLayout
@@ -526,14 +528,15 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:gravity="center"
+        android:weightSum="4"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/btnCallFirst"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="Delivered"
             android:text="PickUp" />
@@ -543,8 +546,8 @@
             android:id="@+id/btnCallFirst2"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="CallConsignee"
             android:text="Call" />
@@ -553,8 +556,8 @@
             android:id="@+id/btnAccept"
             android:layout_width="70dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:layout_marginStart="8dp"
-
             android:background="@drawable/round"
             android:onClick="AcceptClick"
             android:text="Accept"
@@ -565,7 +568,7 @@
             android:layout_width="70dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-
+            android:layout_weight="1"
             android:background="@drawable/round"
             android:onClick="RejectClick"
             android:text="Reject"

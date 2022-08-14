@@ -2,15 +2,15 @@ package com.naqelexpress.naqelpointer
 
 import android.app.Activity
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import com.pusher.chatkit.messages.Message
 import com.pusher.util.Result
 import kotlinx.android.synthetic.main.activity_chat_room.*
 import android.view.inputmethod.InputMethodManager
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.pusher.chatkit.presence.Presence
 import com.pusher.chatkit.rooms.Room
 import com.pusher.chatkit.rooms.RoomEvent

@@ -188,7 +188,7 @@
             tools:ignore="MissingConstraints" />
     </android.support.constraint.ConstraintLayout>
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:id="@+id/OptionsLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -196,6 +196,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
+        android:weightSum="3"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -212,6 +213,7 @@
             android:background="@drawable/round"
             android:onClick="CallConsignee"
             android:text="Call"
+            android:layout_weight="1"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText,RtlHardcoded" />
@@ -226,6 +228,7 @@
             android:background="@drawable/round"
             android:onClick="Delivered"
             android:text="PickUp"
+            android:layout_weight="1"
             app:layout_constraintLeft_toRightOf="@+id/btnCallFirst"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText,RtlHardcoded" />
@@ -239,9 +242,10 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/round"
             android:text="Miss PickUp"
+            android:layout_weight="1"
             app:layout_constraintLeft_toRightOf="@+id/btnDelivered"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="HardcodedText,RtlHardcoded" />
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

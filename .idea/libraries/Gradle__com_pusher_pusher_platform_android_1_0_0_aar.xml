@@ -4,8 +4,9 @@
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/39f43b33994fe17b00400929a0183f68/pusher-platform-android-1.0.0/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/ee64f4b4ab39a38dddd3504432fc8239/transformed/jetified-pusher-platform-android-1.0.0/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4ed8883a00ce5048f052ee4ed344b21a/transformed/jetified-pusher-platform-android-1.0.0/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4ed8883a00ce5048f052ee4ed344b21a/transformed/jetified-pusher-platform-android-1.0.0/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/4ed8883a00ce5048f052ee4ed344b21a/transformed/jetified-pusher-platform-android-1.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bd36a7d02405ef88cb6b337af26d0f08/transformed/jetified-pusher-platform-android-1.0.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/bd36a7d02405ef88cb6b337af26d0f08/transformed/jetified-pusher-platform-android-1.0.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/bd36a7d02405ef88cb6b337af26d0f08/transformed/jetified-pusher-platform-android-1.0.0/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pusher/pusher-platform-android/1.0.0/f9285422abe5f7b5508b91c74100fdc0fd36a383/pusher-platform-android-1.0.0-javadoc.jar!/" />

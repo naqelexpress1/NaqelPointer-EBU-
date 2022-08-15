@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.firebase:firebase-messaging:11.8.0@aar">
     <CLASSES>
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/b954aea9eeb9fd19bf740f5358430a21/transformed/jetified-firebase-messaging-11.8.0/res" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/b954aea9eeb9fd19bf740f5358430a21/transformed/jetified-firebase-messaging-11.8.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/b954aea9eeb9fd19bf740f5358430a21/transformed/jetified-firebase-messaging-11.8.0/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/4e91053984e54c5a0d4675a13fcb57d1/transformed/jetified-firebase-messaging-11.8.0/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4e91053984e54c5a0d4675a13fcb57d1/transformed/jetified-firebase-messaging-11.8.0/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/4e91053984e54c5a0d4675a13fcb57d1/transformed/jetified-firebase-messaging-11.8.0/AndroidManifest.xml" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

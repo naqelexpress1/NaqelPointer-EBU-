@@ -116,9 +116,8 @@
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
             android:value="true" />
-
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="com.naqelexpress.naqelpointer.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">

@@ -1,9 +1,9 @@
 <component name="libraryTable">
   <library name="Gradle: com.google.android.gms:play-services-maps:11.8.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/6edbb50276fc93bea528a8e15d7ad73e/transformed/jetified-play-services-maps-11.8.0/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/6edbb50276fc93bea528a8e15d7ad73e/transformed/jetified-play-services-maps-11.8.0/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/6edbb50276fc93bea528a8e15d7ad73e/transformed/jetified-play-services-maps-11.8.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/a24f6c9957c07a070766403900f3755f/transformed/jetified-play-services-maps-11.8.0/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/a24f6c9957c07a070766403900f3755f/transformed/jetified-play-services-maps-11.8.0/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/a24f6c9957c07a070766403900f3755f/transformed/jetified-play-services-maps-11.8.0/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

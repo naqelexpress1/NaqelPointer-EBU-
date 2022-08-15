@@ -20,7 +20,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="32dp"
-            android:maxLength="8"
             android:ems="10"
             android:hint="Waybill No"
             android:inputType="number"

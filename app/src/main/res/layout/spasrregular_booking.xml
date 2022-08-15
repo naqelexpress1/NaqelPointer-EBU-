@@ -149,7 +149,7 @@
             android:hint="@string/txtBarCode"
             android:imeOptions="actionDone"
             android:inputType="number"
-            android:maxLength="14"
+
             tools:ignore="HardcodedText" />
 
         <TextView

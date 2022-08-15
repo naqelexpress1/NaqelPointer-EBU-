@@ -43,7 +43,7 @@ public class NotDeliveredFirstFragment extends Fragment {
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
             txtWaybillNo.addTextChangedListener(textWatcher);
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtReason = (EditText) rootView.findViewById(R.id.txtReason);
             txtReason.setInputType(InputType.TYPE_NULL);
             txtNotes = (EditText) rootView.findViewById(R.id.txtNotes);

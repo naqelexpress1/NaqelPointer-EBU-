@@ -1,14 +1,12 @@
 package com.naqelexpress.naqelpointer.Activity.NightStock;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +15,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 
 public class ScanShipmentFragment extends Fragment {
@@ -45,7 +46,7 @@ public class ScanShipmentFragment extends Fragment {
 
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 
             txtbinlocation = (EditText) rootView.findViewById(R.id.binlocation);
 
@@ -95,12 +96,14 @@ public class ScanShipmentFragment extends Fragment {
         String barcode = txtWaybillNo.getText().toString();
         // txtWaybilll.removeTextChangedListener(textWatcher);
         if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            AddNewWaybill8and9(barcode.substring(0, 8));
+//            AddNewWaybill8and9(barcode.substring(0, 8));
+            AddNewWaybill8and9(barcode);
 
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
+        } else if (barcode.length() >= 8) {
+//            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            AddNewWaybill8and9(barcode);
             //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
         }
@@ -132,7 +135,7 @@ public class ScanShipmentFragment extends Fragment {
 //        String WaybillNo = txtWaybillNo.getText().toString();
 //        if (WaybillNo.length() > 8)
 //            WaybillNo = WaybillNo.substring(0, 8);
-        if (WaybillNo.toString().length() == 8 || WaybillNo.toString().length() == GlobalVar.ScanWaybillLength) {
+        if (WaybillNo.toString().length() >=8) {
             if (!WaybillList.contains(WaybillNo.toString())) {
                 WaybillList.add(0, WaybillNo.toString());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

@@ -3,6 +3,7 @@ package com.naqelexpress.naqelpointer.Activity.PickUp;
 import static android.app.Activity.RESULT_OK;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,10 +11,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -30,6 +27,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -317,7 +318,6 @@ public class PickUpFirstFragment
                     onBackpressed();
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-
                     setTxtWaybillNo(txtWaybillNo.getText().toString());
                     return true;
                 }
@@ -337,9 +337,7 @@ public class PickUpFirstFragment
 //
 //            @Override
 //            public void afterTextChanged(Editable s) {
-//                if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
-//                        txtWaybillNo.getText().toString().length() == GlobalVar.ScanWaybillLength)
-//                )
+//                if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)// ||txtWaybillNo.getText().toString().length() == GlobalVar.ScanWaybillLength
 //                    setTxtWaybillNo(txtWaybillNo.getText().toString());
 //            }
 //        });
@@ -367,7 +365,7 @@ public class PickUpFirstFragment
         try {
 
             txtWaybillNo.setText(bookinglist.get(0).RefNo);
-            txtWaybillNo.setInputType(InputType.TYPE_NULL);
+//            txtWaybillNo.setInputType(InputType.TYPE_NULL);
             txtOrigin.setText(bookinglist.get(0).Orgin); //
             OriginID = bookinglist.get(0).OriginId;
             txtDestination.setText(bookinglist.get(0).Destination);
@@ -434,7 +432,6 @@ public class PickUpFirstFragment
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
-
                         String barcode = extras.getString("barcode");
                         setTxtWaybillNo(barcode);
                     }
@@ -461,7 +458,7 @@ public class PickUpFirstFragment
     private void setTxtWaybillNo(String barcode) {
 
         txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() > 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+        if (barcode.length() >= 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
             txtWaybillNo.setText(barcode);
         } else
             txtWaybillNo.setText(barcode);

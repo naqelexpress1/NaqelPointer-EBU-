@@ -13,7 +13,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.text.InputFilter;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,7 +103,7 @@ public class DeliveryFirstFragment
             CheckBox actualLocation = (CheckBox) rootView.findViewById(R.id.alocation);
             actualLocation.setVisibility(View.GONE);
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtConsigneeName = (TextView) rootView.findViewById(R.id.txtConsigneeName);
             txtBillingType = (TextView) rootView.findViewById(R.id.txtBillingType);
             txtCODAmount = (TextView) rootView.findViewById(R.id.txtCODAmount);

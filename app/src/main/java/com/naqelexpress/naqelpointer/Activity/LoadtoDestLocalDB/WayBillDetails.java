@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -21,6 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -138,14 +139,14 @@ public class WayBillDetails extends Fragment // implements ResultInterface
             dbConnections.close();
 
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-//            txtBarCode.setText("");
+            txtBarCode.setText("");
             adapter.notifyDataSetChanged();
             validatewaybilldetails.add(waybillno);
             waybillcount.setText(getString(R.string.lbCount) + validatewaybilldetails.size());
 
         } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
-//            txtBarCode.setText("");
+            txtBarCode.setText("");
         }
     }
 

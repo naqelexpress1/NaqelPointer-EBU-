@@ -16,7 +16,6 @@
         android:layout_marginTop="8dp"
         android:ems="10"
         android:gravity="center"
-        android:maxLength="13"
         android:hint="@string/txtWaybillNo"
         android:inputType="number"
         app:layout_constraintLeft_toLeftOf="parent"

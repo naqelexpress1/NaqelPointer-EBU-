@@ -18,7 +18,6 @@
         android:gravity="center"
         android:hint="Bin Location"
         android:inputType="text"
-        android:maxLength="50"
         android:visibility="visible"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -38,7 +37,6 @@
         android:gravity="center"
         android:hint="@string/txtWaybillNo"
         android:inputType="number"
-        android:maxLength="13"
         app:layout_constraintLeft_toLeftOf="parent"
 
         app:layout_constraintRight_toRightOf="parent"

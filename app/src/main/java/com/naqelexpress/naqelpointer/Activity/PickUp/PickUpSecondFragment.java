@@ -1,5 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.PickUp;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,21 +12,22 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
+import android.text.Editable;
 import android.text.InputType;
-import android.view.KeyEvent;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
@@ -31,8 +35,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class PickUpSecondFragment
         extends Fragment {
@@ -59,9 +61,10 @@ public class PickUpSecondFragment
             rootView = inflater.inflate(R.layout.pickupsecondfragment, container, false);
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
+
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
-           /* txtBarCode.addTextChangedListener(new TextWatcher() {
+            txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -72,46 +75,45 @@ public class PickUpSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13
-                            || txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength)
+                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8)//|| txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength
                         AddNewPiece();
                 }
-            });*/
-
-            txtBarCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_DONE || actionId == KeyEvent.KEYCODE_ENTER) {
-                        if (txtBarCode != null && txtBarCode.getText().length() == 13
-                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
-                            AddNewPiece();
-                        }
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
             });
-            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        onBackPressed();
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                        if (txtBarCode != null && txtBarCode.getText().length() == 13
-                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
-                            AddNewPiece();
-                        }
 
-
-                        return true;
-                    }
-                    return false;
-                }
-            });
+//            txtBarCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//                @Override
+//                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                    if (actionId == EditorInfo.IME_ACTION_DONE || actionId == KeyEvent.KEYCODE_ENTER) {
+//                        if (txtBarCode != null && txtBarCode.getText().length()  >= 8
+//                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
+//                            AddNewPiece();
+//                        }
+//                        return true;
+//                    } else {
+//                        return false;
+//                    }
+//                }
+//            });
+//            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        onBackPressed();
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                        if (txtBarCode != null && txtBarCode.getText().length() >= 8
+//                                || txtBarCode.getText().length() == GlobalVar.ScanBarcodeLength) {
+//                            AddNewPiece();
+//                        }
+//
+//
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
 
@@ -160,7 +162,7 @@ public class PickUpSecondFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() == 13 || barcode.length() == GlobalVar.GV().ScanBarcodeLength) {
+                        if (barcode.length() >= 8) {// || barcode.length() == GlobalVar.GV().ScanBarcodeLength
                             txtBarCode.setText(barcode);
                             AddNewPiece();
                         }
@@ -270,8 +272,7 @@ public class PickUpSecondFragment
             }
         }
         if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() == 13
-                    || txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength) {
+            if (txtBarCode.getText().toString().length()  >= 8) {//|| txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength
                 PickUpBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PickUpBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

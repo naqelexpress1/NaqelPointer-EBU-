@@ -109,14 +109,14 @@ public class SingleLoad extends Fragment {
             dbConnections.close();
 
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-//            txtBarCode.setText("");
+            txtBarCode.setText("");
             adapter.notifyDataSetChanged();
             ValidateBarCodeList.add(barcode);
             lbTotal.setText(String.valueOf(ValidateBarCodeList.size()));
 
         } else {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
-//            txtBarCode.setText("");
+            txtBarCode.setText("");
         }
 
     }

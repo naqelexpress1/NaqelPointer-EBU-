@@ -2,9 +2,9 @@ package com.naqelexpress.naqelpointer.Activity.NightStock;
 
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.widget.GridView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.naqelexpress.naqelpointer.R;
 
@@ -19,7 +19,7 @@ public class NightStockActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_night_stock);
-
+//        Toast.makeText(this, "THIS Night Stock Activity", Toast.LENGTH_SHORT).show();
 
 //        LoadMenu();
 //        gridView = (GridView) findViewById(R.id.gridnightStock);

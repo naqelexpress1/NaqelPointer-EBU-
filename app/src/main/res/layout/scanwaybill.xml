@@ -39,7 +39,6 @@
                 android:background="@drawable/border"
                 android:gravity="center"
                 android:inputType="numberDecimal"
-                android:maxLength="9"
                 android:text=""
                 android:textColor="#000000"
                 android:textSize="15sp"

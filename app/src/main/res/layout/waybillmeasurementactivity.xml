@@ -25,7 +25,6 @@
             android:ems="10"
             android:hint="Waybill No"
             android:inputType="number"
-            android:maxLength="8"
             android:textAlignment="center"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"

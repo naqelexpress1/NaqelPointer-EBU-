@@ -2,16 +2,13 @@ package com.naqelexpress.naqelpointer.Activity.WaybillMeasurments;
 
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import android.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -22,6 +19,9 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
@@ -72,7 +72,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         constraintLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
 
         txtWaybillNo = (EditText) findViewById(R.id.txtWaybillNo);
-        txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//        txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 
         txtWeight = (EditText) findViewById(R.id.weight);
         txtTotalPieces = (EditText) findViewById(R.id.txtTotalPieces);
@@ -229,13 +229,15 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
         String barcode = txtWaybillNo.getText().toString();
         txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            txtWaybillNo.setText(barcode.substring(0, 8));
+        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+//            txtWaybillNo.setText(barcode.substring(0, 8));
+            txtWaybillNo.setText(barcode);
 
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
         } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+            txtWaybillNo.setText(barcode);
             //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
             //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
         }

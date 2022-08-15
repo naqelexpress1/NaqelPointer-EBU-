@@ -1,16 +1,14 @@
 package com.naqelexpress.naqelpointer.Activity.PickupPieceLevel;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -21,6 +19,10 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -49,8 +51,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.app.Activity.RESULT_OK;
 
 public class PickUpFirstFragment
         extends Fragment {
@@ -92,7 +92,7 @@ public class PickUpFirstFragment
             txtWaybillNo.setFocusable(true);
             txtWaybillNo.setInputType(InputType.TYPE_NULL);
 
-            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
+//            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
             txtWeight = (EditText) rootView.findViewById(R.id.txtWeight);

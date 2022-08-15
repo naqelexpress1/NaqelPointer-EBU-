@@ -104,12 +104,8 @@ public class Constant {
         String id = String.valueOf(GlobalVar.GV().EmployID);
         String imageFileName = id + "_" + timestamp.toString() + "_" + imageSuffix + "_" + String.valueOf(count);// +".png";
         SharedHelper.putKeyString(activity.getApplicationContext(), "fileName", imageFileName);
-//        String driverId = "1";// SharedHelper.getDriverIDOnly(activity);
-//        String imageFileName = driverId;
         File storageDir = activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-
         File image = new File(storageDir, imageFileName + ".jpg");
-
         // Save a file: path for use with ACTION_VIEW intents
 //        mCurrentPhotoPath = image.getAbsolutePath();
         return image;

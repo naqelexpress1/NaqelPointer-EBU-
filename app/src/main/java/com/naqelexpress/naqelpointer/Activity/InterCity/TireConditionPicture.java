@@ -10,13 +10,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
@@ -37,12 +38,13 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
     TextView back, next;
     Button uploadFile;
     public static final int BITMAP_SAMPLE_SIZE = 8;
-    File filename;
-    String imagesuffix = "";
 
+
+    File filename;
     List<File> sendImages = new ArrayList<File>();
     List<File> tempImages = new ArrayList<File>();
-    View view;
+
+
     ImagesAdapter adapter;
     GridView gridview;
 
@@ -82,11 +84,8 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
             public void onItemClick(AdapterView<?> parent,
                                     View v, int position, long id) {
                 // Send intent to SingleViewActivity
-                Toast.makeText(TireConditionPicture.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
-//                Intent i = new Intent(getApplicationContext(), SingleViewActivity.class);
-//                // Pass image index
-//                i.putExtra("id", position);
-//                startActivity(i);
+//                Toast.makeText(TireConditionPicture.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -96,8 +95,6 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.uploadFile:
-                this.view = view;
-
                 CreateFileName();
                 break;
 
@@ -115,9 +112,59 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
 
 
     public void setImageInImageView(String imagePath) {
-        if (imagePath.equals("")) {
             adapter = new ImagesAdapter(this, tempImages);
             gridview.setAdapter(adapter);
+    }
+
+
+    protected void CreateFileName() {
+        int count = tempImages.size() + 1;
+//        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
+        try {
+            filename = Constant.createImageFile(TireConditionPicture.this, "TireCondition", count);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Uri check = Uri.fromFile(filename);
+        CropImage.activity(null).setOutputUri(check).setGuidelines(CropImageView.Guidelines.ON).start(TireConditionPicture.this);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You Must Allow Permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // handle result of CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                tempImages.add(filename);
+                compressImage(filename.getAbsolutePath());
+                setImageInImageView(filename.getAbsolutePath());
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
+                filename = null;
+
+            }
         }
     }
 
@@ -155,62 +202,5 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
         options.inSampleSize = sampleSize;
 
         return BitmapFactory.decodeFile(filePath, options);
-    }
-
-
-    @TargetApi(Build.VERSION_CODES.M)
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-
-        switch (requestCode) {
-            case 1:
-                if (grantResults.length > 0) {
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    } else {
-                        Toast.makeText(getApplicationContext(), "You Must Allow Permission", Toast.LENGTH_LONG).show();
-                    }
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // handle result of CropImageActivity
-        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-            CropImage.ActivityResult result = CropImage.getActivityResult(data);
-            if (resultCode == RESULT_OK) {
-                setImageInImageView(filename.getAbsolutePath());
-                compressImage(filename.getAbsolutePath());
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
-
-
-    protected void CreateFileName() {
-//        Long timestamp = System.currentTimeMillis() / 1000;
-//        String id = String.valueOf(GlobalVar.GV().EmployID);
-//        imagesuffix = "TireCondition";
-        int count = tempImages.size() + 1;
-//        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
-        try {
-            filename = Constant.createImageFile(TireConditionPicture.this, "TireCondition", count);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-//        tempImages.add(filename);
-//        callCameraIntent(filename.getAbsolutePath(), 0);
-        Uri check = Uri.fromFile(filename);
-        CropImage.activity(null).setOutputUri(check).setGuidelines(CropImageView.Guidelines.ON).start(TireConditionPicture.this);
-
-
-
     }
 }

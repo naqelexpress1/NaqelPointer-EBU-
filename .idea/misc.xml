@@ -18,7 +18,7 @@
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_rooms_list.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_safety_curtains_and_cargo.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_safety_curtains_and_cargo_pictures.xml" value="0.18432971014492755" />
-        <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_tire_condition_pictures.xml" value="0.18432971014492755" />
+        <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_tire_condition_pictures.xml" value="0.1" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_trailer_boy.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_trailer_boy_remarks.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/activity_trip_and_vehicle_details.xml" value="0.15006412997007268" />
@@ -201,6 +201,7 @@
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/waybillmeasurementactivity.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/waybillplan.xml" value="0.15006412997007268" />
         <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/layout/waybillplannomap.xml" value="0.15006412997007268" />
+        <entry key="..\:/Users/24316noshad/AndroidStudioProjects/EBU Pointer/app/src/main/res/menu/searchingtext.xml" value="0.19581017528858485" />
       </map>
     </option>
   </component>

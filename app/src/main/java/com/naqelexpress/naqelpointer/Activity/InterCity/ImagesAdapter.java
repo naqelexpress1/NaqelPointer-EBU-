@@ -1,20 +1,25 @@
 package com.naqelexpress.naqelpointer.Activity.InterCity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import com.naqelexpress.naqelpointer.GlobalVar;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.naqelexpress.naqelpointer.R;
+
 import java.io.File;
 import java.util.List;
 
-public class ImagesAdapter  extends ArrayAdapter<File> {
+public class ImagesAdapter extends ArrayAdapter<File> {
+
 
     public ImagesAdapter(@NonNull Context context, List<File> courseModelArrayList) {
         super(context, 0, courseModelArrayList);
@@ -33,16 +38,17 @@ public class ImagesAdapter  extends ArrayAdapter<File> {
         ImageView courseIV = listitemView.findViewById(R.id.image);
         ImageView deleteImage = listitemView.findViewById(R.id.deleteImage);
 
-        File image = new File(GlobalVar.naqelCityTripModuleImages + "/"
-                + courseModel);
+        Bitmap checkBitmap = BitmapFactory.decodeFile(courseModel);
+        courseIV.setImageBitmap(checkBitmap);
 
-        courseIV.setImageBitmap(BitmapFactory.decodeFile(image.getAbsolutePath()));
 
 
         deleteImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Toast.makeText(getContext().getApplicationContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+                File file = getItem(position);
+                remove(file);
             }
         });
         return listitemView;

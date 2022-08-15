@@ -1,7 +1,9 @@
 package com.naqelexpress.naqelpointer;
 
-import android.app.Application;
 import android.content.Context;
+
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -15,7 +17,7 @@ import java.util.Properties;
  * Created by Hasna on 11/26/18.
  */
 
-public class ApplicationController extends Application {
+public class ApplicationController extends MultiDexApplication {
     private static ApplicationController thisInstance;
     private RequestQueue mRequestQueue;
     static CurrentUser currentUser;
@@ -23,11 +25,17 @@ public class ApplicationController extends Application {
     private static final String PROPERTIES_FILE = "app.properties";
     private static Properties properties = new Properties();
 
+//    @Override
+//    protected void attachBaseContext(Context base) {
+//        MultiDex.install(this);
+//        super.attachBaseContext(base);
+//    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         thisInstance = this;
-
+        MultiDex.install(this);
         try {
             loadProperties(getBaseContext());
         } catch (Exception e) {

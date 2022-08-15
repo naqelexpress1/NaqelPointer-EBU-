@@ -1,23 +1,35 @@
 package com.naqelexpress.naqelpointer.Activity.InterCity;
 
-import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Environment;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.naqelexpress.naqelpointer.GlobalVar;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.SharedHelper;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +37,15 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
 
     TextView back, next;
     Button uploadFile;
-    String filename;
-    String imagesuffix = "";
 
-    List<String> sendImages = new ArrayList<String>();
-    List<String> tempImages = new ArrayList<String>();
+    public static final int BITMAP_SAMPLE_SIZE = 8;
+    File filename;
+    List<File> sendImages = new ArrayList<File>();
+    List<File> tempImages = new ArrayList<File>();
 
-//    public HashMap<Integer, String> sendimages;
-//    HashMap<Integer, String> ;
+
+    ImagesAdapter adapter;
+    GridView gridview;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +64,27 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
         back.setOnClickListener(this);
         next.setOnClickListener(this);
         uploadFile.setOnClickListener(this);
+
+        gridview = (GridView) findViewById(R.id.imagesGridview);
+        SharedPreferences mySettings;
+        mySettings = getSharedPreferences("ImageDetails", MODE_PRIVATE);
+        int gridSize = 50 * Integer.parseInt(mySettings.getString("gridSize", "2"));
+        gridview.setColumnWidth(gridSize + 10);
+
+
+        adapter = new ImagesAdapter(this, tempImages);
+        gridview.setAdapter(adapter);
+
+
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent,
+                                    View v, int position, long id) {
+                // Send intent to SingleViewActivity
+//                Toast.makeText(TireConditionPicture.this, String.valueOf(position), Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 
     @Override
@@ -58,11 +92,7 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
         switch (view.getId()) {
 
             case R.id.uploadFile:
-                Long timpstamp = System.currentTimeMillis() / 1000;
-                String id = String.valueOf(GlobalVar.GV().EmployID);
-                imagesuffix = "FleetSafety";
-                filename = id + "_" + timpstamp.toString() + "_" + imagesuffix + "_" + ".png";
-                CreatefileName(view);
+                CreateFileName();
                 break;
 
             case R.id.back:
@@ -76,54 +106,97 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
 
         }
     }
+    public void setImageInImageView(String imagePath) {
+        adapter = new ImagesAdapter(this, tempImages);
+        gridview.setAdapter(adapter);
 
-    protected void CreatefileName(View view) {
+    }
 
-        if (filename.length() > 0) {
-            sendImages.add(filename);
-            callcameraIntent(filename, 0, view);
+
+    protected void CreateFileName() {
+        int count = tempImages.size() + 1;
+//        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
+        try {
+            filename = Constant.createImageFile(AttachPictures.this, "TireCondition", count);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Uri check = Uri.fromFile(filename);
+        CropImage.activity(null).setOutputUri(check).setGuidelines(CropImageView.Guidelines.ON).start(AttachPictures.this);
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "You Must Allow Permission", Toast.LENGTH_LONG).show();
+                    }
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // handle result of CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                tempImages.add(filename);
+                compressImage(filename.getAbsolutePath());
+                setImageInImageView(filename.getAbsolutePath());
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
+                filename = null;
+
+            }
+        }
+    }
+
+    private void compressImage(String filePath) {
+
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();//me
+
+        Bitmap bitmap = optimizeBitmap(BITMAP_SAMPLE_SIZE, filePath);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes); //me
+
+        String imageFileName = SharedHelper.getKeyString(getApplicationContext(), "fileName");//new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File storageDir = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = new File(storageDir, imageFileName + ".jpg");
+        String path = String.valueOf(image);
+        FileOutputStream fo;
+        try {
+            fo = new FileOutputStream(path);
+            fo.write(bytes.toByteArray());
+            fo.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
 
-    protected void callcameraIntent(String imagename, int camerareqid, View view) {
 
-        if (ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(getApplicationContext(),
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+    public static Bitmap optimizeBitmap(int sampleSize, String filePath) {
+        // bitmap factory
+        BitmapFactory.Options options = new BitmapFactory.Options();
 
-            Intent cameraIntent = new Intent(
-                    MediaStore.ACTION_IMAGE_CAPTURE);
-            File newfile = new File(GlobalVar.naqelvehicleimagepath);
-            File imgfile = new File(GlobalVar.naqelvehicleimagepath + "/" + imagename);
-            if (!newfile.exists())
-                newfile.mkdirs();
+        // downsizing image as it throws OutOfMemory Exception for larger
+        // images
+        options.inSampleSize = sampleSize;
 
-            Uri outputFileUri = null;
-            if (Build.VERSION.SDK_INT > 23)
-                outputFileUri = FileProvider.getUriForFile(getApplicationContext(), getPackageName() + ".fileprovider",
-                        imgfile);
-            else
-                outputFileUri = Uri.fromFile(imgfile);
-
-            // Uri outputFileUri = Uri.fromFile(imgfile);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivityForResult(cameraIntent, camerareqid);
-
-        } else {
-            GlobalVar.GV().ShowSnackbar(view, getString(R.string.ErrorWhileSaving),
-                    GlobalVar.AlertType.Error);
-            try {
-                Intent intent = new Intent(
-                        android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package", getPackageName(),
-                        null);
-                intent.setData(uri);
-                startActivity(intent);
-            } catch (Exception e) {
-
-            }
-        }
+        return BitmapFactory.decodeFile(filePath, options);
     }
 }

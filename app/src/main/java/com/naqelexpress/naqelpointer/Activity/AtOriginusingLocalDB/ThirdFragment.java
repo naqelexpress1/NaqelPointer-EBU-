@@ -3,16 +3,11 @@ package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 import static android.app.Activity.RESULT_OK;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,6 +17,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -124,9 +126,10 @@ public class ThirdFragment extends Fragment{
         recyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext().getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new DataAdapterForThird(SelectedwaybillBardetails);
+        adapter = new DataAdapterForThird(ValidateBarCodeList);
         recyclerView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        lbTotal.setText(getString(R.string.lbCount) + ValidateBarCodeList.size());
 //        initSwipe();
     }
 
@@ -142,6 +145,7 @@ public class ThirdFragment extends Fragment{
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
+                        setBarcode();
                     }
                 }
             }
@@ -186,7 +190,8 @@ public class ThirdFragment extends Fragment{
 
     private void setBarcode() {
 //        ValidateWayBill(txtBarCode.getText().toString());
-        ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//        ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+        ValidateWayBill(txtBarCode.getText().toString());
 
 
     }
@@ -194,45 +199,64 @@ public class ThirdFragment extends Fragment{
 
     private void ValidateWayBill(String barcode) {
         if (!ValidateBarCodeList.contains(barcode)) {
-            for (int i = 0; i < CourierDetails.waybillBardetails.size(); i++) {
-                boolean sound = false;
-                if (barcode.equals(CourierDetails.waybillBardetails.get(i).get("BarCode"))) {
 
-                    for (int j = 0; j < SecondFragment.Selectedwaybilldetails.size(); j++) {
+            int preqty = ValidateBarCodeList.size() + 1;
+//            SecondFragment.Selectedwaybilldetails.get(j).put("ScannedPC", String.valueOf(preqty));
 
-                        if (SecondFragment.Selectedwaybilldetails.get(j).get("WaybillNo").
-                                equals(CourierDetails.waybillBardetails.get(i).get("WaybillNo"))) {
+//            SelectedwaybillBardetails.add(CourierDetails.waybillBardetails.get(i));
+
+            DBConnections dbConnections = new DBConnections(getContext(), null);
+            dbConnections.AtOriginScannedPiecesCount(barcode, String.valueOf(preqty), getView());
+            dbConnections.AtOriginScannedPiececode(barcode, getView());
+            dbConnections.close();
+
+            GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
+//            txtBarCode.setText("");
+
+            ValidateBarCodeList.add(barcode);
+            lbTotal.setText(getString(R.string.lbCount) + ValidateBarCodeList.size());
+            adapter.notifyDataSetChanged();
 
 
-                            int preqty = Integer.parseInt(SecondFragment.Selectedwaybilldetails.get(j).get("ScannedPC")) + 1;
-                            SecondFragment.Selectedwaybilldetails.get(j).put("ScannedPC", String.valueOf(preqty));
-
-                            SelectedwaybillBardetails.add(CourierDetails.waybillBardetails.get(i));
-
-                            DBConnections dbConnections = new DBConnections(getContext(), null);
-                            dbConnections.AtOriginScannedPiecesCount(CourierDetails.waybillBardetails.get(i).get("WaybillNo")
-                                    , String.valueOf(preqty), getView());
-                            dbConnections.AtOriginScannedPiececode(barcode, getView());
-                            dbConnections.close();
-
-                            GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-                            txtBarCode.setText("");
-                            adapter.notifyDataSetChanged();
-                            SecondFragment.adapter.notifyDataSetChanged();
-                            lbTotal.setText(getString(R.string.lbCount) + SelectedwaybillBardetails.size());
-                            ValidateBarCodeList.add(barcode);
-                            sound = true;
-                            break;
-
-                        }
-                    }
-                    if (!sound) {
-                        GlobalVar.GV().ShowSnackbar(getView(), "No WayBillNo under this BarCode", GlobalVar.AlertType.Error);
-                        GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
-                    }
-                }
-
-            }
+//            for (int i = 0; i < CourierDetails.waybillBardetails.size(); i++) {
+//                boolean sound = false;
+//                if (barcode.equals(CourierDetails.waybillBardetails.get(i).get("BarCode"))) {
+//
+//                    for (int j = 0; j < SecondFragment.Selectedwaybilldetails.size(); j++) {
+//
+//                        if (SecondFragment.Selectedwaybilldetails.get(j).get("WaybillNo").
+//                                equals(CourierDetails.waybillBardetails.get(i).get("WaybillNo"))) {
+//
+//
+//                            int preqty = Integer.parseInt(SecondFragment.Selectedwaybilldetails.get(j).get("ScannedPC")) + 1;
+//                            SecondFragment.Selectedwaybilldetails.get(j).put("ScannedPC", String.valueOf(preqty));
+//
+//                            SelectedwaybillBardetails.add(CourierDetails.waybillBardetails.get(i));
+//
+//                            DBConnections dbConnections = new DBConnections(getContext(), null);
+//                            dbConnections.AtOriginScannedPiecesCount(CourierDetails.waybillBardetails.get(i).get("WaybillNo")
+//                                    , String.valueOf(preqty), getView());
+//                            dbConnections.AtOriginScannedPiececode(barcode, getView());
+//                            dbConnections.close();
+//
+//                            GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
+//                            txtBarCode.setText("");
+//                            adapter.notifyDataSetChanged();
+//                            SecondFragment.adapter.notifyDataSetChanged();
+//                            lbTotal.setText(getString(R.string.lbCount) + SelectedwaybillBardetails.size());
+//                            ValidateBarCodeList.add(barcode);
+//                            sound = true;
+//                            break;
+//
+//                        }
+//                    }
+//                    if (!sound) {
+//                        GlobalVar.GV().ShowSnackbar(getView(), "No WayBillNo under this BarCode", GlobalVar.AlertType.Error);
+//                        GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
+//                    }
+//                }
+//
+//            }
         } else
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
 
@@ -262,7 +286,7 @@ public class ThirdFragment extends Fragment{
             lbTotal.setText(savedInstanceState.getString("waybillcount"));
             ValidateBarCodeList = savedInstanceState.getStringArrayList("ValidateBarCodeList");
             SelectedwaybillBardetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("SelectedwaybillBardetails");
-//            initViews();
+            initViews();
         }
     }
 }

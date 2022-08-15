@@ -212,9 +212,6 @@ public class AtOrigin extends AppCompatActivity {
         if (requestCode == 0) {
             if (resultCode == Activity.RESULT_OK) {
                 int result = data.getIntExtra("result", -1);
-//                if (result == 0) {
-//                    addwaybillagain();
-//                }
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -226,21 +223,12 @@ public class AtOrigin extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == 1 && resultCode == RESULT_OK) {
-//            if (data != null) {
-//                Bundle extras = data.getExtras();
-//                if (extras != null) {
-//                    if (extras.containsKey("Save")) {
-//                        finish();
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private void SaveData() {
+
+        if(ThirdFragment.ValidateBarCodeList.size()>0){
+
+        }
 
         for (int i = 0; i < SecondFragment.Selectedwaybilldetails.size(); i++) {
             int piececount = Integer.parseInt(SecondFragment.Selectedwaybilldetails.get(i).get("PieceCount"));
@@ -337,7 +325,7 @@ public class AtOrigin extends AppCompatActivity {
             header.put("IsSync", false);
             header.put("WaybillCount", SecondFragment.Selectedwaybilldetails.size());
             header.put("StationID", GlobalVar.GV().StationID);
-            header.put("PieceCount", ThirdFragment.SelectedwaybillBardetails.size());
+            header.put("PieceCount", ThirdFragment.ValidateBarCodeList.size());
             header.put("CTime", DateTime.now().toString());
             int insertpartial = 0;
             for (int i = 0; i < SecondFragment.Selectedwaybilldetails.size(); i++) {

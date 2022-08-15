@@ -1,22 +1,22 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.R;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.ArrayList;
 
 public class DataAdapterForThird
         extends RecyclerView.Adapter<DataAdapterForThird.ViewHolder>
 {
-    private List<HashMap<String, String>> BarcodeList;
+    private ArrayList<String> BarcodeList;
 
-    public DataAdapterForThird(List<HashMap<String, String>> PieceBarcode)
+    public DataAdapterForThird(ArrayList<String> PieceBarcode)
     {
         this.BarcodeList = PieceBarcode;
     }
@@ -31,7 +31,7 @@ public class DataAdapterForThird
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
 
-        viewHolder.txtBarCode.setText(BarcodeList.get(i).get("BarCode"));
+        viewHolder.txtBarCode.setText(BarcodeList.get(i));
     }
 
 

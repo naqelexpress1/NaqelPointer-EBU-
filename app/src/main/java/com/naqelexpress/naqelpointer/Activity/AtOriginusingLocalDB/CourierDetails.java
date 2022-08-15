@@ -4,9 +4,6 @@ import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -35,6 +36,7 @@ import java.util.HashMap;
 
 public class CourierDetails extends Fragment // implements ResultInterface
 {
+
     View rootView;
     private EditText txtBarCode;
     TextView waybillcount, piececount, selectedwaybillcount;
@@ -357,5 +359,6 @@ public class CourierDetails extends Fragment // implements ResultInterface
             //waybillBardetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("waybillBardetails");
         }
     }
+
 
 }

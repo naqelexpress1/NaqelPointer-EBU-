@@ -3,16 +3,12 @@ package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 import static android.app.Activity.RESULT_OK;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -22,12 +18,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +54,8 @@ public class SecondFragment extends Fragment {
         {
             if (rootView == null) {
 
+
+
                 rootView = inflater.inflate(R.layout.atoriginfirstnew, container, false);
                 lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
@@ -74,6 +76,9 @@ public class SecondFragment extends Fragment {
                         if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
                             //if (setTxtWaybillNo())
                             setTxtWaybillNo();
+//                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            //  ValidateWayBill(txtBarCode.getText().toString());
                         }
                     }
                 });
@@ -81,6 +86,8 @@ public class SecondFragment extends Fragment {
                 Button cmrabtn = (Button) rootView.findViewById(R.id.btnOpenCamera);
                 //cmrabtn.setVisibility(View.GONE);
 
+
+                intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
                 cmrabtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -88,14 +95,29 @@ public class SecondFragment extends Fragment {
                             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                             GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                         } else
-                        {
-                            Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                            getActivity().startActivityForResult(newIntent, 2);
-                        }
-
+                            startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                     }
                 });
 
+
+//                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                        // If the event is a key-down event on the "enter" button
+//                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                            return true;
+//                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                            //finish();
+//                            onBackpressed();
+//                            return true;
+//                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                            setTxtWaybillNo();
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
+                //Selectedwaybilldetails.clear();
 
                 swipeMenuListView = (SwipeMenuListView) rootView.findViewById(R.id.pieceslist);
                 adapter = new DataAdapter(Selectedwaybilldetails, getContext());
@@ -114,8 +136,19 @@ public class SecondFragment extends Fragment {
     private void setTxtWaybillNo() {
 
         String barcode = txtBarCode.getText().toString();
-        utilities utilities = new utilities();
-        ValidateWayBill(utilities.findwaybillno(barcode));
+//        utilities utilities = new utilities();
+        ValidateWayBill(barcode);
+//
+//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+//            //txtBarCode.setText(barcode.substring(0, 8));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
 
     }
@@ -145,7 +178,7 @@ public class SecondFragment extends Fragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 2 && resultCode == RESULT_OK) {
+        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {

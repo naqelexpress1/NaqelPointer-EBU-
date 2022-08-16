@@ -20,6 +20,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.naqelexpress.naqelpointer.Activity.PickUp.NoPickup;
 import com.naqelexpress.naqelpointer.Activity.PickUp.PickUpActivity;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -56,13 +57,12 @@ public class BookingDetailActivity extends AppCompatActivity
         setContentView(R.layout.bookingdetailnew);
         Bundle bundle = getIntent().getExtras();
 
-
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(this);
 
-
+//        Toast.makeText(this, "Booking List", Toast.LENGTH_SHORT).show();
         position = bundle.getInt("position");
         bookinglist = getIntent().getParcelableArrayListExtra("value");
 
@@ -219,7 +219,6 @@ public class BookingDetailActivity extends AppCompatActivity
             LatLng latLng = new LatLng(Latitude, Longitude);
             GlobalVar.GV().currentLocation = latLng;
 
-
         }
     }
 
@@ -243,6 +242,30 @@ public class BookingDetailActivity extends AppCompatActivity
         intent.putExtras(bundle);
         startActivityForResult(intent, 0);
         //To do need to call API
+    }
+
+    public void NOPICKUP(View view) {
+        //Status is Pickup
+
+        Intent intent = new Intent(BookingDetailActivity.this, NoPickup.class);
+
+        Bundle bundle = new Bundle();
+        intent.putParcelableArrayListExtra("value", bookinglist);
+        bundle.putString("class", "BookingDetailAcyivity");
+        bundle.putString("ref_no", bookinglist.get(position).RefNo);
+        bundle.putInt("position", position);
+        intent.putExtras(bundle);
+        startActivity(intent);
+        /*
+        Bundle bundle = new Bundle();
+        intent.putParcelableArrayListExtra("value", bookinglist);
+        bundle.putString("class", "BookingDetailAcyivity");
+        bundle.putInt("position", position);
+        intent.putExtras(bundle);
+        startActivityForResult(intent, 0);
+        //To do need to call API
+
+         */
     }
 
     public void AcceptClick(View view) {

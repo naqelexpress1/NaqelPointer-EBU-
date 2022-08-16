@@ -1,5 +1,7 @@
 package com.naqelexpress.naqelpointer.DB;
 
+import static android.content.Context.TELEPHONY_SERVICE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ContentValues;
@@ -83,8 +85,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import static android.content.Context.TELEPHONY_SERVICE;
 
 public class DBConnections
         extends SQLiteOpenHelper {
@@ -2161,6 +2161,26 @@ public class DBConnections
             Log.d("test", "DBConnection - Failed updating CNE");
         }
         db.close();
+    }
+
+    //---------------------------------PickUp Table-------------------------------
+
+    public boolean InsertNoPickupReason(String RefNo,String Reason,int Uid, Context context) {
+        long result = 0;
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put("RefNo", RefNo);
+            contentValues.put("Reason", Reason);
+            contentValues.put("UserID", Uid);
+            contentValues.put("IsSync", Boolean.FALSE);
+            result = db.insert("NoPickupReason", null, contentValues);
+            //db.insert("PickUpTemp", null, contentValues);
+            db.close();
+        } catch (SQLiteException e) {
+
+        }
+        return result != -1;
     }
 
     //---------------------------------PickUp Table-------------------------------
@@ -4439,6 +4459,25 @@ public class DBConnections
 
                 String args[] = {String.valueOf(ID)};
                 db.update("PickUpAuto", contentValues, "ID=?", args);
+                db.close();
+            } catch (Exception e) {
+            }
+
+        } catch (SQLiteException e) {
+        }
+    }
+
+    public void updateNoPickupbyID(int ID, Context context) {
+
+        try {
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(),
+                    null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
+            ContentValues contentValues = new ContentValues();
+            try {
+                contentValues.put("IsSync", true);
+
+                String args[] = {String.valueOf(ID)};
+                db.update("NoPickupReason", contentValues, "ID=?", args);
                 db.close();
             } catch (Exception e) {
             }

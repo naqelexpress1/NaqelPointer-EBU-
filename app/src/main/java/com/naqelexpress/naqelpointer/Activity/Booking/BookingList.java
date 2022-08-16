@@ -7,13 +7,14 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
@@ -54,6 +55,7 @@ public class BookingList extends AppCompatActivity {
             setContentView(R.layout.content_booking_list);
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
 
+//            Toast.makeText(this, "Booking List", Toast.LENGTH_SHORT).show();
             myBookingList = new ArrayList<>();
 
             setAdapter();

@@ -528,12 +528,12 @@
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:gravity="center"
-        android:weightSum="4"
+        android:weightSum="5"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
             android:id="@+id/btnCallFirst"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
@@ -544,7 +544,7 @@
 
         <Button
             android:id="@+id/btnCallFirst2"
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
@@ -553,8 +553,18 @@
             android:text="Call" />
 
         <Button
+            android:id="@+id/btnCallFirst3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/round"
+            android:onClick="NOPICKUP"
+            android:text="NO PickUp" />
+
+        <Button
             android:id="@+id/btnAccept"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
@@ -565,7 +575,7 @@
 
         <Button
             android:id="@+id/btnReject"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_weight="1"

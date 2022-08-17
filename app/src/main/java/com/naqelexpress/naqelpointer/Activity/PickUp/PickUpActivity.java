@@ -164,12 +164,12 @@ public class PickUpActivity extends AppCompatActivity {
                         SaveData();
                     }
                 }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                PickUpFirstFragment.al = 0;
-                SaveData();
-            }
-        }).setCancelable(false);
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        PickUpFirstFragment.al = 0;
+                        SaveData();
+                    }
+                }).setCancelable(false);
         AlertDialog alertDialog = builder.create();
         alertDialog.setCancelable(false);
         alertDialog.show();
@@ -191,7 +191,6 @@ public class PickUpActivity extends AppCompatActivity {
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
-
             requestLocation();
         } else {
             ActivityCompat.requestPermissions(PickUpActivity.this,
@@ -221,7 +220,7 @@ public class PickUpActivity extends AppCompatActivity {
                 GlobalVar.GV().getIntegerFromString(firstFragment.txtPiecesCount.getText().toString()),
                 GlobalVar.GV().getDoubleFromString(firstFragment.txtWeight.getText().toString()),
                 DateTime.now(), DateTime.now(), firstFragment.txtRefNo.getText().toString(),
-                String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.districtID , 0 , 0);
+                String.valueOf(Latitude), String.valueOf(Longitude), firstFragment.districtID, 0, 0);
 
         int loadtypeid = 0;
         if (firstFragment.clientdetails.size() > 0) {

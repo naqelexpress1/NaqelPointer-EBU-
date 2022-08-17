@@ -82,7 +82,7 @@ public class NoPickup extends AppCompatActivity {
                 String refno=txtRefNo.getText().toString();
                 //String refno=RefNo.toString();
 
-                String reasontype=reason.getSelectedItem().toString();
+                String reasontype = reason.getSelectedItem().toString();
 
 
                 SaveData(refno,reasontype);
@@ -96,7 +96,7 @@ public class NoPickup extends AppCompatActivity {
 
     private void SaveData(String refno,String reasontype) {
 
-        boolean IsSaved = true;
+        boolean IsSaved = false;
         String error = "";
         if (refno.toString().length() < 12)
             error += " Please enter the valid Pickup reference No \n";
@@ -104,7 +104,6 @@ public class NoPickup extends AppCompatActivity {
         if (error.length() == 0) {
             DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
             IsSaved= dbConnections.InsertNoPickupReason(refno,reasontype, GlobalVar.GV().EmployID,this.getApplicationContext());
-
             AlertDialog.Builder builder = new AlertDialog.Builder(NoPickup.this);
             builder.setTitle("Info")
                     .setMessage("Do you want to Update Another Pickup again?")
@@ -184,7 +183,6 @@ public class NoPickup extends AppCompatActivity {
 
             } else {
                 flag_thread = false;
-
                 android.os.Process.killProcess(android.os.Process.myPid()); // kill service
             }
         } catch (Exception e) {
@@ -200,11 +198,6 @@ public class NoPickup extends AppCompatActivity {
         String URL = DomainURL + "SumbitNoPickup";
 
 
-        db.updateNoPickupbyID(id, getApplicationContext());
-
-        db.updatePickupbyID(id,getApplicationContext());
-        db.deletePickupID(id,getApplicationContext());
-
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
                 URL, null, new Response.Listener<JSONObject>() {
             @Override
@@ -214,9 +207,17 @@ public class NoPickup extends AppCompatActivity {
 
                     boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
                     if (!HasError) {
+                        db.updatePickupbyID(id,getApplicationContext());
+                        db.deletePickupID(id,getApplicationContext());
+
+
                         //db.deletePickupID(id, getApplicationContext());
                         // db.deletePickupDetails(id, getApplicationContext());
+
+
                         db.updateNoPickupbyID(id, getApplicationContext());
+
+
                         flag_thread = false;
 
 

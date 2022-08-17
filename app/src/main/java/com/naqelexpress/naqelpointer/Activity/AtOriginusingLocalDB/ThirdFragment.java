@@ -205,6 +205,10 @@ public class ThirdFragment extends Fragment{
 
     private void ValidateWayBill(String barcode) {
         if (!ValidateBarCodeList.contains(barcode)) {
+            ValidateBarCodeList.add(barcode);
+            lbTotal.setText(getString(R.string.lbCount) + ValidateBarCodeList.size());
+
+
             for (int i = 0; i < CourierDetails.waybillBardetails.size(); i++) {
                 boolean sound = false;
                 if (barcode.equals(CourierDetails.waybillBardetails.get(i).get("BarCode"))) {

@@ -40,7 +40,6 @@ import java.util.ArrayList;
 
 public class BookingList extends AppCompatActivity {
 
-
     private SwipeMenuListView mapListview;
     private BookingListAdapter adapter;
     public ArrayList<Booking> myBookingList;
@@ -50,12 +49,10 @@ public class BookingList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         try {
 
-
             super.onCreate(savedInstanceState);
             setContentView(R.layout.content_booking_list);
             mapListview = (SwipeMenuListView) findViewById(R.id.myBookingListView);
 
-//            Toast.makeText(this, "Booking List", Toast.LENGTH_SHORT).show();
             myBookingList = new ArrayList<>();
 
             setAdapter();

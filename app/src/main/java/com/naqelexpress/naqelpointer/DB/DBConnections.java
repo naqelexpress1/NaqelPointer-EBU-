@@ -86,6 +86,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+
 public class DBConnections
         extends SQLiteOpenHelper {
     private static final int Version = 178; // Create View
@@ -589,6 +590,9 @@ public class DBConnections
 
         db.execSQL("CREATE TABLE IF NOT EXISTS \"PickupSheetReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
                 "\"Name\" Text NOT NULL , \"DBID\"  INTEGER )");
+        db.execSQL("CREATE TABLE IF NOT EXISTS \"NoPickupReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                "\"RefNo\" Text NOT NULL , \"Reason\"  Text NOT NULL ,\"IsSync\"  BOOL NOT NULL , \"UserID\" INTEGER NOT NULL )");
+
 
         /*  END -  Riyam */
 
@@ -1342,6 +1346,8 @@ public class DBConnections
 
 //            if (!isColumnExist("MyRouteShipments", "CDAmount"))
 //                db.execSQL("ALTER TABLE MyRouteShipments ADD COLUMN CDAmount DOUBLE");
+            db.execSQL("CREATE TABLE IF NOT EXISTS \"NoPickupReason\" (\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL  UNIQUE , " +
+                    "\"RefNo\" Text NOT NULL , \"Reason\"  Text NOT NULL ,\"IsSync\"  BOOL NOT NULL , \"UserID\" INTEGER NOT NULL )");
 
             db.execSQL("Create View IF NOT EXISTS v_validation As" +
                     " select WaybillNo ,  WaybillDestID ,  IsMultiPiece , IsStopped , 0 IsRTORequest ,  NoOfAttempts," +
@@ -2183,7 +2189,7 @@ public class DBConnections
         return result != -1;
     }
 
-    //---------------------------------PickUp Table-------------------------------
+
     public boolean InsertPickUp(PickUp instance, Context context, int lid, int al, String JsonData) {
         long result = 0;
         try {
@@ -4435,6 +4441,8 @@ public class DBConnections
         }
     }
 
+
+
     public void deletePickupDetails(int pickupid, Context context) {
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -4475,7 +4483,6 @@ public class DBConnections
             ContentValues contentValues = new ContentValues();
             try {
                 contentValues.put("IsSync", true);
-
                 String args[] = {String.valueOf(ID)};
                 db.update("NoPickupReason", contentValues, "ID=?", args);
                 db.close();
@@ -4485,6 +4492,7 @@ public class DBConnections
         } catch (SQLiteException e) {
         }
     }
+
 
     public void DeleteAllSyncData(Context context) {
 
@@ -6009,7 +6017,7 @@ public class DBConnections
 
     }
 
-    public boolean InsertAtDestWaybill(String Waybill, String tripid, Context context) {
+    public boolean InsertAtDestWaybill(int Waybill, String tripid, Context context) {
         long result = 0;
         try {
             SQLiteDatabase db = SQLiteDatabase.openDatabase(context.getDatabasePath(DBName).getPath(), null, SQLiteDatabase.NO_LOCALIZED_COLLATORS | SQLiteDatabase.OPEN_READWRITE);
@@ -9549,6 +9557,8 @@ public class DBConnections
 
 
     }
+
+
 
 
     public static ArrayList<MyRouteShipments> getWaybillMeasurementListHistory(Context context) {

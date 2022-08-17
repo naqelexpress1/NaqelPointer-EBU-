@@ -8,10 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -21,6 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -154,8 +155,9 @@ public class Waybill extends Fragment {
 
 
     private void SaveWaybilltoLocal(String waybill) {
+        int wb = Integer.parseInt(waybill);
         DBConnections dbConnections = new DBConnections(getContext(), null);
-        dbConnections.InsertAtDestWaybill(waybill, ArrivedatDestination.tripPlanID, getContext());
+        dbConnections.InsertAtDestWaybill(wb, ArrivedatDestination.tripPlanID, getContext());
         dbConnections.close();
     }
 

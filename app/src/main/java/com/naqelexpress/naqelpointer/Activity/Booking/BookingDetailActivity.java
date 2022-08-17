@@ -57,12 +57,15 @@ public class BookingDetailActivity extends AppCompatActivity
         setContentView(R.layout.bookingdetailnew);
         Bundle bundle = getIntent().getExtras();
 
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
 
+//        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+
         mapFragment.getMapAsync(this);
 
-//        Toast.makeText(this, "Booking List", Toast.LENGTH_SHORT).show();
+
         position = bundle.getInt("position");
         bookinglist = getIntent().getParcelableArrayListExtra("value");
 
@@ -219,6 +222,7 @@ public class BookingDetailActivity extends AppCompatActivity
             LatLng latLng = new LatLng(Latitude, Longitude);
             GlobalVar.GV().currentLocation = latLng;
 
+
         }
     }
 
@@ -246,6 +250,9 @@ public class BookingDetailActivity extends AppCompatActivity
 
     public void NOPICKUP(View view) {
         //Status is Pickup
+        //DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        //dbConnections.UpdateBookingStatus(BookingId, 3, view, getApplicationContext());
+        //dbConnections.close();
 
         Intent intent = new Intent(BookingDetailActivity.this, NoPickup.class);
 

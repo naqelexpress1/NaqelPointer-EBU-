@@ -5186,6 +5186,80 @@ public class DBConnections
     }
 
 
+    public ArrayList<MyRouteShipments> getAllNoPickupReason(Context context) {
+        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+        try {
+            Cursor mnocursor = Fill("select * from NoPickupReason", context);
+            if (mnocursor.getCount() > 0) {
+                mnocursor.moveToFirst();
+                do {
+                    MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+                    onDeliveryRequest.ID = Integer.parseInt(mnocursor.getString(mnocursor.getColumnIndex("ID")));
+//                    onDeliveryRequest.ItemNo = mnocursor.getString(mnocursor.getColumnIndex("WaybillNo"));
+//                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+//                onDeliveryRequest.TypeID = -1;
+                    onDeliveryRequest.RefNo = mnocursor.getString(mnocursor.getColumnIndex("RefNo"));
+                    onDeliveryRequest.Reason = mnocursor.getString(mnocursor.getColumnIndex("Reason"));
+                    OnDeleiveryFromLocal.add(onDeliveryRequest);
+
+//                    Location temp = new Location("");
+//                    temp.setLongitude(Double.parseDouble(mnocursor.getString(mnocursor.getColumnIndex("Longitude"))));
+//                    temp.setLatitude(Double.parseDouble(mnocursor.getString(mnocursor.getColumnIndex("Latitude"))));
+//                    OnDeleiveryFromLocal.add(temp);
+
+                } while (mnocursor.moveToNext());
+            }
+        } catch (SQLiteException e) {
+        }
+        return OnDeleiveryFromLocal;
+    }
+
+//    public static ArrayList<MyRouteShipments> getAllNoPickupReason(Context context) {
+//        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+//
+//        Cursor result = dbConnections.Fill("select * from NoPickupReason", context);// where IsSync = 0
+//        if (result.getCount() > 0) {
+//            result.moveToFirst();
+//            do {
+//
+//                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+//                onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+//                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+////                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+////                onDeliveryRequest.TypeID = -1;
+//                onDeliveryRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
+//                onDeliveryRequest.Reason = result.getString(result.getColumnIndex("Reason"));
+//                OnDeleiveryFromLocal.add(onDeliveryRequest);
+//
+//            }
+//            while (result.moveToNext());
+//        }
+//        return OnDeleiveryFromLocal;
+//    }
+
+//    public ArrayList<MyRouteShipments> getAllNoPickupReason(Context context) {
+//        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+//        ArrayList<HashMap<String, String>> contactdetails = new ArrayList<HashMap<String, String>>();
+//        try {
+//            Cursor mnocursor = Fill("select * from NoPickupReason", context);
+//            if (mnocursor.getCount() > 0) {
+//                mnocursor.moveToFirst();
+//                do {
+//                    HashMap<String, String> temp = new HashMap<>();
+//                    temp.put("mno", mnocursor.getString(mnocursor.getColumnIndex("MobileNo")));
+//                    temp.put("name", mnocursor.getString(mnocursor.getColumnIndex("Name")));
+//                    temp.put("rawid", String.valueOf(mnocursor.getInt(mnocursor.getColumnIndex("RawID"))));
+//                    contactdetails.add(temp);
+//
+//                } while (mnocursor.moveToNext());
+//            }
+//
+//        } catch (SQLiteException e) {
+//
+//        }
+//        return contactdetails;
+//    }
+
     public boolean InsertLocation(String instance, Context context) {
         long result = 0;
         try {

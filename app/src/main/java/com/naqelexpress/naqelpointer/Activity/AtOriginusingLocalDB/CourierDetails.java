@@ -1,5 +1,4 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
-
 import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -36,10 +35,9 @@ import java.util.HashMap;
 
 public class CourierDetails extends Fragment // implements ResultInterface
 {
-
     View rootView;
     private EditText txtBarCode;
-    TextView waybillcount, piececount, selectedwaybillcount;
+    static TextView waybillcount, piececount, selectedwaybillcount;
     static CourierAdapterNew adapter;
     private GridView waybilgrid;
     EditText employeid;
@@ -101,16 +99,16 @@ public class CourierDetails extends Fragment // implements ResultInterface
     private void clearfields() {
         waybilldetails.clear();
         waybillBardetails.clear();
-        SecondFragment.Selectedwaybilldetails.clear();
-        SecondFragment.validatewaybilldetails.clear();
-        ThirdFragment.SelectedwaybillBardetails.clear();
-        ThirdFragment.ValidateBarCodeList.clear();
+        FirstFragment.Selectedwaybilldetails.clear();
+        FirstFragment.validatewaybilldetails.clear();
+        SecondFragment.SelectedwaybillBardetails.clear();
+        SecondFragment.ValidateBarCodeList.clear();
         selectedwaybillcount.setText("0");
-        if (SecondFragment.adapter != null)
+        if (FirstFragment.adapter != null)
+            FirstFragment.adapter.notifyDataSetChanged();
+        if (SecondFragment.adapter != null) {
             SecondFragment.adapter.notifyDataSetChanged();
-        if (ThirdFragment.adapter != null) {
-            ThirdFragment.adapter.notifyDataSetChanged();
-            ThirdFragment.lbTotal.setText("0");
+            SecondFragment.lbTotal.setText("0");
         }
     }
 
@@ -137,8 +135,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
                 if (result.getString(result.getColumnIndex("bgcolor")).equals("1")) {
                     selectedwayabill = selectedwayabill + 1;
-                    SecondFragment.Selectedwaybilldetails.add(tempwaybill);
-                    SecondFragment.validatewaybilldetails.add(result.getString(result.getColumnIndex("WaybillNo")));
+                    FirstFragment.Selectedwaybilldetails.add(tempwaybill);
+                    FirstFragment.validatewaybilldetails.add(result.getString(result.getColumnIndex("WaybillNo")));
                 }
                 waybilldetails.add(tempwaybill);
 
@@ -147,8 +145,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
             waybillcount.setText(String.valueOf(result.getCount()));
             selectedwaybillcount.setText(String.valueOf(selectedwayabill));
-            if (SecondFragment.adapter != null)
-                SecondFragment.adapter.notifyDataSetChanged();
+            if (FirstFragment.adapter != null)
+                FirstFragment.adapter.notifyDataSetChanged();
         }
         result.close();
 
@@ -167,17 +165,17 @@ public class CourierDetails extends Fragment // implements ResultInterface
 
                 if (result.getString(result.getColumnIndex("bgcolor")).equals("1")) {
                     pc++;
-                    ThirdFragment.ValidateBarCodeList.add(result.getString(result.getColumnIndex("BarCode")));
-                    ThirdFragment.SelectedwaybillBardetails.add(tempbarcode);
+                    SecondFragment.ValidateBarCodeList.add(result.getString(result.getColumnIndex("BarCode")));
+                    SecondFragment.SelectedwaybillBardetails.add(tempbarcode);
                 }
                 waybillBardetails.add(tempbarcode);
             }
             while (result.moveToNext());
 
             piececount.setText(String.valueOf(result.getCount()));
-            if (ThirdFragment.adapter != null) {
-                ThirdFragment.adapter.notifyDataSetChanged();
-                ThirdFragment.lbTotal.setText(String.valueOf(pc));
+            if (SecondFragment.adapter != null) {
+                SecondFragment.adapter.notifyDataSetChanged();
+                SecondFragment.lbTotal.setText(String.valueOf(pc));
             }
         }
         result.close();
@@ -270,8 +268,8 @@ public class CourierDetails extends Fragment // implements ResultInterface
                 waybilldetails.clear();
                 waybillBardetails.clear();
 
-                SecondFragment.Selectedwaybilldetails.clear();
-                ThirdFragment.SelectedwaybillBardetails.clear();
+                FirstFragment.Selectedwaybilldetails.clear();
+                SecondFragment.SelectedwaybillBardetails.clear();
 
                 try {
                     JSONObject job = new JSONObject(finalJson);
@@ -359,6 +357,5 @@ public class CourierDetails extends Fragment // implements ResultInterface
             //waybillBardetails = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable("waybillBardetails");
         }
     }
-
 
 }

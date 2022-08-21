@@ -1,6 +1,10 @@
 package com.naqelexpress.naqelpointer.Activity.AtOriginNew;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,13 +15,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,14 +24,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import static android.app.Activity.RESULT_OK;
 
 public class SecondFragment extends Fragment {
     View rootView;
@@ -72,7 +75,7 @@ public class SecondFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
                         ValidateWayBill(txtBarCode.getText().toString());
                 }
             });
@@ -158,7 +161,7 @@ public class SecondFragment extends Fragment {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
-                        //AddNewPiece();
+//                        AddNewPiece();
                     }
                 }
 //                final Barcode barcode = data.getParcelableExtra("barcode");
@@ -308,7 +311,7 @@ public class SecondFragment extends Fragment {
 //        if (!DeliveryBarCodeList.contains(txtBarCode.getText().toString())) {
 //            if (ShipmentBarCodeList.contains(txtBarCode.getText().toString())) {
 //                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-//                waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                CourierDetails.waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
 //                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
 //                txtBarCode.setText("");
 //                initViews();
@@ -320,7 +323,7 @@ public class SecondFragment extends Fragment {
 //                            @Override
 //                            public void onClick(DialogInterface dialogInterface, int which) {
 //                                DeliveryBarCodeList.add(0, txtBarCode.getText().toString());
-//                                waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                                CourierDetails.waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
 //                                initViews();
 //                                txtBarCode.setText("");
 //                            }
@@ -328,7 +331,7 @@ public class SecondFragment extends Fragment {
 //                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialogInterface, int which) {
-//                                waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
+//                                CourierDetails.waybillcount.setText(getString(R.string.lbCount) + DeliveryBarCodeList.size());
 //                                txtBarCode.setText("");
 //                            }
 //                        })
@@ -343,29 +346,29 @@ public class SecondFragment extends Fragment {
 //        }
 //    }
 
-//    @SuppressLint("RestrictedApi")
-//    private void initDialog() {
-//        alertDialog = new AlertDialog.Builder(this.getContext());
-//        view = getLayoutInflater(null).inflate(R.layout.dialog_layout, null);
-//
-//        alertDialog.setView(view);
-//        alertDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                if (add) {
-//                    add = false;
-////                    adapter.addItem(txtBarCodePiece.getText().toString());
-//                    dialog.dismiss();
-//                } else {
-////                    DeliveryBarCodeList.set(edit_position, txtBarCodePiece.getText().toString());
-//                    adapter.notifyDataSetChanged();
-//                    dialog.dismiss();
-//                }
-//
-//            }
-//        });
-//        txtBarCodePiece = (EditText) view.findViewById(R.id.txtWaybilll);
-//    }
+    @SuppressLint("RestrictedApi")
+    private void initDialog() {
+        alertDialog = new AlertDialog.Builder(this.getContext());
+        view = getLayoutInflater(null).inflate(R.layout.dialog_layout, null);
+
+        alertDialog.setView(view);
+        alertDialog.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (add) {
+                    add = false;
+//                    adapter.addItem(txtBarCodePiece.getText().toString());
+                    dialog.dismiss();
+                } else {
+//                    DeliveryBarCodeList.set(edit_position, txtBarCodePiece.getText().toString());
+                    adapter.notifyDataSetChanged();
+                    dialog.dismiss();
+                }
+
+            }
+        });
+        txtBarCodePiece = (EditText) view.findViewById(R.id.txtWaybilll);
+    }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {

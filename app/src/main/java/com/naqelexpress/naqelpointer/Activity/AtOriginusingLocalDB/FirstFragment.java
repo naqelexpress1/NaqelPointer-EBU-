@@ -1,9 +1,10 @@
-package com.naqelexpress.naqelpointer.Activity.AtOriginNew;
+package com.naqelexpress.naqelpointer.Activity.AtOriginusingLocalDB;
 
 import static android.app.Activity.RESULT_OK;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
@@ -24,6 +25,7 @@ import androidx.fragment.app.Fragment;
 
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
+import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
@@ -44,16 +46,16 @@ public class FirstFragment extends Fragment {
     private boolean add = false;
     private Intent intent;
 
-    //    private ArrayList<HashMap<String, String>> waybilldetails = new ArrayList<>();
-//    public static ArrayList<HashMap<String, String>> waybillBardetails = new ArrayList<>();
     static ArrayList<HashMap<String, String>> Selectedwaybilldetails = new ArrayList<>();
-
-    public ArrayList<String> validatewaybilldetails = new ArrayList<>();
+    public static ArrayList<String> validatewaybilldetails = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         {
             if (rootView == null) {
+
+
+
                 rootView = inflater.inflate(R.layout.atoriginfirstnew, container, false);
                 lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
@@ -70,16 +72,23 @@ public class FirstFragment extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                            ValidateWayBill(txtBarCode.getText().toString());
-                        //     AddNewPiece();
+
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
+                            //if (setTxtWaybillNo())
+                            setTxtWaybillNo();
+//                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                            //  ValidateWayBill(txtBarCode.getText().toString());
+                        }
                     }
                 });
 
+                Button cmrabtn = (Button) rootView.findViewById(R.id.btnOpenCamera);
+                //cmrabtn.setVisibility(View.GONE);
 
-                Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
+
                 intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                btnOpenCamera.setOnClickListener(new View.OnClickListener() {
+                cmrabtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -90,7 +99,25 @@ public class FirstFragment extends Fragment {
                     }
                 });
 
-                Selectedwaybilldetails.clear();
+
+//                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                        // If the event is a key-down event on the "enter" button
+//                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                            return true;
+//                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                            //finish();
+//                            onBackpressed();
+//                            return true;
+//                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                            setTxtWaybillNo();
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
+                //Selectedwaybilldetails.clear();
 
                 swipeMenuListView = (SwipeMenuListView) rootView.findViewById(R.id.pieceslist);
                 adapter = new DataAdapter(Selectedwaybilldetails, getContext());
@@ -102,12 +129,41 @@ public class FirstFragment extends Fragment {
         }
     }
 
+
+
+
+
+    private void setTxtWaybillNo() {
+
+        String barcode = txtBarCode.getText().toString();
+//        utilities utilities = new utilities();
+//        ValidateWayBill(utilities.findwaybillno(barcode));
+        ValidateWayBill(barcode);
+//
+//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+//            //txtBarCode.setText(barcode.substring(0, 8));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
+    }
+
+
     private void ValidateWayBill(String waybillno) {
         if (!validatewaybilldetails.contains(waybillno)) {
             for (int i = 0; i < CourierDetails.waybilldetails.size(); i++) {
                 if (waybillno.equals(CourierDetails.waybilldetails.get(i).get("WaybillNo"))) {
                     Selectedwaybilldetails.add(CourierDetails.waybilldetails.get(i));
                     CourierDetails.waybilldetails.get(i).put("bgcolor", "1");
+                    DBConnections dbConnections = new DBConnections(getContext(), null);
+                    dbConnections.AtOriginScannedWaybill(waybillno, getView());
+                    dbConnections.close();
                     GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
                     txtBarCode.setText("");
                     adapter.notifyDataSetChanged();
@@ -168,4 +224,23 @@ public class FirstFragment extends Fragment {
         }
     }
 
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit PickUp")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
+
+
 }
+

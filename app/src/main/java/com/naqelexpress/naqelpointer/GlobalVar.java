@@ -2333,30 +2333,31 @@ public class GlobalVar {
         return DeliverySheetFromLocal;
     }
 
-    public static ArrayList<MyRouteShipments> getNoPickupHistory(Context context) {
-        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
-        DBConnections dbConnections = new DBConnections(context, null);
-        Cursor result = dbConnections.Fill("select * from NoPickupReason", context);// where IsSync = 0
-        if (result.getCount() > 0) {
-            result.moveToFirst();
-            do {
-
-                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
-                 onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
-//                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
-//                onDeliveryRequest.TypeID = -1;
-                onDeliveryRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
-                onDeliveryRequest.Reason = result.getString(result.getColumnIndex("Reason"));
-                OnDeleiveryFromLocal.add(onDeliveryRequest);
-
-            }
-            while (result.moveToNext());
-
-        }
-        dbConnections.close();
-        return OnDeleiveryFromLocal;
-    }
+//    public static ArrayList<MyRouteShipments> getNoPickupHistory(Context context) {
+//        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
+//        DBConnections dbConnections = new DBConnections(context, null);
+//        dbConnections.getAllNoPickupReason(context);
+//
+//        Cursor result = dbConnections.Fill("select * from NoPickupReason", context);// where IsSync = 0
+//        if (result.getCount() > 0) {
+//            result.moveToFirst();
+//            do {
+//
+//                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
+//                 onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+//                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
+////                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
+////                onDeliveryRequest.TypeID = -1;
+//                onDeliveryRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
+//                onDeliveryRequest.Reason = result.getString(result.getColumnIndex("Reason"));
+//                OnDeleiveryFromLocal.add(onDeliveryRequest);
+//
+//            }
+//            while (result.moveToNext());
+//        }
+//        dbConnections.close();
+//        return OnDeleiveryFromLocal;
+//    }
 
     public static ArrayList<MyRouteShipments> getNightStock(Context context) {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();

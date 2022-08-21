@@ -363,8 +363,12 @@ public class BookingList extends AppCompatActivity {
                     }
                 }
                 adapter.notifyDataSetChanged();
-            } else
+            } else{
+                myBookingList.clear();
+                adapter.notifyDataSetChanged();
                 nodata.setVisibility(View.VISIBLE);
+            }
+
 
         } catch (JSONException ignored) {
             System.out.println(ignored);

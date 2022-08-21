@@ -13,10 +13,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -234,7 +235,6 @@ public class PickUp extends Service {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        //String URL = GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer";
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Pickup");
         String URL = DomainURL + "SendPickUpDataToServer";
 

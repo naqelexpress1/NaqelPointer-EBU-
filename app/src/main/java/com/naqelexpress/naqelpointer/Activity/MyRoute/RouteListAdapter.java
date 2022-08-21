@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -13,6 +12,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -84,6 +85,7 @@ public class RouteListAdapter
 
 
         holder.lbSerial.setText(String.valueOf(getItemId(position) + 1));
+
         if (class_.equals("CourierKpi")) {
             holder.txtWaybill.setText(item.ItemNo);
             Integer typeID = itemListFiltered.get(position).TypeID;
@@ -201,7 +203,6 @@ public class RouteListAdapter
                 holder.txtType.setVisibility(View.VISIBLE);
                 holder.txtWaybill.setText(String.valueOf(item.ItemNo)
                         + "\n" + "PiecesCount " + String.valueOf(item.PiecesCount));
-                // holder.txtType.setText("Weight " + String.valueOf(item.PiecesCount));
 
             } else if (item.TypeID == 124)//AtOrigin
             {

@@ -17,6 +17,15 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.naqelexpress.naqelpointer.Activity.Booking.Booking;
 import com.naqelexpress.naqelpointer.Activity.Booking.BookingListAdapter;
@@ -29,6 +38,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.MyRouteShipments;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDelivered;
 import com.naqelexpress.naqelpointer.DB.DBObjects.NotDeliveredDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.JSON.Request.NoPickupRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryDetailRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.OnDeliveryRequest;
 import com.naqelexpress.naqelpointer.JSON.Request.PickUpDetailRequest;
@@ -45,10 +55,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Hasna on 8/7/18.
@@ -326,8 +339,8 @@ public class History extends Activity {
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
                 GetNightStock();
-            }else if (parent.getItemAtPosition(pos).toString().equals("No Pckup")) {
-                ManualFunction = "No Pickup";
+            } else if (parent.getItemAtPosition(pos).toString().equals("No Pickup")) {
+                ManualFunction = "NoPickup";
                 mydeliverylist = new ArrayList<>();
                 myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
                 mapListview.setAdapter(myrouteadapter);
@@ -372,9 +385,14 @@ public class History extends Activity {
     }
 
     private void GetNoPickup() {
-        mydeliverylist.addAll(GlobalVar.getNoPickupHistory(getApplicationContext()));
+        DBConnections dbConnections = new DBConnections(getApplicationContext(), null);
+        mydeliverylist = dbConnections.getAllNoPickupReason(getApplicationContext());
+//        mydeliverylist = GlobalVar.getNoPickupHistory(getApplicationContext());
+//        mydeliverylist.addAll(GlobalVar.getNoPickupHistory(getApplicationContext()));
         if (mydeliverylist.size() > 0) {
-            myrouteadapter.notifyDataSetChanged();
+            myrouteadapter = new RouteListAdapter(getApplicationContext(), mydeliverylist, "History");
+            mapListview.setAdapter(myrouteadapter);
+//            myrouteadapter.notifyDataSetChanged();
             nodata.setVisibility(View.GONE);
         } else
             nodata.setVisibility(View.VISIBLE);
@@ -1670,11 +1688,12 @@ public class History extends Activity {
 
             Cursor ts = null;
             if (ManualFunction.equals("Pickup")) {
-                stopService(
-                        new Intent(History.this,
-                                com.naqelexpress.naqelpointer.service.PickUp.class));
+                stopService(new Intent(History.this,
+                        com.naqelexpress.naqelpointer.service.PickUp.class));
 
                 ts = db.Fill("select Count(1) As totalRecord  from PickUpAuto where issync = 0 ", getApplicationContext());
+            } else if (ManualFunction.equals("NoPickup")) {
+                updateNoPickup();
             } else if (ManualFunction.equals("OnDelivery")) {
 
                 stopService(
@@ -1703,7 +1722,6 @@ public class History extends Activity {
                 ts = db.Fill("select Count(1) As totalRecord  from NCL where issync = 0 ", getApplicationContext());
             } else
                 return;
-
             if (ts != null) {
                 ts.moveToFirst();
                 try {
@@ -1715,7 +1733,11 @@ public class History extends Activity {
 
                 if (totalsize > 0 && ManualFunction.equals("Pickup")) {
                     new SavePickupbyManual().execute(String.valueOf(totalsize));
-                } else if (totalsize > 0 && ManualFunction.equals("OnDelivery")) {
+                }
+//                else if () {
+//
+//                }
+                else if (totalsize > 0 && ManualFunction.equals("OnDelivery")) {
                     if (GlobalVar.getDivision(getApplicationContext()).equals("Express"))
                         new SaveDeliverybyManual().execute(String.valueOf(totalsize));
                     else
@@ -1724,6 +1746,7 @@ public class History extends Activity {
                     new SaveNotDeliverybyManual().execute(String.valueOf(totalsize));
                 else if (totalsize > 0 && ManualFunction.equals("CheckPoint"))
                     new SyncCheckpointbyManual().execute(String.valueOf(totalsize));
+
                 else {
                     manualsyncbtn.setEnabled(true);
                     manualsyncbtn.setClickable(true);
@@ -2349,6 +2372,136 @@ public class History extends Activity {
             }
         });
         builderSingle.show();
+    }
+
+    public void updateNoPickup() {
+
+        try {
+
+            DBConnections db = new DBConnections(getApplicationContext(), null);
+
+            Cursor result = db.Fill("select * from NoPickupReason where IsSync = 0", getApplicationContext());
+
+
+            if (result.getCount() > 0) {
+
+                if (result.moveToFirst()) {
+
+                    NoPickupRequest noPickUpRequest = new NoPickupRequest();
+                    noPickUpRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
+                    noPickUpRequest.PickupRef = result.getString(result.getColumnIndex("RefNo"));
+                    noPickUpRequest.Reason = result.getString(result.getColumnIndex("Reason"));
+                    noPickUpRequest.Employeeid = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
+
+                    String jsonData = JsonSerializerDeserializer.serialize(noPickUpRequest, true);
+                    jsonData = jsonData.replace("Date(-", "Date(");
+
+
+                    SaveNoPickup(db, jsonData, noPickUpRequest.ID);
+
+                }
+
+
+            } else {
+//                flag_thread = false;
+                android.os.Process.killProcess(android.os.Process.myPid()); // kill service
+            }
+        } catch (Exception e) {
+//            flag_thread = false;
+        }
+    }
+
+    public void SaveNoPickup(final DBConnections db, final String input, final int id) {
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Pickup");
+        String URL = DomainURL + "SumbitNoPickup";
+
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                URL, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+
+                    boolean HasError = Boolean.parseBoolean(response.getString("HasError"));
+                    if (!HasError) {
+                        db.updatePickupbyID(id,getApplicationContext());
+                        db.deletePickupID(id,getApplicationContext());
+
+                        //db.deletePickupID(id, getApplicationContext());
+                        // db.deletePickupDetails(id, getApplicationContext());
+
+
+                        db.updateNoPickupbyID(id, getApplicationContext());
+
+
+//                        flag_thread = false;
+
+
+                    } else
+//                        flag_thread = false;
+                    db.close();
+                    GlobalVar.GV().triedTimes_ForPickup = 0;
+                } catch (JSONException e) {
+//                    flag_thread = false;
+                    if (db != null)
+                        db.close();
+                    e.printStackTrace();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+                //ArrayList<String> value = GlobalVar.VolleyError(error);
+                if (error.toString().contains("No address associated with hostname")) {
+
+                } else {
+                    GlobalVar.GV().triedTimes_ForPickup = GlobalVar.GV().triedTimes_ForPickup + 1;
+                    if (GlobalVar.GV().triedTimes_ForPickup == GlobalVar.GV().triedTimesCondition) {
+                        GlobalVar.GV().SwitchoverDomain_Service(getApplicationContext(), DomainURL, "Pickup");
+
+                    }
+                }
+//                flag_thread = false;
+                db.close();
+            }
+        }) {
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public byte[] getBody() {
+                try {
+                    return input == null ? null : input.getBytes("utf-8");
+                } catch (UnsupportedEncodingException uee) {
+                    VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s", input, "utf-8");
+                    return null;
+                }
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Content-Type", "application/json; charset=utf-8");
+                return params;
+            }
+
+        };
+        jsonObjectRequest.setShouldCache(false);
+        jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(
+                120000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        requestQueue.add(jsonObjectRequest);
+        requestQueue.getCache().remove(URL);
+
     }
 
 

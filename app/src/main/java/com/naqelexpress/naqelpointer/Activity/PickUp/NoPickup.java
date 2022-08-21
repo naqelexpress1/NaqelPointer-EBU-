@@ -155,23 +155,6 @@ public class NoPickup extends AppCompatActivity {
                     noPickUpRequest.Reason = result.getString(result.getColumnIndex("Reason"));
                     noPickUpRequest.Employeeid = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
 
-
-
-
-
-//                    Cursor resultDetail = db.Fill("select * from PickUpDetailAuto where PickUpID = " + pickUpRequest.ID, getApplicationContext());
-//
-//                    if (resultDetail.getCount() > 0) {
-//                        int index = 0;
-//                        resultDetail.moveToFirst();
-//                        do {
-//                            pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
-//                                    (resultDetail.getString(resultDetail.getColumnIndex("BarCode"))));
-//                            index++;
-//                        }
-//                        while (resultDetail.moveToNext());
-//                    }
-
                     String jsonData = JsonSerializerDeserializer.serialize(noPickUpRequest, true);
                     jsonData = jsonData.replace("Date(-", "Date(");
 
@@ -193,7 +176,6 @@ public class NoPickup extends AppCompatActivity {
 
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        //String URL = GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer";
         final String DomainURL = GlobalVar.GV().GetDomainURLforService(getApplicationContext(), "Pickup");
         String URL = DomainURL + "SumbitNoPickup";
 
@@ -209,7 +191,6 @@ public class NoPickup extends AppCompatActivity {
                     if (!HasError) {
                         db.updatePickupbyID(id,getApplicationContext());
                         db.deletePickupID(id,getApplicationContext());
-
 
                         //db.deletePickupID(id, getApplicationContext());
                         // db.deletePickupDetails(id, getApplicationContext());
@@ -273,16 +254,6 @@ public class NoPickup extends AppCompatActivity {
                 return params;
             }
 
-//            @Override
-//            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-//                String responseString = "";
-//                if (response != null) {
-//
-//                    responseString = String.valueOf(response.statusCode);
-//
-//                }
-//                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
-//            }
         };
         jsonObjectRequest.setShouldCache(false);
         jsonObjectRequest.setRetryPolicy(new DefaultRetryPolicy(

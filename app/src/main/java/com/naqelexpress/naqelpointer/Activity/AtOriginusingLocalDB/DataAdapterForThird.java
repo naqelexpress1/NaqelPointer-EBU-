@@ -9,14 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.naqelexpress.naqelpointer.R;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 
 public class DataAdapterForThird
         extends RecyclerView.Adapter<DataAdapterForThird.ViewHolder>
 {
-    private ArrayList<String> BarcodeList;
+    private List<HashMap<String, String>> BarcodeList;
 
-    public DataAdapterForThird(ArrayList<String> PieceBarcode)
+    public DataAdapterForThird(List<HashMap<String, String>> PieceBarcode)
     {
         this.BarcodeList = PieceBarcode;
     }
@@ -31,7 +33,7 @@ public class DataAdapterForThird
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
 
-        viewHolder.txtBarCode.setText(BarcodeList.get(i));
+        viewHolder.txtBarCode.setText(BarcodeList.get(i).get("BarCode"));
     }
 
 

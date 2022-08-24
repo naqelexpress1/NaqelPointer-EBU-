@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TireConditionPicture extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,8 +39,7 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
 
 
     File filename;
-    List<File> sendImages = new ArrayList<File>();
-    List<File> tempImages = new ArrayList<File>();
+
 
 
     ImagesAdapter adapter;
@@ -76,7 +73,7 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
         gridview.setColumnWidth(gridSize + 10);
 
 
-        adapter = new ImagesAdapter(this, tempImages);
+        adapter = new ImagesAdapter(this, Constant.tireConditionPicture);
         gridview.setAdapter(adapter);
 
 
@@ -111,14 +108,14 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
     }
 
 
-    public void setImageInImageView(String imagePath) {
-            adapter = new ImagesAdapter(this, tempImages);
+    public void setImageInImageView() {
+            adapter = new ImagesAdapter(this, Constant.tireConditionPicture);
             gridview.setAdapter(adapter);
     }
 
 
     protected void CreateFileName() {
-        int count = tempImages.size() + 1;
+        int count = Constant.tireConditionPicture.size() + 1;
 //        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
         try {
             filename = Constant.createImageFile(TireConditionPicture.this, "TireCondition", count);
@@ -157,9 +154,9 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                tempImages.add(filename);
+                Constant.tireConditionPicture.add(filename);
                 compressImage(filename.getAbsolutePath());
-                setImageInImageView(filename.getAbsolutePath());
+                setImageInImageView();
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Toast.makeText(this, "Cropping failed: " + result.getError(), Toast.LENGTH_LONG).show();
                 filename = null;

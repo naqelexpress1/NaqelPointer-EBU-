@@ -389,7 +389,7 @@
         android:paddingLeft="10dp"
         android:paddingTop="30dp"
         android:paddingRight="10dp"
-        android:paddingBottom="30dp"
+        android:paddingBottom="60dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp"
         app:layout_constraintBottom_toBottomOf="parent"

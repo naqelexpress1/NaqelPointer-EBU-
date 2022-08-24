@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements View.OnClickListener{
 
@@ -40,8 +38,6 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
 
     public static final int BITMAP_SAMPLE_SIZE = 8;
     File filename;
-    List<File> sendImages = new ArrayList<File>();
-    List<File> tempImages = new ArrayList<File>();
 
     ImagesAdapter adapter;
     GridView gridview;
@@ -73,7 +69,7 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
         gridview.setColumnWidth(gridSize + 10);
 
 
-        adapter = new ImagesAdapter(this, tempImages);
+        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture);
         gridview.setAdapter(adapter);
 
 
@@ -101,7 +97,7 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
                 break;
 
             case R.id.next:
-                Intent intent = new Intent(getApplicationContext(), TrailerBody.class);
+                Intent intent = new Intent(getApplicationContext(), TrailerBody.class);//
                 startActivity(intent);
                 break;
 
@@ -109,17 +105,17 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
     }
 
     public void setImageInImageView(String imagePath) {
-        adapter = new ImagesAdapter(this, tempImages);
+        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture);
         gridview.setAdapter(adapter);
 
     }
 
 
     protected void CreateFileName() {
-        int count = tempImages.size() + 1;
+        int count = Constant.safetyCurtainsCargoPicture.size() + 1;
 //        filename = id + "_" + timestamp.toString() + "_" + imagesuffix + "_" + String.valueOf(count) +".png";
         try {
-            filename = Constant.createImageFile(SafetryCurtainsAndCargoPicture.this, "TireCondition", count);
+            filename = Constant.createImageFile(SafetryCurtainsAndCargoPicture.this, "SafetyCurtainsAndCargo", count);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -155,7 +151,7 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                tempImages.add(filename);
+                Constant.safetyCurtainsCargoPicture.add(filename);
                 compressImage(filename.getAbsolutePath());
                 setImageInImageView(filename.getAbsolutePath());
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {

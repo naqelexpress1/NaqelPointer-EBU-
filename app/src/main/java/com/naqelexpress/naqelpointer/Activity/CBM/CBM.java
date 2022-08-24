@@ -1,14 +1,15 @@
 package com.naqelexpress.naqelpointer.Activity.CBM;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.Models.CommonResult;
@@ -82,7 +83,6 @@ public class CBM extends AppCompatActivity implements AlertCallback {
             }
         }, cbmRequest);
     }
-
     private CBMRequest isValid() {
         String txtheight = txtHeight.getText().toString();
         String txtlength = txtLength.getText().toString();

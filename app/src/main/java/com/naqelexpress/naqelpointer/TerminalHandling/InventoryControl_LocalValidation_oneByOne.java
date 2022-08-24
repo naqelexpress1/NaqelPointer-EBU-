@@ -40,7 +40,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.Station;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
-import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IAPICallListener;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
 

@@ -66,7 +66,7 @@ import com.naqelexpress.naqelpointer.Models.WaybillNoBarcodeModels;
 import com.naqelexpress.naqelpointer.NCLBulk.INclShipmentActivity;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
-import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IAPICallListener;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
 import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.service.NclService;

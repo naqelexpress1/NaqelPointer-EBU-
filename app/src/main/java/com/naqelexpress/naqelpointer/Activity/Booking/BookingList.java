@@ -175,7 +175,6 @@ public class BookingList extends AppCompatActivity {
     }//onActivityResult
 
     private void GetBookingList() {
-
         // GlobalVar.GV().LoadMyBooking();
         //GlobalVar.GV().LoadMyBookingList("BringBookingList",true);
         JSONObject jsonObject = new JSONObject();
@@ -196,8 +195,6 @@ public class BookingList extends AppCompatActivity {
             e.printStackTrace();
         }
         //adapter.notifyDataSetChanged();
-
-
     }
 
     private class BringBookingData extends AsyncTask<String, Void, String> {

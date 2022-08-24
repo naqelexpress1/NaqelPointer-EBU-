@@ -462,7 +462,7 @@ public class AtOrigin extends AppCompatActivity {
     public void onBackPressed() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Exit Delivery")
+        builder.setTitle("Exit At Origin")
                 .setMessage("Are you sure you want to exit without saving?")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override

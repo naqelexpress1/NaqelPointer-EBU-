@@ -1,6 +1,6 @@
 package com.naqelexpress.naqelpointer.utils;
 
-import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IPointerAPI;
 import com.naqelexpress.naqelpointer.Retrofit.RetrofitAdapter;
 
 public class NetworkingUtils {
@@ -8,7 +8,7 @@ public class NetworkingUtils {
     private static IPointerAPI iPointerAPI;
 
     public static IPointerAPI getUserApiInstance() {
-        if (iPointerAPI == null) {
+//        if (iPointerAPI == null) {
 //            OkHttpClient.Builder httpClient = new OkHttpClient.Builder()
 //                    .connectTimeout(30, TimeUnit.SECONDS)
 //                    .readTimeout(30, TimeUnit.SECONDS)
@@ -21,7 +21,7 @@ public class NetworkingUtils {
 //
 //            Retrofit retrofit = builder.build();
             iPointerAPI = RetrofitAdapter.getInstance().create(IPointerAPI.class);
-        }
+//        }
 
         return iPointerAPI;
     }

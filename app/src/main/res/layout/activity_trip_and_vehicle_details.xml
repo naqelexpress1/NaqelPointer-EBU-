@@ -142,6 +142,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/Black"
                         android:hint="@string/enterTripId"
+                        android:inputType="number"
                         android:textSize="15dp"></EditText>
 
                     <EditText
@@ -158,6 +159,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/Black"
                         android:hint="@string/enterDriverEmpId"
+                        android:inputType="number"
                         android:textSize="15dp"></EditText>
 
                     <EditText
@@ -174,6 +176,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/Black"
                         android:hint="@string/enterDriverContactNo"
+                        android:inputType="number"
                         android:textSize="15dp"></EditText>
 
                 </LinearLayout>

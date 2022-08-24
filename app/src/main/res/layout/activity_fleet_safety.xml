@@ -28,15 +28,15 @@
             android:textSize="16dp"
             android:text="@string/back"></TextView>
 
-        <TextView
-            android:id="@+id/next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.5"
-            android:textColor="@color/Black"
-            android:textSize="16dp"
-            android:gravity="right"
-            android:text="@string/next"></TextView>
+<!--        <TextView-->
+<!--            android:id="@+id/next"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1.5"-->
+<!--            android:textColor="@color/Black"-->
+<!--            android:textSize="16dp"-->
+<!--            android:gravity="right"-->
+<!--            android:text="@string/next"></TextView>-->
 
     </LinearLayout>
 

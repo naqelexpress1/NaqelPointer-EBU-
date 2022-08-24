@@ -1,5 +1,6 @@
 package com.naqelexpress.naqelpointer.utils;
 
+import com.naqelexpress.naqelpointer.Activity.InterCity.Model.InterCityModel;
 import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.Request.CBMRequest;
 import com.naqelexpress.naqelpointer.Models.Request.CommonRequest;
@@ -13,6 +14,63 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class CommonApi {
+
+    public static void submitCBM2(final Callback<CommonResult> callback, InterCityModel cbmRequest) {
+
+        NetworkingUtils.getUserApiInstance()
+                .submitInterCityDataToServer(cbmRequest)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<CommonResult>() {
+                    @Override
+                    public void onNext(CommonResult users) {
+
+                        callback.returnResult(users);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                        System.out.println("");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        callback.returnError(e.getMessage()
+                        );
+                    }
+
+
+                });
+    }
+
+    public static void submitInterCityData(final Callback<CommonResult> callback, InterCityModel cbmRequest) {
+        NetworkingUtils.getUserApiInstance()
+                .submitInterCityDataToServer(cbmRequest)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new Observer<CommonResult>() {
+                    @Override
+                    public void onNext(CommonResult users) {
+
+                        callback.returnResult(users);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+
+                        System.out.println("");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        callback.returnError(e.getMessage()
+                        );
+                    }
+                });
+    }
 
     public static void submitCBM(final Callback<CommonResult> callback, CBMRequest cbmRequest) {
 

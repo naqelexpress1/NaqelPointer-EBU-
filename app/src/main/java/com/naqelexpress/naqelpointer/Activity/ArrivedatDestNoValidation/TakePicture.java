@@ -16,12 +16,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
@@ -34,6 +28,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Activity.ArrivedDest.PalletAdapter;
 import com.naqelexpress.naqelpointer.GlobalVar;
@@ -381,8 +382,6 @@ public class TakePicture extends Fragment implements View.OnClickListener {
 
                 System.out.println(result);
             }
-
-
         }
     }
 

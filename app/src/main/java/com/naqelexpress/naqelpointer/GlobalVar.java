@@ -73,7 +73,7 @@ import com.naqelexpress.naqelpointer.Models.Enum.Enum;
 import com.naqelexpress.naqelpointer.Models.Request.AlertRequest;
 import com.naqelexpress.naqelpointer.NCLBlockWaybills.NclShipmentActivity;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
-import com.naqelexpress.naqelpointer.Retrofit.IPointerAPI;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IPointerAPI;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
 
 import org.joda.time.DateTime;

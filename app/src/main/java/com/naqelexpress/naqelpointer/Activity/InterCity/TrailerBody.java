@@ -2,11 +2,13 @@ package com.naqelexpress.naqelpointer.Activity.InterCity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
 
 public class TrailerBody extends AppCompatActivity implements View.OnClickListener{
@@ -66,24 +68,28 @@ public class TrailerBody extends AppCompatActivity implements View.OnClickListen
         switch (view.getId()) {
 
             case R.id.checkRearDoorBoltsCBY:
+                Constant.interCityModel.setCheckRearDoorBolts(1);
                 if(checkRearDoorBoltsCBN.isChecked()){
                     checkRearDoorBoltsCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkRearDoorBoltsCBN:
+                Constant.interCityModel.setCheckRearDoorBolts(0);
                 if(checkRearDoorBoltsCBY.isChecked()){
                     checkRearDoorBoltsCBY.setChecked(false);
                 }
                 break;
 
             case R.id.checkRearDoorLocksCBY:
+                Constant.interCityModel.setCheckRearDoorLocks(1);
                 if(checkRearDoorLocksCBN.isChecked()){
                     checkRearDoorLocksCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkRearDoorLocksCBN:
+                Constant.interCityModel.setCheckRearDoorLocks(0);
                 if(checkRearDoorLocksCBY.isChecked()){
                     checkRearDoorLocksCBY.setChecked(false);
                 }
@@ -91,24 +97,28 @@ public class TrailerBody extends AppCompatActivity implements View.OnClickListen
 
 
             case R.id.checkSlidingSupportCBY:
+                Constant.interCityModel.setCheckSlidingSupportPostAndItsLocking(1);
                 if(checkSlidingSupportCBN.isChecked()){
                     checkSlidingSupportCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkSlidingSupportCBN:
+                Constant.interCityModel.setCheckSlidingSupportPostAndItsLocking(0);
                 if(checkSlidingSupportCBY.isChecked()){
                     checkSlidingSupportCBY.setChecked(false);
                 }
                 break;
 
             case R.id.checkNumberPlateCBY:
+                Constant.interCityModel.setCheckNumberPlateAndHolder(1);
                 if(checkNumberPlateCBN.isChecked()){
                     checkNumberPlateCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkNumberPlateCBN:
+                Constant.interCityModel.setCheckNumberPlateAndHolder(0);
                 if(checkNumberPlateCBY.isChecked()){
                     checkNumberPlateCBY.setChecked(false);
                 }
@@ -116,24 +126,28 @@ public class TrailerBody extends AppCompatActivity implements View.OnClickListen
 
 
             case R.id.checkAirLeakCBY:
+                Constant.interCityModel.setCheckAirLeak(1);
                 if(checkAirLeakCBN.isChecked()){
                     checkAirLeakCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkAirLeakCBN:
+                Constant.interCityModel.setCheckAirLeak(0);
                 if(checkAirLeakCBY.isChecked()){
                     checkAirLeakCBY.setChecked(false);
                 }
                 break;
 
             case R.id.checkAirSuspensionCBY:
+                Constant.interCityModel.setCheckAirSuspensionCondition(1);
                 if(checkAirSuspensionCBN.isChecked()){
                     checkAirSuspensionCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkAirSuspensionCBN:
+                Constant.interCityModel.setCheckAirSuspensionCondition(0);
                 if(checkAirSuspensionCBY.isChecked()){
                     checkAirSuspensionCBY.setChecked(false);
                 }

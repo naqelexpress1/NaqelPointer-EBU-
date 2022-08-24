@@ -2,12 +2,14 @@ package com.naqelexpress.naqelpointer.Activity.InterCity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
 
 public class TrailerBodyRemarks extends AppCompatActivity implements View.OnClickListener{
@@ -54,36 +56,42 @@ public class TrailerBodyRemarks extends AppCompatActivity implements View.OnClic
         switch (view.getId()) {
 
             case R.id.landingLelFunctionalCBY:
+                Constant.interCityModel.setLandingLegFunctional(1);
                 if(landingLelFunctionalCBN.isChecked()){
                     landingLelFunctionalCBN.setChecked(false);
                 }
                 break;
 
             case R.id.landingLelFunctionalCBN:
+                Constant.interCityModel.setLandingLegFunctional(0);
                 if(landingLelFunctionalCBY.isChecked()){
                     landingLelFunctionalCBY.setChecked(false);
                 }
                 break;
 
             case R.id.landingLegsShoesCBY:
+                Constant.interCityModel.setLandingLegShoes(1);
                 if(landingLegsShoesCBN.isChecked()){
                     landingLegsShoesCBN.setChecked(false);
                 }
                 break;
 
             case R.id.landingLegsShoesCBN:
+                Constant.interCityModel.setLandingLegShoes(0);
                 if(landingLegsShoesCBY.isChecked()){
                     landingLegsShoesCBY.setChecked(false);
                 }
                 break;
 
             case R.id.checkLightsConditionCBY:
+                Constant.interCityModel.setCheckLightConditions(1);
                 if(checkLightsConditionCBN.isChecked()){
                     checkLightsConditionCBN.setChecked(false);
                 }
                 break;
 
             case R.id.checkLightsConditionCBN:
+                Constant.interCityModel.setCheckLightConditions(0);
                 if(checkLightsConditionCBY.isChecked()){
                     checkLightsConditionCBY.setChecked(false);
                 }
@@ -96,8 +104,13 @@ public class TrailerBodyRemarks extends AppCompatActivity implements View.OnClic
                 break;
 
             case R.id.next:
-                Intent intent = new Intent(getApplicationContext(), AttachPictures.class);
-                startActivity(intent);
+                if(trailerBoyRemarks.getText().toString().equals("") || trailerBoyRemarks.getText().toString().equals(null)){
+                    Constant.alert("Alert", "All Fields Required", TrailerBodyRemarks.this);
+                }else{
+                    Intent intent = new Intent(getApplicationContext(), AttachPictures.class);
+                    startActivity(intent);
+                }
+
                 break;
 
         }

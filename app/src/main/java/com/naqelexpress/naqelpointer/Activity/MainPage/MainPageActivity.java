@@ -72,7 +72,7 @@ import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.History.History;
 import com.naqelexpress.naqelpointer.Activity.IncabCheckList.IncCabChecklist;
 import com.naqelexpress.naqelpointer.Activity.Incident.Incident;
-import com.naqelexpress.naqelpointer.Activity.InterCity.TripAndVehicleDetail;
+import com.naqelexpress.naqelpointer.Activity.InterCity.AttachPictures;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.LoadtoDestination;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.SyncTripDetails;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
@@ -463,7 +463,7 @@ public class MainPageActivity
                 cellTitle[23] = "InCab CheckList";//CBU 7
                 cellTitle[24] = "Fuel Model";//CBU 7
                 cellTitle[25] = "Scan Waybills";//CBU 7
-//                cellTitle[26] = "Inter City";//CBU 7
+                cellTitle[26] = "Inter City";//CBU 7
 
             } else {
 
@@ -517,7 +517,7 @@ public class MainPageActivity
                 itemposition.put(23, 27);
                 itemposition.put(24, 31);
                 itemposition.put(25, 33);
-//                itemposition.put(26, 34);
+                itemposition.put(26, 34);
 
             } else {
                 itemposition.put(0, 11);
@@ -607,7 +607,7 @@ public class MainPageActivity
                 cellIcon[23] = R.drawable.car; //CBU
                 cellIcon[24] = R.drawable.fuel; //CBU
                 cellIcon[25] = R.drawable.scanwaybill; //CBU
-//                cellIcon[26] = R.drawable.contacts; //CBU
+                cellIcon[26] = R.drawable.contacts; //CBU
             } else {
                 cellIcon[0] = R.drawable.contacts;
                 cellIcon[1] = R.drawable.pickup; //CBU
@@ -1338,7 +1338,7 @@ public class MainPageActivity
                         break;
                     case 34:
                         if (VersionMatct()){
-                            Intent cbm = new Intent(getApplicationContext(), TripAndVehicleDetail.class);
+                            Intent cbm = new Intent(getApplicationContext(), AttachPictures.class);
                             startActivity(cbm);
                         }else{
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",

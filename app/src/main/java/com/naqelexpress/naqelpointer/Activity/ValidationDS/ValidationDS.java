@@ -1,14 +1,12 @@
 package com.naqelexpress.naqelpointer.Activity.ValidationDS;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import android.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -21,6 +19,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.naqelexpress.naqelpointer.Activity.OnlineValidation.OnlineValidation;
 import com.naqelexpress.naqelpointer.Classes.JsonSerializerDeserializer;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScannerForVS;
@@ -29,7 +30,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.BringMyRouteShipmentsRequest;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.APICall;
-import com.naqelexpress.naqelpointer.Retrofit.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IAPICallListener;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidation;
 import com.naqelexpress.naqelpointer.callback.AlertCallbackOnlineValidation;
 import com.naqelexpress.naqelpointer.service.Discrepancy;

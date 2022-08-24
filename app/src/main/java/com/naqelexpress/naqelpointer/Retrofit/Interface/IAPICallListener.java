@@ -1,4 +1,4 @@
-package com.naqelexpress.naqelpointer.Retrofit;
+package com.naqelexpress.naqelpointer.Retrofit.Interface;
 
 public interface IAPICallListener <T> {
 

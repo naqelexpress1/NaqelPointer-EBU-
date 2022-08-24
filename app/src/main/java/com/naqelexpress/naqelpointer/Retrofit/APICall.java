@@ -8,6 +8,8 @@ import android.util.Log;
 
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IAPICallListener;
+import com.naqelexpress.naqelpointer.Retrofit.Interface.IPointerAPI;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnLineValidationGWT;
 import com.naqelexpress.naqelpointer.Retrofit.Models.OnlineValidationOffset;
 import com.naqelexpress.naqelpointer.Retrofit.Request.OnlineValidationRequest;
@@ -71,7 +73,7 @@ public class APICall {
             }
 
             //TODO Update to live link
-            String url = GlobalVar.GV().NaqelPointerAPILink ;
+            String url = GlobalVar.GV().NaqelPointerAPILink;
 
             IPointerAPI iPointerAPI = GlobalVar.getIPointerAPI(url,420,420); //420
             Call<RetrofitCallResponse.OnlineValidationGWTResponse> call = iPointerAPI.GetOnlineValidationDataGWT();

@@ -49,7 +49,7 @@
     <string name="dispatchChecklist">Dispatch Checklist</string>
     <string name="spareTire">Spare Tire</string>
     <string name="greaseHubCup">Grease Hub Cup(Yes/No)</string>
-    <string name="damagesOrPunctureIfYesThanAddPicture">Damage of Puncture (If YES, than add a picture and highlight to the local head)</string>
+    <string name="damagesOrPunctureIfYesThanAddPicture">Damage or Puncture (If YES, than add a picture and highlight to the local head)</string>
     <string name="back"><u>Back</u></string>
     <string name="next"><u>Next</u></string>
 

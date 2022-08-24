@@ -1,5 +1,6 @@
-package com.naqelexpress.naqelpointer.Retrofit;
+package com.naqelexpress.naqelpointer.Retrofit.Interface;
 
+import com.naqelexpress.naqelpointer.Activity.InterCity.Model.InterCityModel;
 import com.naqelexpress.naqelpointer.JSON.Request.UpdateWaybillRequest;
 import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.Models.DistrictDataModel;
@@ -27,6 +28,16 @@ import retrofit2.http.POST;
 import rx.Observable;
 
 public interface IPointerAPI {
+//
+//    @POST("SumbitCBM")
+//    Observable<CommonResult> SumbitCBM(@Body CBMRequest cbmRequest);
+
+    // req 1
+    @POST("InsertInterCityTripDetail")
+    Observable<CommonResult> submitInterCityDataToServer(@Body InterCityModel interCityModel);
+
+    @POST("SumbitCBM")
+    Observable<CommonResult> SumbitCBM(@Body CBMRequest cbmRequest);
 
     @GET("GetOnlineValidationData")
     Call<RetrofitCallResponse.OnlineValidationResponse> GetOnlineValidationData();
@@ -73,8 +84,7 @@ public interface IPointerAPI {
     @POST("GetUAEHVAlarmWaybills")
     Observable<List<WaybillNoBarcodeModels>> GetUAEHVAlarmWaybills();
 
-    @POST("SumbitCBM")
-    Observable<CommonResult> SumbitCBM(@Body CBMRequest cbmRequest);
+
 
     //Fetch Fuel Type
     @GET("FetchFuelSupplierType")

@@ -34,7 +34,7 @@ import java.io.IOException;
 public class AttachPictures extends AppCompatActivity implements View.OnClickListener{
 
     TextView back, next;
-    Button uploadFile;
+    static Button uploadFile;
 
     public static final int BITMAP_SAMPLE_SIZE = 8;
     File filename;
@@ -61,6 +61,9 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
         next.setOnClickListener(this);
         uploadFile.setOnClickListener(this);
 
+        int noOfImages = 8 - Constant.attachments.size();
+        uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
+
         gridview = (GridView) findViewById(R.id.imagesGridview);
         SharedPreferences mySettings;
         mySettings = getSharedPreferences("ImageDetails", MODE_PRIVATE);
@@ -68,7 +71,7 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
         gridview.setColumnWidth(gridSize + 10);
 
 
-        adapter = new ImagesAdapter(this, Constant.attachments);
+        adapter = new ImagesAdapter(this, Constant.attachments, true);
         gridview.setAdapter(adapter);
 
 
@@ -96,14 +99,20 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
                 break;
 
             case R.id.next:
-                Intent intent = new Intent(getApplicationContext(), FleetSafety.class);
-                startActivity(intent);
+                if(Constant.attachments.size() == 8){
+                    Intent intent = new Intent(getApplicationContext(), FleetSafety.class);
+                    startActivity(intent);
+                }else{
+                    Constant.alert("ERROR", "PLesae Upload 8 Pictures to Continue", AttachPictures.this);
+                }
+
+
                 break;
 
         }
     }
     public void setImageInImageView(String imagePath) {
-        adapter = new ImagesAdapter(this, Constant.attachments);
+        adapter = new ImagesAdapter(this, Constant.attachments, true);
         gridview.setAdapter(adapter);
 
     }
@@ -147,6 +156,7 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
         super.onActivityResult(requestCode, resultCode, data);
         // handle result of CropImageActivity
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
                 Constant.attachments.add(filename);
@@ -157,6 +167,9 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
                 filename = null;
 
             }
+
+            int noOfImages = 8 - Constant.attachments.size();
+            uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
         }
     }
 

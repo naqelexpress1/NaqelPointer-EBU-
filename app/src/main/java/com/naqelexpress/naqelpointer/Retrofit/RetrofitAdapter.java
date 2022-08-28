@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Retrofit;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.naqelexpress.naqelpointer.GlobalVar;
 
 import java.util.concurrent.TimeUnit;
 
@@ -14,7 +15,7 @@ public class RetrofitAdapter {
 
     private static Retrofit retrofit;
     private static Gson gson;
-    private static final String BASE_URL = "http://localhost:49982/Api/Pointer/";//GlobalVar.GV().NaqelPointerAPILink_For5_1;
+    private static final String BASE_URL = GlobalVar.GV().NaqelPointerAPILink_For5_1; // "http://localhost:49982/Api/Pointer/";//
 
     public static synchronized Retrofit getInstance() {
 

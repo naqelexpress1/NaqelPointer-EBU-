@@ -259,12 +259,12 @@ public class DeliveryFirstFragment
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                     } else {
                         Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        startActivityForResult(intent, 1);
                     }
                 }
             });
 
-           /* txtWaybillNo.addTextChangedListener(new TextWatcher() {
+            txtWaybillNo.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 }
@@ -278,15 +278,15 @@ public class DeliveryFirstFragment
                     if (!isExist) {
 
 
-                        if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                        if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
                             //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                            setTxtWaybillNo();
+//                            setTxtWaybillNo();
                     }
 
                 }
-            });*/
+            });
 
-            txtWaybillNo.addTextChangedListener(textWatcher);
+//            txtWaybillNo.addTextChangedListener(textWatcher);
             initViews();
 
             // GlobalVar.GV().activity.setRequestedOrientation(getResources().getConfiguration().orientation);
@@ -296,25 +296,26 @@ public class DeliveryFirstFragment
         return rootView;
     }
 
-    private void setTxtWaybillNo() {
-
-        String barcode = txtWaybillNo.getText().toString();
-        txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            txtWaybillNo.setText(barcode.substring(0, 8));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
-
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-
-    }
+//    private void setTxtWaybillNo() {
+//
+//        String barcode = txtWaybillNo.getText().toString();
+//        txtWaybillNo.removeTextChangedListener(textWatcher);
+//        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+//            txtWaybillNo.setText(barcode);
+////            txtWaybillNo.setText(barcode.substring(0, 8));
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+//            txtWaybillNo.setText(barcode);
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
+//
+//
+//        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//
+//    }
 
     String mobilevalidate = "", phonenovalidate = "";
     boolean watsapp = false;
@@ -408,14 +409,14 @@ public class DeliveryFirstFragment
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() > 8)
-                            barcode = barcode.substring(0, 8);
+                        if (barcode.length() >= 8)
+//                            barcode = barcode.substring(0, 8);
                         txtWaybillNo.setText(barcode);
                         GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                     }
@@ -825,26 +826,26 @@ public class DeliveryFirstFragment
         popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
     }
 
-    protected TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // your logic here
-            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
-                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                setTxtWaybillNo();
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // your logic here
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // your logic here
-        }
-    };
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 
 }

@@ -69,7 +69,7 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
         gridview.setColumnWidth(gridSize + 10);
 
 
-        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture);
+        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture, false);
         gridview.setAdapter(adapter);
 
 
@@ -105,7 +105,7 @@ public class SafetryCurtainsAndCargoPicture extends AppCompatActivity implements
     }
 
     public void setImageInImageView(String imagePath) {
-        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture);
+        adapter = new ImagesAdapter(this, Constant.safetyCurtainsCargoPicture, false);
         gridview.setAdapter(adapter);
 
     }

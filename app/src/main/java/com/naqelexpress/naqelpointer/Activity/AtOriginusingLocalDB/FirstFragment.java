@@ -54,11 +54,10 @@ public class FirstFragment extends Fragment {
         {
             if (rootView == null) {
 
-
-
                 rootView = inflater.inflate(R.layout.atoriginfirstnew, container, false);
                 lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
 
+//                Toast.makeText(getActivity(), "First Fragment", Toast.LENGTH_SHORT).show();
                 txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
                 txtBarCode.addTextChangedListener(new TextWatcher() {
@@ -95,7 +94,7 @@ public class FirstFragment extends Fragment {
                             GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                             GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                         } else
-                            startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                            getActivity().startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                     }
                 });
 
@@ -139,6 +138,7 @@ public class FirstFragment extends Fragment {
 //        utilities utilities = new utilities();
 //        ValidateWayBill(utilities.findwaybillno(barcode));
         ValidateWayBill(barcode);
+
 //
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
 //            //txtBarCode.setText(barcode.substring(0, 8));
@@ -165,7 +165,7 @@ public class FirstFragment extends Fragment {
                     dbConnections.AtOriginScannedWaybill(waybillno, getView());
                     dbConnections.close();
                     GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.barcodescanned);
-                    txtBarCode.setText("");
+//                    txtBarCode.setText("");
                     adapter.notifyDataSetChanged();
                     validatewaybilldetails.add(waybillno);
                     lbTotal.setText(getString(R.string.lbCount) + Selectedwaybilldetails.size());

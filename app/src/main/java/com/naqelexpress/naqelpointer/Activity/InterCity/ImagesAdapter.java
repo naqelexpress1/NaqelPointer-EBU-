@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
 import com.naqelexpress.naqelpointer.R;
 
 import java.io.File;
@@ -19,9 +20,10 @@ import java.util.List;
 
 public class ImagesAdapter extends ArrayAdapter<File> {
 
-
-    public ImagesAdapter(@NonNull Context context, List<File> courseModelArrayList) {
+    boolean isAttachment;
+    public ImagesAdapter(@NonNull Context context, List<File> courseModelArrayList, boolean isAttachment) {
         super(context, 0, courseModelArrayList);
+        this.isAttachment = isAttachment;
     }
 
     @NonNull
@@ -48,6 +50,10 @@ public class ImagesAdapter extends ArrayAdapter<File> {
 //                Toast.makeText(getContext().getApplicationContext(), String.valueOf(position), Toast.LENGTH_SHORT).show();
                 File file = getItem(position);
                 remove(file);
+                if (isAttachment){
+                    int noOfImages = 8 - Constant.attachments.size();
+                    AttachPictures.uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
+                }
             }
         });
         return listitemView;

@@ -72,6 +72,7 @@ public class DeliveryActivity
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.delivery);
+//        Toast.makeText(this, "This", Toast.LENGTH_SHORT).show();
 
         bundle = getIntent().getExtras();
         TimeIn = DateTime.now();

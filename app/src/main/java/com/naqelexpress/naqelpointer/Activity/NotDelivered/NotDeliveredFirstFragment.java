@@ -1,13 +1,11 @@
 package com.naqelexpress.naqelpointer.Activity.NotDelivered;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,6 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
@@ -24,8 +26,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class NotDeliveredFirstFragment extends Fragment {
 
@@ -42,7 +42,26 @@ public class NotDeliveredFirstFragment extends Fragment {
 
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybillNo.addTextChangedListener(textWatcher);
+//            txtWaybillNo.addTextChangedListener(textWatcher);
+
+            txtWaybillNo.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+//                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
+//                        AddNewPiece();
+                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
+//                        setTxtWaybillNo();
+                }
+            });
+
 //            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtReason = (EditText) rootView.findViewById(R.id.txtReason);
             txtReason.setInputType(InputType.TYPE_NULL);
@@ -80,7 +99,6 @@ public class NotDeliveredFirstFragment extends Fragment {
             });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            btnOpenCamera.setVisibility(View.GONE);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -89,7 +107,7 @@ public class NotDeliveredFirstFragment extends Fragment {
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                     } else {
                         Intent intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        getActivity().startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
                     }
                 }
             });
@@ -107,25 +125,27 @@ public class NotDeliveredFirstFragment extends Fragment {
         return rootView;
     }
 
-    private void setTxtWaybillNo() {
-
-        String barcode = txtWaybillNo.getText().toString();
-        txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-            txtWaybillNo.setText(barcode.substring(0, 8));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
-
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-
-    }
+//    private void setTxtWaybillNo() {
+//
+//        String barcode = txtWaybillNo.getText().toString();
+////        txtWaybillNo.removeTextChangedListener(textWatcher);
+//        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+////            txtWaybillNo.setText(barcode.substring(0, 8));
+//            txtWaybillNo.setText(barcode);
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+////            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            txtWaybillNo.setText(barcode);
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
+//
+//
+//        ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//
+//    }
 
     public ArrayList<String> DeliveryStatusNameList = new ArrayList<>();
     public ArrayList<String> DeliveryStatusFNameList = new ArrayList<>();
@@ -167,13 +187,14 @@ public class NotDeliveredFirstFragment extends Fragment {
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
                         txtWaybillNo.setText(barcode);
                     }
                 }
+
             }
         }
     }
+
 
 
     @Override
@@ -204,25 +225,25 @@ public class NotDeliveredFirstFragment extends Fragment {
         }
     }
 
-    protected TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // your logic here
-            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
-                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                setTxtWaybillNo();
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // your logic here
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // your logic here
-        }
-    };
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 }

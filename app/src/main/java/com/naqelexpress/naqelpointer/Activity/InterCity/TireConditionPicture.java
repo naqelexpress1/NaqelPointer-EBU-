@@ -73,7 +73,7 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
         gridview.setColumnWidth(gridSize + 10);
 
 
-        adapter = new ImagesAdapter(this, Constant.tireConditionPicture);
+        adapter = new ImagesAdapter(this, Constant.tireConditionPicture, false);
         gridview.setAdapter(adapter);
 
 
@@ -109,7 +109,7 @@ public class TireConditionPicture extends AppCompatActivity implements View.OnCl
 
 
     public void setImageInImageView() {
-            adapter = new ImagesAdapter(this, Constant.tireConditionPicture);
+            adapter = new ImagesAdapter(this, Constant.tireConditionPicture, false);
             gridview.setAdapter(adapter);
     }
 

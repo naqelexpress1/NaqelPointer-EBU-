@@ -146,22 +146,22 @@ public class TripAndVehicleDetail  extends AppCompatActivity implements View.OnC
 //                }, Constant.interCityModel);
 
 //                prepareToSubmitData();
-//                if(tripId.getText().toString().equals(null) || vehicleTractorHead.getText().toString().equals(null) ||
-//                        driverEmpId.getText().toString().equals(null) || driverEmpName.getText().toString().equals(null) ||
-//                        driverContactNo.getText().toString().equals(null) || tripId.getText().toString().equals("") ||
-//                        vehicleTractorHead.getText().toString().equals("") || driverEmpId.getText().toString().equals("") ||
-//                        driverEmpName.getText().toString().equals("") ||
-//                        driverContactNo.getText().toString().equals("")){
-//                    Constant.alert("Alert", "All Fields Required", TripAndVehicleDetail.this);
-//                }else{
-//                    Constant.interCityModel.setTripId(Integer.parseInt(tripId.getText().toString()));
-//                    Constant.interCityModel.setVehicleTractorHeadAndTrailer(vehicleTractorHead.getText().toString());
-//                    Constant.interCityModel.setDriverEmpId(Integer.parseInt(driverEmpId.getText().toString()));
-//                    Constant.interCityModel.setDriverEmpName(driverEmpName.getText().toString());
-//                    Constant.interCityModel.setDriverContactNo(driverContactNo.getText().toString());
+                if(tripId.getText().toString().equals(null) || vehicleTractorHead.getText().toString().equals(null) ||
+                        driverEmpId.getText().toString().equals(null) || driverEmpName.getText().toString().equals(null) ||
+                        driverContactNo.getText().toString().equals(null) || tripId.getText().toString().equals("") ||
+                        vehicleTractorHead.getText().toString().equals("") || driverEmpId.getText().toString().equals("") ||
+                        driverEmpName.getText().toString().equals("") ||
+                        driverContactNo.getText().toString().equals("")){
+                    Constant.alert("Alert", "All Fields Required", TripAndVehicleDetail.this);
+                }else{
+                    Constant.interCityModel.setTripId(Integer.parseInt(tripId.getText().toString()));
+                    Constant.interCityModel.setVehicleTractorHeadAndTrailer(vehicleTractorHead.getText().toString());
+                    Constant.interCityModel.setDriverEmpId(Integer.parseInt(driverEmpId.getText().toString()));
+                    Constant.interCityModel.setDriverEmpName(driverEmpName.getText().toString());
+                    Constant.interCityModel.setDriverContactNo(driverContactNo.getText().toString());
                     Intent intent = new Intent(getApplicationContext(), TireConditionPicture.class);
                     startActivity(intent);
-//                }
+                }
                 break;
 
         }

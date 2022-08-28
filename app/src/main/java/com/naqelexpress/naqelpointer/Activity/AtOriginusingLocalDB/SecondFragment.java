@@ -14,8 +14,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,23 +65,43 @@ public class SecondFragment extends Fragment {
 
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        //finish();
-                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
+            txtBarCode.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
+                        //if (setTxtWaybillNo())
                         setBarcode();
-                        return true;
                     }
-                    return false;
                 }
             });
+
+//            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        //finish();
+//                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//
+//                        setBarcode();
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
             //cmrabtn.setVisibility(View.GONE);
@@ -105,7 +126,7 @@ public class SecondFragment extends Fragment {
                         GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
                     } else
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
+                        getActivity().startActivityForResult(intent, 2);
                 }
             });
 
@@ -157,7 +178,7 @@ public class SecondFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d("SECFRAG", "onActivityResult: ");
-        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
+        if (requestCode == 2 && resultCode == RESULT_OK) {
             if (data != null) {
                 Bundle extras = data.getExtras();
                 if (extras != null) {

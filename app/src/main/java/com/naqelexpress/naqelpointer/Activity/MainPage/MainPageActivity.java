@@ -72,7 +72,7 @@ import com.naqelexpress.naqelpointer.Activity.FuelModelEBU.Fuel;
 import com.naqelexpress.naqelpointer.Activity.History.History;
 import com.naqelexpress.naqelpointer.Activity.IncabCheckList.IncCabChecklist;
 import com.naqelexpress.naqelpointer.Activity.Incident.Incident;
-import com.naqelexpress.naqelpointer.Activity.InterCity.AttachPictures;
+import com.naqelexpress.naqelpointer.Activity.InterCity.TripAndVehicleDetail;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.LoadtoDestination;
 import com.naqelexpress.naqelpointer.Activity.LoadtoDestLocalDB.SyncTripDetails;
 import com.naqelexpress.naqelpointer.Activity.Login.SplashScreenActivity;
@@ -1338,7 +1338,7 @@ public class MainPageActivity
                         break;
                     case 34:
                         if (VersionMatct()){
-                            Intent cbm = new Intent(getApplicationContext(), AttachPictures.class);
+                            Intent cbm = new Intent(getApplicationContext(), TripAndVehicleDetail.class);
                             startActivity(cbm);
                         }else{
                             GlobalVar.GV().ShowDialog(MainPageActivity.this, "Info.",

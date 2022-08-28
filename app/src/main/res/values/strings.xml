@@ -2,14 +2,14 @@
 <resources>
 
     <string name="enterTextHere">Enter Text Here</string>
-    <string name="trailerBoy">Trailer Boy *</string>
+    <string name="trailerBoy">Trailer Body *</string>
     <string name="checkRearDoorBolts">Check rear door bolts, If available?</string>
     <string name="checkRearDoorLocks">Check rear door locks, If available?</string>
     <string name="checkSlidingSupport">Check sliding support post &amp; its locking mechanism</string>
     <string name="checkNumberPlate">Check number plate &amp; its holder</string>
     <string name="checkAirLeak">Check Air leak. If Ok</string>
     <string name="checkAirSuspension">Check Air suspension condition, If OK</string>
-    <string name="trailerBoyRemarks">Trailer Boy - Remark</string>
+    <string name="trailerBoyRemarks">Trailer Body - Remark</string>
     <string name="chassisBeams">Chassis Beams *</string>
     <string name="landingLelFunctional">Landing Leg functional?</string>
     <string name="landingLegsShoes">Landing legs shoes</string>

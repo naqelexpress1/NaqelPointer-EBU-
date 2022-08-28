@@ -8,8 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -19,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -55,6 +54,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
         setContentView(R.layout.waybillmeasurementactivity);
 
+        Toast.makeText(this, "Measurement Screen", Toast.LENGTH_SHORT).show();
         btnStart = (Button) findViewById(R.id.btnStart);
         btnNext = (Button) findViewById(R.id.btnNext);
         btnPlus = (Button) findViewById(R.id.btnPlus);
@@ -98,7 +98,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             txtTotalPieces.setEnabled(false);
         }
 
-        txtWaybillNo.addTextChangedListener(textWatcher);
+//        txtWaybillNo.addTextChangedListener(textWatcher);
       /*  txtWaybillNo.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -228,7 +228,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybillNo.getText().toString();
-        txtWaybillNo.removeTextChangedListener(textWatcher);
+//        txtWaybillNo.removeTextChangedListener(textWatcher);
         if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
 //            txtWaybillNo.setText(barcode.substring(0, 8));
             txtWaybillNo.setText(barcode);
@@ -737,26 +737,26 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
         return false;
     }
 
-    protected TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // your logic here
-            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
-                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                setTxtWaybillNo();
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // your logic here
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // your logic here
-        }
-    };
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 }
 

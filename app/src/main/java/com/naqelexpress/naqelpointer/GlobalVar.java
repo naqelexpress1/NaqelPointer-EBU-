@@ -138,15 +138,23 @@ public class GlobalVar {
     public int AppID = 6;
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
-    public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
-    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
+//    public String NaqelPointerAPILink_For5_1 =          "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//    public String NaqelPointerAPILink_For5_2 =          "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//    public String NaqelPointerAPILink =                 "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//    public String NaqelPointerAPILink_UploadImage =     "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//    public String NaqelPointerAPILink1_ForDomain =      "https://naqelpointerpd.naqelksa.com/api/pointer/";
+
+    public String NaqelPointerAPILink_For5_1 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_2 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink =                 "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_UploadImage =     "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink1_ForDomain =      "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+
+
+    public String NaqelPointerAPILink2_ForDomain =      "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILinkForHighValueAlarm ="https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerLivetrackingPusher =      "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+    public String NaqelApk =                            "https://naqelpointersc.naqelksa.com/Download/";
     static IPointerAPI iPointerAPI;
 
 
@@ -3490,8 +3498,11 @@ public class GlobalVar {
     }
 
     public String GetDomainURL(Context context) {
-        DBConnections dbConnections = new DBConnections(context, null);
-        return dbConnections.GetPrimaryDomain(context);
+
+        return NaqelPointerAPILink;
+
+//        DBConnections dbConnections = new DBConnections(context, null);
+//        return dbConnections.GetPrimaryDomain(context);
 
     }
 

@@ -169,7 +169,13 @@ public class AttachPictures extends AppCompatActivity implements View.OnClickLis
             }
 
             int noOfImages = 8 - Constant.attachments.size();
-            uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
+            if(noOfImages == 0){
+                uploadFile.setText("DONE");
+                uploadFile.setClickable(false);
+            }else{
+                uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
+            }
+
         }
     }
 

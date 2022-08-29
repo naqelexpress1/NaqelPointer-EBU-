@@ -52,6 +52,7 @@ public class ImagesAdapter extends ArrayAdapter<File> {
                 remove(file);
                 if (isAttachment){
                     int noOfImages = 8 - Constant.attachments.size();
+                    AttachPictures.uploadFile.setClickable(true);
                     AttachPictures.uploadFile.setText(String.valueOf(noOfImages) + " Images to Upload");
                 }
             }

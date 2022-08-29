@@ -13,7 +13,7 @@ import retrofit2.http.Part;
 public interface Interface {
     @Multipart
     @POST("uploadInterCityTripImages")
-    Call<CommonResult> uploadImages(@Part MultipartBody.Part file);
+    Call<String> uploadImages(@Part MultipartBody.Part file);
 
 
     @POST("InsertInterCityTripDetail")

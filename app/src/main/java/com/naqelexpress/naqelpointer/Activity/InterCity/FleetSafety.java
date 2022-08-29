@@ -1,6 +1,10 @@
 package com.naqelexpress.naqelpointer.Activity.InterCity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -13,8 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.naqelexpress.naqelpointer.Activity.Constants.ConnectionHelper;
 import com.naqelexpress.naqelpointer.Activity.Constants.Constant;
+import com.naqelexpress.naqelpointer.Activity.MainPage.MainPageActivity;
 import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.Models.CommonResult;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Retrofit.Interface.Interface;
 import com.naqelexpress.naqelpointer.Retrofit.Interface.OkRetrofitClient;
@@ -46,7 +50,7 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
     CheckBox fireExtinguisherAvailabilityCBY, fireExtinguisherAvailabilityCBN,
             fireExtinguisherValidityCBY, fireExtinguisherValidityCBN;
     Button submit;
-    static ProgressDialog progressDialog = null;
+    static ProgressDialog pd;
     ArrayList<String> fileNames = new ArrayList<String>();
 
     @Override
@@ -110,6 +114,13 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
 
             case R.id.submit:
                 if (ConnectionHelper.isConnectingToInternet(FleetSafety.this)) {
+
+                    pd = new ProgressDialog(FleetSafety.this);
+                    pd.setTitle("Loading");
+                    pd.setMessage("Submitting Inter City Trip Details ");
+                    pd.setCancelable(false);
+                    pd.show();
+
                     fileNames.clear();
                     for (int i = 0; i < Constant.tireConditionPicture.size(); i++) {
                         String[] checkFileName = Constant.tireConditionPicture.get(i).getAbsolutePath().split("/");
@@ -150,77 +161,6 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
                     } else {
                         prepareToSubmitData();
                     }
-
-
-//                    new SubmitDetails(FleetSafety.this).verifyNumber(Constant.interCityModel);
-
-//                    prepareToSubmitData();
-
-//                    CommonApi.submitCBM2(new com.naqelexpress.naqelpointer.callback.Callback<CommonResult>() {
-//                        @Override
-//                        public void returnResult(CommonResult result) {
-//                            System.out.println();
-//
-//                            String msg = result.getErrorMessage();
-//                            if (result.getHasError())
-//                                GlobalVar.GV().alertMsgAll("Info", msg, FleetSafety.this,
-//                                        Enum.NORMAL_TYPE, "CBM");
-//                            else
-//                                GlobalVar.GV().alertMsgAll("Info", msg, FleetSafety.this,
-//                                        Enum.SUCCESS_TYPE, "CBM");
-//
-//                        }
-//
-//                        @Override
-//                        public void returnError(String message) {
-//                            //mView.showError(message);
-//                            GlobalVar.GV().alertMsgAll("Info", "Something went wrong , please try again", FleetSafety.this,
-//                                    Enum.NORMAL_TYPE, "CBM");
-//                            System.out.println(message);
-//
-//                        }
-//                    }, Constant.interCityModel);
-
-//                    progressDialog = ProgressDialog.show(FleetSafety.this,
-//                            "Please wait.", "Update Facility Login.", true);
-
-
-//                    CommonApi.submitInterCityData(new Callback<CommonResult>() {
-//                        @Override
-//                        public void onResponse(Call<CommonResult> call, Response<CommonResult> response) {
-//
-//                        }
-//
-//                        @Override
-//                        public void onFailure(Call<CommonResult> call, Throwable t) {
-//                            if (progressDialog != null && progressDialog.isShowing()) {
-//                                progressDialog.dismiss();
-//                                progressDialog = null;
-//                            }
-//                            System.out.println(message);
-//                        }
-//
-//                        @Override
-//                        public void returnResult(CommonResult result) {
-//                            if (progressDialog != null && progressDialog.isShowing()) {
-//                                progressDialog.dismiss();
-//                                progressDialog = null;
-//                            }
-//
-//                            String msg = result.getErrorMessage();
-//                            if (result.getHasError())
-//                                Constant.alert("Info", msg, FleetSafety.this);
-////                            GlobalVar.GV().alertMsgAll("Info", msg, FleetSafety.this,
-////                                    Enum.NORMAL_TYPE, "CBM");
-//                            else
-//                                Constant.alert("Info", msg, FleetSafety.this);
-////                            GlobalVar.GV().alertMsgAll("Info", msg, FleetSafety.this,
-////                                    Enum.SUCCESS_TYPE, "CBM");
-//
-//
-//                        }
-//
-//                    }, Constant.interCityModel);
                 } else {
                     Constant.alert("Internet Connection", "Make sure you are connected with internet", FleetSafety.this);
                 }
@@ -235,153 +175,6 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
         }
     }
 
-//    public void prepareToUploadImages(){
-//        final ProgressDialog progresRing = ProgressDialog.show(FleetSafety.this,
-//                "Uploading Images", "please Wait uploading images...", true);
-//        progresRing.setCancelable(false);
-//
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    for (int i = 0; i < imagepositions.size(); i++) {
-//                        try {
-//                            boolean upload = false;
-//                            while (!upload) {
-//                                String result = new uploadImages().execute(String.valueOf(imagepositions.get(i))).get();
-//                                if (result != null && result.contains("Created Successfully")) {
-//                                    deleteimages(imagepositions.get(i));
-//                                    upload = true;
-//                                }
-//                            }
-//                        } catch (Exception e) {
-//                            System.out.println(e.toString());
-//                        }
-//
-//                        if (imagepositions.size() - 1 == i) {
-//                            String result = alertMail();
-//
-//                            try {
-//                                JSONObject jsonObject = new JSONObject(result);
-//                                if (!jsonObject.getBoolean("HasError")) {
-//
-//                                    GlobalVar.hideKeyboardFrom(getApplicationContext(), getWindow().getDecorView().getRootView());
-//                                    Constant.alert("Info", "Successfully Inserted ", FleetSafety.this);
-//                                } else {
-//
-//                                    Constant.alert("Info", "Something Error , kindly please update again ", FleetSafety.this);
-//                                }
-//
-//                            } catch (JSONException e) {
-//                                e.printStackTrace();
-//                            }
-//                            // finish();
-//                        }
-//                    }
-//
-//                } catch (Exception e) {
-//
-//                }
-//                progresRing.dismiss();
-//
-//            }
-//        }).start();
-//    }
-//    private class uploadImages extends AsyncTask<String, Integer, String> {
-//        StringBuffer buffer;
-//        int position = 0;
-//
-//        @Override
-//        protected void onPreExecute() {
-//
-//            // if (progressDialog == null)
-//            //   progressDialog = ProgressDialog.show(ArrivedatDestination.this,
-//            //         "Please wait.", "Uploading Images to Server.", true);
-//            super.onPreExecute();
-//
-//        }
-//
-//        protected String doInBackground(String... params) {
-//            position = Integer.parseInt(params[0]);
-//            JSONObject jsonObject = null;
-//            try {
-//                jsonObject = new JSONObject();
-//                jsonObject.put("ImageName", takePicture.sendimages.get(position));
-//                String image = convertimage(position);
-//                if (!image.equals("error"))
-//                    jsonObject.put("FileName", image);
-//                else
-//                    return "201 - Created Successfully";
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//
-//            }
-//
-//            String jsonData = jsonObject.toString();
-//            HttpURLConnection httpURLConnection = null;
-//            OutputStream dos = null;
-//            InputStream ist = null;
-//
-//            try {
-//
-//                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "upload");
-//                httpURLConnection = (HttpURLConnection) url.openConnection();
-//
-//                httpURLConnection.setRequestMethod("POST");
-//                httpURLConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-//                httpURLConnection.setDoInput(true);
-//                httpURLConnection.setDoOutput(true);
-//                httpURLConnection.connect();
-//
-//                dos = httpURLConnection.getOutputStream();
-//                httpURLConnection.getOutputStream();
-//                dos.write(jsonData.getBytes());
-//
-//                ist = httpURLConnection.getInputStream();
-//                String line;
-//                BufferedReader reader = new BufferedReader(new InputStreamReader(ist));
-//                buffer = new StringBuffer();
-//
-//                while ((line = reader.readLine()) != null) {
-//                    buffer.append(line);
-//                }
-//                return String.valueOf(buffer);
-//            } catch (Exception ignored) {
-//            } finally {
-//                try {
-//                    if (ist != null)
-//                        ist.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                try {
-//                    if (dos != null)
-//                        dos.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                if (httpURLConnection != null)
-//                    httpURLConnection.disconnect();
-//            }
-//            return null;
-////
-//
-//
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute("");
-//            if (result != null) {
-//
-//
-//                System.out.println(result);
-//            }
-//
-//
-//        }
-//
-//    }
 
     // Uploading Image/Video
     private void prepareToUploadImages(final String filePath) {
@@ -401,13 +194,13 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
             // Generate the implementation of the APIService interface
             Interface client = retrofit.getClient();
             // Create the ASYNCHRONOUS call
-            Call<CommonResult> call = client.uploadImages(fileToUpload);//(ApplicantCode, mobileNumber);
+            Call<String> call = client.uploadImages(fileToUpload);//(ApplicantCode, mobileNumber);
 
-            call.enqueue(new Callback<CommonResult>() {
+            call.enqueue(new Callback<String>() {
                 @Override
-                public void onResponse(Call<CommonResult> call, Response<CommonResult> response) {
+                public void onResponse(Call<String> call, Response<String> response) {
 
-                    if (response.code() == 1) {
+                    if (response.code() == 200) {
                         Constant.AllImages.remove(0);
                         if (Constant.AllImages.size() > 0) {
                             prepareToUploadImages(Constant.AllImages.get(0).getPath());
@@ -415,13 +208,14 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
                             prepareToSubmitData();
                         }
                     } else {
+                        pd.dismiss();
                         Constant.alert("Error", "Error Occurred Please Try Again", FleetSafety.this);
                     }
                 }
 
                 @Override
-                public void onFailure(Call<CommonResult> call, Throwable t) {
-
+                public void onFailure(Call<String> call, Throwable t) {
+                    pd.dismiss();
                 }
             });
 
@@ -455,7 +249,7 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
             jsonObject.put("checkNumberPlateAndHolder", String.valueOf(Constant.interCityModel.getCheckNumberPlateAndHolder()));
             jsonObject.put("checkAirLeak", String.valueOf(Constant.interCityModel.getCheckAirLeak()));
             jsonObject.put("checkAirSuspensionCondition", String.valueOf(Constant.interCityModel.getCheckAirSuspensionCondition()));
-            jsonObject.put("trailerBodyRemarks", Constant.interCityModel.getTrailerBodyRemarks());
+            jsonObject.put("trailerBodyRemarks", String.valueOf(Constant.interCityModel.getTrailerBodyRemarks()));
             jsonObject.put("landingLegFunctional", String.valueOf(Constant.interCityModel.getLandingLegFunctional()));
             jsonObject.put("landingLegShoes", String.valueOf(Constant.interCityModel.getLandingLegShoes()));
             jsonObject.put("checkLightConditions", String.valueOf(Constant.interCityModel.getCheckLightConditions()));
@@ -495,16 +289,12 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
     private class insertTripAndVehicleDetail extends AsyncTask<String, Void, String> {
         String result = "";
         StringBuffer buffer;
-        ProgressDialog pd;
         String DomainURL = "";
         String isInternetAvailable = "";
 
         @Override
         protected void onPreExecute() {
-            pd = new ProgressDialog(FleetSafety.this);
-            pd.setTitle("Loading");
-            pd.setMessage("Submitting Inter City Trip Details ");
-            pd.show();
+
             super.onPreExecute();
             DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
         }
@@ -518,7 +308,7 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
             try {
                 DomainURL = GlobalVar.GV().GetDomainURL(getApplicationContext());
 //                http://localhost:49982/Api/Pointer/InsertInterCityTripDetail
-                URL url = new URL("http://localhost:49982/Api/Pointer/" + "InsertInterCityTripDetail");
+                URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "InsertInterCityTripDetail");
                 httpURLConnection = (HttpURLConnection) url.openConnection();
 
                 httpURLConnection.setRequestMethod("POST");
@@ -564,13 +354,16 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
 
         @Override
         protected void onPostExecute(String finalJson) {
+
             if (finalJson != null) {
+                exitConfirmation(FleetSafety.this,"DONE", "Your data has been submitted");
                 Constant.interCityModel = null;
                 Constant.safetyCurtainsCargoPicture.clear();
                 Constant.tireConditionPicture.clear();
                 Constant.attachments.clear();
                 pd.dismiss();
             } else {
+                pd.dismiss();
                 //
                 // GlobalVar.GV().ShowSnackbar(getWindow().getDecorView().getRootView(), getString(R.string.wentwrong), GlobalVar.AlertType.Error);
                 if (isInternetAvailable.contains("No address associated with hostname")) {
@@ -587,6 +380,22 @@ public class FleetSafety extends AppCompatActivity implements View.OnClickListen
                 pd.dismiss();
             super.onPostExecute(String.valueOf(finalJson));
         }
+    }
+
+    public static void exitConfirmation(Activity activity, String title, String message){
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        Intent intent = new Intent(activity, MainPageActivity.class);
+                        activity.startActivity(intent);
+                        activity.finish();
+                    }
+                }).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
 

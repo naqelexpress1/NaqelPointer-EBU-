@@ -107,6 +107,7 @@ public class TrailerBodyRemarks extends AppCompatActivity implements View.OnClic
                 if(trailerBoyRemarks.getText().toString().equals("") || trailerBoyRemarks.getText().toString().equals(null)){
                     Constant.alert("Alert", "All Fields Required", TrailerBodyRemarks.this);
                 }else{
+                    Constant.interCityModel.setTrailerBodyRemarks(trailerBoyRemarks.getText().toString());
                     Intent intent = new Intent(getApplicationContext(), AttachPictures.class);
                     startActivity(intent);
                 }

@@ -61,6 +61,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.85"
+            android:ems="10"
             android:hint="Waybill No"
             android:inputType="number" />
 

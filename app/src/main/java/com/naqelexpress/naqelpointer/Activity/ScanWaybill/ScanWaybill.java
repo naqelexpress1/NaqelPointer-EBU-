@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.ScanWaybill;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -12,30 +13,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.MediaStore;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import android.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.naqelexpress.naqelpointer.Activity.Incident.Incident;
-import com.naqelexpress.naqelpointer.GlobalVar;
-import com.naqelexpress.naqelpointer.Models.CommonResult;
-import com.naqelexpress.naqelpointer.Models.Enum.Enum;
-import com.naqelexpress.naqelpointer.Models.Request.CBMRequest;
-import com.naqelexpress.naqelpointer.R;
-import com.naqelexpress.naqelpointer.callback.AlertCallback;
-import com.naqelexpress.naqelpointer.callback.Callback;
-import com.naqelexpress.naqelpointer.utils.CommonApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-import org.joda.time.DateTime;
+import com.naqelexpress.naqelpointer.GlobalVar;
+import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,8 +45,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
-
 public class ScanWaybill extends AppCompatActivity implements View.OnClickListener {
     EditText txtWNo, txtWidth, txtHeight, txtLength;
     ImageView image1, image2;
@@ -62,7 +53,14 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
     HashMap<Integer, String> tempimages;
     String imagenames[] = {"Waybill1.png", "Waybill2.png"};
 
+    private void setTxtWaybillNo() {
 
+        String barcode = txtWNo.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtWNo.setText(nbarcode);
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +74,25 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
         //image2 = (ImageView) findViewById(R.id.image2);
         //image2.setOnClickListener(this);
         tempimages = new HashMap<Integer, String>();
+
+        txtWNo.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (txtWNo != null && txtWNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                        setTxtWaybillNo();
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
 
     @Override

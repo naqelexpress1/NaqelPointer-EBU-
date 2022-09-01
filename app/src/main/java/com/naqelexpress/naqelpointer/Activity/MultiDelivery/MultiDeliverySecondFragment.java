@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.MultiDelivery;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,14 +12,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,10 +20,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -48,6 +50,27 @@ public class MultiDeliverySecondFragment
     private boolean add = false;
     SpinnerDialog spinnerDialog;
 
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -60,21 +83,40 @@ public class MultiDeliverySecondFragment
             txtWaybilll = (EditText) rootView.findViewById(R.id.txtWaybilll);
 //            txtWaybilll.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 //            txtWaybilll.addTextChangedListener(textWatcher);
-            txtWaybilll.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
 
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (txtWaybilll != null && txtWaybilll.getText().toString().length() >= 8)//txtWaybilll.getText().toString().length() == GlobalVar.ScanWaybillLength
-                        AddNewWaybill();
+            txtWaybilll.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                        if (txtWaybilll != null && txtWaybilll.getText().toString().length() >= 8)
+                            AddNewWaybill();
+                        return true;
+                    }
+                    return false;
                 }
             });
+
+//            txtWaybilll.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    if (txtWaybilll != null && txtWaybilll.getText().toString().length() >= 8)//txtWaybilll.getText().toString().length() == GlobalVar.ScanWaybillLength
+//                        AddNewWaybill();
+//                }
+//            });
 
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
 //            intent = new Intent(getActivity(), NewBarCodeScanner.class);
@@ -100,31 +142,31 @@ public class MultiDeliverySecondFragment
         return rootView;
     }
 
-    private void setTxtWaybillNo() {
-
-        String barcode = txtWaybilll.getText().toString();
-        AddNewWaybill8and9(barcode);
-        // txtWaybilll.removeTextChangedListener(textWatcher);
-//        utilities utilities = new utilities();
-//        AddNewWaybill8and9(utilities.findwaybillno(barcode));
-
-
-//        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
-//            AddNewWaybill8and9(barcode.substring(0, 8));
+//    private void setTxtWaybillNo() {
 //
-//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//        String barcode = txtWaybilll.getText().toString();
+//        AddNewWaybill8and9(barcode);
+//        // txtWaybilll.removeTextChangedListener(textWatcher);
+////        utilities utilities = new utilities();
+////        AddNewWaybill8and9(utilities.findwaybillno(barcode));
 //
-//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
-//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-//        }
-
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-
-    }
+//
+////        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
+////            AddNewWaybill8and9(barcode.substring(0, 8));
+////
+////            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+////
+////        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+////            AddNewWaybill8and9(barcode.substring(0, GlobalVar.ScanWaybillLength));
+////            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+////            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+////        }
+//
+//
+//        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//
+//    }
 
     private void initViews() {
         recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
@@ -148,7 +190,7 @@ public class MultiDeliverySecondFragment
 //                        if (barcode.length() > 8)
 //                            barcode = barcode.substring(0, 8);
                         txtWaybilll.setText(barcode);
-//                        AddNewWaybill();
+                        AddNewWaybill();
                     }
                 }
 
@@ -265,22 +307,27 @@ public class MultiDeliverySecondFragment
 
     private void AddNewWaybill() {
         String WaybillNo = txtWaybilll.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(WaybillNo);
+        txtWaybilll.setText(nbarcode);
+        AddNewWaybill8and9(nbarcode);
+
 //        if (WaybillNo.length() > 8)
 //            WaybillNo = WaybillNo.substring(0, 8);
 
-        if (WaybillNo.toString().length() >= 8) {
-            if (!WaybillList.contains(WaybillNo.toString())) {
-                WaybillList.add(0, WaybillNo.toString());
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
-                lbTotal.setText(getString(R.string.lbCount) + WaybillList.size());
-                txtWaybilll.setText("");
-                initViews();
-            } else {
-                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
-                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
-                txtWaybilll.setText("");
-            }
-        }
+//        if (WaybillNo.toString().length() >= 8) {
+//            if (!WaybillList.contains(WaybillNo.toString())) {
+//                WaybillList.add(0, WaybillNo.toString());
+//                GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+//                lbTotal.setText(getString(R.string.lbCount) + WaybillList.size());
+//                txtWaybilll.setText("");
+//                initViews();
+//            } else {
+//                GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.AlreadyExists), GlobalVar.AlertType.Warning);
+//                GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
+//                txtWaybilll.setText("");
+//            }
+//        }
     }
 
     private void AddNewWaybillOld() {
@@ -341,6 +388,22 @@ public class MultiDeliverySecondFragment
             WaybillList = savedInstanceState.getStringArrayList("WaybillList");
             initViews();
         }
+    }
+
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit Multi Delivery")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 
 //    protected TextWatcher textWatcher = new TextWatcher() {

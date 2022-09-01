@@ -64,6 +64,8 @@ public class LoadtoDestination extends AppCompatActivity {
 
         setContentView(R.layout.delivery);
         Bundle bundle = getIntent().getExtras();
+
+//        Toast.makeText(this, "Load to Dest", Toast.LENGTH_SHORT).show();
         triplanID = bundle.getString("triplanID");
 
         TimeIn = DateTime.now();

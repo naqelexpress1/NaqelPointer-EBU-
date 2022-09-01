@@ -74,6 +74,7 @@ public class MultiDeliveryActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+//        Toast.makeText(this, "Multi Delivery", Toast.LENGTH_SHORT).show();
         com.naqelexpress.naqelpointer.Activity.MultiDelivery.MultiDeliveryActivity.SectionsPagerAdapter mSectionsPagerAdapter
                 = new com.naqelexpress.naqelpointer.Activity.MultiDelivery.MultiDeliveryActivity.SectionsPagerAdapter(getSupportFragmentManager());
 

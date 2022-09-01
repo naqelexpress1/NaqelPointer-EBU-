@@ -4,12 +4,13 @@ package com.naqelexpress.naqelpointer.Activity.ArrivedatDestNoValidation;
 import static android.app.Activity.RESULT_OK;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -41,6 +43,28 @@ public class Waybill extends Fragment {
     TextView wbScanned, bpScanned, slScanned, wbTotal, bpTotal, slTotal;
     public static TextView tripcode, tripname;
 
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 
     @Nullable
     @Override
@@ -70,22 +94,40 @@ public class Waybill extends Fragment {
             waybilgrid.setAdapter(adapter);
             adapter.notifyDataSetChanged();
 
-            txtBarCode.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                        setTxtWaybillNo();
+            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (txtBarCode != null && txtBarCode.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                            setTxtWaybillNo();
+                        return true;
+                    }
+                    return false;
                 }
             });
+
+//            txtBarCode.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                        setTxtWaybillNo();
+//                }
+//            });
 
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -111,7 +153,10 @@ public class Waybill extends Fragment {
 
     private void setTxtWaybillNo() {
         String barcode = txtBarCode.getText().toString();
-        ValidateWayBill(barcode);
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtBarCode.setText(nbarcode);
+        ValidateWayBill(nbarcode);
 
     }
 
@@ -196,5 +241,21 @@ public class Waybill extends Fragment {
             txtBarCode.setText(savedInstanceState.getString("txtBarCode"));
             ReadFromLocal();
         }
+    }
+
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit Arrived Dest")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 }

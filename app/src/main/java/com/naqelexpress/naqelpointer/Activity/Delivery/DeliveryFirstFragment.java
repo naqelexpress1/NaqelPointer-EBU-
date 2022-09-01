@@ -4,8 +4,10 @@ import static android.app.Activity.RESULT_OK;
 import static android.content.Context.TELEPHONY_SERVICE;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -13,9 +15,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,7 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.JSON.Request.GetWaybillDetailsRequest;
 import com.naqelexpress.naqelpointer.JSON.Results.WaybillDetailsResult;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -86,7 +88,27 @@ public class DeliveryFirstFragment
     static int al = 0;
     public static String Lat = "0", Longi = "0";
     boolean isExist = false;
-
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if (rootView == null) {
@@ -264,27 +286,45 @@ public class DeliveryFirstFragment
                 }
             });
 
-            txtWaybillNo.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                    if (!isExist) {
-
-
-                        if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
-                            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//                            setTxtWaybillNo();
+            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                            setTxtWaybillNo();
+                        return true;
                     }
-
+                    return false;
                 }
             });
+
+//            txtWaybillNo.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+//                    if (!isExist) {
+//
+//
+//                        if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
+//                            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+////                            setTxtWaybillNo();
+//                    }
+//
+//                }
+//            });
 
 //            txtWaybillNo.addTextChangedListener(textWatcher);
             initViews();
@@ -296,10 +336,12 @@ public class DeliveryFirstFragment
         return rootView;
     }
 
-//    private void setTxtWaybillNo() {
-//
-//        String barcode = txtWaybillNo.getText().toString();
-//        txtWaybillNo.removeTextChangedListener(textWatcher);
+    private void setTxtWaybillNo() {
+        String barcode = txtWaybillNo.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtWaybillNo.setText(nbarcode);
+//        AddNewWaybill8and9(nbarcode);
 //        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
 //            txtWaybillNo.setText(barcode);
 ////            txtWaybillNo.setText(barcode.substring(0, 8));
@@ -310,12 +352,12 @@ public class DeliveryFirstFragment
 //            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
 //            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
 //        }
-//
-//
-//        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//
-//
-//    }
+
+
+        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+
+
+    }
 
     String mobilevalidate = "", phonenovalidate = "";
     boolean watsapp = false;
@@ -418,7 +460,9 @@ public class DeliveryFirstFragment
                         if (barcode.length() >= 8)
 //                            barcode = barcode.substring(0, 8);
                         txtWaybillNo.setText(barcode);
+
                         GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
+                        setTxtWaybillNo();
                     }
                 }
 
@@ -848,4 +892,19 @@ public class DeliveryFirstFragment
 //        }
 //    };
 
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit Delivery")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
 }

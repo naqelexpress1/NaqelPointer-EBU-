@@ -9,8 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +27,7 @@ import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +49,29 @@ public class FirstFragment extends Fragment {
     static ArrayList<HashMap<String, String>> Selectedwaybilldetails = new ArrayList<>();
     public static ArrayList<String> validatewaybilldetails = new ArrayList<>();
 
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         {
@@ -60,27 +83,50 @@ public class FirstFragment extends Fragment {
 //                Toast.makeText(getActivity(), "First Fragment", Toast.LENGTH_SHORT).show();
                 txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
-                txtBarCode.addTextChangedListener(new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    }
 
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {
-
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
-                            //if (setTxtWaybillNo())
-                            setTxtWaybillNo();
-//                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
-//                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                            //  ValidateWayBill(txtBarCode.getText().toString());
+                txtBarCode.setOnKeyListener(new View.OnKeyListener() {
+                    public boolean onKey(View v, int keyCode, KeyEvent event) {
+                        // If the event is a key-down event on the "enter" button
+                        if (event.getAction() != KeyEvent.ACTION_DOWN)
+                            return true;
+                        else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                            onBackpressed();
+                            return true;
+                        } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                            if (txtBarCode != null && txtBarCode.getText().toString().length() >= 8)
+                                setTxtWaybillNo();
+                            return true;
                         }
+                        return false;
                     }
                 });
+
+//                txtBarCode.addTextChangedListener(new TextWatcher() {
+//                    @Override
+//                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                    }
+//
+//                    @Override
+//                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                    }
+//
+//                    @Override
+//                    public void afterTextChanged(Editable s) {
+//
+//                        if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
+//                            //if (setTxtWaybillNo())
+//
+//                            utilities utilities = new utilities();
+//                            String check = utilities.findwaybillno(txtBarCode.getText().toString());
+//                            txtBarCode.setText(check);
+//                            setTxtWaybillNo();
+////                            if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+////                                ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                            //  ValidateWayBill(txtBarCode.getText().toString());
+//                        }
+//                    }
+//                });
 
                 Button cmrabtn = (Button) rootView.findViewById(R.id.btnOpenCamera);
                 //cmrabtn.setVisibility(View.GONE);
@@ -129,15 +175,15 @@ public class FirstFragment extends Fragment {
     }
 
 
-
-
-
     private void setTxtWaybillNo() {
 
         String barcode = txtBarCode.getText().toString();
-//        utilities utilities = new utilities();
-//        ValidateWayBill(utilities.findwaybillno(barcode));
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtBarCode.setText(nbarcode);
         ValidateWayBill(barcode);
+
+//        ValidateWayBill(barcode);
 
 //
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
@@ -186,6 +232,7 @@ public class FirstFragment extends Fragment {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
+                        setTxtWaybillNo();
                         //AddNewPiece();
                     }
                 }
@@ -227,7 +274,7 @@ public class FirstFragment extends Fragment {
     private void onBackpressed() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Exit PickUp")
+        builder.setTitle("Exit At Origin")
                 .setMessage("Are you sure you want to exit without saving?")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
@@ -239,7 +286,6 @@ public class FirstFragment extends Fragment {
         alertDialog.show();
 
     }
-
 
 
 }

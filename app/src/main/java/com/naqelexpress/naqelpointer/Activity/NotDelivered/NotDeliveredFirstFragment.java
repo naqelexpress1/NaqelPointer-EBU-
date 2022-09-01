@@ -2,12 +2,13 @@ package com.naqelexpress.naqelpointer.Activity.NotDelivered;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -33,6 +35,28 @@ public class NotDeliveredFirstFragment extends Fragment {
     SpinnerDialog spinnerDialog;
     EditText txtWaybillNo, txtReason, txtNotes;
     public int ReasonID = 0;
+
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,23 +68,41 @@ public class NotDeliveredFirstFragment extends Fragment {
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
 //            txtWaybillNo.addTextChangedListener(textWatcher);
 
-            txtWaybillNo.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-//                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
-//                        AddNewPiece();
-                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
-//                        setTxtWaybillNo();
+            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                        if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+                            SetText();
+                        return true;
+                    }
+                    return false;
                 }
             });
+
+//            txtWaybillNo.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+////                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
+////                        AddNewPiece();
+//                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8){}
+////                        setTxtWaybillNo();
+//                }
+//            });
 
 //            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
             txtReason = (EditText) rootView.findViewById(R.id.txtReason);
@@ -179,6 +221,13 @@ public class NotDeliveredFirstFragment extends Fragment {
 
     }
 
+    private void SetText() {
+        String WaybillNo = txtWaybillNo.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(WaybillNo);
+        txtWaybillNo.setText(nbarcode);
+
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
@@ -188,6 +237,7 @@ public class NotDeliveredFirstFragment extends Fragment {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtWaybillNo.setText(barcode);
+                        SetText();
                     }
                 }
 
@@ -223,6 +273,22 @@ public class NotDeliveredFirstFragment extends Fragment {
 
 
         }
+    }
+
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit Not Delivered")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
     }
 
 //    protected TextWatcher textWatcher = new TextWatcher() {

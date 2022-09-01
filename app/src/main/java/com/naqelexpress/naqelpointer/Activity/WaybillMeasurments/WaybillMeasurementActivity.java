@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +18,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -30,6 +30,7 @@ import com.naqelexpress.naqelpointer.DB.DBObjects.WaybillMeasurementDetail;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.service.WayBillMeasurement;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 
@@ -46,7 +47,27 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
     SpinnerDialog reasonSpinnerDialog;
     private Bundle bundle;
 
-
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +75,7 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
         setContentView(R.layout.waybillmeasurementactivity);
 
-        Toast.makeText(this, "Measurement Screen", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Measurement Screen", Toast.LENGTH_SHORT).show();
         btnStart = (Button) findViewById(R.id.btnStart);
         btnNext = (Button) findViewById(R.id.btnNext);
         btnPlus = (Button) findViewById(R.id.btnPlus);
@@ -97,6 +118,24 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
             txtTotalPieces.setText(bundle.getString("PiecesCount"));
             txtTotalPieces.setEnabled(false);
         }
+
+        txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                        setTxtWaybillNo();
+                    return true;
+                }
+                return false;
+            }
+        });
 
 //        txtWaybillNo.addTextChangedListener(textWatcher);
       /*  txtWaybillNo.addTextChangedListener(new TextWatcher() {
@@ -228,25 +267,45 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybillNo.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtWaybillNo.setText(nbarcode);
+
 //        txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
-//            txtWaybillNo.setText(barcode.substring(0, 8));
-            txtWaybillNo.setText(barcode);
+//        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+////            txtWaybillNo.setText(barcode.substring(0, 8));
+//            txtWaybillNo.setText(barcode);
+//
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//
+//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
+////            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            txtWaybillNo.setText(barcode);
+//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
+//            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
+//        }
 
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            txtWaybillNo.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            txtWaybillNo.setText(barcode);
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
-
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//        ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
 
 
     }
+
+//    private void onBackpressed() {
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+//        builder.setTitle("Exit Measurement")
+//                .setMessage("Are you sure you want to exit without saving?")
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int which) {
+//                        finish();
+//                    }
+//                }).setNegativeButton("Cancel", null).setCancelable(false);
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
+//
+//    }
 
     private void visibleWeightModule() {
 

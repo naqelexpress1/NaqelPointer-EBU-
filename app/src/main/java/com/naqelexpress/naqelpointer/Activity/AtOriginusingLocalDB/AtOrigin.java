@@ -59,6 +59,8 @@ public class AtOrigin extends AppCompatActivity {
         bundle = getIntent().getExtras();
         TimeIn = DateTime.now();
 
+//        Toast.makeText(this, "At Origin", Toast.LENGTH_SHORT).show();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

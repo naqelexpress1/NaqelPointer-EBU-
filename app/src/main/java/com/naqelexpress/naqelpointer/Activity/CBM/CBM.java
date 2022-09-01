@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 
@@ -19,6 +20,7 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
 import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.utils.CommonApi;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -32,6 +34,15 @@ public class CBM extends AppCompatActivity implements AlertCallback {
     EditText txtWNo, txtWidth, txtHeight, txtLength;
     static SweetAlertDialog alertDialog;
 
+    private void setTxtWaybillNo() {
+
+        String barcode = txtWNo.getText().toString();
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtWNo.setText(nbarcode);
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,9 +54,41 @@ public class CBM extends AppCompatActivity implements AlertCallback {
         txtHeight = (EditText) findViewById(R.id.txtheight);
         txtLength = (EditText) findViewById(R.id.txtlength);
 
+        txtWNo.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if (event.getAction() != KeyEvent.ACTION_DOWN)
+                    return true;
+                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackPressed();
+                    return true;
+                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    if (txtWNo != null && txtWNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                        setTxtWaybillNo();
+                    return true;
+                }
+                return false;
+            }
+        });
 
     }
 
+//    private void onBackpressed() {
+//
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
+//        builder.setTitle("Exit At Origin")
+//                .setMessage("Are you sure you want to exit without saving?")
+//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialogInterface, int which) {
+//                        finish();
+//                    }
+//                }).setNegativeButton("Cancel", null).setCancelable(false);
+//        AlertDialog alertDialog = builder.create();
+//        alertDialog.show();
+//
+//    }
 
     public void onSubmit(View v) {
 

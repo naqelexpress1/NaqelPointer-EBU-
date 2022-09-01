@@ -1,5 +1,8 @@
 package com.naqelexpress.naqelpointer.Activity.DeliverySheet;
 
+import static android.app.Activity.RESULT_OK;
+
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,12 +12,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -24,6 +21,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
@@ -32,8 +36,6 @@ import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
 
 import java.util.ArrayList;
-
-import static android.app.Activity.RESULT_OK;
 
 public class DeliverySheetSecondFragment
         extends Fragment {
@@ -76,8 +78,7 @@ public class DeliverySheetSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
-                            txtWaybillNo.getText().toString().length() == 9)
+                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() >= 8)
                             )
                         AddNewWaybill();
                 }

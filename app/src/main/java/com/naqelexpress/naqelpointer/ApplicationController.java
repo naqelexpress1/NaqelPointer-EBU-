@@ -25,11 +25,13 @@ public class ApplicationController extends MultiDexApplication {
     private static final String PROPERTIES_FILE = "app.properties";
     private static Properties properties = new Properties();
 
-//    @Override
-//    protected void attachBaseContext(Context base) {
-//        MultiDex.install(this);
-//        super.attachBaseContext(base);
-//    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        MultiDex.install(this);
+        super.attachBaseContext(base);
+
+    }
 
     @Override
     public void onCreate() {
@@ -41,7 +43,14 @@ public class ApplicationController extends MultiDexApplication {
         } catch (Exception e) {
 
         }
+
+
+
     }
+
+
+
+
 
     public static synchronized ApplicationController getInstance() {
         return thisInstance;

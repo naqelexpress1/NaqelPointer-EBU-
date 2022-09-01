@@ -107,6 +107,98 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GlobalVar {
 
+//    final static Environment appMode = Environment.PRODUCTION;
+//
+//    enum Environment {
+//        DEVELOPMENT,
+//        UAT,
+//        PRODUCTION
+//    }
+
+//    interface DevelopmentEnvironment {
+//        public String NaqelPointerAPILink_For5_1 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink_For5_2 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink_UploadImage = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink1_ForDomain = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//
+//        public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//        public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+//        public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
+//    }
+
+
+//    interface UATEnvironment {
+//        public String NaqelPointerAPILink_For5_1 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink_For5_2 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink_UploadImage = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerAPILink1_ForDomain = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//
+//        public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//        public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+//        public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
+//
+//    }
+
+//    interface ProductionEnvironment {
+//        public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//        public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//        public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//        public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//        public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//
+//
+//        public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//        public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+//        public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+//        public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
+//
+//
+//    }
+
+//    public static String getEnvType() {
+//        String NaqelApk = "", NaqelPointerLivetrackingPusher = "", NaqelPointerAPILinkForHighValueAlarm = "", NaqelPointerAPILink2_ForDomain = "", NaqelPointerAPILink1_ForDomain = "", NaqelPointerAPILink_UploadImage = "", NaqelPointerAPILink = "", NaqelPointerAPILink_For5_1 = "", NaqelPointerAPILink_For5_2 = "";
+//        switch (appMode) {
+//            case DEVELOPMENT:
+//                NaqelPointerAPILink_For5_1 = DevelopmentEnvironment.NaqelPointerAPILink_For5_1;
+//                NaqelPointerAPILink_For5_2 = DevelopmentEnvironment.NaqelPointerAPILink_For5_2;
+//                NaqelPointerAPILink = DevelopmentEnvironment.NaqelPointerAPILink;
+//                NaqelPointerAPILink_UploadImage = DevelopmentEnvironment.NaqelPointerAPILink_UploadImage;
+//                NaqelPointerAPILink1_ForDomain = DevelopmentEnvironment.NaqelPointerAPILink1_ForDomain;
+//                NaqelPointerAPILink2_ForDomain = DevelopmentEnvironment.NaqelPointerAPILink2_ForDomain;
+//                NaqelPointerAPILinkForHighValueAlarm = DevelopmentEnvironment.NaqelPointerAPILinkForHighValueAlarm;
+//                NaqelPointerLivetrackingPusher = DevelopmentEnvironment.NaqelPointerLivetrackingPusher;
+//                NaqelApk = DevelopmentEnvironment.NaqelApk;
+//                break;
+//            case UAT:
+//                NaqelPointerAPILink_For5_1 = UATEnvironment.NaqelPointerAPILink_For5_1;
+//                NaqelPointerAPILink_For5_2 = UATEnvironment.NaqelPointerAPILink_For5_2;
+//                NaqelPointerAPILink = UATEnvironment.NaqelPointerAPILink;
+//                NaqelPointerAPILink_UploadImage = UATEnvironment.NaqelPointerAPILink_UploadImage;
+//                NaqelPointerAPILink1_ForDomain = UATEnvironment.NaqelPointerAPILink1_ForDomain;
+//                NaqelPointerAPILink2_ForDomain = UATEnvironment.NaqelPointerAPILink2_ForDomain;
+//                NaqelPointerAPILinkForHighValueAlarm = UATEnvironment.NaqelPointerAPILinkForHighValueAlarm;
+//                NaqelPointerLivetrackingPusher = UATEnvironment.NaqelPointerLivetrackingPusher;
+//                NaqelApk = UATEnvironment.NaqelApk;
+//                break;
+//            case PRODUCTION:
+//                NaqelPointerAPILink_For5_1 = ProductionEnvironment.NaqelPointerAPILink_For5_1;
+//                NaqelPointerAPILink_For5_2 = ProductionEnvironment.NaqelPointerAPILink_For5_2;
+//                NaqelPointerAPILink = ProductionEnvironment.NaqelPointerAPILink;
+//                NaqelPointerAPILink_UploadImage = ProductionEnvironment.NaqelPointerAPILink_UploadImage;
+//                NaqelPointerAPILink1_ForDomain = ProductionEnvironment.NaqelPointerAPILink1_ForDomain;
+//                NaqelPointerAPILink2_ForDomain = ProductionEnvironment.NaqelPointerAPILink2_ForDomain;
+//                NaqelPointerAPILinkForHighValueAlarm = ProductionEnvironment.NaqelPointerAPILinkForHighValueAlarm;
+//                NaqelPointerLivetrackingPusher = ProductionEnvironment.NaqelPointerLivetrackingPusher;
+//                NaqelApk = ProductionEnvironment.NaqelApk;
+//                break;
+//        }
+//        return baseURL;
+//    }
+
     public UserSettings currentSettings;
     public boolean autoLogout = false;
 
@@ -138,23 +230,26 @@ public class GlobalVar {
     public int AppID = 6;
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
-//    public String NaqelPointerAPILink_For5_1 =          "https://naqelpointerpd.naqelksa.com/api/pointer/";
-//    public String NaqelPointerAPILink_For5_2 =          "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-//    public String NaqelPointerAPILink =                 "https://naqelpointerpd.naqelksa.com/api/pointer/";
-//    public String NaqelPointerAPILink_UploadImage =     "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-//    public String NaqelPointerAPILink1_ForDomain =      "https://naqelpointerpd.naqelksa.com/api/pointer/";
 
-    public String NaqelPointerAPILink_For5_1 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerAPILink_For5_2 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerAPILink =                 "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerAPILink_UploadImage =     "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerAPILink1_ForDomain =      "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+    public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+    public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
 
 
-    public String NaqelPointerAPILink2_ForDomain =      "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILinkForHighValueAlarm ="https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerLivetrackingPusher =      "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
-    public String NaqelApk =                            "https://naqelpointersc.naqelksa.com/Download/";
+    //API with public IP
+//    public String NaqelPointerAPILink_For5_1 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//    public String NaqelPointerAPILink_For5_2 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//    public String NaqelPointerAPILink =                 "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//    public String NaqelPointerAPILink_UploadImage =     "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+//    public String NaqelPointerAPILink1_ForDomain =      "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+
+
+    public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
     static IPointerAPI iPointerAPI;
 
 
@@ -3499,10 +3594,10 @@ public class GlobalVar {
 
     public String GetDomainURL(Context context) {
 
-        return NaqelPointerAPILink;
+//        return NaqelPointerAPILink;
 
-//        DBConnections dbConnections = new DBConnections(context, null);
-//        return dbConnections.GetPrimaryDomain(context);
+        DBConnections dbConnections = new DBConnections(context, null);
+        return dbConnections.GetPrimaryDomain(context);
 
     }
 

@@ -68,6 +68,8 @@ public class NotDeliveredActivity
         bundle = getIntent().getExtras();
         TimeIn = DateTime.now();
 
+//        Toast.makeText(this, "Not Delivery", Toast.LENGTH_SHORT).show();
+
         //GlobalVar.GV().activity = this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

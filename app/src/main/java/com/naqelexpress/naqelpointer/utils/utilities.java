@@ -63,7 +63,7 @@ public class utilities {
     public String findwaybillno(String WaybillNo) {
         String wno = "";
 
-        if (WaybillNo.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(WaybillNo.substring(0, 1)))
+        if (WaybillNo.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(WaybillNo.substring(0,1)))
             wno = WaybillNo.substring(0, 8);
         else if (WaybillNo.length() > 8)
             wno = WaybillNo.substring(0, GlobalVar.ScanWaybillLength);

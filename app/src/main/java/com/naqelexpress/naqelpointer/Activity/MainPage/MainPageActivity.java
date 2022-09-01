@@ -649,6 +649,7 @@ public class MainPageActivity
         } else if (devision.equals("Courier")) {
             enablevisibleproductivity();
         }
+
     }
 
     private void hidevisibleproductivity() {
@@ -1396,6 +1397,7 @@ public class MainPageActivity
     public void onBackPressed() {
         GlobalVar.CloseActivity(MainPageActivity.this);
     }
+
 
 
     @Override

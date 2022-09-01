@@ -78,7 +78,7 @@ public class DeliverySheetActivity
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
-
+//        Toast.makeText(this, "Delivery Sheet", Toast.LENGTH_SHORT).show();
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         barcodelist.clear();

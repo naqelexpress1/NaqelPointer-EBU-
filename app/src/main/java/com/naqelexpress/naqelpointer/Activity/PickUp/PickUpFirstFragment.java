@@ -11,9 +11,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.Editable;
 import android.text.InputType;
-import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +54,7 @@ import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.callback.AlertCallback;
 import com.naqelexpress.naqelpointer.callback.Callback;
 import com.naqelexpress.naqelpointer.utils.PickupApi;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,7 +109,6 @@ public class PickUpFirstFragment
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
 
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
-            txtWaybillNo.addTextChangedListener(textWatcher);
 
             txtClientID = (EditText) rootView.findViewById(R.id.txtClientID);
             txtPiecesCount = (EditText) rootView.findViewById(R.id.txtPiecesCount);
@@ -318,29 +316,14 @@ public class PickUpFirstFragment
                     onBackpressed();
                     return true;
                 } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    setTxtWaybillNo(txtWaybillNo.getText().toString());
+                    if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+                        setTxtWaybillNo(txtWaybillNo.getText().toString());
                     return true;
                 }
                 return false;
             }
         });
 
-//        txtWaybillNo.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {
-//
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)// ||txtWaybillNo.getText().toString().length() == GlobalVar.ScanWaybillLength
-//                    setTxtWaybillNo(txtWaybillNo.getText().toString());
-//            }
-//        });
 
         return rootView;
     }
@@ -406,23 +389,6 @@ public class PickUpFirstFragment
         }
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
-//            if (data != null) {
-//                Bundle extras = data.getExtras();
-//                if (extras != null) {
-//                    if (extras.containsKey("barcode")) {
-//                        String barcode = extras.getString("barcode");
-//                        if (barcode.length() > 8)
-//                            barcode = barcode.substring(0, 8);
-//                        txtWaybillNo.setText(barcode);
-//                        GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -440,28 +406,15 @@ public class PickUpFirstFragment
         }
     }
 
-    private void setTxtWaybillNo() {
-
-        String barcode = txtWaybillNo.getText().toString();
-        txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
-            txtWaybillNo.setText(barcode);
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-            txtWaybillNo.setText(barcode);
-            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-            //ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-        }
-    }
 
     private void setTxtWaybillNo(String barcode) {
-
-        txtWaybillNo.removeTextChangedListener(textWatcher);
-        if (barcode.length() >= 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
-            txtWaybillNo.setText(barcode);
-        } else
-            txtWaybillNo.setText(barcode);
+        utilities utilities = new utilities();
+        txtWaybillNo.setText(utilities.findwaybillno(barcode));
+//        txtWaybillNo.removeTextChangedListener(textWatcher);
+//        if (barcode.length() >= 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
+//            txtWaybillNo.setText(barcode);
+//        } else
+//            txtWaybillNo.setText(barcode);
 
         txtPiecesCount.requestFocus();
         GlobalVar.GV().MakeSound(getContext(), R.raw.barcodescanned);
@@ -798,25 +751,25 @@ public class PickUpFirstFragment
 
     }
 
-    protected TextWatcher textWatcher = new TextWatcher() {
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            // your logic here
-            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
-                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                setTxtWaybillNo();
-
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // your logic here
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // your logic here
-        }
-    };
+//    protected TextWatcher textWatcher = new TextWatcher() {
+//
+//        @Override
+//        public void afterTextChanged(Editable s) {
+//            // your logic here
+//            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                setTxtWaybillNo();
+//
+//        }
+//
+//        @Override
+//        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            // your logic here
+//        }
+//
+//        @Override
+//        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            // your logic here
+//        }
+//    };
 }

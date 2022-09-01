@@ -3,6 +3,7 @@ package com.naqelexpress.naqelpointer.Activity.Constants;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.view.WindowManager;
 
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class Constant {
 
+    CountDownTimer cTimer = null;
     public static boolean enableLocation = true;
 
     public static InterCityModel interCityModel = new InterCityModel();
@@ -38,6 +40,27 @@ public class Constant {
 
     public static Double payAbleAmount = 0.0;
     public static Double totalEarning = 0.0;
+
+//    public CountDownTimer getcTimer(int timeInSeconds, Activity activity){
+//
+//        if(cTimer == null){
+//            cTimer = new CountDownTimer(timeInSeconds, 1000) {
+//                @Override
+//                public void onTick(long millisUntilFinished) {
+//                    isCalled = true;
+//                    myTime = myTime - 1;
+//                    Log.d("COUNT DOWN TIMER", String.valueOf(myTime));
+//                    Toast.makeText(activity, "TIME " + String.valueOf(myTime), Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onFinish() {
+//                    //Call API Here
+//                }
+//            }
+//        }
+//        return cTimer;
+//    }
 
     public static void exitConfirmation(Activity activity, String title, String message){
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);

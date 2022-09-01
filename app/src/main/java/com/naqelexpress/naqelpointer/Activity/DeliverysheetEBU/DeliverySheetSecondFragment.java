@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.DeliverysheetEBU;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,14 +12,9 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +22,19 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.Classes.OnSpinerItemClick;
 import com.naqelexpress.naqelpointer.Classes.SpinnerDialog;
 import com.naqelexpress.naqelpointer.GlobalVar;
 import com.naqelexpress.naqelpointer.R;
+import com.naqelexpress.naqelpointer.utils.utilities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +55,28 @@ public class DeliverySheetSecondFragment
     private boolean add = false;
     SpinnerDialog spinnerDialog;
 
+    protected TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            // your logic here
+            if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+                //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+                setTxtWaybillNo();
+
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // your logic here
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // your logic here
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -63,27 +89,45 @@ public class DeliverySheetSecondFragment
             txtWaybillNo = (EditText) rootView.findViewById(R.id.txtWaybilll);
 //            txtWaybillNo.setFilters(new InputFilter[]{new InputFilter.LengthFilter(GlobalVar.ScanWaybillLength)});
 
-            txtWaybillNo.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-//                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
-//                            txtWaybillNo.getText().toString().length() == 9)
-//                    )
-//                        AddNewWaybill();
-                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
-                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-                        setTxtWaybillNo();
+            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    // If the event is a key-down event on the "enter" button
+                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+                        return true;
+                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+                        onBackpressed();
+                        return true;
+                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                        if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+                            setTxtWaybillNo();
+                        return true;
+                    }
+                    return false;
                 }
             });
+
+//            txtWaybillNo.addTextChangedListener(new TextWatcher() {
+//                @Override
+//                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                }
+//
+//                @Override
+//                public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//                }
+//
+//                @Override
+//                public void afterTextChanged(Editable s) {
+////                    if (txtWaybillNo != null && (txtWaybillNo.getText().toString().length() == 8 ||
+////                            txtWaybillNo.getText().toString().length() == 9)
+////                    )
+////                        AddNewWaybill();
+//                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 8)
+//                        // ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
+//                        setTxtWaybillNo();
+//                }
+//            });
 
             //intent = new Intent(getContext().getApplicationContext(), BarcodeScan.class);
             //intent = new Intent(getActivity().getApplicationContext(), NewBarCodeScanner.class);
@@ -94,8 +138,7 @@ public class DeliverySheetSecondFragment
                     if (!GlobalVar.GV().checkPermission(getActivity(), GlobalVar.PermissionType.Camera)) {
                         GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
                         GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                    }  else
-                    {
+                    } else {
                         Intent newIntent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
                         getActivity().startActivityForResult(newIntent, 1);
                     }
@@ -144,9 +187,11 @@ public class DeliverySheetSecondFragment
     private void setTxtWaybillNo() {
 
         String barcode = txtWaybillNo.getText().toString();
-//        utilities utilities = new utilities();
-//        AddNewWaybill8and9(utilities.findwaybillno(barcode));
-        AddNewWaybill8and9(barcode);
+        utilities utilities = new utilities();
+        String nbarcode = utilities.findwaybillno(barcode);
+        txtWaybillNo.setText(nbarcode);
+        AddNewWaybill8and9(nbarcode);
+//        AddNewWaybill8and9(barcode);
 
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {
 //            //txtBarCode.setText(barcode.substring(0, 8));
@@ -184,7 +229,8 @@ public class DeliverySheetSecondFragment
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         if (barcode.length() >= 8)
-                        txtWaybillNo.setText(barcode);
+                            txtWaybillNo.setText(barcode);
+                        setTxtWaybillNo();
 //                        AddNewWaybill();
                     }
                 }
@@ -403,4 +449,21 @@ public class DeliverySheetSecondFragment
         }
 
     }
+
+    private void onBackpressed() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Exit Delivery Sheet")
+                .setMessage("Are you sure you want to exit without saving?")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int which) {
+                        getActivity().finish();
+                    }
+                }).setNegativeButton("Cancel", null).setCancelable(false);
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
 }

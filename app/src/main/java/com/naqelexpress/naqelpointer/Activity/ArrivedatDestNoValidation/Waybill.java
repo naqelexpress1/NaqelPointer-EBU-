@@ -195,7 +195,6 @@ public class Waybill extends Fragment {
             GlobalVar.MakeSound(getActivity().getApplicationContext(), R.raw.wrongbarcodescan);
             txtBarCode.setText("");
         }
-
     }
 
 
@@ -206,6 +205,7 @@ public class Waybill extends Fragment {
         dbConnections.close();
     }
 
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 1 && resultCode == RESULT_OK) {
@@ -215,6 +215,7 @@ public class Waybill extends Fragment {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
+                        setTxtWaybillNo();
                     }
                 }
             }

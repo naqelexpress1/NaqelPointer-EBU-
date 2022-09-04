@@ -159,6 +159,7 @@ public class WayBillDetails extends Fragment // implements ResultInterface
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
+                        setTxtWaybillNo(barcode);
 
                     }
                 }

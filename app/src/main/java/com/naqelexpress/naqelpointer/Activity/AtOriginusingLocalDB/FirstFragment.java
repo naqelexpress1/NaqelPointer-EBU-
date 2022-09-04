@@ -181,7 +181,7 @@ public class FirstFragment extends Fragment {
         utilities utilities = new utilities();
         String nbarcode = utilities.findwaybillno(barcode);
         txtBarCode.setText(nbarcode);
-        ValidateWayBill(barcode);
+        ValidateWayBill(nbarcode);
 
 //        ValidateWayBill(barcode);
 

@@ -59,6 +59,7 @@ import com.naqelexpress.naqelpointer.JSON.Results.GetUserMEDataResult;
 import com.naqelexpress.naqelpointer.R;
 import com.naqelexpress.naqelpointer.Receiver.LocationupdateInterval;
 import com.naqelexpress.naqelpointer.service.LocationService;
+import com.naqelexpress.naqelpointer.utils.SharedHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -1010,6 +1011,7 @@ public class LoginActivity
 
                     instance.Password = txtPassword.getText().toString();//getUserMEDataResult.Password;
                     instance.RoleMEID = getUserMEDataResult.RoleMEID;
+                    SharedHelper.putKeyInteger(getApplicationContext(), "RoleMEID", getUserMEDataResult.RoleMEID);
                     instance.StationID = getUserMEDataResult.StationID;
                     instance.StatusID = getUserMEDataResult.StatusID;
 
@@ -1162,11 +1164,7 @@ public class LoginActivity
 
         @SuppressWarnings("deprecation")
         protected String doInBackground(String... params) {
-
-
             //uploadfilescount = uploadfilescount + 1;
-
-            // GlobalVar.GV().GetMasterData(MainPageActivity.this, getWindow().getDecorView().getRootView(), progressDialog);
             GetDeliveryStatusRequest getDeliveryStatusRequest = new GetDeliveryStatusRequest();
             String jsonData = JsonSerializerDeserializer.serialize(getDeliveryStatusRequest, true);
 
@@ -1215,12 +1213,8 @@ public class LoginActivity
                 }
                 if (httpURLConnection != null)
                     httpURLConnection.disconnect();
-                // result = String.valueOf(buffer);
             }
             return null;
-//
-
-
         }
 
         @Override

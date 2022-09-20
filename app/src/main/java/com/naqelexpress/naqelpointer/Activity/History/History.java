@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -1020,14 +1021,14 @@ public class History extends Activity {
 
                 String piececodes[];
                 int index = 0;
-                if (loop.getString(loop.getColumnIndex("JsonData")) != null) {
-                    piececodes = loop.getString(loop.getColumnIndex("JsonData")).split(",");
-                    for (String piece : piececodes) {
-                        pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
-                                (piece));
-                        index++;
-                    }
-                } else {
+//                if (loop.getString(loop.getColumnIndex("JsonData")) != null) {
+//                    piececodes = loop.getString(loop.getColumnIndex("JsonData")).split(",");
+//                    for (String piece : piececodes) {
+//                        pickUpRequest.PickUpDetailRequestList.add(index, new PickUpDetailRequest
+//                                (piece));
+//                        index++;
+//                    }
+//                } else {
                     if (resultDetail.getCount() > 0) {
                         index = 0;
                         resultDetail.moveToFirst();
@@ -1038,7 +1039,7 @@ public class History extends Activity {
                         }
                         while (resultDetail.moveToNext());
                     }
-                }
+//                }
 
                 String jsonData = JsonSerializerDeserializer.serialize(pickUpRequest, true);
                 jsonData = jsonData.replace("Date(-", "Date(");
@@ -1049,6 +1050,7 @@ public class History extends Activity {
 
                 try {
                     URL url = new URL(GlobalVar.GV().NaqelPointerAPILink + "SendPickUpDataToServer");
+                    Log.d("PICKUP SUBMIT URL:", url.toString());
                     httpURLConnection = (HttpURLConnection) url.openConnection();
 
                     httpURLConnection.setRequestMethod("POST");

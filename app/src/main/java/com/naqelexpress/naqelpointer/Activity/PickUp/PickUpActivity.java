@@ -90,6 +90,7 @@ public class PickUpActivity extends AppCompatActivity {
             setBookingData(bookinglist.get(position));
         }
 
+//        Toast.makeText(this, "PICKUP", Toast.LENGTH_SHORT).show();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

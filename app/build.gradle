@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-
+apply plugin: 'kotlin-android-extensions'
 
 android {
     signingConfigs {
@@ -11,6 +11,7 @@ android {
             storePassword '123Naq!Pointer$#@'
         }
     }
+
     compileSdkVersion 30
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
@@ -171,11 +172,11 @@ dependencies {
 
 }
 
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android-extensions'
+
 
 repositories {
     mavenCentral()
-
-
 }
+
+
+apply plugin: 'com.google.gms.google-services'

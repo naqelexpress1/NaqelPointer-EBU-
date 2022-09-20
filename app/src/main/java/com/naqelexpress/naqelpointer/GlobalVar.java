@@ -97,7 +97,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -231,27 +230,30 @@ public class GlobalVar {
     public int AppTypeID = 1;
     public boolean ThereIsMandtoryVersion = false;
 
-    public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
-    public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
-    public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
-    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
-    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
-
+//    public String NaqelPointerAPILink_For5_1 = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//    public String NaqelPointerAPILink_For5_2 = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//    public String NaqelPointerAPILink = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//    public String NaqelPointerAPILink_UploadImage = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//    public String NaqelPointerAPILink1_ForDomain = "https://naqelpointerpd.naqelksa.com/api/pointer/";
+//    public String NaqelPointerAPILinkForHighValueAlarm = "https://infotrack.naqelexpress.com/NaqelPointer/Api/Pointer/";
+//    public String NaqelPointerAPILink2_ForDomain = "https://naqelpointersc.naqelksa.com/Api/Pointer/";
+//    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+//    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
 
 
     //API with public IP
-//    public String NaqelPointerAPILink_For5_1 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-//    public String NaqelPointerAPILink_For5_2 =          "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-//    public String NaqelPointerAPILink =                 "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-//    public String NaqelPointerAPILink_UploadImage =     "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-//    public String NaqelPointerAPILink1_ForDomain =      "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
-//    public String NaqelPointerAPILinkForHighValueAlarm ="https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_1 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_For5_2 = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink_UploadImage = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink1_ForDomain = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILinkForHighValueAlarm = "https://solutionsuat.naqelksa.com/NaqelPointer/Api/Pointer/";
+    public String NaqelPointerAPILink2_ForDomain = "https://solutionsuat.naqelksa.com/Api/Pointer/";
+    public String NaqelPointerLivetrackingPusher = "https://pointercourierlocation.naqelksa.com/api/CourierLocation/InsertCourierLocation";
+    public String NaqelApk = "https://naqelpointersc.naqelksa.com/Download/";
 
 //    GetDomainURL(); //keep here to find in easy
+//    GetDomainURLforService();  //keep here to find in easy
 
     static IPointerAPI iPointerAPI;
 
@@ -379,24 +381,6 @@ public class GlobalVar {
         Error
     }
 
-//    public void ShowMessage(Context context, String Message, AlertType alertType) {
-//        Toast toast = Toast.makeText(context, Message, Toast.LENGTH_LONG);
-//        View view = toast.getView();
-//        TextView text = (TextView) view.findViewById(android.R.id.message);
-//
-//        if (alertType == AlertType.Error) {
-//            view.setBackgroundResource(R.color.NaqelRed);
-//            text.setTextColor(Color.WHITE);
-//        } else if (alertType == AlertType.Info) {
-//            view.setBackgroundResource(R.color.NaqelBlue);
-//            text.setTextColor(Color.WHITE);
-//        } else if (alertType == AlertType.Warning) {
-//            view.setBackgroundResource(R.color.NaqelRed);
-//            text.setTextColor(Color.WHITE);
-//        }
-//        toast.show();
-//    }
-
     public void ShowSnackbar(View view, String Message, AlertType alertType) {
 
         hideKeyboardFrom(view.getContext(), view);
@@ -492,30 +476,6 @@ public class GlobalVar {
         insertContactPhoneNumber(addContactsUri, rowContactId, MobileNo, context);
         contactIdByPhoneNumber(context, MobileNo);
 
-
-//        ArrayList<ContentProviderOperation> ops = new ArrayList<>();
-//
-//        int rawContactID = ops.size();
-//
-//        ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
-//                .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
-//                .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
-//                .build());
-//
-//        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-//                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
-//                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
-//                .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, "MadHasWatsapp")
-//                .build());
-//
-//
-//        ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
-//                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactID)
-//                .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
-//                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, MobileNo)
-//                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
-//                .build());
-
     }
 
     public static boolean deleteContact(Context ctx, String phone) {
@@ -576,25 +536,8 @@ public class GlobalVar {
         String[] selectionArgs = new String[]{ContactID, "com.whatsapp"};
         Cursor cursor = context.getContentResolver().query(ContactsContract.RawContacts.CONTENT_URI, projection, selection, selectionArgs, null);
         boolean hasWhatsApp = cursor.moveToNext();
-//        String rowContactId = "";
-//        if (hasWhatsApp) {
-//            rowContactId = cursor.getString(0);
-//        }
-//        cursor.close();
         return hasWhatsApp;
     }
-
-
-//    public void ShowDialogCustom(Context context, String title, String Message)
-//    {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//        builder.setCancelable(true);
-//        builder.setTitle(title);
-//        builder.setMessage(Message);
-//        View view = LayoutInflater.from(context).inflate(R.layout.activity_dialog, null);
-//        builder.setView(view);
-//        builder.show();
-//    }
 
     public static void MakeSound(final Context context, final int url) {
         Thread t = new Thread() {
@@ -723,110 +666,14 @@ public class GlobalVar {
                 public void onPreExecuteUpdate() {
                     // GlobalVar.GV().ShowSnackbar(view, "Loading Station List", AlertType.Info);
                 }
-
             });
             task.execute();
-
-            // return;
         }
-
-
-//        DBConnections dbConnections = new DBConnections(context, null);
-//        GlobalVar.GV().StationList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().StationNameList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().StationFNameList.clear();// = new ArrayList<>();
-//        Cursor result = dbConnections.Fill("select * from Station");
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Code = result.getString(result.getColumnIndex("Code"));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//                int CountryID = Integer.parseInt(result.getString(result.getColumnIndex("CountryID")));
-//
-//                Station instance = new Station(ID, Code, Name, FName, CountryID);
-//                GlobalVar.GV().StationList.add(instance);
-//                GlobalVar.GV().StationNameList.add(Code + " : " + Name);
-//                GlobalVar.GV().StationFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//
-//
-//        }
-//        dbConnections.close();
-//        GlobalVar.gs = true;
-
     }
 
-//    public void GetMasterData(final Activity activity, final View view, final ProgressDialog dialog) {
-//        GetDeliveryStatusRequest getDeliveryStatusRequest = new GetDeliveryStatusRequest();
-//        String jsonData = JsonSerializerDeserializer.serialize(getDeliveryStatusRequest, true);
-//
-//        ProjectAsyncTask task = new ProjectAsyncTask("GetMasterData", "Post", jsonData);
-//        task.setUpdateListener(new OnUpdateListener() {
-//            public void onPostExecuteUpdate(String obj) {
-//                try {
-//                    Context context = activity.getApplicationContext();
-//                    JSONObject jsonObject = new JSONObject(obj);
-//                    JSONArray appversion = jsonObject.getJSONArray("AppVersion");
-//
-//                    JSONObject jo = appversion.getJSONObject(0);
-//                    DBConnections dbConnections = new DBConnections(context, null);
-//                    dbConnections.InsertAppVersion(jo.getInt("VersionCode"), context);
-//                    int versioncode = VersionCode(context);
-//                    if (jo.getInt("VersionCode") == versioncode) {
-//                        if (jo.getInt("ChangesMainMenu") == 1) {
-//                            JSONArray station = jsonObject.getJSONArray("Station");
-//                            if (station.length() > 0)
-//                                new Station(station.toString(), view, context);
-//
-//                            JSONArray deliveryStatus = jsonObject.getJSONArray("DeliveyStatus");
-//                            if (deliveryStatus.length() > 0)
-//                                new DeliveryStatus(deliveryStatus.toString(), view, context);
-//
-//                            JSONArray checkPointType = jsonObject.getJSONArray("CheckPointType");
-//                            if (checkPointType.length() > 0)
-//                                new CheckPointType(checkPointType.toString(), view, context);
-//
-//                            JSONArray checkPointdetail = jsonObject.getJSONArray("CheckPointTypeDetail");
-//                            if (checkPointdetail.length() > 0)
-//                                new CheckPointTypeDetail(checkPointdetail.toString(), view, context);
-//
-//                            JSONArray typeDDetails = jsonObject.getJSONArray("TypeDDetails");
-//                            if (typeDDetails.length() > 0)
-//                                new CheckPointTypeDDetail(typeDDetails.toString(), view, context);
-//
-//                            JSONArray noNeedVolume = jsonObject.getJSONArray("NoNeedVolume");
-//                            if (noNeedVolume.length() > 0)
-//                                new NoNeedVolumeReason(noNeedVolume.toString(), view, context);
-//
-//                            SharedPreferences sharedpreferences = context.getSharedPreferences("naqelSettings", Context.MODE_PRIVATE);
-//                            SharedPreferences.Editor editor = sharedpreferences.edit();
-//                            editor.putString("division", jsonObject.getString("Division"));
-//                            editor.commit();
-//                        }
-//                    } else
-//                        updateApp(activity);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
-//                if (dialog != null && dialog.isShowing())
-//                    dialog.dismiss();
-//            }
-//
-//            public void onPreExecuteUpdate() {
-//                // GlobalVar.GV().ShowSnackbar(view, "Loading Station List", AlertType.Info);
-//            }
-//
-//        });
-//        task.execute();
-//    }
 
     public static int VersionCode(Context context) {
         int versioncode = 0;
-
         try {
             PackageManager manager = context.getPackageManager();
             PackageInfo info = manager.getPackageInfo(context.getPackageName(), 0);
@@ -935,29 +782,6 @@ public class GlobalVar {
         }
     }
 
-
-//    public static void updateApp(final Activity activity) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-//        builder.setTitle("Info")
-//                .setMessage("Kindly Please update our lastest version")
-//                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int which) {
-//                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.naqelexpress.naqelpointer"));
-//                        activity.startActivity(intent);
-//                        final DBConnections dbConnections = new DBConnections(activity.getApplicationContext(), null);
-//                        int id = dbConnections.getMaxID(" UserMeLogin where LogoutDate is NULL ", activity.getApplicationContext());
-//                        UserMeLogin userMeLogin = new UserMeLogin(id);
-//                        dbConnections.UpdateUserMeLogout(userMeLogin, activity.getApplicationContext());
-//                        activity.finish();
-//                    }
-//                }).setCancelable(false);//.setNegativeButton("Cancel", null).setCancelable(false);
-//        AlertDialog alertDialog = builder.create();
-//        alertDialog.show();
-//
-//    }
-
-
     public ArrayList<DeliveryStatus> DeliveryStatusList = new ArrayList<>();
     public ArrayList<String> DeliveryStatusNameList = new ArrayList<>();
     public ArrayList<String> DeliveryStatusFNameList = new ArrayList<>();
@@ -970,34 +794,6 @@ public class GlobalVar {
             dataSync.GetDeliveryStatus(context, view);
             return;
         }
-
-//        GlobalVar.GV().DeliveryStatusList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().DeliveryStatusNameList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().DeliveryStatusFNameList.clear();// = new ArrayList<>();
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill("select * from DeliveryStatus");
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Code = result.getString(result.getColumnIndex("Code"));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//
-//                DeliveryStatus instance = new DeliveryStatus(ID, Code, Name, FName);
-//                GlobalVar.GV().DeliveryStatusList.add(instance);
-//                GlobalVar.GV().DeliveryStatusNameList.add(Name);
-//                GlobalVar.GV().DeliveryStatusFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//
-//
-//        }
-//
-//        dbConnections.close();
-//        GlobalVar.dsl = true;
 
     }
 
@@ -1024,31 +820,6 @@ public class GlobalVar {
             task.execute();
             return;
         }
-//
-//        GlobalVar.GV().CheckPointTypeList.clear();
-//        GlobalVar.GV().CheckPointTypeNameList.clear();
-//        GlobalVar.GV().CheckPointTypeFNameList.clear();
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill("select * from CheckPointType");
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//
-//                CheckPointType instance = new CheckPointType(ID, Name, FName);
-//                GlobalVar.GV().CheckPointTypeList.add(instance);
-//                GlobalVar.GV().CheckPointTypeNameList.add(Name);
-//                GlobalVar.GV().CheckPointTypeFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//        }
-//        dbConnections.close();
-//
-//        GlobalVar.cptl = true;
     }
 
     public ArrayList<CheckPointTypeDetail> CheckPointTypeDetailList = new ArrayList<>();
@@ -1061,11 +832,6 @@ public class GlobalVar {
         //com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
         // if (GlobalVar.GV().CheckPointTypeDetailList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
         if (bringFromServer) {
-
-//            if (!GlobalVar.GV().HasInternetAccess)
-//                return;
-
-            //dataSync.GetCheckPointTypeDetail();
 
             ProjectAsyncTask task = new ProjectAsyncTask("GetCheckPointTypeDetail", "Get");
             task.setUpdateListener(new OnUpdateListener() {
@@ -1081,37 +847,6 @@ public class GlobalVar {
             return;
         }
 
-//        GlobalVar.GV().CheckPointTypeDetailList.clear();
-//        GlobalVar.GV().CheckPointTypeDetailNameList.clear();
-//        GlobalVar.GV().CheckPointTypeDetailFNameList.clear();
-//
-//        String selectCommand = "select * from CheckPointTypeDetail";
-//        if (checkPointTypeID > 0)
-//            selectCommand += " where CheckPointTypeID=" + checkPointTypeID;
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill(selectCommand);
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//                int CheckPointTypeID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeID")));
-//
-//                CheckPointTypeDetail instance = new CheckPointTypeDetail(ID, Name, FName, CheckPointTypeID);
-//                GlobalVar.GV().CheckPointTypeDetailList.add(instance);
-//                GlobalVar.GV().CheckPointTypeDetailNameList.add(Name);
-//                GlobalVar.GV().CheckPointTypeDetailFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//
-//        }
-//
-//        dbConnections.close();
-//        GlobalVar.cptdl = true;
-
     }
 
     public ArrayList<CheckPointTypeDDetail> CheckPointTypeDDetailList = new ArrayList<>();
@@ -1122,11 +857,7 @@ public class GlobalVar {
                                              int checkPointTypeDetailID, final Context context, final View view) {
 
         com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
-//        if (GlobalVar.GV().CheckPointTypeDDetailList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
-//            if (!GlobalVar.GV().HasInternetAccess)
-//                return;
 
-        //dataSync.GetCheckPointTypeDDetail();
         if (bringFromServer) {
             ProjectAsyncTask task = new ProjectAsyncTask("GetCheckPointTypeDDetail", "Get");
             task.setUpdateListener(new OnUpdateListener() {
@@ -1141,38 +872,6 @@ public class GlobalVar {
             task.execute();
             return;
         }
-
-//        GlobalVar.GV().CheckPointTypeDDetailList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().CheckPointTypeDDetailNameList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().CheckPointTypeDDetailFNameList.clear();// = new ArrayList<>();
-//
-//        String selectCommand = "select * from CheckPointTypeDDetail";
-//        if (checkPointTypeDetailID > 0)
-//            selectCommand += " where CheckPointTypeDetailID=" + checkPointTypeDetailID;
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill(selectCommand);
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//                int CheckPointTypeDetailID = Integer.parseInt(result.getString(result.getColumnIndex("CheckPointTypeDetailID")));
-//
-//                CheckPointTypeDDetail instance = new CheckPointTypeDDetail(ID, Name, FName, CheckPointTypeDetailID);
-//                GlobalVar.GV().CheckPointTypeDDetailList.add(instance);
-//                GlobalVar.GV().CheckPointTypeDDetailNameList.add(Name);
-//                GlobalVar.GV().CheckPointTypeDDetailFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//
-//        }
-//        dbConnections.close();
-//        GlobalVar.cptddl = true;
-
-
     }
 
     public ArrayList<NoNeedVolumeReason> NoNeedVolumeReasonList = new ArrayList<>();
@@ -1182,9 +881,6 @@ public class GlobalVar {
     public void GetNoNeedVolumeReasonList(boolean bringFromServer, final Context context,
                                           final View view) {
 
-//        if (GlobalVar.GV().NoNeedVolumeReasonList.size() <= 0 || (bringFromServer && LastBringMasterData(context, EmployID) > 0)) {
-//            if (!GlobalVar.GV().HasInternetAccess)
-//                return;
         if (bringFromServer) {
             ProjectAsyncTask task = new ProjectAsyncTask("GetNoNeedVolumeReason", "Get");
             task.setUpdateListener(new OnUpdateListener() {
@@ -1199,37 +895,6 @@ public class GlobalVar {
             task.execute();
             return;
         }
-
-//
-//        GlobalVar.GV().NoNeedVolumeReasonList.clear();// = new ArrayList<>();
-//        GlobalVar.GV().NoNeedVolumeReasonNameList = new ArrayList<>();
-//        GlobalVar.GV().NoNeedVolumeReasonFNameList = new ArrayList<>();
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill("select * from NoNeedVolumeReason");
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//                int ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                String Name = result.getString(result.getColumnIndex("Name"));
-//                String FName = result.getString(result.getColumnIndex("FName"));
-//
-//                NoNeedVolumeReason instance = new NoNeedVolumeReason(ID, Name, FName);
-//                GlobalVar.GV().NoNeedVolumeReasonList.add(instance);
-//                GlobalVar.GV().NoNeedVolumeReasonNameList.add(Name);
-//                GlobalVar.GV().NoNeedVolumeReasonFNameList.add(FName);
-//            }
-//            while (result.moveToNext());
-//
-//
-//        }
-//
-//        dbConnections.close();
-//        GlobalVar.nnvdl = true;
-//
-//        // com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
-
 
     }
 
@@ -1284,11 +949,6 @@ public class GlobalVar {
                 return;
             }
 
-//            Intent intent1 = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
-//            intent1.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-//                    activity.getPackageName());
-//            activity.startActivity(intent1);
-
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.setData(Uri.parse("tel:" + MobileNo));
@@ -1309,10 +969,6 @@ public class GlobalVar {
                 return;
             }
 
-//            Intent intent1 = new Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER);
-//            intent1.putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME,
-//                    activity.getPackageName());
-//            activity.startActivity(intent1);
             String mno = "";
             if (MobileNo.length() >= 9) {
                 mno = "90" + MobileNo.substring(MobileNo.length() - 9);
@@ -1352,26 +1008,6 @@ public class GlobalVar {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, 10));
         }
     }
-
-//    public void SyncData(Context context, View view) {
-//        //   if (GlobalVar.GV().HasInternetAccess) {
-//        GlobalVar.GV().ShowSnackbar(view, context.getString(R.string.SyncingStarted), GlobalVar.AlertType.Info);
-//        com.naqelexpress.naqelpointer.JSON.DataSync dataSync = new DataSync();
-//
-//        dataSync.SendPickUpData();
-//        dataSync.SendOnDliveryData();
-//        dataSync.SendNotDliveryData();
-//        dataSync.SendUserMeLoginsData();
-//        dataSync.SendOnCloadingForDData();
-//        dataSync.SendMultiDeliveryData();
-//        dataSync.SendWaybillMeasurementDataData();
-//        dataSync.SendCheckPointData();
-//
-//        GlobalVar.GV().ShowSnackbar(view, "Syncing Finish Successfully", GlobalVar.AlertType.Info);
-//
-////        } else
-////            GlobalVar.GV().ShowSnackbar(view, context.getString(R.string.NoInternetConnection), GlobalVar.AlertType.Warning);
-//    }
 
     public int getIntegerFromString(String str) {
         int i = 0;
@@ -1420,7 +1056,6 @@ public class GlobalVar {
                                      boolean CheckComplaintandDeliveryRequest, Context context, View view) {
 
         haslocation.clear();
-//        MyRouteActivity.places.clear();
         MyRouteActivity_Complaince_GroupbyPhn.places.clear();
         MyRouteActivity_Complaince_GroupbyPhn.Optmizeplaces.clear();
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -1754,67 +1389,6 @@ public class GlobalVar {
         dbConnections.close();
     }
 
-//    public void LoadMyBookingList(String orderBy, boolean isFromServer) {
-//
-//        GlobalVar.GV().myBookingList = new ArrayList<Booking>();
-//
-//        if (isFromServer) {
-//            DataSync dataSync = new DataSync();
-//            dataSync.GetBookingListSerer();
-//        } else {
-//
-//            Cursor result = dbConnections.Fill("select * from Booking Where EmployID = 1024"); //+ " GlobalVar.GV().EmployID order by " + orderBy
-//            if (result.getCount() > 0) {
-//                GlobalVar.GV().myBookingList = new ArrayList<Booking>();
-//
-//                result.moveToFirst();
-//                do {
-//                    Booking myBooking = new Booking();
-//                    myBooking.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                    myBooking.RefNo = result.getString(result.getColumnIndex("RefNo"));
-//                    myBooking.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
-//                    myBooking.ClientName = result.getString(result.getColumnIndex("ClientName"));
-//                    myBooking.BookingDate = DateTime.parse(result.getString(result.getColumnIndex("BookingDate")));
-//                    myBooking.PicesCount = Integer.parseInt(result.getString(result.getColumnIndex("PicesCount")));
-//                    myBooking.Weight = Double.parseDouble(result.getString(result.getColumnIndex("Weight")));
-//                    //myBooking.SpecialInstruction = result.getString(result.getColumnIndex("SpecialInstruction"));
-//                    //myBooking.OfficeUpTo = DateTime.parse(result.getString(result.getColumnIndex("OfficeUpTo")));
-//                    //myBooking.PickUpReqDT = DateTime.parse(result.getString(result.getColumnIndex("PickUpReqDT")));
-//                    myBooking.ContactPerson = result.getString(result.getColumnIndex("ContactPerson"));
-//                    myBooking.ContactNumber = result.getString(result.getColumnIndex("ContactNumber"));
-//                    myBooking.Address = result.getString(result.getColumnIndex("Address"));
-//                    //myBooking.Latitude = result.getString(result.getColumnIndex("Latitude"));
-//                    //myBooking.Longitude = result.getString(result.getColumnIndex("Longitude"));
-//                    //myBooking.Status = Integer.parseInt(result.getString(result.getColumnIndex("Status")));
-//                    myBooking.Orgin = result.getString(result.getColumnIndex("Orgin"));
-//                    myBooking.Destination = result.getString(result.getColumnIndex("Destination"));
-//                    //myBooking.LoadType = result.getString(result.getColumnIndex("LoadType"));
-//                    myBooking.BillType = result.getString(result.getColumnIndex("BillType"));
-//                    //myBooking.EmployeeId = Integer.parseInt(result.getString(result.getColumnIndex("EmployeeId")));
-//
-//                    GlobalVar.GV().myBookingList.add(myBooking);
-//                }
-//                while (result.moveToNext());
-//            }
-//
-//
-//        }
-//    }
-
-//    private void openWhatsApp(Context mycontext, String MobileNo, String Message) {
-//        //String smsNumber =MobileNo ;// "+966553234520";
-//        String smsNumber = "+919566706786";// "+966553234520";
-//
-//        Intent sendIntent = new Intent("android.intent.action.MAIN");
-//        //Intent sendIntent = new Intent("android.intent.action.SEND_TO");
-//        sendIntent.setComponent(new ComponentName("com.whatsapp", "com.whatsapp.Conversation"));
-//
-//        sendIntent.putExtra("jid", PhoneNumberUtils.stripSeparators(smsNumber) + "@s.whatsapp.net");//phone number without "+" prefix
-//        sendIntent.putExtra(Intent.EXTRA_TEXT, Message);
-//        mycontext.startActivity(sendIntent);
-//
-//    }
-
     public static boolean getPOS(Context context) {
         boolean pos = false;
 
@@ -1882,10 +1456,6 @@ public class GlobalVar {
             smsIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(smsIntent);
 
-//            SmsManager smsManager = SmsManager.getDefault();
-//            smsManager.sendTextMessage(phoneNo, null, msg, null, null);
-//            Toast.makeText(context, "Message Sent",
-//                    Toast.LENGTH_LONG).show();
         } catch (Exception ex) {
             Toast.makeText(context, ex.getMessage().toString(),
                     Toast.LENGTH_LONG).show();
@@ -1932,24 +1502,6 @@ public class GlobalVar {
         return validate;
     }
 
-//    public void MessageWhatsApp(Context context, String MobileNo, String Message) {
-//
-//        try {
-//            MobileNo = MobileNo.replace("00966", "+966");
-//            WhatsApp(context, MobileNo, "Hellow");
-//            return;
-//
-//            //String text = Message;// Replace with your message.
-//            //String toNumber ="966581776681"; // Replace with mobile phone number without +Sign or leading zeros.
-//            //Intent intent = new Intent(Intent.ACTION_VIEW);
-//            //intent.setData(Uri.parse("http://api.whatsapp.com/send?phone="+toNumber +"&text="+text));
-//            //context.startActivity(intent);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     public static String getDivisionID(Context context, int empId) {
         String devision = "";
         DBConnections dbConnections = new DBConnections(context, null);
@@ -1978,19 +1530,9 @@ public class GlobalVar {
                 com.naqelexpress.naqelpointer.Activity.Booking.Booking pickUpRequest = new com.naqelexpress.naqelpointer.Activity.Booking.Booking();
                 //pickUpRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
                 pickUpRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("WaybillNo")));
-                //pickUpRequest.ClientID = Integer.parseInt(result.getString(result.getColumnIndex("ClientID")));
-                //pickUpRequest.FromStationID = Integer.parseInt(result.getString(result.getColumnIndex("FromStationID")));
-                //pickUpRequest.ToStationID = Integer.parseInt(result.getString(result.getColumnIndex("ToStationID")));
                 pickUpRequest.PicesCount = Double.parseDouble(result.getString(result.getColumnIndex("PieceCount")));
                 pickUpRequest.Weight = Double.parseDouble(result.getString(result.getColumnIndex("Weight")));
-                //pickUpRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
-                //pickUpRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
-                //pickUpRequest.UserMEID = Integer.parseInt(result.getString(result.getColumnIndex("UserID")));
-                //pickUpRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
                 pickUpRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
-                //pickUpRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
-                //pickUpRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
-                //pickUpRequest.CurrentVersion = result.getString(result.getColumnIndex("CurrentVersion"));
 
                 pickupFromLocal.add(pickUpRequest);
             }
@@ -2061,20 +1603,6 @@ public class GlobalVar {
                 MyRouteShipments onDeliveryRequest = new MyRouteShipments();
                 // onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
                 onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
-                //  onDeliveryRequest.ReceiverName = result.getString(result.getColumnIndex("ReceiverName"));
-                // onDeliveryRequest.PiecesCount = Integer.parseInt(result.getString(result.getColumnIndex("PiecesCount")));
-                //   onDeliveryRequest.TimeIn = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
-                //   onDeliveryRequest.TimeOut = DateTime.parse(result.getString(result.getColumnIndex("TimeOut")));
-                //   onDeliveryRequest.EmployID = Integer.parseInt(result.getString(result.getColumnIndex("EmployID")));
-                //   onDeliveryRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
-                //    onDeliveryRequest.IsPartial = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsPartial")));
-                //    onDeliveryRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
-                //     onDeliveryRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
-                //     onDeliveryRequest.ReceivedAmt = Double.parseDouble(result.getString(result.getColumnIndex("TotalReceivedAmount")));
-                //onDeliveryRequest.ReceiptNo = result.getString(result.getColumnIndex("ReceiptNo"));
-                //onDeliveryRequest.StopPointsID = Integer.parseInt(result.getString(result.getColumnIndex("StopPointsID")));
-                //     onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
-                //     onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
 
                 OnDeleiveryFromLocal.add(onDeliveryRequest);
 
@@ -2105,16 +1633,6 @@ public class GlobalVar {
                 ;
                 onDeliveryRequest.PiecesCount = result.getString(result.getColumnIndex("PiecesCount"));
                 onDeliveryRequest.ExpectedTime = DateTime.parse(result.getString(result.getColumnIndex("TimeIn")));
-                //onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsDelivered")) > 0;
-                //   onDeliveryRequest.StationID = Integer.parseInt(result.getString(result.getColumnIndex("StationID")));
-                //    onDeliveryRequest.IsPartial = Boolean.parseBoolean(result.getString(result.getColumnIndex("IsPartial")));
-                //    onDeliveryRequest.Latitude = result.getString(result.getColumnIndex("Latitude"));
-                //     onDeliveryRequest.Longitude = result.getString(result.getColumnIndex("Longitude"));
-                //     onDeliveryRequest.ReceivedAmt = Double.parseDouble(result.getString(result.getColumnIndex("TotalReceivedAmount")));
-                //onDeliveryRequest.ReceiptNo = result.getString(result.getColumnIndex("ReceiptNo"));
-                //onDeliveryRequest.StopPointsID = Integer.parseInt(result.getString(result.getColumnIndex("StopPointsID")));
-                //     onDeliveryRequest.POSAmount = Double.parseDouble(result.getString(result.getColumnIndex("POSAmount")));
-                //     onDeliveryRequest.CashAmount = Double.parseDouble(result.getString(result.getColumnIndex("CashAmount")));
 
                 OnDeleiveryFromLocal.add(onDeliveryRequest);
 
@@ -2439,32 +1957,6 @@ public class GlobalVar {
         return DeliverySheetFromLocal;
     }
 
-//    public static ArrayList<MyRouteShipments> getNoPickupHistory(Context context) {
-//        ArrayList<MyRouteShipments> OnDeleiveryFromLocal = new ArrayList<>();
-//        DBConnections dbConnections = new DBConnections(context, null);
-//        dbConnections.getAllNoPickupReason(context);
-//
-//        Cursor result = dbConnections.Fill("select * from NoPickupReason", context);// where IsSync = 0
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            do {
-//
-//                MyRouteShipments onDeliveryRequest = new MyRouteShipments();
-//                 onDeliveryRequest.ID = Integer.parseInt(result.getString(result.getColumnIndex("ID")));
-//                onDeliveryRequest.ItemNo = result.getString(result.getColumnIndex("WaybillNo"));
-////                onDeliveryRequest.IsDelivered = result.getInt(result.getColumnIndex("IsSync")) > 0;
-////                onDeliveryRequest.TypeID = -1;
-//                onDeliveryRequest.RefNo = result.getString(result.getColumnIndex("RefNo"));
-//                onDeliveryRequest.Reason = result.getString(result.getColumnIndex("Reason"));
-//                OnDeleiveryFromLocal.add(onDeliveryRequest);
-//
-//            }
-//            while (result.moveToNext());
-//        }
-//        dbConnections.close();
-//        return OnDeleiveryFromLocal;
-//    }
-
     public static ArrayList<MyRouteShipments> getNightStock(Context context) {
         ArrayList<MyRouteShipments> DeliverySheetFromLocal = new ArrayList<>();
 
@@ -2588,13 +2080,6 @@ public class GlobalVar {
 
     private void ReOrderMyRouteShipments(boolean CheckComplaintandDeliveryRequest,
                                          final View view, final Context context) {
-        //Has Complaint and Has Delivery Request has high priority.
-        //Has Complaint
-        // Has Delivery Request
-        //Normal Order
-        //Has Delivery Exception
-        //Delivered will be removed from the list.
-        //GTranslation gTranslation = new GTranslation(AddressText,languageCode);
 
 
         if (CheckComplaintandDeliveryRequest) {
@@ -2659,62 +2144,6 @@ public class GlobalVar {
         GlobalVar.GV().myRouteShipmentList = tmpRouteShipmentList;
     }
 
-    //    public String DateFormat = "dd/MMM/yyyy HH:mm:ss";
-//    public java.sql.Date getCurrentSQLDate()
-//    {
-//        DateTime now = new DateTime();
-//        java.sql.Date sqlDate = new java.sql.Date(now.getTime());
-//        return sqlDate;
-//    }
-
-//    public String getDateTime(DateTime date)
-//    {
-//        return date.toString();
-//        //SimpleDateFormat dateFormat = new SimpleDateFormat(this.DateFormat, Locale.getDefault());
-//
-////        return dateFormat.format(date);
-//    }
-
-//    public String ConvertJsonDate1(String jsonDate)
-//    {
-////        String jsondate="\/Date(1427959670000)\/";
-//        jsonDate=jsonDate.replace("/Date(", "").replace(")/", "");
-//        long time = Long.parseLong(jsonDate);
-//        Date d = new Date(time);
-//        //Log.d("Convertd date is:"+new SimpleDateFormat("dd/MM/yyyy").format(d).toString());
-//
-//        return new SimpleDateFormat(GlobalVar.GV().DateFormat).format(d).toString();
-//    }
-
-    //Date Format
-    //SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-    //GlobalVar.GV().ShowMessage(this,sdf.format(instance.CTime).toString());
-
-    //For Settings Error
-    //txtPOS.setError(txtPOS.getText().toString());
-
-    //Open new Intent
-    //Intent mainpage = new Intent(this,MainPageActivity.class);
-    //startActivity(mainpage);
-
-    // Make Toast
-    //Toast.makeText(this, GlobalVar.gv.xTest,Toast.LENGTH_LONG).show();
-
-//    String ackwardDate = "/Date(1376841597000)/";
-//    //Dirty convertion
-//    Calendar calendar = Calendar.getInstance();
-//    String ackwardRipOff = ackwardDate.replace("/Date(", "").replace(")/", "");
-//    Long timeInMillis = Long.valueOf(ackwardRipOff);
-//    calendar.setTimeInMillis(timeInMillis);
-//    GlobalVar.GV().ShowMessage(this,calendar.getTime().toGMTString());
-
-
-    //                    DateTime dateTime = new DateTime();//new DateTime(1467880743533L, DateTimeZone.forOffsetHours(-5));
-//                    System.out.println(dateTime.toString(ISODateTimeFormat.dateTime()));
-//                    String json = JsonSerializerDeserializer.serialize(dateTime, Boolean.TRUE);
-//                    System.out.println(json);
-//                    dateTime = JsonSerializerDeserializer.deserialize(json, DateTime.class);
-//                    System.out.println(dateTime.toString(ISODateTimeFormat.dateTime()));
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
@@ -2723,65 +2152,6 @@ public class GlobalVar {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
-//    public static LatLng getNextLatLong(LatLng point) {
-//
-//
-//        double meters = 5;
-//
-//        double coef = meters * 0.0000089;
-//
-//        double new_lat = point.latitude + coef;
-//
-//// pi / 180 = 0.018
-//        double new_long = point.longitude + coef / Math.cos(point.latitude * 0.018);
-//
-//        LatLng newLaLng = new LatLng(new_lat, new_long);
-//        return newLaLng;
-//    }
-
-    //For testing Purpose
-//    public static LatLng getRandomLocation(LatLng point, int radius) {
-//
-//        radius = 100;
-//        List<LatLng> randomPoints = new ArrayList<>();
-//        List<Float> randomDistances = new ArrayList<>();
-//        Location myLocation = new Location("");
-//        myLocation.setLatitude(point.latitude);
-//        myLocation.setLongitude(point.longitude);
-//
-//        //This is to generate 10 random points
-//        for (int i = 0; i < 1; i++) {
-//            double x0 = point.latitude;
-//            double y0 = point.longitude;
-//
-//            Random random = new Random();
-//
-//            // Convert radius from meters to degrees
-//            double radiusInDegrees = radius / 111000f;
-//
-//            double u = random.nextDouble();
-//            double v = random.nextDouble();
-//            double w = radiusInDegrees * Math.sqrt(u);
-//            double t = 2 * Math.PI * v;
-//            double x = w * Math.cos(t);
-//            double y = w * Math.sin(t);
-//
-//            // Adjust the x-coordinate for the shrinking of the east-west distances
-//            double new_x = x / Math.cos(y0);
-//
-//            double foundLatitude = new_x + x0;
-//            double foundLongitude = y + y0;
-//            LatLng randomLatLng = new LatLng(foundLatitude, foundLongitude);
-//            randomPoints.add(randomLatLng);
-//            Location l1 = new Location("");
-//            l1.setLatitude(randomLatLng.latitude);
-//            l1.setLongitude(randomLatLng.longitude);
-//            randomDistances.add(l1.distanceTo(myLocation));
-//        }
-//        //Get nearest point to the centre
-//        int indexOfNearestPointToCentre = randomDistances.indexOf(Collections.min(randomDistances));
-//        return randomPoints.get(indexOfNearestPointToCentre);
-//    }
 
     public static boolean AskPermission_Camera(Activity activity, int reqcode) {
         String[] PERMISSIONS = {
@@ -2843,16 +2213,6 @@ public class GlobalVar {
         return true;
     }
 
-//    private void RedirectSettings(Activity activity, String message) {
-//        android.app.AlertDialog.Builder alertBuilder = new android.app.AlertDialog.Builder(activity);
-//        alertBuilder.setCancelable(true);
-//        alertBuilder.setTitle(message + " Permission necessary");
-//        alertBuilder.setMessage("Kindly please contact admin");
-//        android.app.AlertDialog alert = alertBuilder.create();
-//        alert.setCancelable(false);
-//        alert.show();
-//    }
-
     public static boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager
@@ -2904,21 +2264,6 @@ public class GlobalVar {
         //getLastLocationNewMethod(context);
         return bestLocation;
     }
-//
-//    public static void lastlogin(Context context, int EmpId) {
-//
-////        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
-////        SharedPreferences.Editor editor = pref.edit();
-////        editor.putInt("EmpID", EmpId); // Storing integer
-////        editor.apply();
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//        dbConnections.UpdateLastLogin(EmpId, context);
-//        dbConnections.close();
-////
-//
-//    }
-
     public static int getlastlogin(Context context) {
 //        SharedPreferences pref = context.getSharedPreferences("LastLogin", 0); // 0 - for private mode
 //        return pref.getInt("EmpID", 0); // Storing integer
@@ -3013,11 +2358,6 @@ public class GlobalVar {
         }
 
         return add1day;
-
-//        Calendar calander = Calendar.getInstance();
-//        calander.add(Calendar.DATE, 1);
-//        SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyy-MM-dd");
-//        return simpledateformat.format(calander.getTime());
     }
 
     public static String getDateAdd1Day() {
@@ -3087,8 +2427,8 @@ public class GlobalVar {
     public static boolean ValidateAutomacticDate_Splashscreen(Context context) {
 
         //return true;
-        if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
-            return true;
+//        if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
+//            return true;
 
         int isValidAutoTimeZone = 0;
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -3123,62 +2463,11 @@ public class GlobalVar {
 
     public static boolean ValidateAutomacticDate(Context context) {
 
-        //return true;
-//        if (GlobalVar.GV().EmployID == 90189 || GlobalVar.GV().EmployID == 19127)
-//            return true;
-
-        int isValidAutoTimeZone = 0;
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            isValidAutoTimeZone =
-                    android.provider.Settings.System.getInt(context.getContentResolver(),
-                            Settings.Global.AUTO_TIME_ZONE, 0); // 1 means Enabled
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            return Settings.Global.getInt(context.getContentResolver(), Settings.Global.AUTO_TIME, 0) == 1;
         } else {
-            isValidAutoTimeZone = android.provider.Settings.System.getInt(context.getContentResolver(),
-                    Settings.System.AUTO_TIME_ZONE, 0); // 1 means Enabled
+            return android.provider.Settings.System.getInt(context.getContentResolver(), android.provider.Settings.System.AUTO_TIME, 0) == 1;
         }
-
-        if (isValidAutoTimeZone == 1) {
-            int isvalidAutotime = 0;
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-
-                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
-                        Settings.Global.AUTO_TIME, 0); // 1 means Enabled
-            } else {
-                isvalidAutotime = android.provider.Settings.System.getInt(context.getContentResolver(),
-                        Settings.System.AUTO_TIME, 0); // 1 means Enabled
-            }
-            if (isvalidAutotime == 1) {
-
-                String timeZone = GetLastLoggedinUserTimeZone(context);
-                Calendar calendar = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy hh:mm"); //dd-MMM-yyyy hh:mm:ss z
-                sdf.setTimeZone(TimeZone.getTimeZone(timeZone));
-                System.out.println(sdf.format(calendar.getTime()));
-
-                Calendar calendar1 = Calendar.getInstance();
-                SimpleDateFormat sdf1 = new SimpleDateFormat("dd-MMM-yyyy hh:mm"); //dd-MMM-yyyy hh:mm:ss z
-                System.out.println(sdf1.format(calendar1.getTime()));
-
-
-                if (sdf.format(calendar.getTime()).equals(sdf1.format(calendar1.getTime()))) {
-
-                    return true;
-//                    TimeZone tz = TimeZone.getTimeZone(timeZone);
-//                    Calendar mCalendar = new GregorianCalendar();
-//                    TimeZone mTimeZone = mCalendar.getTimeZone();
-//                    String devicetZ = mTimeZone.getID();
-//                    if (timeZone.equals(devicetZ))
-//                        return true;
-//                    else
-//                        return false;
-                } else
-                    return false;
-            }
-
-        }
-
-        return false;
-
     }
 
     public static void RedirectSettings(final Activity activity) {
@@ -3358,24 +2647,6 @@ public class GlobalVar {
             foundLongitude = location.getLongitude();
         }
 
-
-        //     Random random = new Random();
-
-        // Convert radius from meters to degrees
-//        double radiusInDegrees = radius / 111000f;
-//
-//        double u = random.nextDouble();
-//        double v = random.nextDouble();
-//        double w = radiusInDegrees * Math.sqrt(u);
-//        double t = 2 * Math.PI * v;
-//        double x = w * Math.cos(t);
-//        double y = w * Math.sin(t);
-//
-//        // Adjust the x-coordinate for the shrinking of the east-west distances
-//        double new_x = x / Math.cos(lat);
-
-        // double foundLongitude = new_x + lon;
-        // double foundLatitude = y + lat;
 
         float[] results = new float[1];
         Location.distanceBetween(lat, lon, foundLatitude, foundLongitude, results);
@@ -3576,20 +2847,6 @@ public class GlobalVar {
         context.startActivity(intent);
 
     }
-//    public static String getDivision(Context context) {
-//        String division = "";
-//
-//        DBConnections dbConnections = new DBConnections(context, null);
-//
-//        Cursor result = dbConnections.Fill("select * from UserME where StatusID <> 3 and EmployID = " +
-//                GlobalVar.GV().EmployID, context);
-//        if (result.getCount() > 0) {
-//            result.moveToFirst();
-//            division = result.getString(result.getColumnIndex("Division"));
-//        }
-//        return division;
-//    }
-
     public static void ResetTriedCount() {
         triedTimes = 0;
 
@@ -3597,15 +2854,14 @@ public class GlobalVar {
 
     public String GetDomainURL(Context context) {
 
-//        return NaqelPointerAPILink;
+        return NaqelPointerAPILink;
 
-        DBConnections dbConnections = new DBConnections(context, null);
-        return dbConnections.GetPrimaryDomain(context);
+//        DBConnections dbConnections = new DBConnections(context, null);
+//        return dbConnections.GetPrimaryDomain(context);
 
     }
 
     public static IPointerAPI getIPointerAPI(String url, int readTimeOut, int connectTimeOut) {
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -3617,8 +2873,6 @@ public class GlobalVar {
     }
 
     private static OkHttpClient getClient(int readTimeOut, int connectTimeOut) {
-
-
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .readTimeout(readTimeOut, TimeUnit.SECONDS)
                 .connectTimeout(connectTimeOut, TimeUnit.SECONDS)
@@ -3627,14 +2881,6 @@ public class GlobalVar {
         return okHttpClient;
     }
 
-
-//    public static String getTestAPIURL(Context context) {
-//        return NaqelAPITest_V10;
-//    }
-//
-//    public static String getUATUrl(Context context) {
-//        return NaqelAPIUAT;
-//    }
 
     public String GetDomainURLforService(Context context, String ServiceName) {
         DBConnections dbConnections = new DBConnections(context, null);
@@ -3697,20 +2943,6 @@ public class GlobalVar {
 
     public boolean isValidBarcode(String Barcode) {
         boolean isvalid = true;
-
-
-//        try {
-//            double barcode = Double.parseDouble(Barcode);
-//            if (Barcode.length() == 13) {
-//                String validChar = Barcode.substring(8, 12);
-//                if (!validChar.equals("0000"))
-//                    isvalid = false;
-//            } else
-//                isvalid = false;
-//
-//        } catch (Exception e) {
-//            isvalid = false;
-//        }
 
         return isvalid;
 
@@ -4291,13 +3523,6 @@ public class GlobalVar {
     }
 
     private void setCallback(String classname) {
-//        if (classname.equals("SkipWaybillNoinRouteLine"))
-//            alertCallback = new SkipWaybillNoinRouteLine();
-//        else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
-//            alertCallback = new com.naqelexpress.naqelpointer.Activity.PickUp.PickUpFirstFragment();
-//        else if (classname.equals("MyRouteActivity_Complaince_GroupbyPhn"))
-//            alertCallback = new MyRouteActivity_Complaince_GroupbyPhn();
-
         if (classname.equals("SkipWaybillNoinRouteLine"))
             alertCallback = new SkipWaybillNoinRouteLine();
         else if (classname.equals("PickUpFirstFragmentEBU")) //EBU
@@ -4373,18 +3598,6 @@ public class GlobalVar {
         return returnvalue;
 
     }
-
-//    public void erroralert(String title, String msg, Activity activity) {
-//        AlertRequest alertRequest = new AlertRequest();
-//        alertRequest.setAlertType(Enum.ERROR_TYPE.getValue());
-//        alertRequest.setIsCancelable(false);
-//        alertRequest.setIsFinish(true);
-//        alertRequest.setAlrttitle(title);
-//        alertRequest.setAlrtmessage(msg);
-//
-//        CommonAlertMessageActivity(title, msg, activity, alertRequest);
-//
-//    }
 
 
     public static String GetDateTimeFormat(String datetime) {
@@ -4627,12 +3840,6 @@ public class GlobalVar {
     }
 
     public static void toGoogle(String lat, String lng, Activity activity, Location location) {
-//        Uri gmmIntentUri = Uri.parse("geo:" + lat + "," + lng);
-//        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-//        mapIntent.setPackage("com.google.android.apps.maps");
-//        if (mapIntent.resolveActivity(activity.getPackageManager()) != null) {
-//            activity.startActivity(mapIntent);
-//        }
         String api = "http://maps.google.com/maps?saddr=";
         StringBuilder sb = new StringBuilder();
         sb.append(api);
@@ -4760,21 +3967,6 @@ public class GlobalVar {
         }
     }
 
-//    public boolean isEightorNine(String WaybillNo)
-//    {
-//
-//        if (WaybillNo.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(WaybillNo.substring(0, 1))) {
-//            //txtBarCode.setText(barcode.substring(0, 8));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-//
-//        } else if (barcode.length() >= GlobalVar.ScanWaybillLength) {
-//            //txtBarCode.setText(barcode.substring(0, GlobalVar.ScanWaybillLength));
-//            ValidateWayBill(txtBarCode.getText().toString().substring(0, GlobalVar.ScanWaybillLength));
-//        }
-//
-//
-//    }
-
     public static void onBackpressed(final Activity activity, String title, String msg) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -4877,14 +4069,6 @@ public class GlobalVar {
         HashMap<String, String> hashMap = new HashMap<>();
 
         DBConnections dbConnections = new DBConnections(context, null);
-//        Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
-//                "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
-//                "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
-//                " , Count(Distinct ItemNo) WBCount , Count(Distinct b.Barcode) BarCodeCount , SUM(Distinct mr.CODAmount) tCoD " +
-//                ",SUM(Distinct CustomDuty) tCDAmount , Count(Distinct od.WayBillNo) DWCount , Count(Distinct nd.WayBillNo) NTWCount" +
-//                " from MyRouteShipments mr LEFT JOIN USERME um on um.EmployID = mr.EmpID Left JOIN BarCode b on b.WayBillNo = mr.ItemNo" +
-//                " LEFT JOIN OnDelivery od on od.WayBillNo = mr.ItemNo LEFt JOIN NotDelivered nd on nd.WayBillNo = mr.ItemNo", context);
-
         Cursor result = dbConnections.Fill("SELECT mr.DeliverySheetID , " +
                 "um.EmployID || ' ' || CASE WHEN  um.EmployName is null THEN  um.EmployFName ELSE um.EmployName END EmployName," +
                 "IqamaNo,MobileNo,RouteName,PlateNumber,TruckName ,  substr(mr.date, 0,11) DsDate,KMOut,POSName" +
@@ -4949,11 +4133,6 @@ public class GlobalVar {
                 hashMap.add(hm);
             } while (result.moveToNext());
         }
-//        else {
-//            HashMap<String, String> hm = new HashMap<>();
-//            hm.put("isDone", "0");
-//            hashMap.add(hm);
-//        }
 
         result.close();
         dbConnections.close();
@@ -4991,11 +4170,6 @@ public class GlobalVar {
                 hashMap.add(hm);
             } while (result.moveToNext());
         }
-//        else {
-//            HashMap<String, String> hm = new HashMap<>();
-//            hm.put("isDone", "0");
-//            hashMap.add(hm);
-//        }
 
         result.close();
         dbConnections.close();
@@ -5033,12 +4207,6 @@ public class GlobalVar {
                 hashMap.add(hm);
             } while (result.moveToNext());
         }
-//        else {
-//            HashMap<String, String> hm = new HashMap<>();
-//            hm.put("isDone", "0");
-//            hashMap.add(hm);
-//        }
-
         result.close();
         dbConnections.close();
         return hashMap;

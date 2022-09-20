@@ -67,10 +67,16 @@ public class PickUpSecondFragment
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8){
+
+                    }
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8){
+
+                    }
                 }
 
                 @Override

@@ -7,10 +7,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -20,6 +16,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
 import com.naqelexpress.naqelpointer.DB.DBConnections;
@@ -66,7 +67,7 @@ public class SingleItem extends Fragment {
 
                     @Override
                     public void afterTextChanged(Editable s) {
-                        if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+                        if (txtBarCode != null && txtBarCode.getText().length() >= 13)//every making 13 bcz it was reading mentioned number count in some devices
 //                            ValidatePallet(txtBarCode.getText().toString());
                             setBarcode();
                     }

@@ -6,7 +6,8 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 
@@ -54,23 +55,41 @@ public class CBM extends AppCompatActivity implements AlertCallback {
         txtHeight = (EditText) findViewById(R.id.txtheight);
         txtLength = (EditText) findViewById(R.id.txtlength);
 
-        txtWNo.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if (event.getAction() != KeyEvent.ACTION_DOWN)
-                    return true;
-                else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        onBackPressed();
-                    return true;
-                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                    if (txtWNo != null && txtWNo.getText().toString().length() >= 8)
-//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
-                        setTxtWaybillNo();
-                    return true;
-                }
-                return false;
+        txtWNo.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (txtWNo != null && txtWNo.getText().length()  >= 9)//every making 9 bcz it was reading mentioned number count in some devices
+                    setTxtWaybillNo();
             }
         });
+
+//        txtWNo.setOnKeyListener(new View.OnKeyListener() {
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                // If the event is a key-down event on the "enter" button
+//                if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                    return true;
+//                else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        onBackPressed();
+//                    return true;
+//                } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+//                    if (txtWNo != null && txtWNo.getText().toString().length() >= 8)
+////                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+//                        setTxtWaybillNo();
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
 
     }
 

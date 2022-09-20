@@ -6,7 +6,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,23 +90,41 @@ public class ScanShipmentFragment extends Fragment {
                 }
             });
 
-            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
-                public boolean onKey(View v, int keyCode, KeyEvent event) {
-                    // If the event is a key-down event on the "enter" button
-                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-                        return true;
-                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-                        onBackpressed();
-                        return true;
-                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-//                            setTxtWaybillNo(txtWaybillNo.getText().toString());
-                        if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
-                            setTxtWaybillNo();
-                        return true;
-                    }
-                    return false;
+            txtWaybillNo.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (txtWaybillNo != null && txtWaybillNo.getText().length()  >= 9)//every making 9 bcz it was reading mentioned number count in some devices
+                        setTxtWaybillNo();
                 }
             });
+
+//            txtWaybillNo.setOnKeyListener(new View.OnKeyListener() {
+//                public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                    // If the event is a key-down event on the "enter" button
+//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
+//                        return true;
+//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//                        onBackpressed();
+//                        return true;
+//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
+////                            setTxtWaybillNo(txtWaybillNo.getText().toString());
+//                        if (txtWaybillNo != null && txtWaybillNo.getText().toString().length() >= 8)
+//                            setTxtWaybillNo();
+//                        return true;
+//                    }
+//                    return false;
+//                }
+//            });
 
 //            txtWaybillNo.addTextChangedListener(new TextWatcher() {
 //                @Override

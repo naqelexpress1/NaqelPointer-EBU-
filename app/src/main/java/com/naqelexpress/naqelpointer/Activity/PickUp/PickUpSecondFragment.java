@@ -67,21 +67,17 @@ public class PickUpSecondFragment
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8){
 
-                    }
                 }
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8){
 
-                    }
                 }
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length()  >= 8)//|| txtBarCode.getText().length() == GlobalVar.GV().ScanBarcodeLength
+                    if (txtBarCode != null && txtBarCode.getText().length()  >= 13)//every making 13 bcz it was reading mentioned number count in some devices
                         AddNewPiece();
                 }
             });
@@ -269,17 +265,19 @@ public class PickUpSecondFragment
     }
 
     private void AddNewPiece() {
+        String barCode = txtBarCode.getText().toString();
         GlobalVar.hideKeyboardFrom(getContext(), rootView);
         if (PickUpActivity.class_.equals("BookingDetailAcyivityforCBU")) {
-            if (!txtBarCode.getText().toString().contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
+            if (!barCode.contains(PickUpFirstFragment.txtWaybillNo.getText().toString())) {
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.wrongbarcodescan);
                 GlobalVar.GV().ShowSnackbar(rootView, "Scanned Piece Barcode Not Matching", GlobalVar.AlertType.Warning);
                 return;
             }
         }
-        if (!PickUpBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length()  >= 8) {//|| txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength
-                PickUpBarCodeList.add(0, txtBarCode.getText().toString());
+
+        if (!PickUpBarCodeList.contains(barCode)) {
+            if (barCode.length()  >= 13) {//|| txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength
+                PickUpBarCodeList.add(0, barCode);
                 lbTotal.setText(getString(R.string.lbCount) + PickUpBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);
                 txtBarCode.setText("");

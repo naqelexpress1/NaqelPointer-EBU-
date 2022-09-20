@@ -61,7 +61,7 @@ public class SingleLoad extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)//every making 13 bcz it was reading mentioned number count in some devices
                         setBarcode();
                 }
             });

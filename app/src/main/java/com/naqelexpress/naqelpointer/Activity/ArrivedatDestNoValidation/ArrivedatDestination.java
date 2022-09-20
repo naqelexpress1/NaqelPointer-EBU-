@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,7 +83,7 @@ public class ArrivedatDestination extends AppCompatActivity {
 
         setContentView(R.layout.delivery);
 
-        Toast.makeText(this, "Arrive At Dest", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Arrive At Dest", Toast.LENGTH_SHORT).show();
 
         Bundle bundle = getIntent().getExtras();
         tripPlanID = bundle.getString("triplanID");

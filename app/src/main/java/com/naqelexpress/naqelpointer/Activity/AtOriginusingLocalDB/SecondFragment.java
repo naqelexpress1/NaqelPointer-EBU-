@@ -78,7 +78,7 @@ public class SecondFragment extends Fragment {
                 @Override
                 public void afterTextChanged(Editable s) {
 
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 8) {
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13) {//every making 13 bcz it was reading mentioned number count in some devices
                         //if (setTxtWaybillNo())
                         setBarcode();
                     }
@@ -212,7 +212,7 @@ public class SecondFragment extends Fragment {
     }
 
     private void setBarcode() {
-        if (txtBarCode.getText().length() >= 8) {
+        if (txtBarCode.getText().length() >= 13) {
             //txtBarCode.setText(barcode.substring(0, 8));
             ValidateWayBill(txtBarCode.getText().toString());
 

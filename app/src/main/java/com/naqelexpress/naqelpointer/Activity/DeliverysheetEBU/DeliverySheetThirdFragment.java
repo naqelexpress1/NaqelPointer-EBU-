@@ -2,6 +2,7 @@ package com.naqelexpress.naqelpointer.Activity.DeliverysheetEBU;
 
 import static android.app.Activity.RESULT_OK;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,12 +12,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.app.AlertDialog;import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -25,6 +20,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.naqelexpress.naqelpointer.Activity.Delivery.DataAdapter;
 import com.naqelexpress.naqelpointer.Classes.NewBarCodeScanner;
@@ -99,7 +101,7 @@ public class DeliverySheetThirdFragment
                 public void afterTextChanged(Editable s) {
 //                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
 //                        AddNewPiece();
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 8)
+                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)//every making 13 bcz it was reading mentioned number count in some devices
                         setBarcode();
                 }
             });
@@ -283,7 +285,7 @@ public class DeliverySheetThirdFragment
 
     private void AddNewPiece13and14() {
         if (!PieceBarCodeList.contains(txtBarCode.getText().toString())) {
-            if (txtBarCode.getText().toString().length() >=8 ) {//|| txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength
+            if (txtBarCode.getText().toString().length() >=13 ) {//|| txtBarCode.getText().toString().length() == GlobalVar.ScanBarcodeLength
                 PieceBarCodeList.add(0, txtBarCode.getText().toString());
                 lbTotal.setText(getString(R.string.lbCount) + PieceBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

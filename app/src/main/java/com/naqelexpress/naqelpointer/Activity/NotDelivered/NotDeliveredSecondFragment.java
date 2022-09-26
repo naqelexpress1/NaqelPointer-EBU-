@@ -71,8 +71,15 @@ public class NotDeliveredSecondFragment
                 public void afterTextChanged(Editable s) {
 //                    if (txtBarCode != null && txtBarCode.getText().length() == 13)
 //                        AddNewPiece();
-                    if (txtBarCode != null && txtBarCode.getText().length() >= 13)//every making 13 bcz it was reading mentioned number count in some devices
-                        AddNewPiece();
+                    if (txtBarCode.getText().length()  >= 13) {//every making 13 bcz it was reading mentioned number count in some devices
+                        String subS = txtBarCode.getText().toString().substring(0, 1);
+                        boolean check = GlobalVar.EWaybilSeries.contains(subS);//for e waybills check will be true
+                        if (check == true && txtBarCode.getText().length() >= 14) {//for e pieces it will be 14 digits
+                            AddNewPiece();
+                        } else if (check == false && txtBarCode.getText().length() >= 13) {
+                            AddNewPiece();
+                        }
+                    }
                 }
             });
 

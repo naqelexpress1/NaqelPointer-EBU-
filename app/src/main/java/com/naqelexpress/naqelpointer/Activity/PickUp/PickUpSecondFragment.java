@@ -77,8 +77,15 @@ public class PickUpSecondFragment
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtBarCode != null && txtBarCode.getText().length()  >= 13)//every making 13 bcz it was reading mentioned number count in some devices
-                        AddNewPiece();
+                    if (txtBarCode.getText().length()  >= 13) {//every making 13 bcz it was reading mentioned number count in some devices
+                        String subS = txtBarCode.getText().toString().substring(0,1);
+                        boolean check = GlobalVar.EWaybilSeries.contains(subS);//for e waybills check will be true
+                        if(check == true && txtBarCode.getText().length() >= 14){//for e pieces it will be 14 digits
+                            AddNewPiece();
+                        }else if(check == false && txtBarCode.getText().length() >= 13){
+                            AddNewPiece();
+                        }
+                    }
                 }
             });
 
@@ -164,7 +171,7 @@ public class PickUpSecondFragment
                 if (extras != null) {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
-                        if (barcode.length() >= 8) {// || barcode.length() == GlobalVar.GV().ScanBarcodeLength
+                        if (barcode.length() >= 13) {// || barcode.length() == GlobalVar.GV().ScanBarcodeLength
                             txtBarCode.setText(barcode);
                             AddNewPiece();
                         }
@@ -276,7 +283,7 @@ public class PickUpSecondFragment
         }
 
         if (!PickUpBarCodeList.contains(barCode)) {
-            if (barCode.length()  >= 13) {//|| txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength
+            if (barCode.length() >= 13) {//|| txtBarCode.getText().toString().length() == GlobalVar.GV().ScanBarcodeLength
                 PickUpBarCodeList.add(0, barCode);
                 lbTotal.setText(getString(R.string.lbCount) + PickUpBarCodeList.size());
                 GlobalVar.GV().MakeSound(this.getContext(), R.raw.barcodescanned);

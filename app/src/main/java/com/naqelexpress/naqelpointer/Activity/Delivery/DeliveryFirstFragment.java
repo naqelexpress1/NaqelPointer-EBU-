@@ -358,8 +358,9 @@ public class DeliveryFirstFragment
     private void setTxtWaybillNo() {
         String barcode = txtWaybillNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtWaybillNo.setText(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWaybillNo.setText(newBarcode);
 //        AddNewWaybill8and9(nbarcode);
 //        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
 //            txtWaybillNo.setText(barcode);

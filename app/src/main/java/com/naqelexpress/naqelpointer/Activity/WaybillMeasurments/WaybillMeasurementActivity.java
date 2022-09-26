@@ -287,8 +287,9 @@ public class WaybillMeasurementActivity extends AppCompatActivity {
 
         String barcode = txtWaybillNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtWaybillNo.setText(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWaybillNo.setText(newBarcode);
 
 //        txtWaybillNo.removeTextChangedListener(textWatcher);
 //        if (barcode.length() >= 8) {// && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))

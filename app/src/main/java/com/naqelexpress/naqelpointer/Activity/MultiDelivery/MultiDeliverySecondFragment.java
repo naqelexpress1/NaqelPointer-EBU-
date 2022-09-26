@@ -327,9 +327,10 @@ public class MultiDeliverySecondFragment
     private void AddNewWaybill() {
         String WaybillNo = txtWaybilll.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(WaybillNo);
-        txtWaybilll.setText(nbarcode);
-        AddNewWaybill8and9(nbarcode);
+        String newBarcode = utilities.findwaybillno(WaybillNo);
+        if (newBarcode.length() < 9)
+            txtWaybilll.setText(newBarcode);
+        AddNewWaybill8and9(newBarcode);
 
 //        if (WaybillNo.length() > 8)
 //            WaybillNo = WaybillNo.substring(0, 8);

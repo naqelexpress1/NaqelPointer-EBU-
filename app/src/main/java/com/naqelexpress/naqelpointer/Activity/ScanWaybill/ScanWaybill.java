@@ -58,8 +58,9 @@ public class ScanWaybill extends AppCompatActivity implements View.OnClickListen
 
         String barcode = txtWNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtWNo.setText(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWNo.setText(newBarcode);
 
     }
     @Override

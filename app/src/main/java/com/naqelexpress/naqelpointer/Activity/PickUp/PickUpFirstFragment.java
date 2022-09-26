@@ -321,7 +321,7 @@ public class PickUpFirstFragment
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (txtWaybillNo != null && txtWaybillNo.getText().length()  >= 9)//every making 9 bcz it was reading mentioned number count in some devices
+                if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 9)//every making 9 bcz it was reading mentioned number count in some devices
                     setTxtWaybillNo(txtWaybillNo.getText().toString());
             }
         });
@@ -428,7 +428,10 @@ public class PickUpFirstFragment
 
     private void setTxtWaybillNo(String barcode) {
         utilities utilities = new utilities();
-        txtWaybillNo.setText(utilities.findwaybillno(barcode));
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWaybillNo.setText(newBarcode);
+
 //        txtWaybillNo.removeTextChangedListener(textWatcher);
 //        if (barcode.length() >= 8 ) {//&& GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))
 //            txtWaybillNo.setText(barcode);

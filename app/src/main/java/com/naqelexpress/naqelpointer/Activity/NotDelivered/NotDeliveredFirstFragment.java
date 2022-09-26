@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,7 +84,7 @@ public class NotDeliveredFirstFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    if (txtWaybillNo != null && txtWaybillNo.getText().length()  >= 9)//every making 9 bcz it was reading mentioned number count in some devices
+                    if (txtWaybillNo != null && txtWaybillNo.getText().length() >= 9)//every making 9 bcz it was reading mentioned number count in some devices
                         SetText();
                 }
             });
@@ -223,6 +224,7 @@ public class NotDeliveredFirstFragment extends Fragment {
 
         Cursor result = dbConnections.Fill("select * from DeliveryStatus", getContext());
         int RoleMEID = SharedHelper.getKeyInteger(getActivity(), "RoleMEID");
+        int empID = SharedHelper.getKeyInteger(getActivity(), "EmployID");
         if (result.getCount() > 0) {
             result.moveToFirst();
             do {
@@ -231,180 +233,186 @@ public class NotDeliveredFirstFragment extends Fragment {
                 String Code = result.getString(result.getColumnIndex("Code"));
                 String Name = result.getString(result.getColumnIndex("Name"));
                 String FName = result.getString(result.getColumnIndex("FName"));
-
-                if(Name.contains("Accident-Collision")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Accident-Theft")){
-                    if(RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 31){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Accident-Breakdown")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Not Available")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Customer Facility Challanges")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Customer Change Location")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("IncompleteInformation-address")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Claims-Damage")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-Unsealed")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Not Received")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Claims-Lost")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Customer-Noresponse")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Delivered")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("IncompleteInformation-address")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-Cash")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("IncompleteInformation-DCode")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Charges Approval")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Weekend Off")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Wrong Destination")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Weather")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Legal Holiday")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Accessrestricted")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("ODA-Schedule")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("On Hold-CreditControl")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("On Hold-CustomerCollection")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-MissingContent")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-WrongContent")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-DamageContent")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-OpenRequest")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Refused Delivery-CustomerDoNotNeedTheShipment")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("ReturntoOrigin")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Truckban")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Late Trip")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Attached Document Incomplete")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Mall Timing Restricted")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("UCS")){
-                    if(RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 31){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Conginee Location Sealed by The Baladia")){
-                    if(RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Que Delivery")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else if(Name.contains("Forward-Pharma")){
+                if (empID == 17824 || empID == 17734 || empID == 20211 || empID == 20923) {
                     toAdd = true;
-                }else if(Name.contains("Customer Request")){
-                    if(RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30){
+                } else {
+                    if (Name.equals("Accident - Collision")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Accident - Theft")) {//
+                        if (RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 31) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Accident - Breakdown")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Attempt - Not Available")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Customer facility challenges")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Attempt - Change Location")) {//Customer - Change Location
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Incomplete Information - address")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Claims - Damage")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Unsealed")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Not received")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Claims - Lost")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Customer - No response")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Delivered")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Incomplete Information - address")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Cash")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Incomplete Information - DCode")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("No Attempt - Charges Approval")) {//Charges Approval
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("No attempt -  Weekend Off")) {// Weekend Off
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Attempt - Wrong Destination")) {//Wrong Destination
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Weather")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Legal Holiday- National Day")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Access restricted")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("ODA - Schedule")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("On Hold - Credit Control")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("On Hold - Customer Collection")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Missing Content")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Wrong Content")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Damage Content")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery - Open Request")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Refused Delivery-Customer dont need the shipment")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Return to Origin")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.contains("Trucknban")) {//No Attempt - Late Trip Trucknban
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.contains("Late Trip")) {//No Attempt - Late Trip Trucknban
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Attached Document Incomplete")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Mall Timing Restricted")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("UCS")) {//
+                        if (RoleMEID == 28 || RoleMEID == 30 || RoleMEID == 31) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Conginee Location Sealed by The Baladia")) {//
+                        if (RoleMEID == 29 || RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Que Delivery")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Forward-Pharma")) {//
+                        toAdd = true;
+                    } else if (Name.equals("Customer Request")) {//
+                        if (RoleMEID == 27 || RoleMEID == 28 || RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    } else if (Name.equals("Redirection request")) {//
+                        if (RoleMEID == 30) {
+                            toAdd = true;
+                        }
+                    }
+                    else {
                         toAdd = true;
                     }
-                }else if(Name.contains("Redirection request")){
-                    if(RoleMEID == 30){
-                        toAdd = true;
-                    }
-                }else{
-                    toAdd = true;
                 }
 
-                if(toAdd){
+                if (toAdd) {
                     DeliveryStatusList.add(ID);
                     DeliveryStatusNameList.add(Name);
                     DeliveryStatusFNameList.add(FName);
                 }
             }
             while (result.moveToNext());
+
+            Log.d("LIST: ",DeliveryStatusNameList.toString());
         }
         dbConnections.close();
 
@@ -414,10 +422,12 @@ public class NotDeliveredFirstFragment extends Fragment {
     private void SetText() {
         String WaybillNo = txtWaybillNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(WaybillNo);
-        txtWaybillNo.setText(nbarcode);
+        String newBarcode = utilities.findwaybillno(WaybillNo);
+        if (newBarcode.length() < 9)
+            txtWaybillNo.setText(newBarcode);
 
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == GlobalVar.GV().CAMERA_PERMISSION_REQUEST && resultCode == RESULT_OK) {
@@ -434,7 +444,6 @@ public class NotDeliveredFirstFragment extends Fragment {
             }
         }
     }
-
 
 
     @Override

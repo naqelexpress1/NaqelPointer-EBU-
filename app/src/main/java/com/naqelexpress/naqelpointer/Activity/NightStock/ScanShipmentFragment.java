@@ -154,9 +154,10 @@ public class ScanShipmentFragment extends Fragment {
 
         String barcode = txtWaybillNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtWaybillNo.setText(nbarcode);
-        AddNewWaybill8and9(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWaybillNo.setText(newBarcode);
+        AddNewWaybill8and9(newBarcode);
 
 //        // txtWaybilll.removeTextChangedListener(textWatcher);
 //        if (barcode.length() >= 8 && GlobalVar.WaybillNoStartSeries.contains(barcode.substring(0, 1))) {

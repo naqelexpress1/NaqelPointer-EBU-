@@ -1008,7 +1008,7 @@ public class LoginActivity
                     instance = new UserME();
                     instance.ID = getUserMEDataResult.ID;
                     instance.EmployID = getUserMEDataResult.EmployID;
-
+                    SharedHelper.putKeyInteger(getApplicationContext(), "EmployID", getUserMEDataResult.EmployID);
                     instance.Password = txtPassword.getText().toString();//getUserMEDataResult.Password;
                     instance.RoleMEID = getUserMEDataResult.RoleMEID;
                     SharedHelper.putKeyInteger(getApplicationContext(), "RoleMEID", getUserMEDataResult.RoleMEID);

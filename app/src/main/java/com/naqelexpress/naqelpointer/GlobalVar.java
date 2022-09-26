@@ -224,6 +224,7 @@ public class GlobalVar {
     public static int BarcodeLength = 17; // if EBU Max length 14 , CBU 17 becuase of SPL
     public static boolean ManualType = false;
     public static String WaybillNoStartSeries = "871";//871 //812345679
+    public static String EWaybilSeries = "2";//871 //812345679
 
     private String WebServiceVersion = "2.0";
     public int AppID = 6;

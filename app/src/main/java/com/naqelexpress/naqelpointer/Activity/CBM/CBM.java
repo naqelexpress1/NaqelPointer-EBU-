@@ -39,8 +39,9 @@ public class CBM extends AppCompatActivity implements AlertCallback {
 
         String barcode = txtWNo.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtWNo.setText(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtWNo.setText(newBarcode);
 
     }
 

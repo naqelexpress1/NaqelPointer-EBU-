@@ -172,9 +172,10 @@ public class Waybill extends Fragment {
     private void setTxtWaybillNo() {
         String barcode = txtBarCode.getText().toString();
         utilities utilities = new utilities();
-        String nbarcode = utilities.findwaybillno(barcode);
-        txtBarCode.setText(nbarcode);
-        ValidateWayBill(nbarcode);
+        String newBarcode = utilities.findwaybillno(barcode);
+        if (newBarcode.length() < 9)
+            txtBarCode.setText(newBarcode);
+        ValidateWayBill(newBarcode);
 
     }
 

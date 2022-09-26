@@ -66,6 +66,7 @@ public class SecondFragment extends Fragment {
             lbTotal = (TextView) rootView.findViewById(R.id.lbTotal);
             txtBarCode = (EditText) rootView.findViewById(R.id.txtWaybilll);
 
+            //
             txtBarCode.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -77,7 +78,6 @@ public class SecondFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-
                     if (txtBarCode.getText().length()  >= 13) {//every making 13 bcz it was reading mentioned number count in some devices
                         String subS = txtBarCode.getText().toString().substring(0,1);
                         boolean check = GlobalVar.EWaybilSeries.contains(subS);//for e waybills check will be true
@@ -87,44 +87,12 @@ public class SecondFragment extends Fragment {
                             setBarcode();
                         }
                     }
-
                 }
             });
 
-//            txtBarCode.setOnKeyListener(new View.OnKeyListener() {
-//                public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                    // If the event is a key-down event on the "enter" button
-//                    if (event.getAction() != KeyEvent.ACTION_DOWN)
-//                        return true;
-//                    else if (keyCode == KeyEvent.KEYCODE_BACK) {
-//                        //finish();
-//                        GlobalVar.onBackpressed(getActivity(), "Exit", "Are you sure want to Exit?");
-//                        return true;
-//                    } else if (keyCode == KeyEvent.KEYCODE_ENTER) {
-//
-//                        setBarcode();
-//                        return true;
-//                    }
-//                    return false;
-//                }
-//            });
 
             Button btnOpenCamera = (Button) rootView.findViewById(R.id.btnOpenCamera);
-            //cmrabtn.setVisibility(View.GONE);
-            /*
-           intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
-            cmrabtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        GlobalVar.GV().ShowSnackbar(rootView, getString(R.string.NeedCameraPermission), GlobalVar.AlertType.Error);
-                        GlobalVar.GV().askPermission(getActivity(), GlobalVar.PermissionType.Camera);
-                    } else
-                        startActivityForResult(intent, GlobalVar.GV().CAMERA_PERMISSION_REQUEST);
 
-                }
-            });
-*/
             intent = new Intent(getContext().getApplicationContext(), NewBarCodeScanner.class);
             btnOpenCamera.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -151,7 +119,7 @@ public class SecondFragment extends Fragment {
 //                public void onTextChanged(CharSequence s, int start, int before, int count) {
 //                }
 //
-//                @Override
+//                @Override/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/**/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/*/
 //                public void afterTextChanged(Editable s) {
 //                    //if (txtBarCode != null && txtBarCode.getText().length() == 13)
 //                    //    ValidateWayBill(txtBarCode.getText().toString());
@@ -191,21 +159,8 @@ public class SecondFragment extends Fragment {
                     if (extras.containsKey("barcode")) {
                         String barcode = extras.getString("barcode");
                         txtBarCode.setText(barcode);
-//                        AddNewPiece();
                     }
                 }
-//                final Barcode barcode = data.getParcelableExtra("barcode");
-//                txtBarCode.post(new Runnable()
-//                {
-//                    @Override
-//                    public void run()
-//                    {
-//                        txtBarCode.setText(barcode.displayValue);
-//
-//                        if (txtBarCode.getText().toString().length() > 6)
-//                            AddNewPiece();
-//                    }
-//                });
             }
         }
     }
@@ -222,10 +177,6 @@ public class SecondFragment extends Fragment {
             //txtBarCode.setText(barcode.substring(0, 8));
             ValidateWayBill(txtBarCode.getText().toString());
         }
-
-        //ValidateWayBill(txtBarCode.getText().toString().substring(0, 8));
-
-
     }
 
 
@@ -239,7 +190,6 @@ public class SecondFragment extends Fragment {
 
                         if (FirstFragment.Selectedwaybilldetails.get(j).get("WaybillNo").
                                 equals(CourierDetails.waybillBardetails.get(i).get("WaybillNo"))) {
-
 
                             int preqty = Integer.parseInt(FirstFragment.Selectedwaybilldetails.get(j).get("ScannedPC")) + 1;
                             FirstFragment.Selectedwaybilldetails.get(j).put("ScannedPC", String.valueOf(preqty));
